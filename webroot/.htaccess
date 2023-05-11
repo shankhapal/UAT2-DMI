@@ -1,0 +1,29 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteRule ^ index.php [L]
+	
+	RewriteCond %{SERVER_PORT} 80
+	RewriteRule ^(.*)$ https://164.100.115.134/$1 [R,L]
+
+</IfModule>
+
+
+<IfModule mod_headers.c>
+     RewriteEngine On
+	 
+	 Header edit Set-Cookie (.*) "$1;HTTPOnly;Secure;SameSite=None"
+	 
+     Header set Test-Output-Request_URI "%{Request_URI}e"
+    <If "%{THE_REQUEST} =~ m#/report/*#">
+        Header set Content-Security-Policy: "default-src 'self'; style-src 'self' 'unsafe-inline' 'unsafe-eval';"
+    </If>
+    <If "%{THE_REQUEST} =~ m#/ckeditor/*#">
+        Header set Content-Security-Policy: "default-src 'self'; style-src 'self' 'unsafe-inline' 'unsafe-eval';"
+    </If>
+    <If "%{THE_REQUEST} =~ m#/cms/*#">
+        Header set Content-Security-Policy: "default-src 'self'; style-src 'self' 'unsafe-inline' ;"
+    </If>
+    <Else>   
+    </Else>
+</IfModule>
