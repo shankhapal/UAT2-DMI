@@ -1,6 +1,6 @@
 <?php echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-data', 'id'=>$section)); ?>
 
-<section class="content form-middle form_outer_class" id="form_outer_main">
+<section class="content form-middle form_outer_class" id="form_outer_main"> 
 	<div class="container-fluid">
 	  	<h5 class="mt-1 mb-2">Change Details</h5>
 	    
