@@ -254,10 +254,12 @@
                     </div>
                 </div>
             </div>
-        </div>
+        
+            </div>
+         </div>
     </div>
-</div>
-
+</div>  
+<!-- 9. Is the premises adequately lighted, ventilated & hygienic -->
 <div class="card-header sub-card-header-firm"><h3 class="card-title">Is the premises adequately lighted, ventilated & hygienic</h3></div>
     <div class="form-horizontal">
          <div class="card-body">
@@ -411,26 +413,26 @@
     <div class="form-horizontal">
         <div class="card-body">
             <div class="row">
-                <div class="col-sm-4">
+                <div class="col-sm-6">
                     <div class="form-group row">
-                        <label for="inputLastlotno" class="col-sm-4 col-form-label">Last lot No.<span class="cRed">*</span></label>
+                        <label for="inputLastlotno" class="col-sm-5 col-form-label">Last lot No.<span class="cRed">*</span></label>
                         <div class="col-sm-7">
                             <?php echo $this->Form->control('last_lot_no', array('type'=>'text', 'id'=>'last_lot_no', 'class'=>'form-control input-field', 'value '=>$section_form_details[0]['last_lot_no'],'placeholder'=>'Last lot No.', 'label'=>false)); ?>
                             <span id="error_last_lot_no" class="error invalid-feedback error_last_lot_no"></span>
                         </div>
                     </div>
                 </div>
-                 <div class="col-sm-4">
+                 <div class="col-sm-6">
                     <div class="form-group row">
                         <label for="inputLastlotno" class="col-sm-2 col-form-label">Date<span class="cRed">*</span></label>
-                        <div class="col-sm-7">
-                           <?php echo $this->Form->control('last_lot_date', array('type'=>'text', 'id'=>'date_last_inspection', 'value'=>$section_form_details[0]['date_last_inspection'], 'class'=>'form-control input-field', 'placeholder'=>'Enter DD/MM/YYYY', 'label'=>false)); ?>
-                            <span id="error_date_last_inspection" class="error invalid-feedback"></span>
+                        <div class="col-sm-10">
+                           <?php echo $this->Form->control('last_lot_date', array('type'=>'text', 'id'=>'last_lot_date', 'value'=>$section_form_details[0]['date_last_inspection'], 'class'=>'form-control input-field', 'placeholder'=>'Enter DD/MM/YYYY', 'label'=>false)); ?>
+                            <span id="error_last_lot_date" class="error invalid-feedback"></span>
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-4">
-                <div class="form-group row">
+                <div class="col-sm-6">
+                    <div class="form-group row">
                         <label for="inputEmail3" class="col-sm-5 col-form-label">Analytical Results<span class="cRed"> * </span></label>
                         <div class="col-sm-7">
                             <?php echo $this->Form->control('quantity_graded', array('type'=>'textarea', 'id'=>'quantity_graded', 'class'=>'form-control input-field', 'placeholder'=>'Type here..','value '=>$section_form_details[0]['quantity_graded'], 'label'=>false)); ?>
@@ -438,6 +440,23 @@
                         </div>
                     </div>
                 </div>
+               <div class="col-sm-6">
+                <div class="form-group row">
+                   <label for="inputEmail3" class="col-sm-2 col-form-label">Attach file<span class="cRed"> * </span></label>
+                   
+
+                    <?php if(!empty($section_form_details[0]['analytical_result_docs'])){?>
+                        <a id="analytical_result_value" target="blank" href="<?php  echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['analytical_result_docs']); ?>">Preview</a>
+                    <?php } ?>
+                  
+                    <div class="custom-file col-sm-10">
+                        <input type="file" name="analytical_result_docs" class="form-control" id="analytical_result_docs" multiple='multiple'>
+                        <span id="error_analytical_result_docs" class="error invalid-feedback"></span>
+                        <span id="error_type_analytical_result_docs" class="error invalid-feedback"></span>
+                        <span id="error_size_analytical_result_docs" class="error invalid-feedback"></span>
+                    </div>
+                </div>
+                 <p class="lab_form_note float-right mt-3"><i class="fa fa-info-circle"></i> File type: PDF, jpg &amp; max size upto 2 MB</p>
             </div>
     </div>
 </div>
@@ -451,8 +470,8 @@
                     <div class="form-group row">
                         <label for="inputEmail3" class="col-sm-5 col-form-label">Quantity Graded During Current Month Upto<span class="cRed">*</span></label>
                     <div class="col-sm-7">
-                         <?php echo $this->Form->control('last_lot_date', array('type'=>'text', 'id'=>'date_last_inspection', 'value'=>$section_form_details[0]['date_last_inspection'], 'class'=>'form-control input-field', 'placeholder'=>'Enter DD/MM/YYYY', 'label'=>false)); ?>
-                        <span id="error_date_last_inspection" class="error invalid-feedback"></span>
+                         <?php echo $this->Form->control('month_upto', array('type'=>'text', 'id'=>'month_upto', 'value'=>$section_form_details[0]['date_last_inspection'], 'class'=>'form-control input-field', 'placeholder'=>'Enter DD/MM/YYYY', 'label'=>false)); ?>
+                        <span id="error_month_upto" class="error invalid-feedback"></span>
                     </div>
                 </div>
             </div>
@@ -578,7 +597,7 @@
                                     <label for="e_briefly_suggestions_radio-no">No
                                     </label>
                                 </div>
-                                <div class="col-sm-9" id="hide_enumerate_briefly_suggestions">
+                                <div class="col-sm-9 hidden" id="briefly_suggestions">
                                     <?php echo $this->Form->control('enumerate_briefly_suggestions', array('type'=>'textarea', 'id'=>'enumerate_briefly_suggestions', 'escape'=>false, 'value'=>$section_form_details[0]['enumerate_briefly_suggestions'], 'class'=>'form-control input-field', 'label'=>false, 'placeholder'=>'Enter discrepancies here...')); ?>
                                     <span id="error_enumerate_briefly_suggestions" class="error invalid-feedback"></span>
                                 </div>    
@@ -599,8 +618,8 @@
                     <div class="form-group row">
                         <label for="inputEmail3" class="col-sm-5 col-form-label">Shortcomings noticed in present inspection:<span class="cRed"> * </span></label>
                     <div class="col-sm-7">
-                        <?php echo $this->Form->control('email', array('type'=>'email', 'id'=>'email', 'class'=>'form-control', 'label'=>false,'value'=>base64_decode($firm_details['email']))); ?>
-                        <span id="error_email" class="error invalid-feedback"></span>
+                        <?php echo $this->Form->control('sort_notice', array('type'=>'text', 'id'=>'sort_notice', 'class'=>'form-control', 'label'=>false,'value'=>'')); ?>
+                        <span id="error_sort_notice" class="error invalid-feedback"></span>
                     </div>
                     
                 </div>
@@ -636,7 +655,7 @@
                     <div class="form-group row">
                         <label for="inputEmail3" class="col-sm-5 col-form-label">Suggestions<span class="cRed">*</span></label>
                     <div class="col-sm-7">
-                         <?php echo $this->Form->control('last_lot_date', array('type'=>'textarea', 'id'=>'date_last_inspection', 'value'=>$section_form_details[0]['date_last_inspection'], 'class'=>'form-control input-field', 'placeholder'=>'Enter DD/MM/YYYY', 'label'=>false)); ?>
+                         <?php echo $this->Form->control('suggestions', array('type'=>'textarea', 'id'=>'suggestions', 'value'=>$section_form_details[0]['date_last_inspection'], 'class'=>'form-control input-field', 'placeholder'=>'Enter Suggestions', 'label'=>false)); ?>
                         <span id="error_date_last_inspection" class="error invalid-feedback"></span>
                     </div>
                 </div>
@@ -653,8 +672,8 @@
                     <div class="form-group row">
                         <label for="inputEmail3" class="col-sm-5 col-form-label">Signnature and Name of the Packer or his representative<span class="cRed"> * </span></label>
                     <div class="col-sm-7">
-                        <?php echo $this->Form->control('email', array('type'=>'email', 'id'=>'email', 'class'=>'form-control', 'label'=>false,'value'=>base64_decode($firm_details['email']))); ?>
-                        <span id="error_email" class="error invalid-feedback"></span>
+                        <?php echo $this->Form->control('name_packer_representative', array('type'=>'text', 'id'=>'name_packer_representative','placeholder'=>'Enter Name of the Packer or his representative', 'class'=>'form-control', 'label'=>false,'value'=>'')); ?>
+                        <span id="error_name_packer_representative" class="error invalid-feedback"></span>
                     </div>
                     
                 </div>
@@ -688,15 +707,15 @@
                     <div class="form-group row">
                         <label for="inputEmail3" class="col-sm-5 col-form-label">Signnature and Name of the Inspecting Officer<span class="cRed"> * </span></label>
                     <div class="col-sm-7">
-                        <?php echo $this->Form->control('email', array('type'=>'email', 'id'=>'email', 'class'=>'form-control', 'label'=>false,'value'=>base64_decode($firm_details['email']))); ?>
-                        <span id="error_email" class="error invalid-feedback"></span>
+                        <?php echo $this->Form->control('name_of_inspecting_officer', array('type'=>'text', 'id'=>'name_of_inspecting_officer', 'class'=>'form-control', 'label'=>false,'value'=>'')); ?>
+                        <span id="error_name_of_inspecting_officer" class="error invalid-feedback"></span>
                     </div>
                     
                 </div>
                 <div class="form-group row">
                     <label for="inputEmail3" class="col-sm-5 col-form-label">Designation:<span class="cRed"> * </span></label>
                     <div class="col-sm-7">
-                        <?php echo $this->Form->control('designation_inspecting_officer', array('type'=>'text', 'id'=>'designation_inspecting_officer', 'class'=>'form-control input-field','value '=>$section_form_details[0]['designation_inspecting_officer'], 'placeholder'=>'Please Enter Designation', 'label'=>false)); ?>
+                        <?php echo $this->Form->control('designation_inspecting_officer', array('type'=>'text', 'id'=>'designation_inspecting_officer', 'class'=>'form-control','value '=>$section_form_details[0]['designation_inspecting_officer'], 'placeholder'=>'Please Enter Designation', 'label'=>false)); ?>
                         <span id="error_designation_inspecting_officer" class="error invalid-feedback"></span>
                     </div>
                 </div>
@@ -726,5 +745,7 @@
 <input type="hidden" id="final_submit_status_id" value="<?php echo $final_submit_status; ?>">
 <input type="hidden" id="application_mode" value="<?php echo $_SESSION['application_mode']; ?>">
 <input type="hidden" id="application_type_id" value="<?php echo $_SESSION['application_type']; ?>">
-<?php echo $this->Html->script('routininspection/routin_inspection');?>
+<?php 
+echo $this->Html->css('RoutineInspection/routine_inspection_style');
+echo $this->Html->script('routininspection/routin_inspection');?>
 

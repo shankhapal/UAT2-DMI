@@ -179,6 +179,13 @@ $(document).ready(function () {
       }
     });
   }
+  $('input[name="e_briefly_suggestions_radio"]').on("click", function () {
+    if ($(this).val() === "yes") {
+      $("#briefly_suggestions").show();
+    } else {
+      $("#briefly_suggestions").val("").hide();
+    }
+  });
 });
 
 function sample_table_validation(e) {
@@ -318,6 +325,9 @@ function routineInspectionFormValidation() {
     var date_p_inspection = $("#date_p_inspection").val();
     var name_of_packer = $("#name_of_packer").val();
     var name_inspecting_officer = $("#name_inspecting_officer").val();
+    var name_packer_representative = $("#name_packer_representative").val();
+    var name_of_inspecting_officer = $("#name_of_inspecting_officer").val();
+    var analytical_result_docs = $("#analytical_result_docs").val();
     var Designation_inspecting_officer = $(
       "#designation_inspecting_officer"
     ).val();
@@ -374,6 +384,55 @@ function routineInspectionFormValidation() {
       value_return = "false";
     }
 
+    if (name_packer_representative == "") {
+      $("#error_name_packer_representative")
+        .show()
+        .text("Please Enter Name of Packer or his Representative");
+      setTimeout(function () {
+        $("#error_name_packer_representative").fadeOut();
+      }, 8000);
+      $("#name_packer_representative").addClass("is-invalid");
+      $("#name_packer_representative").click(function () {
+        $("#error_name_packer_representative").hide().text;
+        $("#name_packer_representative").removeClass("is-invalid");
+      });
+      value_return = "false";
+    }
+
+    if (name_of_inspecting_officer == "") {
+      $("#error_name_of_inspecting_officer")
+        .show()
+        .text("Please Enter Name of Inspecting Officer");
+      setTimeout(function () {
+        $("#error_name_of_inspecting_officer").fadeOut();
+      }, 8000);
+      $("#name_of_inspecting_officer").addClass("is-invalid");
+      $("#name_of_inspecting_officer").click(function () {
+        $("#error_name_of_inspecting_officer").hide().text;
+        $("#name_of_inspecting_officer").removeClass("is-invalid");
+      });
+      value_return = "false";
+    }
+
+    // Change Condition for validation and error message by shankhpal 11-05-2023
+    if ($("#analytical_result_value").text() == "") {
+      if (
+        check_file_upload_validation(analytical_result_docs).result == false
+      ) {
+        $("#error_analytical_result_docs")
+          .show()
+          .text(
+            check_file_upload_validation(analytical_result_docs).error_message
+          );
+        $("#analytical_result_docs").addClass("is-invalid");
+        $("#analytical_result_docs").click(function () {
+          $("#error_analytical_result_docs").hide().text;
+          $("#analytical_result_docs").removeClass("is-invalid");
+        });
+        value_return = "false";
+      }
+    }
+
     if (name_inspecting_officer == "") {
       $("#error_name_inspecting_officer")
         .show()
@@ -392,7 +451,7 @@ function routineInspectionFormValidation() {
     if (Designation_inspecting_officer == "") {
       $("#error_designation_inspecting_officer")
         .show()
-        .text("Please Enter Designation o Inspecting Officer");
+        .text("Please Enter Designation of Inspecting Officer");
       setTimeout(function () {
         $("#error_designation_inspecting_officer").fadeOut();
       }, 8000);
@@ -510,20 +569,20 @@ function routineInspectionFormValidation() {
         value_return = "false";
       }
     }
-    if ($("#sample_table tr td:first").text() == "") {
-      $("#error_sample")
-        .show()
-        .text("Sorry. There should be minimum 1 check samples details added.");
-      setTimeout(function () {
-        $("#error_person").fadeOut();
-      }, 8000);
-      $("#person_details_table").addClass("is-invalid");
-      $("#person_details_table").click(function () {
-        $("#error_person").hide().text;
-        $("#person_details_table").removeClass("is-invalid");
-      });
-      value_return = "false";
-    }
+    // if ($("#sample_table tr td:first").text() == "") {
+    //   $("#error_sample")
+    //     .show()
+    //     .text("Sorry. There should be minimum 1 check samples details added.");
+    //   setTimeout(function () {
+    //     $("#error_person").fadeOut();
+    //   }, 8000);
+    //   $("#person_details_table").addClass("is-invalid");
+    //   $("#person_details_table").click(function () {
+    //     $("#error_person").hide().text;
+    //     $("#person_details_table").removeClass("is-invalid");
+    //   });
+    //   value_return = "false";
+    // }
     if (doinspection == "") {
       $("#error_doi").show().text("Please Select Date");
       setTimeout(function () {
@@ -1176,12 +1235,6 @@ function routineInspectionFormValidation() {
   }
 }
 
-$(function () {
-  $("#datetimepicker1").datetimepicker({
-    format: "DD/MM/YYYY HH:mm",
-  });
-});
-
 function check_file_upload_validation(field_value) {
   var error_message = "Please upload the required file";
 
@@ -1191,10 +1244,23 @@ function check_file_upload_validation(field_value) {
 
   return true;
 }
+
 $(document).ready(function () {
   $("#date_p_inspection").datepicker({
     format: "dd/mm/yyyy",
     autoclose: true,
+  });
+  $("#last_lot_date").datepicker({
+    format: "dd/mm/yyyy",
+    autoclose: true,
+  });
+  $("#month_upto").datepicker({
+    format: "dd/mm/yyyy",
+    autoclose: true,
+  });
+
+  $("#time_p_inspection").datetimepicker({
+    format: "hh:mm:ss a",
   });
 
   $("#date").datepicker({
@@ -1329,3 +1395,7 @@ $("#replica_appl_list_table").on("change", ".packer_id", function () {
     },
   });
 });
+
+// briefly_suggestions;
+// e_briefly_suggestions_radio;
+// $("#e_briefly_suggestions_radio");
