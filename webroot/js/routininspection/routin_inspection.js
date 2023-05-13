@@ -332,6 +332,7 @@ function routineInspectionFormValidation() {
     var signnature_of_inspecting_officer_docs = $(
       "#signnature_of_inspecting_officer_docs"
     ).val();
+    var last_lot_date = $("#last_lot_date").val();
 
     var analytical_results = $("#analytical_results").val();
     var designation_inspecting_officer = $(
@@ -340,14 +341,6 @@ function routineInspectionFormValidation() {
 
     var month_upto = $("#month_upto").val();
     var shortcomings_noticed = $("#shortcomings_noticed").val();
-
-    // var Designation_inspecting_officer = $(
-    //   "#designation_inspecting_officer"
-    // ).val();
-    // var up_to_date_docs = $("#up_to_date_docs").val();
-
-    // var fssai_approved_docs = $("#fssai_approved_docs").val();
-
     var value_return = "true";
 
     if ($("#fssai_approved-yes").is(":checked")) {
@@ -563,21 +556,6 @@ function routineInspectionFormValidation() {
       value_return = "false";
     }
 
-    // if (Designation_inspecting_officer == "") {
-    //   $("#error_designation_inspecting_officer")
-    //     .show()
-    //     .text("Please Enter Designation of Inspecting Officer");
-    //   setTimeout(function () {
-    //     $("#error_designation_inspecting_officer").fadeOut();
-    //   }, 8000);
-    //   $("#error_designation_inspecting_officer").addClass("is-invalid");
-    //   $("#error_designation_inspecting_officer").click(function () {
-    //     $("#error_designation_inspecting_officer").hide().text;
-    //     $("#error_designation_inspecting_officer").removeClass("is-invalid");
-    //   });
-    //   value_return = "false";
-    // }
-
     if (street_address == "") {
       $("#error_street_address").show().text("Please Enter street address");
       setTimeout(function () {
@@ -614,6 +592,19 @@ function routineInspectionFormValidation() {
       });
       value_return = "false";
     }
+    if (last_lot_date == "") {
+      $("#error_last_lot_date").show().text("Please Select date");
+      setTimeout(function () {
+        $("#error_last_lot_date").fadeOut();
+      }, 8000);
+      $("#last_lot_date").addClass("is-invalid");
+      $("#last_lot_date").click(function () {
+        $("#error_last_lot_date").hide().text;
+        $("#last_lot_date").removeClass("is-invalid");
+      });
+      value_return = "false";
+    }
+
     if (quantity_graded == "") {
       $("#error_quantity_graded").show().text("Please Enter Quantity graded");
       setTimeout(function () {
@@ -684,20 +675,7 @@ function routineInspectionFormValidation() {
         value_return = "false";
       }
     }
-    // if ($("#sample_table tr td:first").text() == "") {
-    //   $("#error_sample")
-    //     .show()
-    //     .text("Sorry. There should be minimum 1 check samples details added.");
-    //   setTimeout(function () {
-    //     $("#error_person").fadeOut();
-    //   }, 8000);
-    //   $("#person_details_table").addClass("is-invalid");
-    //   $("#person_details_table").click(function () {
-    //     $("#error_person").hide().text;
-    //     $("#person_details_table").removeClass("is-invalid");
-    //   });
-    //   value_return = "false";
-    // }
+
     if (doinspection == "") {
       $("#error_doi").show().text("Please Select Date");
       setTimeout(function () {
@@ -1510,7 +1488,3 @@ $("#replica_appl_list_table").on("change", ".packer_id", function () {
     },
   });
 });
-
-// briefly_suggestions;
-// e_briefly_suggestions_radio;
-// $("#e_briefly_suggestions_radio");

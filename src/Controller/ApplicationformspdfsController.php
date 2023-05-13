@@ -3308,7 +3308,7 @@ class ApplicationformspdfsController extends AppController{
 	public function caRiReportPdf(){
 
 	
-		$this->loadModel('DmiRoutineInspectionCaReports');	
+		$this->loadModel('DmiRtiCaPackerDetails');	
 		$this->loadModel('DmiFirms');	
 		$this->loadModel('DmiGrantCertificatesPdfs');
 		$this->loadModel('MCommodity');
@@ -3322,7 +3322,7 @@ class ApplicationformspdfsController extends AppController{
 		$customer_id = $this->Session->read('customer_id');
 		$this->set('customer_id',$customer_id);
 
-		$rti_ca_data = $this->DmiRoutineInspectionCaReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+		$rti_ca_data = $this->DmiRtiCaPackerDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
 		$this->set('rti_ca_data',$rti_ca_data);
 
 		// data from DMI firm Table

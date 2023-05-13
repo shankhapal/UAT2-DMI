@@ -79,7 +79,7 @@ class DmiRtiCaPackerDetailsTable extends Table{
 			//get printing list
 		$lab_list = [];	
 		if(!empty($attached_lab)){
-			$lab_list = $DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/3/'.'%','delete_status IS NULL','id IN'=>$attached_lab),'order'=>'firm_name asc'))->toArray();
+			$lab_list = $DmiFirms->find('all',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/3/'.'%','delete_status IS NULL','id IN'=>$attached_lab),'order'=>'firm_name asc'))->toArray();
 		}
 		
 		$attached_pp = $DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'pp_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id asc'))->toList();    
@@ -93,16 +93,13 @@ class DmiRtiCaPackerDetailsTable extends Table{
 
 		$self_registered_chemist = $DmiChemistRegistrations->find('all',array('conditions'=>array('created_by IS'=>$customer_id)))->toArray();
    
-
-		//$self_registered_chemist = $DmiChemistRegistrations->find('all',array('conditions'=>array('created_by IS' => $customer_id)))->toArray();
-// pr($self_registered_chemist);die;
 			return array($form_fields_details,$added_sample_details,$certificate_valid_upto,$sub_commodity_value,$lab_list,$printers_list,$self_registered_chemist);			
 	}
 	
 	
 	public function saveFormDetails($customer_id,$forms_data){
 
-		//pr($forms_data);die;
+		// pr($forms_data);die;
   
 		$CustomersController = new CustomersController;			
 		
