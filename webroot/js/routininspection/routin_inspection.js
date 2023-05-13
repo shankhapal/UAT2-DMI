@@ -328,12 +328,25 @@ function routineInspectionFormValidation() {
     var name_packer_representative = $("#name_packer_representative").val();
     var name_of_inspecting_officer = $("#name_of_inspecting_officer").val();
     var analytical_result_docs = $("#analytical_result_docs").val();
-    var Designation_inspecting_officer = $(
+    var signnature_of_packer_docs = $("#signnature_of_packer_docs").val();
+    var signnature_of_inspecting_officer_docs = $(
+      "#signnature_of_inspecting_officer_docs"
+    ).val();
+
+    var analytical_results = $("#analytical_results").val();
+    var designation_inspecting_officer = $(
       "#designation_inspecting_officer"
     ).val();
-    var up_to_date_docs = $("#up_to_date_docs").val();
 
-    var fssai_approved_docs = $("#fssai_approved_docs").val();
+    var month_upto = $("#month_upto").val();
+    var shortcomings_noticed = $("#shortcomings_noticed").val();
+
+    // var Designation_inspecting_officer = $(
+    //   "#designation_inspecting_officer"
+    // ).val();
+    // var up_to_date_docs = $("#up_to_date_docs").val();
+
+    // var fssai_approved_docs = $("#fssai_approved_docs").val();
 
     var value_return = "true";
 
@@ -382,6 +395,69 @@ function routineInspectionFormValidation() {
         $("#name_of_packer").removeClass("is-invalid");
       });
       value_return = "false";
+    }
+
+    if (analytical_results == "") {
+      $("#error_analytical_results")
+        .show()
+        .text("Please Enter analytical results");
+      setTimeout(function () {
+        $("#error_analytical_results").fadeOut();
+      }, 8000);
+      $("#analytical_results").addClass("is-invalid");
+      $("#analytical_results").click(function () {
+        $("#error_analytical_results").hide().text;
+        $("#analytical_results").removeClass("is-invalid");
+      });
+      value_return = "false";
+    }
+
+    if (month_upto == "") {
+      $("#error_month_upto")
+        .show()
+        .text("Select Quantity Graded During Current Month Upto");
+      setTimeout(function () {
+        $("#error_month_upto").fadeOut();
+      }, 8000);
+      $("#month_upto").addClass("is-invalid");
+      $("#month_upto").click(function () {
+        $("#error_month_upto").hide().text;
+        $("#month_upto").removeClass("is-invalid");
+      });
+      value_return = "false";
+    }
+
+    if (designation_inspecting_officer == "") {
+      $("#error_designation_inspecting_officer")
+        .show()
+        .text("Please Enter Designation");
+      setTimeout(function () {
+        $("#error_designation_inspecting_officer").fadeOut();
+      }, 8000);
+      $("#designation_inspecting_officer").addClass("is-invalid");
+      $("#designation_inspecting_officer").click(function () {
+        $("#error_designation_inspecting_officer").hide().text;
+        $("#designation_inspecting_officer").removeClass("is-invalid");
+      });
+      value_return = "false";
+    }
+
+    if (shortcomings_noticed == "") {
+      // Check if shortcomings_noticed is an empty string
+      $("#error_shortcomings_noticed") // Select the error message element
+        .show() // Show the error message
+        .text("Shortcomings noticed cannot be empty!"); // Set the error message text
+      setTimeout(function () {
+        // Set a timeout to hide the error message after 8 seconds
+        $("#error_shortcomings_noticed").fadeOut();
+      }, 8000);
+      $("#shortcomings_noticed").addClass("is-invalid"); // Add the is-invalid class to the input field
+      $("#shortcomings_noticed").click(function () {
+        // Set a click event listener on the input field
+        $("#error_shortcomings_noticed").hide().text; // Hide the error message and clear its text
+        $("#shortcomings_noticed").removeClass("is-invalid"); // Remove the is-invalid class from the input field
+      });
+      value_return = "false"; // Set the value_return variable to false
     }
 
     if (name_packer_representative == "") {
@@ -433,6 +509,45 @@ function routineInspectionFormValidation() {
       }
     }
 
+    if ($("#signnature_of_inspecting_officer_docs_value").text() == "") {
+      if (
+        check_file_upload_validation(signnature_of_inspecting_officer_docs)
+          .result == false
+      ) {
+        $("#error_signnature_of_inspecting_officer_docs")
+          .show()
+          .text(
+            check_file_upload_validation(signnature_of_inspecting_officer_docs)
+              .error_message
+          );
+        $("#signnature_of_inspecting_officer_docs").addClass("is-invalid");
+        $("#signnature_of_inspecting_officer_docs").click(function () {
+          $("#error_signnature_of_inspecting_officer_docs").hide().text;
+          $("#signnature_of_inspecting_officer_docs").removeClass("is-invalid");
+        });
+        value_return = "false";
+      }
+    }
+
+    if ($("#signnature_of_packer_docs_value").text() == "") {
+      if (
+        check_file_upload_validation(signnature_of_packer_docs).result == false
+      ) {
+        $("#error_signnature_of_packer_docs")
+          .show()
+          .text(
+            check_file_upload_validation(signnature_of_packer_docs)
+              .error_message
+          );
+        $("#signnature_of_packer_docs").addClass("is-invalid");
+        $("#signnature_of_packer_docs").click(function () {
+          $("#error_signnature_of_packer_docs").hide().text;
+          $("#signnature_of_packer_docs").removeClass("is-invalid");
+        });
+        value_return = "false";
+      }
+    }
+
     if (name_inspecting_officer == "") {
       $("#error_name_inspecting_officer")
         .show()
@@ -448,20 +563,20 @@ function routineInspectionFormValidation() {
       value_return = "false";
     }
 
-    if (Designation_inspecting_officer == "") {
-      $("#error_designation_inspecting_officer")
-        .show()
-        .text("Please Enter Designation of Inspecting Officer");
-      setTimeout(function () {
-        $("#error_designation_inspecting_officer").fadeOut();
-      }, 8000);
-      $("#error_designation_inspecting_officer").addClass("is-invalid");
-      $("#error_designation_inspecting_officer").click(function () {
-        $("#error_designation_inspecting_officer").hide().text;
-        $("#error_designation_inspecting_officer").removeClass("is-invalid");
-      });
-      value_return = "false";
-    }
+    // if (Designation_inspecting_officer == "") {
+    //   $("#error_designation_inspecting_officer")
+    //     .show()
+    //     .text("Please Enter Designation of Inspecting Officer");
+    //   setTimeout(function () {
+    //     $("#error_designation_inspecting_officer").fadeOut();
+    //   }, 8000);
+    //   $("#error_designation_inspecting_officer").addClass("is-invalid");
+    //   $("#error_designation_inspecting_officer").click(function () {
+    //     $("#error_designation_inspecting_officer").hide().text;
+    //     $("#error_designation_inspecting_officer").removeClass("is-invalid");
+    //   });
+    //   value_return = "false";
+    // }
 
     if (street_address == "") {
       $("#error_street_address").show().text("Please Enter street address");

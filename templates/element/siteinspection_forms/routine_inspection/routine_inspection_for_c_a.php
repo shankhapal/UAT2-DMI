@@ -1,4 +1,4 @@
-<?php //pr($section_form_details);die; ?>
+<?php// pr($section_form_details);die; ?>
 <?php echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-data', 'id'=>$section)); ?>
 <div class="content-wrapper">
 	<div class="content-header">
@@ -148,7 +148,15 @@
                     <div class="form-group row">
                         <label for="inputEmail3" class="col-sm-5 col-form-label">Commodity<span class="cRed">*</span></label>
                     <div class="col-sm-7">
-                         <?php echo $this->Form->control('sub_commodity', array('type'=>'select', 'options'=>$section_form_details[3], 'multiple'=>'multiple', 'label'=>false, 'disabled'=>'disabled', 'class'=>'form-control')); ?>
+                        <ul>
+                            <?php
+                                if($section_form_details[3] != null){
+                                    foreach ($section_form_details[3] as $value) { ?>
+                                    <li class="list-group-item"><?php echo $value; ?></li>
+                                <?php }}else{ ?>
+                                <div class="colorWarning margin5 header-text">Not Available</div>
+                            <?php } ?>    
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -164,12 +172,23 @@
                     <div class="form-group row">
                         <label for="inputEmail3" class="col-sm-5 col-form-label">Grading laboratory<span class="cRed">*</span></label>
                     <div class="col-sm-7">
-                        <?php if($section_form_details[4] != null){?>  
-                        <?php echo $this->Form->control('grading_lab', array('type'=>'text', 'id'=>'grading_lab', 'value'=>$section_form_details[4],'readonly'=>true,   'class'=>'form-control', 'label'=>false, 'required'=>true)); ?>
-                        <?php }else {?>
-                        <?php echo $this->Form->control('grading_lab', array('type'=>'text', 'id'=>'grading_lab','class'=>'form-control','readonly'=>true, 'label'=>false, 'required'=>true)); ?>
-                        <div class="colorWarning margin5 header-text">Laboratory must be mapped by CA on the System</div>
-                        <?php } ?>
+
+                    <ul>
+                        <?php
+                            if($section_form_details[4] != null){
+                                foreach ($section_form_details[4] as $value) {  ?>
+                                   <li class="list-group-item"><?php echo $value; ?></li>
+                            <?php }}else{ ?>
+                            <div class="colorWarning margin5 header-text">Laboratory must be mapped by CA on the System</div>
+                            <?php } ?>    
+                        
+                    </ul>
+                        <?php //if($section_form_details[4] != null){?>  
+                        <?php //echo $this->Form->control('grading_lab', array('type'=>'text', 'id'=>'grading_lab', 'value'=>$section_form_details[4],'readonly'=>true,   'class'=>'form-control', 'label'=>false, 'required'=>true)); ?>
+                        <?php //}else {?>
+                        <?php //echo $this->Form->control('grading_lab', array('type'=>'text', 'id'=>'grading_lab','class'=>'form-control','readonly'=>true, 'label'=>false, 'required'=>true)); ?>
+                        <!-- <div class="colorWarning margin5 header-text">Laboratory must be mapped by CA on the System</div> -->
+                        <?php //} ?>
                     </div>
                 </div>
             </div>
@@ -183,16 +202,37 @@
              <div class="row">
                  <div class="col-sm-6">
                     <div class="form-group row">
-                        <label for="inputEmail3" class="col-sm-5 col-form-label">Printing press <span class="cRed">*</span></label>
+                        <label for="inputEmail3" class="col-sm-5 col-form-label">Approved Printing press <span class="cRed">*</span></label>
                     <div class="col-sm-7">
-                    <?php if($section_form_details[5] != null){?>  
-                        <?php echo $this->Form->control('printing_press', array('type'=>'text', 'value'=>$section_form_details[5],'readonly'=>true,'id'=>'printing_press', 'class'=>'form-control input-field', 'label'=>false)); ?>
-                        <span id="error_printing_press" class="error invalid-feedback"></span>
-                        <?php }else { ?>
-                        <?php echo $this->Form->control('printing_press', array('type'=>'text','readonly'=>true,'id'=>'printing_press', 'class'=>'form-control input-field', 'label'=>false)); ?>
-                        <span id="error_printing_press" class="error invalid-feedback"></span>
-                        <div class="colorWarning margin5 header-text">Printing Press must by mapped by CA on the System</div>
-                        <?php } ?>
+                         <?php $i=1;
+                         if($section_form_details[5] != null){ ?>
+                        <table  class="table m-0 table-bordered table-striped table-hover">
+                        <thead class="">
+                            <tr>
+                                <th>Sr.no.</th>
+                                <th>Printing press</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                             <?php 
+                            foreach ($section_form_details[5] as $value) { ?>
+                                <tr>
+                                    <td><?php echo $i; ?></td>
+                                    <td><?php echo $value['firm_name']; ?></td>
+                                </tr>
+                            <?php $i++; }}else{ ?>
+                            <div class="colorWarning margin5 header-text">Printing Press must by mapped by CA on the System</div>
+                            <?php } ?>    
+                        </tbody>
+                    </table>
+                    <?php //if($section_form_details[5] != null){?>  
+                        <?php //echo $this->Form->control('printing_press', array('type'=>'select', 'options'=>$section_form_details[5],'multiple'=>'multiple','readonly'=>true,'id'=>'printing_press', 'class'=>'form-control input-field', 'label'=>false)); ?>
+                        <!-- <span id="error_printing_press" class="error invalid-feedback"></span> -->
+                        <?php //}else { ?>
+                        <?php //echo $this->Form->control('printing_press', array('type'=>'text','readonly'=>true,'id'=>'printing_press', 'class'=>'form-control input-field', 'label'=>false)); ?>
+                        <!-- <span id="error_printing_press" class="error invalid-feedback"></span> -->
+                        <!-- <div class="colorWarning margin5 header-text">Printing Press must by mapped by CA on the System</div> -->
+                        <?php //} ?>
                     </div>
                 </div>
             </div>
@@ -245,16 +285,50 @@
                         <label for="inputEmail3" class="col-sm-5 col-form-label">Chemist Incharge<span class="cRed">*</span></label>
                     <div class="col-sm-7">
                         <?php if($section_form_details[6] != null){?>    
-                            <?php echo $this->Form->control('fax_no', array('type'=>'text', 'placeholder'=>'Enter name of the chemist incharge','value'=>$section_form_details[6][0]['chemist_fname']." ".$section_form_details[6][0]['chemist_lname'],'readonly'=>true, 'id'=>'fax_no', 'class'=>'form-control input-field', 'label'=>false)); ?>
+                            <?php echo $this->Form->control('chemist_incharge', array('type'=>'text', 'placeholder'=>'Enter name of the chemist incharge','value'=>$section_form_details[6][0]['chemist_fname']." ".$section_form_details[6][0]['chemist_lname'],'readonly'=>true, 'id'=>'chemist_incharge', 'class'=>'form-control input-field', 'label'=>false)); ?>
                         <?php }else{ ?>
-                            <?php echo $this->Form->control('fax_no', array('type'=>'text', 'readonly'=>true, 'id'=>'fax_no', 'class'=>'form-control input-field', 'label'=>false)); ?>
-                                <div class="colorWarning margin5 header-text col-form-label"> Chemist Registr and and mapped by CA on the System</div>
-                            <span id="error_fax_no" class="error invalid-feedback"></span>
+                            <?php echo $this->Form->control('chemist_incharge', array('type'=>'text', 'readonly'=>true, 'id'=>'fax_no', 'class'=>'form-control input-field', 'label'=>false)); ?>
+                                <div class="colorWarning margin5 header-text col-form-label"> Chemist Register and mapped by CA on the System</div>
+                            <span id="error_chemist_incharge" class="error invalid-feedback"></span>
                         <?php } ?>
                     </div>
+                    
                 </div>
             </div>
-        
+            <!-- start -->
+             <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label for="inputEmail3" class="col-sm-5 col-form-label">Present at the time of Inspection<span class="cRed">*</span></label>
+                    <div class="col-sm-7">
+                    <?php 
+                            $i=1;
+                            $present_time_of_inspection = isset($section_form_details[0]['present_time_of_inspection'])?$section_form_details[0]['present_time_of_inspection']:"";
+                    
+                                if($present_time_of_inspection == 'yes'){
+                                    $checked_yes = 'checked';
+                                    $checked_no = '';
+                                } else {
+
+                                    $checked_yes = '';
+                                    $checked_no = 'checked';
+                                }
+                            $i++;
+                        ?>
+                        <div class="col-sm-7">
+                            <div class=" d-inline">
+                                <input type="radio" name="present_time_of_inspection" checked="" id="present_time_of_inspection-yes" value="yes"<?php echo $checked_yes; ?>>
+                                <label for="present_time_of_inspection-yes">Yes
+                                </label>
+                            </div>
+                        <div class=" d-inline">
+                            <input type="radio" name="present_time_of_inspection" id="present_time_of_inspection-no" value="no" <?php echo $checked_no; ?>>
+                            <label for="present_time_of_inspection-no">No
+                            </label>
+                        </div>
+                        <span id="error_present_time_of_inspection" class="error invalid-feedback"></span>
+                    </div>
+                </div>
+            <!-- end -->
             </div>
          </div>
     </div>
@@ -435,21 +509,24 @@
                     <div class="form-group row">
                         <label for="inputEmail3" class="col-sm-5 col-form-label">Analytical Results<span class="cRed"> * </span></label>
                         <div class="col-sm-7">
-                            <?php echo $this->Form->control('quantity_graded', array('type'=>'textarea', 'id'=>'quantity_graded', 'class'=>'form-control input-field', 'placeholder'=>'Type here..','value '=>$section_form_details[0]['quantity_graded'], 'label'=>false)); ?>
-                            <span id="error_quantity_graded" class="error invalid-feedback"></span>
+                            <?php echo $this->Form->control('analytical_results', array('type'=>'text', 'id'=>'analytical_results', 'class'=>'form-control', 'placeholder'=>'Type here..','value '=>$section_form_details[0]['analytical_results'], 'label'=>false)); ?>
+                            <span id="error_analytical_results" class="error invalid-feedback"></span>
                         </div>
                     </div>
                 </div>
                <div class="col-sm-6">
                 <div class="form-group row">
-                   <label for="inputEmail3" class="col-sm-2 col-form-label">Attach file<span class="cRed"> * </span></label>
-                   
 
-                    <?php if(!empty($section_form_details[0]['analytical_result_docs'])){?>
-                        <a id="analytical_result_value" target="blank" href="<?php  echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['analytical_result_docs']); ?>">Preview</a>
-                    <?php } ?>
-                  
-                    <div class="custom-file col-sm-10">
+                    <label for="field3" class="col-sm-5 col-form-label"><span><?php if ($current_level == 'level_2' && $application_mode == 'edit' ) { echo 'Analytical Results Doc'; } else { echo 'Analytical Results Doc'; } ?></span></label>
+
+                    <span class="float-left"><?php if ($current_level == 'level_2' && $application_mode == 'edit' && empty($section_form_details[0]['analytical_result_docs'])) { echo 'Attach doc'; }else{ echo 'Attached doc'; } ?> :
+                    <?php if (!empty($section_form_details[0]['analytical_result_docs'])) { ?>
+                        <a id="analytical_result_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['analytical_result_docs']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['analytical_result_docs'])), -1))[0],23);?></a>
+                    <?php }else{ echo "No Document Provided" ;} ?>
+
+
+
+                    <div class="custom-file col-sm-7">
                         <input type="file" name="analytical_result_docs" class="form-control" id="analytical_result_docs" multiple='multiple'>
                         <span id="error_analytical_result_docs" class="error invalid-feedback"></span>
                         <span id="error_type_analytical_result_docs" class="error invalid-feedback"></span>
@@ -562,7 +639,7 @@
 
 <!-- 16.Collection of check samples -->
 <div class="card-header sub-card-header-firm"><h3 class="card-title">Collection of check samples </h3></div>
-     <?php echo $this->element('rti_addmore_element/rti_addmore_element'); ?>
+     <?php //echo $this->element('rti_addmore_element/rti_addmore_element'); ?>
 </div>
 
 <!-- 17.Enumerate briefly suggestions given during last inspection and state, if carried out -->
@@ -618,8 +695,8 @@
                     <div class="form-group row">
                         <label for="inputEmail3" class="col-sm-5 col-form-label">Shortcomings noticed in present inspection:<span class="cRed"> * </span></label>
                     <div class="col-sm-7">
-                        <?php echo $this->Form->control('sort_notice', array('type'=>'text', 'id'=>'sort_notice', 'class'=>'form-control', 'label'=>false,'value'=>'')); ?>
-                        <span id="error_sort_notice" class="error invalid-feedback"></span>
+                        <?php echo $this->Form->control('shortcomings_noticed', array('type'=>'text', 'id'=>'shortcomings_noticed', 'class'=>'form-control', 'label'=>false,'value'=>$section_form_details[0]['shortcomings_noticed'])); ?>
+                        <span id="error_shortcomings_noticed" class="error invalid-feedback"></span>
                     </div>
                     
                 </div>
@@ -627,16 +704,20 @@
            
             <div class="col-sm-6">
                 <div class="form-group row">
-                   <label for="inputEmail3" class="col-sm-3 col-form-label">Attach file</label>
-                    <?php if(!empty($section_form_details[0]['fssai_approved_docs'])){?>
-                        <a id="fssai_approved_docs_value" target="blank" href="<?php  echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['fssai_approved_docs']); ?>">Preview</a>
-                    <?php } ?>
+
+                    <label for="field3" class="col-sm-5 col-form-label"><span><?php if ($current_level == 'level_2' && $application_mode == 'edit' ) { echo 'Shortcomings noticed Docs'; } else { echo 'Shortcomings noticed Docs'; } ?></span></label>
+
+                    <span class="float-left"><?php if ($current_level == 'level_2' && $application_mode == 'edit' && empty($section_form_details[0]['shortcomings_noticed_docs'])) { echo 'Attach docs'; }else{ echo 'Attached docs'; } ?> :
+                    <?php if (!empty($section_form_details[0]['shortcomings_noticed_docs'])) { ?>
+                        <a id="shortcomings_noticed_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['shortcomings_noticed_docs']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['shortcomings_noticed_docs'])), -1))[0],23);?></a>
+                    <?php }else{ echo "No Document Provided" ;} ?>
+
                   
-                    <div class="custom-file col-sm-9">
-                        <input type="file" name="fssai_approved_docs" class="form-control" id="fssai_approved_docs" multiple='multiple'>
-                        <span id="error_fssai_approved_docs" class="error invalid-feedback"></span>
-                        <span id="error_type_fssai_approved_docs" class="error invalid-feedback"></span>
-                        <span id="error_size_fssai_approved_docs" class="error invalid-feedback"></span>
+                    <div class="custom-file col-sm-7">
+                        <input type="file" name="shortcomings_noticed_docs" class="form-control" id="shortcomings_noticed_docs" multiple='multiple'>
+                        <span id="error_shortcomings_noticed_docs" class="error invalid-feedback"></span>
+                        <span id="error_type_shortcomings_noticed_docs" class="error invalid-feedback"></span>
+                        <span id="error_size_shortcomings_noticed_docs" class="error invalid-feedback"></span>
                     </div>
                 </div>
                  <p class="lab_form_note float-right mt-3"><i class="fa fa-info-circle"></i> File type: PDF, jpg &amp; max size upto 2 MB</p>
@@ -670,9 +751,9 @@
              <div class="row">
                  <div class="col-sm-6">
                     <div class="form-group row">
-                        <label for="inputEmail3" class="col-sm-5 col-form-label">Signnature and Name of the Packer or his representative<span class="cRed"> * </span></label>
+                        <label for="inputEmail3" class="col-sm-5 col-form-label">Name of the Packer or his representative<span class="cRed"> * </span></label>
                     <div class="col-sm-7">
-                        <?php echo $this->Form->control('name_packer_representative', array('type'=>'text', 'id'=>'name_packer_representative','placeholder'=>'Enter Name of the Packer or his representative', 'class'=>'form-control', 'label'=>false,'value'=>'')); ?>
+                        <?php echo $this->Form->control('name_packer_representative', array('type'=>'text', 'id'=>'name_packer_representative','value'=>$section_form_details[0]['name_packer_representative'], 'placeholder'=>'Enter Name of the Packer or his representative', 'class'=>'form-control', 'label'=>false)); ?>
                         <span id="error_name_packer_representative" class="error invalid-feedback"></span>
                     </div>
                     
@@ -681,16 +762,19 @@
            
             <div class="col-sm-6">
                 <div class="form-group row">
-                   <label for="inputEmail3" class="col-sm-3 col-form-label">Attach file</label>
-                    <?php if(!empty($section_form_details[0]['fssai_approved_docs'])){?>
-                        <a id="fssai_approved_docs_value" target="blank" href="<?php  echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['fssai_approved_docs']); ?>">Preview</a>
-                    <?php } ?>
-                  
+
+                    <label for="field3" class="col-sm-5 col-form-label"><span><?php if ($current_level == 'level_2' && $application_mode == 'edit' ) { echo 'Signnature of Packer or his representative'; } else { echo 'Signnature of Packer or his representative'; } ?></span></label>
+
+                    <span class="float-left"><?php if ($current_level == 'level_2' && $application_mode == 'edit' && empty($section_form_details[0]['signnature_of_packer_docs'])) { echo 'Attach doc'; }else{ echo 'Attached doc'; } ?> :
+                    <?php if (!empty($section_form_details[0]['signnature_of_packer_docs'])) { ?>
+                        <a id="signnature_of_packer_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['signnature_of_packer_docs']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['signnature_of_packer_docs'])), -1))[0],23);?></a>
+                    <?php }else{ echo "No Document Provided" ;} ?>
+                
                     <div class="custom-file col-sm-9">
-                        <input type="file" name="fssai_approved_docs" class="form-control" id="fssai_approved_docs" multiple='multiple'>
-                        <span id="error_fssai_approved_docs" class="error invalid-feedback"></span>
-                        <span id="error_type_fssai_approved_docs" class="error invalid-feedback"></span>
-                        <span id="error_size_fssai_approved_docs" class="error invalid-feedback"></span>
+                        <input type="file" name="signnature_of_packer_docs" class="form-control" id="signnature_of_packer_docs" multiple='multiple'>
+                        <span id="error_signnature_of_packer_docs" class="error invalid-feedback"></span>
+                        <span id="error_type_signnature_of_packer_docs" class="error invalid-feedback"></span>
+                        <span id="error_size_signnature_of_packer_docs" class="error invalid-feedback"></span>
                     </div>
                 </div>
                  <p class="lab_form_note float-right mt-3"><i class="fa fa-info-circle"></i> File type: PDF, jpg &amp; max size upto 2 MB</p>
@@ -707,7 +791,7 @@
                     <div class="form-group row">
                         <label for="inputEmail3" class="col-sm-5 col-form-label">Signnature and Name of the Inspecting Officer<span class="cRed"> * </span></label>
                     <div class="col-sm-7">
-                        <?php echo $this->Form->control('name_of_inspecting_officer', array('type'=>'text', 'id'=>'name_of_inspecting_officer', 'class'=>'form-control', 'label'=>false,'value'=>'')); ?>
+                        <?php echo $this->Form->control('name_of_inspecting_officer', array('type'=>'text', 'id'=>'name_of_inspecting_officer', 'class'=>'form-control', 'label'=>false,'value'=>$section_form_details[0]['name_of_inspecting_officer'])); ?>
                         <span id="error_name_of_inspecting_officer" class="error invalid-feedback"></span>
                     </div>
                     
@@ -722,16 +806,19 @@
             </div>
             <div class="col-sm-6">
                 <div class="form-group row">
-                   <label for="inputEmail3" class="col-sm-3 col-form-label">Attach file</label>
-                    <?php if(!empty($section_form_details[0]['fssai_approved_docs'])){?>
-                        <a id="fssai_approved_docs_value" target="blank" href="<?php  echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['fssai_approved_docs']); ?>">Preview</a>
-                    <?php } ?>
-                  
+
+                  <label for="field3" class="col-sm-5 col-form-label"><span><?php if ($current_level == 'level_2' && $application_mode == 'edit' ) { echo 'Signnature of Inspecting Officer'; } else { echo 'Signnature of Inspecting Officer'; } ?></span></label>
+
+                    <span class="float-left"><?php if ($current_level == 'level_2' && $application_mode == 'edit' && empty($section_form_details[0]['signnature_of_inspecting_officer_docs'])) { echo 'Attach docs'; }else{ echo 'Attached docs'; } ?> :
+                    <?php if (!empty($section_form_details[0]['signnature_of_inspecting_officer_docs'])) { ?>
+                        <a id="signnature_of_inspecting_officer_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['signnature_of_inspecting_officer_docs']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['signnature_of_inspecting_officer_docs'])), -1))[0],23);?></a>
+                    <?php }else{ echo "No Document Provided" ;} ?>
+
                     <div class="custom-file col-sm-9">
-                        <input type="file" name="fssai_approved_docs" class="form-control" id="fssai_approved_docs" multiple='multiple'>
-                        <span id="error_fssai_approved_docs" class="error invalid-feedback"></span>
-                        <span id="error_type_fssai_approved_docs" class="error invalid-feedback"></span>
-                        <span id="error_size_fssai_approved_docs" class="error invalid-feedback"></span>
+                        <input type="file" name="signnature_of_inspecting_officer_docs" class="form-control" id="signnature_of_inspecting_officer_docs" multiple='multiple'>
+                        <span id="error_signnature_of_inspecting_officer_docs" class="error invalid-feedback"></span>
+                        <span id="error_type_signnature_of_inspecting_officer_docs" class="error invalid-feedback"></span>
+                        <span id="error_size_signnature_of_inspecting_officer_docs" class="error invalid-feedback"></span>
                     </div>
                 </div>
                  <p class="lab_form_note float-right mt-3"><i class="fa fa-info-circle"></i> File type: PDF, jpg &amp; max size upto 2 MB</p>

@@ -229,6 +229,7 @@ class InspectionsController extends AppController{
 		$this->set('section_model_name',$section_model_name);
 		
 		$section_model = TableRegistry::getTableLocator()->get($section_model_name);
+		
 		$section = $section_details['section_name'];
 			
 		//addded by akash thakre to display section details
