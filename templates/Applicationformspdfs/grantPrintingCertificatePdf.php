@@ -1,5 +1,5 @@
 
-	<?php ?>		
+<?php ?>		
 
 <style>
 	h4 {
@@ -7,7 +7,6 @@
 		font-family: times;
 		font-size: 12pt;	
 	}
-								
 
 	table{
 		padding: 5px;
@@ -25,7 +24,11 @@
 		<table width="100%" border="1">
 			<tr>
 				<td>
-					<h4 class="cRed">This Application is Surrendered on Date: <?php echo date('Y-m-d'); ?></h4>
+					<h4 class="cRed">
+						This Permission to Printing Press is cancelled by the competent authority dated <b> <?php echo date('d-m-Y'); ?> </b> 
+						Applicant should do the Submission of balance printed material and declaration that applicant will not print under Agmark.
+						If, violation is observed than action shall be taken as per APGM Act and GGM Rule.
+					</h4>
 				</td>
 			</tr>
 		</table>

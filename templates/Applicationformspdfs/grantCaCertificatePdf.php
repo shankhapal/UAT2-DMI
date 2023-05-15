@@ -19,7 +19,11 @@
 		<table width="100%" border="1">
 			<tr>
 				<td>
-					<h4 class="cRed">This Application is Surrendered on Date: <?php echo date('Y-m-d'); ?></h4>
+					<h4 class="cRed">
+						This Certificate of Authorisation is cancelled by the competent authority dated <b> <?php echo date('d-m-Y'); ?> </b> 
+						Applicant do not grade and mark "<?php echo $commodityNames ?>" commodity/ies under AGMARK.
+						If, violation is observed than action shall be taken as per APGM Act and GGM Rule.
+					</h4>
 				</td>
 			</tr>
 		</table>

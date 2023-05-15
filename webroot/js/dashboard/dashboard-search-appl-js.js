@@ -1,7 +1,7 @@
 //search application ajax call
 //added on 25-10-2021 by Amol
 
-$("#applSearchInPopup").hide();
+$("#search_application_modal").hide();
 $("#search_appl_btn").click(function(){
 
     var applicant_id = $("#srch_appl_id").val();
@@ -20,6 +20,7 @@ $("#search_appl_btn").click(function(){
 				success: function (response) {
 					
 					$("#applSearchInPopup").show();
+					$('#search_application_modal').modal('show')
 					$("#srch_appl_content").html(response);
 				}
 		});
@@ -29,7 +30,7 @@ $("#search_appl_btn").click(function(){
 
 $(".close").click(function(){
 	
-	$("#applSearchInPopup").hide();
+	$("#search_application_modal").hide();
     $("#srch_appl_content").html('');
 				
 });

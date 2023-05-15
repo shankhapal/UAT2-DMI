@@ -481,7 +481,7 @@ class ApplicationController extends AppController{
 		if (null !== $this->request->getData('save')) {
 
 			$result = $this->$section_model->saveFormDetails($customer_id,$this->request->getData());
-
+			
 			if (is_array($result)=='') {
 				
 				if ($result == 1) {
@@ -504,7 +504,12 @@ class ApplicationController extends AppController{
 						}
 					}
 
-					$message = $firm_type_text.' - '.ucwords(str_replace('_',' ',$section_details['section_name'])).' section, '.$process_query.' successfully';
+					// This message is changed for the Surrender module (SOC) - Akash [12-05-2023]
+					if ($application_type == 9) {
+						$message = "Application of Surrender for ".$firm_type_text.' - '.ucwords(str_replace('_',' ',$section_details['section_name'])).' section, '.$process_query.' successfully';
+					}else{
+						$message = $firm_type_text.' - '.ucwords(str_replace('_',' ',$section_details['section_name'])).' section, '.$process_query.' successfully';
+					}
 
 					#Action: Application Section Saved
 					if ($application_type == 4) {
@@ -546,7 +551,14 @@ class ApplicationController extends AppController{
 				if ($final_submit_call_result == true) {
 
 					$this->Customfunctions->saveActionPoint('Application Final Submit', 'Success'); #Action
-					$message = $firm_type_text.' - Final submitted successfully ';
+
+					// This message is changed for the Surrender module (SOC) - Akash [12-05-2023]
+					if ($application_type == 9) {
+						$message = "Application of Surrender for ".$firm_type_text.' - Final submitted successfully ';
+					}else{
+						$message = $firm_type_text.' - Final submitted successfully ';
+					}
+
 					$message_theme = 'success';
 
 					//For Chemist i.e Apllication Type 4 then redirect to Chemist Home after Final Submit -> Akash [29-09-2021].
@@ -960,7 +972,14 @@ class ApplicationController extends AppController{
 						$this->DmiSmsEmailTemplates->sendMessage(5,$customer_id); #APPLICANT , RO , DDO
 						$this->DmiSmsEmailTemplates->sendMessage(6,$customer_id); #Applicant , RO , DDO
 						
-						$message = $firm_type_text.' - Final submitted successfully ';
+
+						// This message is changed for the Surrender module (SOC) - Akash [12-05-2023]
+						if ($application_type == 9) {
+							$message = "Application of Surrender for ".$firm_type_text.' - Final submitted successfully ';
+						}else{
+							$message = $firm_type_text.' - Final submitted successfully ';
+						}
+
 						$message_theme = 'success';
 						$redirect_to = '../applicationformspdfs/'.$section_details['forms_pdf'];
 
@@ -1082,9 +1101,17 @@ class ApplicationController extends AppController{
 		$final_submit_call_result =  $this->Customfunctions->applicationFinalSubmitCall($customer_id,$all_section_status);
 
 		if ($final_submit_call_result == true) {
-			$message = $firm_type_text.' - Final submitted successfully ';
+
+			// This message is changed for the Surrender module (SOC) - Akash [12-05-2023]
+			if ($application_type == 9) {
+				$message = "Application of Surrender for ".$firm_type_text.' - Final submitted successfully ';
+			}else{
+				$message = $firm_type_text.' - Final submitted successfully ';
+			}
+
 			$message_theme = 'success';
 			$redirect_to = '../applicationformspdfs/'.$section_details['forms_pdf'];
+			
 		} else {
 			$message = $firm_type_text.' - All Sections not filled, Please fill all Section and then Final Submit ';
 			$message_theme = 'failed';

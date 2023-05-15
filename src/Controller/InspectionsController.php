@@ -832,7 +832,7 @@ class InspectionsController extends AppController{
 		
 		$customer_level_3_approved = $Dmi_final_submit_tb->find('all',
 												array('conditions'=>array('customer_id IS'=>$customer_id,$grantDateCondition,
-														'status'=>'approved', 'current_level'=>'level_3')))->first();														
+														'status'=>'approved', 'current_level'=>'level_3')))->first();
 		
 		$inspection_allocated = $Dmi_allocation_table_tb->find('all', array(array('conditions'=>array('customer_id IS'=>$customer_id,$grantDateCondition,
 														'level_2 IS NOT NULL'))))->first();
@@ -867,12 +867,17 @@ class InspectionsController extends AppController{
 				
 				//deleting record from temp esign status table, to clear that esign process reached till end succesfully.
 				//added on 01-10-2018 by Amol
-				$this->DmiTempEsignStatuses->deleteTempEsignRecord($customer_id);													 
-				$message = $firm_type_text.' - '.'Final Granted Successfully';
+				$this->DmiTempEsignStatuses->deleteTempEsignRecord($customer_id);
+				
+				//This below code is modified for the Surrender Flow (SOC), the message needed to be diffrent - Akash[12-05-2023]
+				if($application_type == '9'){
+					$message = "Application for surrender of $firm_type_text - Final Granted Successfully";
+				}else{
+					$message = $firm_type_text.' - '.'Final Granted Successfully';
+				}
+			
 				$redirect_to = '../applicationformspdfs/'.$allSectionDetails[0]['grant_pdf'];	
-				//$this->view = '/Element/message_boxes';		
-				
-				
+
 		}elseif(!empty($customer_level_3_approved)){
 				
 				if(!empty($inspection_allocated)){
@@ -893,13 +898,18 @@ class InspectionsController extends AppController{
 				//deleting record from temp esign status table, to clear that esign process reached till end succesfully.
 				//added on 01-10-2018 by Amol 
 				$this->DmiTempEsignStatuses->deleteTempEsignRecord($customer_id);
-				$message = $firm_type_text.' - '.'Final Granted Successfully';
+
+				//This below code is modified for the Surrender Flow (SOC), the message needed to be diffrent - Akash[12-05-2023]
+				if($application_type == '9'){
+					$message = "Application for surrender of $firm_type_text - Final Granted Successfully";
+				}else{
+					$message = $firm_type_text.' - '.'Final Granted Successfully';
+				}
 				$redirect_to = '../applicationformspdfs/'.$allSectionDetails[0]['grant_pdf'];	
-				//$this->view = '/Element/message_boxes';		
-		}			
+		}
 		
 		$this->set('message',$message);
-		$this->set('redirect_to',$redirect_to);			
+		$this->set('redirect_to',$redirect_to);
 	}	
 
 //Ajax function For Constituent Oil Mill details tables end ***********************************************************************************************	
