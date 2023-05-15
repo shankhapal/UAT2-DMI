@@ -31,27 +31,24 @@
 			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['date_p_inspection']; ?></td>
 		</tr>
     <tr>
-        <td style="padding:10px; vertical-align:top;">Name of Authorized Packer :</td>
+        <td style="padding:10px; vertical-align:top;">1. Name of Authorized Packer :</td>
 			  <td style="padding:10px; vertical-align:top;"><?php echo $firm_details['firm_name']; ?></td>
 		</tr>
     <tr>
-        <td style="padding:10px; vertical-align:top;">Address of the Authorized Premises :</td>
+        <td style="padding:10px; vertical-align:top;">2. Address of the Authorized Premises :</td>
 			  <td style="padding:10px; vertical-align:top;"><?php echo $firm_details['street_address']; ?></td>
 		</tr>
     <tr>
-        <td style="padding:10px; vertical-align:top;">Contact details of the packer Mobile:</td>
+        <td style="padding:10px; vertical-align:top;">3. Contact details of the packer Mobile:</td>
 			  <td style="padding:10px; vertical-align:top;"><?php echo 'Mobile :'. base64_decode($firm_details['mobile_no'])." , ".'Email ID :'.base64_decode($firm_details['email']); ?></td>
 		</tr>
     <tr>
-        <td style="padding:10px; vertical-align:top;">Certificate of Authorization No :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $firm_details['customer_id']; ?></td>
+        <td style="padding:10px; vertical-align:top;">4. Certificate of Authorization No and valid upto :</td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo 'Certificate No :'. $firm_details['customer_id'].',','valid upto :'. $certificate_valid_upto; ?></td>
 		</tr>
+    
     <tr>
-        <td style="padding:10px; vertical-align:top;">valid upto :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $certificate_valid_upto; ?></td>
-		</tr>
-    <tr>
-        <td style="padding:10px; vertical-align:top;">Commodity (ies) for which CA is granted :</td>
+        <td style="padding:10px; vertical-align:top;">5. Commodity (ies) for which CA is granted :</td>
 			  <td style="padding:10px; vertical-align:top;">
         <?php 
         $i=0;
@@ -64,7 +61,7 @@
       </td>
 		</tr>
     <tr>
-        <td style="padding:10px; vertical-align:top;">Name of the grading Laboratory :</td>
+        <td style="padding:10px; vertical-align:top;">6. Name of the grading Laboratory :</td>
 			  <td style="padding:10px; vertical-align:top;">
          <?php 
             $i=0;
@@ -77,7 +74,7 @@
       </td>
 		</tr>
     <tr>
-        <td style="padding:10px; vertical-align:top;">Name of approved Printing press :</td>
+        <td style="padding:10px; vertical-align:top;">7. Name of approved Printing press :</td>
 			  <td style="padding:10px; vertical-align:top;"><?php 
             $i=0;
             foreach ($printers_list as $value) {
@@ -87,11 +84,11 @@
             }  ?></td>
 		</tr>
     <tr>
-        <td style="padding:10px; vertical-align:top;">Record of invoice of print Agmark replica is upto date or not? :</td>
+        <td style="padding:10px; vertical-align:top;">a) Record of invoice of print Agmark replica is upto date or not? :</td>
 			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['record_of_invice']; ?></td>
 		</tr>
     <tr>
-        <td style="padding:10px; vertical-align:top;">Name of the chemist Incharge Whether present at the time of Inspection :</td>
+        <td style="padding:10px; vertical-align:top;">8. Name of the chemist Incharge Whether present at the time of Inspection :</td>
 			  <td style="padding:10px; vertical-align:top;"><?php 
            if(!empty($self_registered_chemist)){
                echo $self_registered_chemist[0]['chemist_fname']." ".$self_registered_chemist[0]['chemist_lname'];
@@ -101,65 +98,107 @@
       ?></td>
 		</tr>
      <tr>
-        <td style="padding:10px; vertical-align:top;">Is the premises adequately lighted, ventilated & hygienic :</td>
+        <td style="padding:10px; vertical-align:top;">9. Is the premises adequately lighted, ventilated & hygienic :</td>
 			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['premises_adequately']; ?></td>
 		</tr>
     <tr>
-        <td style="padding:10px; vertical-align:top;">Is the laboratory properly equipped :</td>
+        <td style="padding:10px; vertical-align:top;">10. Is the laboratory properly equipped :</td>
 			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['lab_properly_equipped']; ?></td>
 		</tr>
     <tr>
-        <td style="padding:10px; vertical-align:top;">Are they up to date</td>
+        <td style="padding:10px; vertical-align:top;">a) Are they up to date</td>
 			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['are_you_upto_date']; ?></td>
 		</tr>
      <tr>
-        <td style="padding:10px; vertical-align:top;">Are they being forwarded to the concerned offices in time?</td>
+        <td style="padding:10px; vertical-align:top;">b) Are they being forwarded to the concerned offices in time?</td>
 			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['concerned_offices']; ?></td>
 		</tr>
     <tr>
-        <td style="padding:10px; vertical-align:top;">Last lot No. dated And its analytical results.</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['last_lot_no']; ?></td>
+        <td style="padding:10px; vertical-align:top;">11. Grading Records :</td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo "not added need to update"; ?></td>
 		</tr>
     <tr>
-        <td style="padding:10px; vertical-align:top;">Quantity graded during current month Upto </td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['quantity_graded']; ?></td>
+      
+        <td style="padding:10px; vertical-align:top;">12. Last lot No. dated And its analytical results.</td>
+			  <td style="padding:10px; vertical-align:top;">
+         <div class="row">
+          <div class="col-12">
+            <table class="table "  border="1">
+              <thead>
+                <tr>
+                  <th>Last lot No</th>
+                  <th>Date</th>
+                  <th>Analytical Results</th>
+                  <th>Analytical Results Doc</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><?php echo $rti_ca_data['last_lot_no']; ?></td>
+                  <td><?php echo $rti_ca_data['last_lot_date'] ?></td>
+                  <td><?php echo $rti_ca_data['analytical_results']; ?></td>
+                  <td style="padding:10px; vertical-align:top;"><?php if(!empty($rti_ca_data['analytical_result_docs'])){?>
+                  <a target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$rti_ca_data['analytical_result_docs']); ?>">Preview</a>
+                  <?php }else{ echo "No File Attached";} ?></td>
+                 
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+       </td>
 		</tr>
     <tr>
-        <td style="padding:10px; vertical-align:top;">Is the Agmark Replica account correct?</td>
+        <td style="padding:10px; vertical-align:top;">13. Quantity graded during current month Upto </td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['month_upto']; ?></td>
+		</tr>
+    <tr>
+        <td style="padding:10px; vertical-align:top;">14. Is the Agmark Replica account correct?</td>
 			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['replica_account_correct']; ?></td>
 		</tr>
     <tr>
-        <td style="padding:10px; vertical-align:top;">Is the packer getting its lots tested by FSSAI approved Lab for food safety parameters every 6 months?</td>
+        <td style="padding:10px; vertical-align:top;">15. Is the packer getting its lots tested by FSSAI approved Lab for food safety parameters every 6 months?</td>
 			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['fssai_approved']; ?></td>
 		</tr>
+    </table>
+    <table width="100%" border="1">
      <tr>
-        <td style="padding:10px; vertical-align:top;">Enumerate briefly suggestions given during last inspection and state, if carried out:</td>
+        <td style="padding:10px; vertical-align:top;">16. Enumerate briefly suggestions given during last inspection and state, if carried out:</td>
 			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['e_briefly_suggestions_radio']; ?></td>
 		</tr>
     <tr>
-        <td style="padding:10px; vertical-align:top;">Shortcomings noticed in present inspection:</td>
+        <td style="padding:10px; vertical-align:top;">17. Shortcomings noticed in present inspection:</td>
 			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['shortcomings_noticed']; ?></td>
 		</tr>
+     <tr>
+        <td style="padding:10px; vertical-align:top;">Shortcomings noticed Docs : </td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['e_briefly_suggestions_radio']; ?></td>
+		</tr>
+     <tr>
+        <td style="padding:10px; vertical-align:top;">18. Suggestions :</td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['suggestions']; ?></td>
+		</tr>
     
+   
     <tr>
-        <td style="padding:10px; vertical-align:top;">Signature of the Packer or his representative:</td>
+        <td style="padding:10px; vertical-align:top;">Name of the Packer or his representative:</td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['name_packer_representative']; ?></td>
+		</tr>
+     <tr>
+        <td style="padding:10px; vertical-align:top;">Signnature of the Packer or his representative</td>
 			  <td style="padding:10px; vertical-align:top;">
-           <?php if(!empty($rti_ca_data['signature'])){ $split_file_path = explode("/",$rti_ca_data['signature']);$file_name = $split_file_path[count($split_file_path) - 1];?>
-																<a href="<?php echo $rti_ca_data['signature']; ?>"><?php echo substr($file_name,23); ?></a><?php }else{ echo 'NA'; } ?>
+           <?php if(!empty($rti_ca_data['signnature_of_packer_docs'])){ $split_file_path = explode("/",$rti_ca_data['signnature_of_packer_docs']);$file_name = $split_file_path[count($split_file_path) - 1];?>
+					<a href="<?php echo $rti_ca_data['signnature_of_packer_docs']; ?>"><?php echo substr($file_name,23); ?></a><?php }else{ echo 'NA'; } ?>
         </td>
 		</tr>
     <tr>
-        <td style="padding:10px; vertical-align:top;">Name of the Packer or his representative:</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['name_of_packer']; ?></td>
+        <td style="padding:10px; vertical-align:top;">Name of the Inspecting Officer :</td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['name_of_inspecting_officer']; ?></td>
 		</tr>
     <tr>
         <td style="padding:10px; vertical-align:top;">Signature of the Inspecting Officer:</td>
-			  <td style="padding:10px; vertical-align:top;"><?php if(!empty($rti_ca_data['signature_name'])){ $split_file_path = explode("/",$rti_ca_data['signature_name']);$file_name = $split_file_path[count($split_file_path) - 1];?>
-																<a href="<?php echo $rti_ca_data['signature_name']; ?>"><?php echo substr($file_name,23); ?></a><?php }else{ echo 'NA'; } ?></td>
-		</tr>
-     <tr>
-        <td style="padding:10px; vertical-align:top;">Name of the Inspecting Officer:</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['name_inspecting_officer']; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php if(!empty($rti_ca_data['signnature_of_inspecting_officer_docs'])){ $split_file_path = explode("/",$rti_ca_data['signnature_of_inspecting_officer_docs']);$file_name = $split_file_path[count($split_file_path) - 1];?>
+																<a href="<?php echo $rti_ca_data['signnature_of_inspecting_officer_docs']; ?>"><?php echo substr($file_name,23); ?></a><?php }else{ echo 'NA'; } ?></td>
 		</tr>
     <tr>
         <td style="padding:10px; vertical-align:top;">Designation:</td>
@@ -182,7 +221,7 @@
 </table>
     <table width="100%" border="1">
           <tr>
-              <td align="center" style="padding:5px;"><h4>Collection of check samples : -</h4></td>
+              <td align="center" style="padding:5px;"><h4>19. Collection of check samples : -</h4></td>
           </tr>
     </table>
     <table width="100%" border="1">

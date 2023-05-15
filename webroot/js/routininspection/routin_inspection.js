@@ -179,8 +179,14 @@ $(document).ready(function () {
       }
     });
   }
-  $('input[name="e_briefly_suggestions_radio"]').on("click", function () {
-    if ($(this).val() === "yes") {
+  var enumerate_briefly_suggestions = $(
+    "#e_briefly_suggestions_radio-yes"
+  ).val();
+  if (enumerate_briefly_suggestions == "yes") {
+    $("#briefly_suggestions").show();
+  }
+  $("input[type=radio][name=e_briefly_suggestions_radio]").change(function () {
+    if (this.value === "yes") {
       $("#briefly_suggestions").show();
     } else {
       $("#briefly_suggestions").val("").hide();
@@ -484,7 +490,7 @@ function routineInspectionFormValidation() {
     }
 
     // Change Condition for validation and error message by shankhpal 11-05-2023
-    if ($("#analytical_result_value").text() == "") {
+    if ($("#analytical_result_docs_value").text() == "") {
       if (
         check_file_upload_validation(analytical_result_docs).result == false
       ) {
