@@ -3,23 +3,24 @@
 	h4 {
 		padding: 5px;
 		font-family: times;
-		font-size: 13pt;					
+		font-size: 13pt;
 	}
-							 
-
 	table{
 		padding: 5px;
 		font-size: 12pt;
 		font-family: times;
 	}
-				
+
+	.cRed{
+		color: red;
+	}
 </style>
 
 
 	<table width="100%" border="1">
 		<tr>
 			<td align="center" style="padding:5px;">		
-				<h4>Application for Approval of Surrender of Certificate of Authorisation</h4>
+				<h4>Application for Approval of <b><span class="cRed">SURRENDER</span></b> of Certificate of Authorisation</h4>
 			</td>
 		</tr>
 	</table>
@@ -111,25 +112,31 @@
 														$file_name = $split_file_path[count($split_file_path) - 1];?>
 													<a href="<?php echo $surrenderData[0]['is_surrender_published_docs']; ?>"><?php echo substr($file_name, 23); ?></a><?php }else{ echo 'NA'; }  ?></td>
 		</tr>
-		<tr>
-			<td style="padding:10px; vertical-align:top;">3.Is Packer Submitted CA Book?</td>
-			<td style="padding:10px; vertical-align:top;"><?php echo $surrenderData[0]['is_cabook_submitted']; ?> <br></td>
-		</tr>
-		<tr>
-			<td style="padding:10px; vertical-align:top;">3(a). Related Document: </td>
-			<td style="padding:10px; vertical-align:top;"><?php if(!empty($surrenderData[0]['is_cabook_submitted_docs'])){ $split_file_path = explode("/",$surrenderData[0]['is_cabook_submitted_docs']);
-														$file_name = $split_file_path[count($split_file_path) - 1];?>
-													<a href="<?php echo $surrenderData[0]['is_cabook_submitted_docs']; ?>"><?php echo substr($file_name, 23); ?></a><?php }else{ echo 'NA'; }  ?></td>
-		</tr>
+
+		
+		<!-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+			#This field is not required as UAT Suggestion by DMI - Akash [12-05-2023]
+			<tr>
+				<td style="padding:10px; vertical-align:top;">3.Is Packer Submitted CA Book?</td>
+				<td style="padding:10px; vertical-align:top;"><?php // echo $surrenderData[0]['is_cabook_submitted']; ?> <br></td>
+			</tr>
+			<tr>
+				<td style="padding:10px; vertical-align:top;">3(a). Related Document: </td>
+				<td style="padding:10px; vertical-align:top;"><?php // if(!empty($surrenderData[0]['is_cabook_submitted_docs'])){ $split_file_path = explode("/",$surrenderData[0]['is_cabook_submitted_docs']);
+														//	$file_name = $split_file_path[count($split_file_path) - 1];?>
+														<a href="<?php //echo $surrenderData[0]['is_cabook_submitted_docs']; ?>"><?php // echo substr($file_name, 23); ?></a><?php // }else{ echo 'NA'; }  ?></td>
+			</tr>
+		----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+
 
 		<?php if ($surrenderData[0]['is_ca_have_replica'] == 'yes') { ?>
 
 			<tr>
-				<td style="padding:10px; vertical-align:top;">4.Is Packer Submitted CA Book?</td>
+				<td style="padding:10px; vertical-align:top;">3.Is Packer Submitted CA Book?</td>
 				<td style="padding:10px; vertical-align:top;"><?php echo $surrenderData[0]['is_replica_submitted']; ?> <br></td>
 			</tr>
 			<tr>
-				<td style="padding:10px; vertical-align:top;">4(a). Related Document: </td>
+				<td style="padding:10px; vertical-align:top;">3(a). Related Document: </td>
 				<td style="padding:10px; vertical-align:top;"><?php if(!empty($surrenderData[0]['is_replica_submitted_docs'])){ $split_file_path = explode("/",$surrenderData[0]['is_replica_submitted_docs']);
 															$file_name = $split_file_path[count($split_file_path) - 1];?>
 														<a href="<?php echo $surrenderData[0]['is_replica_submitted_docs']; ?>"><?php echo substr($file_name, 23); ?></a><?php }else{ echo 'NA'; }  ?></td>

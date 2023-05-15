@@ -718,6 +718,7 @@ a:hover {
 #applSearchInPopup .btn{width:100px; float:right;}
 #applSearchInPopup .close{cursor:pointer;}
 
+.searchmod{width:50%; margin:100px auto 0;padding:15px;}
 
 /*login user*/
 .login-tips{border-left:1px solid #eaeaea;}
