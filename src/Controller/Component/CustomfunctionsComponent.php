@@ -7,6 +7,8 @@ use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
 use Cake\Datasource\EntityInterface;
 use QRcode;
+use Cake\Datasource\ConnectionManager;
+
 
 class CustomfunctionsComponent extends Component {
 
@@ -3508,31 +3510,29 @@ class CustomfunctionsComponent extends Component {
 			$customer_id = $this->Session->read('username');
 		}
 
-		/*
-		if ($type =='CHM') {
-			
-			if(!empty($result[0])){
-
-				$tableRowData = $result[0];
-				$i=0;
-				$data1 = '';
-				$data2 = '';
-				$data3 = '';
-				foreach($tableRowData as $each){ 
-					$data1 .=  $each['commodity_name'].",";
-					$data2 .= $each['tbl_name'].",";
-					$data3 .= $each['printer_name'].",";
-				} 
-			}
-		}
-		*/
-
 
 		$DmiCertQrCodes = TableRegistry::getTableLocator()->get('DmiCertQrCodes'); //initialize model in component
 				
 		require_once(ROOT . DS .'vendor' . DS . 'phpqrcode' . DS . 'qrlib.php');
 		
-		if ($type == 'CHM') {
+		if($type == 'SOC'){
+		
+			$split_customer_id = explode('/',$result[0]); 
+			if ($split_customer_id[1] == 1) {
+				$data = "This Certificate of Authorisation is cancelled by the competent authority dated " . date('d-m-Y') . ".\n\n" .
+					"Therefore Applicant do not grade and mark " . $this->commodityNames($result[0]) . " commodity/ies under AGMARK.\n\n" .
+					"If violation is observed, action shall be taken as per APGM Act and GGM Rule.";
+			} elseif ($split_customer_id[1] == 2) {
+				$data = "This Permission to Printing Press is cancelled by the competent authority dated " . date('d-m-Y') . ".\n\n". 
+				"Applicant should do the Submission of balance printed material and declaration that applicant will not print under Agmark.\n\n" .
+				"If, violation is observed than action shall be taken as per APGM Act and GGM Rule.";
+			} elseif ($split_customer_id[1] == 3) {
+				$data = "This Approval of Laboratory is cancelled by the competent authority dated " . htmlspecialchars($isSurrender) . ".\n\n". 
+						"Laboratory should be issue NOC to associated packer to migrate to another Laboratory for commodity/ies under AGMARK.
+						If a violation is observed, action shall be taken as per APGM Act and GGM Rule.";
+			}
+
+		}elseif ($type == 'CHM') {
 			$data = "Chemist Name :".$result[0]." ## "." CA ID :".$result[1]." CA Name : ".$result[2]."##"." Date : ".$result[3]."##"."Region : ".$result[4];
 		}elseif ($type=='FDC') {
 			$data = "CA ID : ".$result[0]." ## "." CA Name : ".$result[1]."##"." Chemist Name : ".$result[2]."##"." Date : ".$result[3]."##"."Region : ".$result[4]."##".$result[5];		  
@@ -3550,6 +3550,7 @@ class CustomfunctionsComponent extends Component {
 		
 		$file_name = $file_path;
 		
+
 		QRcode::png($data,$file_name);
 		
 		
@@ -3634,6 +3635,48 @@ class CustomfunctionsComponent extends Component {
 		if (!preg_match('/^[a-zA-Z0-9\/\r\n+]*={0,2}$/', $data)) 
 		return false;
     }
+
+
+
+	// Description : To get the Comma Sepearated Values for the Commodites for any Firm 
+	// Author : Akash Thakre
+	// Date : 11-05-2023
+	// For : Surrender Module (SOC) / General Use
+
+	public function commodityNames($customer_id){
+
+		//Check if the firm type is 2 i.e Printing Press avoid this as there is no commodities for Priting Press
+		$firm_type = $this->firmType($customer_id);
+
+		if ($firm_type !== 2 ) {
+
+			$conn = ConnectionManager::get('default');
+
+			$commodities = $conn->execute("
+				SELECT commodity_name 
+				FROM m_commodity 
+				WHERE commodity_code IN (
+					SELECT regexp_split_to_table(sub_commodity, ',')::integer 
+					FROM dmi_firms 
+					WHERE customer_id = '$customer_id'
+				)
+			")->fetchAll('assoc');
+			
+	
+			$commodity_names = array_map(function($c) {return $c['commodity_name'];}, $commodities);
+			
+		
+			$commodity_names = implode(',',$commodity_names);
+		
+		} else {
+			$commodity_names = '';
+		}
+		
+		
+		return $commodity_names;
+	}
+
+
 
 
 }

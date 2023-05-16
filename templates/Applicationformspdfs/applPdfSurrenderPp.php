@@ -3,23 +3,25 @@
 	h4 {
 		padding: 5px;
 		font-family: times;
-		font-size: 13pt;					
+		font-size: 13pt;
 	}
-							 
 
 	table{
 		padding: 5px;
 		font-size: 12pt;
 		font-family: times;
 	}
-				
+
+	.cRed{
+		color: red;
+	}
 </style>
 
 
 	<table width="100%" border="1">
 		<tr>
-			<td align="center" style="padding:5px;">		
-				<h4>Application for Approval of Surrender of Printing Press</h4>
+			<td align="center" style="padding:5px;">
+				<h4>Application for Approval of <b><span class="cRed">SURRENDER</span></b> of Permission of Printing Press</h4>
 			</td>
 		</tr>
 	</table>
@@ -121,24 +123,19 @@
 														$file_name = $split_file_path[count($split_file_path) - 1];?>
 													<a href="<?php echo $surrenderData[0]['printing_declaration_docs']; ?>"><?php echo substr($file_name, 23); ?></a><?php }else{ echo 'NA'; }  ?></td>
 		</tr>
-
-		<?php if ($surrenderData[0]['is_ca_have_replica'] == 'yes') { ?>
-
-			<tr>
-				<td style="padding:10px; vertical-align:top;">4.Is Associated packers conveyed ?</td>
-				<td style="padding:10px; vertical-align:top;"><?php echo $surrenderData[0]['is_packers_conveyed']; ?> <br></td>
-			</tr>
-			<tr>
-				<td style="padding:10px; vertical-align:top;">4(a). Related Document: </td>
-				<td style="padding:10px; vertical-align:top;"><?php if(!empty($surrenderData[0]['is_packers_conveyed_docs'])){ $split_file_path = explode("/",$surrenderData[0]['is_packers_conveyed_docs']);
-															$file_name = $split_file_path[count($split_file_path) - 1];?>
-														<a href="<?php echo $surrenderData[0]['is_packers_conveyed_docs']; ?>"><?php echo substr($file_name, 23); ?></a><?php }else{ echo 'NA'; }  ?></td>
-			</tr>
-			
-		<?php } ?>
+		<tr>
+			<td style="padding:10px; vertical-align:top;">4.Is Associated packers conveyed ?</td>
+			<td style="padding:10px; vertical-align:top;"><?php echo $surrenderData[0]['is_packers_conveyed']; ?> <br></td>
+		</tr>
+		<tr>
+			<td style="padding:10px; vertical-align:top;">4(a). Related Document: </td>
+			<td style="padding:10px; vertical-align:top;"><?php if(!empty($surrenderData[0]['is_packers_conveyed_docs'])){ $split_file_path = explode("/",$surrenderData[0]['is_packers_conveyed_docs']);
+														$file_name = $split_file_path[count($split_file_path) - 1];?>
+													<a href="<?php echo $surrenderData[0]['is_packers_conveyed_docs']; ?>"><?php echo substr($file_name, 23); ?></a><?php }else{ echo 'NA'; }  ?></td>
+		</tr>
 	</table>
 
-	<table>					
+	<table>
 		<tr>
 			<td  align="left"><br><br><br>
 				Place: <?php echo $firm_district_name.', '; echo $firm_state_name.'.';?><br>

@@ -604,12 +604,8 @@ class ScrutinyController extends AppController{
 				// # If Block Statement Updated for the Application Type 8 (ADP Flow)- Shankhpal [17/11/2022]
 
 				if((($export_unit_status == 'yes' || $NablDate != null) && $firm_type == 3 ) || ($firm_type == 3 && $export_unit_status == 'yes' && $application_type == 8)){
-							
-																																																
-														   
 
 					$this->Romoioapplicantcommunicationactions->ifApplicationIsExport($customer_id,$application_type);
-														   
 					
 					$this->DmiSmsEmailTemplates->sendMessage(20,$customer_id); #SMS: RO forwarded to HO
 					$this->Customfunctions->saveActionPoint('All Section Scrutinized', 'Success'); #Action
@@ -618,13 +614,11 @@ class ScrutinyController extends AppController{
 					$redirect_to = "../dashboard/home";
 
 				}elseif($application_type==9 || ($application_type==3 && $changeInspection=='no')){//updated condition 21-12-2022 for change flow
-													 
 
 					//For Surrender Application
 					$this->Romoioapplicantcommunicationactions->afterScrutinyForwardToRo($customer_id,$application_type,$grantDateCondition,$Dmi_allocation_table,$Dmi_appl_current_pos_table);
 					$this->Customfunctions->saveActionPoint('All Section Scrutinized and Sent to the RO', 'Success'); #Action
 					$message = $firm_type_text." - All sections scrutinized and forwarded to RO successfully";
-
 					$message_theme = "success";
 					$redirect_to = "../dashboard/home";
 

@@ -17,19 +17,23 @@ $(document).ready(function () {
 
 
     //For CA Book Block
-    if($('#is_cabook_submitted-yes').is(":checked")){
-		$("#is_cabook_submitted_docs_block").show();
-	}else if($('#is_cabook_submitted-no').is(":checked")){
-		$("#is_cabook_submitted_docs_block").hide();
-	}
+	// This code is commented out because it is not necessary by UAT Suggestion - Akash [12-05-2023]
+    /*----------------------------------------------------
+		if($('#is_cabook_submitted-yes').is(":checked")){
+			$("#is_cabook_submitted_docs_block").show();
+		}else if($('#is_cabook_submitted-no').is(":checked")){
+			$("#is_cabook_submitted_docs_block").hide();
+		}
 
-    $('#is_cabook_submitted-yes').click(function(){
-		$("#is_cabook_submitted_docs_block").show();
-	});
+		$('#is_cabook_submitted-yes').click(function(){
+			$("#is_cabook_submitted_docs_block").show();
+		});
 
-    $('#is_cabook_submitted-no').click(function(){
-		$("#is_cabook_submitted_docs_block").hide();
-	});
+		$('#is_cabook_submitted-no').click(function(){
+			$("#is_cabook_submitted_docs_block").hide();
+		});
+	-----------------------------------------------------*/
+
 
     //For Replica Submission
     if($('#is_ca_have_replica-yes').is(":checked")){

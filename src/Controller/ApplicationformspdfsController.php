@@ -15,6 +15,7 @@ use xmldsign;
 use Cake\Utility\Xml;
 use FR3D;
 use Cake\View;
+use PDF_Rotate;
 
 class ApplicationformspdfsController extends AppController{
 	
@@ -1639,7 +1640,7 @@ class ApplicationformspdfsController extends AppController{
 			$grantDateCondition = '';
 		}
 		
-		//for renewal update in Printing grant certificate_type																															//this condition commented on 10-11-2017 by Amol, to show renewal details in grant preview.			
+		//for renewal update in Printing grant certificate_type //this condition commented on 10-11-2017 by Amol, to show renewal details in grant preview.			
 		$check_renewal_final_submit = $this->DmiRenewalFinalSubmits->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, /*$grantDateCondition 'status'=>'approved', 'current_level'=>'level_1'*/)))->first();
 		$this->set('check_renewal_final_submit',$check_renewal_final_submit);
 		
@@ -1754,7 +1755,14 @@ class ApplicationformspdfsController extends AppController{
 			//This below line is added for the QR Code genration on Shankhpal [16-08-2022]	
 			$firm_name_forqr = $customer_firm_data['firm_name'];//updated on 25-04-2023, to get updated details, if changed appl in process
 			$data = [$customer_id,$pdf_date,$certificate_valid_upto,$firm_name_forqr];
-			$result_for_qr = $this->Customfunctions->getQrCode($data);
+			
+			//this condition is updated for the surrender application - Akash [11-05-2023]
+			if ($_SESSION['application_type'] == '9') {
+				$result_for_qr = $this->Customfunctions->getQrCode($data,'SOC');
+			} else {
+				$result_for_qr = $this->Customfunctions->getQrCode($data);
+			}
+
 			$this->set('result_for_qr',$result_for_qr);
 
 			$this->generateGrantCerticateToReEsignPdf('/Applicationformspdfs/grantCaCertificatePdf'); 
@@ -1784,12 +1792,24 @@ class ApplicationformspdfsController extends AppController{
 			//This below line is added for the QR Code genration on Shankhpal [16-08-2022]	
 			$firm_name_forqr = $customer_firm_data['firm_name'];//updated on 25-04-2023, to get updated details, if changed appl in process
 			$data = [$customer_id,$pdf_date,$certificate_valid_upto,$firm_name_forqr];
-			$result_for_qr = $this->Customfunctions->getQrCode($data);
+
+			//this condition is updated for the surrender application - Akash [11-05-2023]
+			if ($_SESSION['application_type'] == '9') {
+				$result_for_qr = $this->Customfunctions->getQrCode($data,'SOC');
+			} else {
+				$result_for_qr = $this->Customfunctions->getQrCode($data);
+			}
+			
+			
 			$this->set('result_for_qr',$result_for_qr);
 			
 			#To check if the application is for Surrender Flow - Akash [14-04-2023]
 			$isSurrender = $this->DmiSurrenderFinalSubmits->checkIfSurrender($customer_id);
 			$this->set('isSurrender',$isSurrender);
+
+			//To give the commodities 
+			$commodityNames = $this->Customfunctions->commodityNames($customer_id);
+			$this->set('commodityNames',$commodityNames);
 
 			$this->generateGrantCerticatePdf('/Applicationformspdfs/grantCaCertificatePdf'); 
 					
@@ -2010,7 +2030,15 @@ class ApplicationformspdfsController extends AppController{
 			//This below line is added for the QR Code genration on Shankhpal [16-08-2022]	
 			$firm_name_forqr = $customer_firm_data['firm_name'];//updated on 25-04-2023, to get updated details, if changed appl in process	
 			$data = [$customer_id,$pdf_date,$certificate_valid_upto,$firm_name_forqr];
-			$result_for_qr = $this->Customfunctions->getQrCode($data);
+
+
+			//this condition is updated for the surrender application - Akash [11-05-2023]
+			if ($_SESSION['application_type'] == '9') {
+				$result_for_qr = $this->Customfunctions->getQrCode($data,'SOC');
+			} else {
+				$result_for_qr = $this->Customfunctions->getQrCode($data);
+			}
+
 			$this->set('result_for_qr',$result_for_qr);				
 
 			$this->generateGrantCerticateToReEsignPdf('/Applicationformspdfs/grantPrintingCertificatePdf'); 
@@ -2040,8 +2068,15 @@ class ApplicationformspdfsController extends AppController{
 			//This below line is added for the QR Code genration on Shankhpal [16-08-2022]	
 			$firm_name_forqr = $customer_firm_data['firm_name'];//updated on 25-04-2023, to get updated details, if changed appl in process
 			$data = [$customer_id,$pdf_date,$certificate_valid_upto,$firm_name_forqr];
-			$result_for_qr = $this->Customfunctions->getQrCode($data);
-			$this->set('result_for_qr',$result_for_qr);				
+
+			//this condition is updated for the surrender application - Akash [11-05-2023]
+			if ($_SESSION['application_type'] == '9') {
+				$result_for_qr = $this->Customfunctions->getQrCode($data,'SOC');
+			} else {
+				$result_for_qr = $this->Customfunctions->getQrCode($data);
+			}
+
+			$this->set('result_for_qr',$result_for_qr);
 			
 			$this->generateGrantCerticatePdf('/Applicationformspdfs/grantPrintingCertificatePdf'); 
 						
@@ -2271,7 +2306,14 @@ class ApplicationformspdfsController extends AppController{
 			//This below line is added for the QR Code genration on Shankhpal [16-08-2022]	
 			$firm_name_forqr = $customer_firm_data['firm_name'];//updated on 25-04-2023, to get updated details, if changed appl in process
 			$data = [$customer_id,$pdf_date,$certificate_valid_upto,$firm_name_forqr];
-			$result_for_qr = $this->Customfunctions->getQrCode($data);
+
+			//this condition is updated for the surrender application - Akash [11-05-2023]
+			if ($_SESSION['application_type'] == '9') {
+				$result_for_qr = $this->Customfunctions->getQrCode($data,'SOC');
+			} else {
+				$result_for_qr = $this->Customfunctions->getQrCode($data);
+			}
+
 			$this->set('result_for_qr',$result_for_qr);
 
 			$this->generateGrantCerticateToReEsignPdf('/Applicationformspdfs/grantLaboratoryCertificatePdf'); 
@@ -2300,8 +2342,15 @@ class ApplicationformspdfsController extends AppController{
 			//This below line is added for the QR Code genration on Shankhpal [16-08-2022]	
 			$firm_name_forqr = $customer_firm_data['firm_name'];//updated on 25-04-2023, to get updated details, if changed appl in process			
 			$data = [$customer_id,$pdf_date,$certificate_valid_upto,$firm_name_forqr];
-			$result_for_qr = $this->Customfunctions->getQrCode($data);
-			$this->set('result_for_qr',$result_for_qr);				
+
+			//this condition is updated for the surrender application - Akash [11-05-2023]
+			if ($_SESSION['application_type'] == '9') {
+				$result_for_qr = $this->Customfunctions->getQrCode($data,'SOC');
+			} else {
+				$result_for_qr = $this->Customfunctions->getQrCode($data);
+			}
+
+			$this->set('result_for_qr',$result_for_qr);
 			
 			$this->generateGrantCerticatePdf('/Applicationformspdfs/grantLaboratoryCertificatePdf'); 
 		}
@@ -2439,8 +2488,15 @@ class ApplicationformspdfsController extends AppController{
 		//generatin pdf starts here
 		//create new pdf using tcpdf including signature apprearence to generate its hash below
 		require_once(ROOT . DS .'vendor' . DS . 'tcpdf' . DS . 'tcpdf.php');
-		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);	
-	
+		require_once(ROOT . DS . 'vendor' . DS . 'tcpdf' . DS . 'tcpdf_text.php');
+
+		//This below condition is updated for the Surrender (SOC) Application PDFs watermarks - Akash [12-05-2023]
+		if ($appl_type == 9 && $current_level != 'applicant') { 
+			$pdf = new PDF_Rotate(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+		}else{
+			$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);	
+		}
+		
 			// set default monospaced font
 		//	$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
 

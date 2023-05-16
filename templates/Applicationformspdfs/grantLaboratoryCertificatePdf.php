@@ -24,7 +24,11 @@
 		<table width="100%" border="1">
 			<tr>
 				<td>
-					<h4 class="cRed">This Application is Surrendered on Date: <?php echo date('Y-m-d'); ?></h4>
+					<h4 class="cRed">
+						This Approval of Laboratory is cancelled by the competent authority dated <b><?php echo date('d-m-Y'); ?></b>. 
+						Laboratory should be issue NOC to associated packer to migrate to another Laboratory for
+						commodity/ies under AGMARK. If a violation is observed, action shall be taken as per APGM Act and GGM Rule.
+					</h4>
 				</td>
 			</tr>
 		</table>
