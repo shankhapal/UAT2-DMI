@@ -142,6 +142,12 @@ use App\Network\Response\Response;
 			$firm_details = $this->DmiFirms->firmDetails($customer_id);
 			$this->set('firm_name',$firm_details['firm_name']);
 
+			//check current postion also, if any case where already allocated and Dy.ama again send HO MO by allocation, then no comment will found from Dyama to HoMO
+			//on 15-05-2023 to resolved such issues, where application get stucked.
+			$checkCurrentPos = $this->$appl_current_pos_table->find('all',array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc'))->first();
+			$curPosUser = $checkCurrentPos['current_user_email_id'];
+			$this->set('curPosUser',$curPosUser);
+
 			// fetch comments history
 			$ho_comment_details = $this->$ho_comments_table->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'OR'=>array('comment_by IS'=>$username,'comment_to'=>$username),$grantDateCondition),'order'=>'id'))->toArray();
 			$this->set('ho_comment_details',$ho_comment_details);
