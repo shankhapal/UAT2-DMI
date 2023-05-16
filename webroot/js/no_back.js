@@ -31,7 +31,7 @@ $(document).ready(function(){
 	$('input').attr('autocomplete', 'off');
 
 	// SET MAXIMUM LENGTH FOR ALL INPUTS
-	$("input[type='text']").attr('maxlength', '50');
+	$("input[type='text']").attr('maxlength', '100');//increased length from 50 to 100 as suggestion by DMI in UAT2
 
 	$("#mobileno").attr('maxlength', '10');
 	$("#mobile").attr('maxlength', '10'); 	 //added on 09-09-2022 for security reasons
