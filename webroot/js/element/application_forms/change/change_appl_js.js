@@ -28,6 +28,10 @@
         var packing_types=$("#packing_types").val();
         var selected_packing_types=$("#selected_packing_types").val();
 		var business_type=$("#business_type").val();
+
+		//new fields added on 17-05-2023 by Amol
+		var commodity_fssai_no=$("#commodity_fssai_no").val();
+		var commodity_fssai_doc=$("#commodity_fssai_doc").val();
 		
 		var selectedValues = $("#selectedValues").val();
 		selectedValues = selectedValues.split(",");
@@ -89,6 +93,22 @@
 				$("#postal_code").click(function(){$("#error_postal_code").hide().text; $("#postal_code").removeClass("is-invalid");});
 				value_return = 'false';
 			}
+
+			//new validation script added for upload fields required for premises change, 17-05-2023
+			if($("#premises_fssai_doc_value").text() == ''){			
+				$("#error_premises_fssai_doc").show().text("Please select related file");
+				$("#premises_fssai_doc").addClass("is-invalid");
+				$("#premises_fssai_doc").click(function(){$("#error_premises_fssai_doc").hide().text; $("#premises_fssai_doc").removeClass("is-invalid");});
+				value_return = 'false';
+			}
+
+			if($("#premises_gst_doc_value").text() == ''){			
+				$("#error_premises_gst_doc").show().text("Please select related file");
+				$("#premises_gst_doc").addClass("is-invalid");
+				$("#premises_gst_doc").click(function(){$("#error_premises_gst_doc").hide().text; $("#premises_gst_doc").removeClass("is-invalid");});
+				value_return = 'false';
+			}
+
 		}
 		
 		if(selectedValues.includes("6")==true){
@@ -122,7 +142,7 @@
 				if($("#consent_letter_docs_value").text() == ''){			
 					$("#error_lab_consent_docs").show().text("Please select related file");
 					$("#lab_consent_docs").addClass("is-invalid");
-					$("#lab_consent_docs").click(function(){$("#error_lab_type").hide().text; $("#lab_consent_docs").removeClass("is-invalid");});
+					$("#lab_consent_docs").click(function(){$("#error_lab_consent_docs").hide().text; $("#lab_consent_docs").removeClass("is-invalid");});
 					value_return = 'false';
 				}
 			}
@@ -154,6 +174,25 @@
 					$("#selected_commodity").addClass("is-invalid");
 					$("#selected_commodity").click(function(){$("#error_selected_commodity").hide().text; $("#selected_commodity").removeClass("is-invalid");});
 					value_return = 'false';
+				}
+
+				if(commodity_fssai_no==""){	
+					$("#error_commodity_fssai_no").show().text("Please FSSAI No.");
+					$("#commodity_fssai_no").addClass("is-invalid");
+					$("#commodity_fssai_no").click(function(){$("#error_commodity_fssai_no").hide().text; $("#commodity_fssai_no").removeClass("is-invalid");});
+					value_return = 'false';
+				}
+
+				//validation for FSSAI added on 17-05-2023 by Amol
+				if($("#commodity_fssai_doc_value").text() == ''){
+
+					if(check_file_upload_validation(commodity_fssai_doc).result == false){	
+						
+						$("#error_commodity_fssai_doc").show().text(check_file_upload_validation(commodity_fssai_doc).error_message);
+						$("#commodity_fssai_doc").addClass("is-invalid");
+						$("#commodity_fssai_doc").click(function(){$("#error_commodity_fssai_doc").hide().text; $("#commodity_fssai_doc").removeClass("is-invalid");});
+						value_return = 'false';
+					}
 				}
 			}
 			
@@ -193,6 +232,11 @@
 	//added on 03-05-2023 by Amol
 	$("#rel_doc").change(function(){
         file_browse_onclick('rel_doc');
+    });
+
+	//added on 17-05-2023 by Amol
+	$("#commodity_fssai_doc").change(function(){
+        file_browse_onclick('commodity_fssai_doc');
     });
 
 

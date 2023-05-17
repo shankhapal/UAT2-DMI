@@ -121,7 +121,11 @@
 										<span id="error_premise_pin" class="error invalid-feedback"></span>
 								</div>
 							</div>
+							
+							<?php echo $this->element('application_forms/change/premises_change_uploads'); ?>							
+		
 						</div>
+						
 						<!-- fields to show last value-->
 						<div class="col-md-6 last_details_change">
 							<p><b>Last Details</b></p>

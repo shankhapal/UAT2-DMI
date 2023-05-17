@@ -36,7 +36,7 @@
 											   'reffered_back_date' => "", 'form_status' =>"", 'customer_reply' =>"", 'customer_reply_date' =>"", 'approved_date' => "",
 											   'user_email_id' => "", 'current_level' => "",'mo_comment' =>"", 'mo_comment_date' => "", 'ro_reply_comment' =>"", 'ro_reply_comment_date' =>"", 'delete_mo_comment' =>"", 'delete_ro_reply' => "",
 											   'delete_ro_referred_back' => "", 'delete_customer_reply' => "", 'ro_current_comment_to' => "",
-											   'rb_comment_ul'=>"",'mo_comment_ul'=>"",'rr_comment_ul'=>"",'cr_comment_ul'=>"",'dist_list'=>"",'business_type'=>"",'rel_doc'=>""); 
+											   'rb_comment_ul'=>"",'mo_comment_ul'=>"",'rr_comment_ul'=>"",'cr_comment_ul'=>"",'dist_list'=>"",'business_type'=>"",'rel_doc'=>"",'commodity_fssai_no'=>"",'commodity_fssai_doc'=>""); 
 				
 			}
 
@@ -263,11 +263,58 @@
 					
 				}
 				if(in_array(5,$selectedValues)){
+
+					//added new fields for uploads required for premises change, on 17-05-2023
+					if(!empty($forms_data['premises_fssai_doc']->getClientFilename())){
+						$file_name = $forms_data['premises_fssai_doc']->getClientFilename();
+						$file_size = $forms_data['premises_fssai_doc']->getSize();
+						$file_type = $forms_data['premises_fssai_doc']->getClientMediaType();
+						$file_local_path = $forms_data['premises_fssai_doc']->getStream()->getMetadata('uri');												
+						$premises_fssai_doc = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function					
+					}else{ $premises_fssai_doc = $section_form_details[0]['premises_fssai_doc']; }
+
+					if(!empty($forms_data['premises_gst_doc']->getClientFilename())){
+						$file_name = $forms_data['premises_gst_doc']->getClientFilename();
+						$file_size = $forms_data['premises_gst_doc']->getSize();
+						$file_type = $forms_data['premises_gst_doc']->getClientMediaType();
+						$file_local_path = $forms_data['premises_gst_doc']->getStream()->getMetadata('uri');												
+						$premises_gst_doc = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function					
+					}else{ $premises_gst_doc = $section_form_details[0]['premises_gst_doc']; }
+
+					if(!empty($forms_data['premises_ownership_doc']->getClientFilename())){
+						$file_name = $forms_data['premises_ownership_doc']->getClientFilename();
+						$file_size = $forms_data['premises_ownership_doc']->getSize();
+						$file_type = $forms_data['premises_ownership_doc']->getClientMediaType();
+						$file_local_path = $forms_data['premises_ownership_doc']->getStream()->getMetadata('uri');												
+						$premises_ownership_doc = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function					
+					}else{ $premises_ownership_doc = $section_form_details[0]['premises_ownership_doc']; }
+
+					if(!empty($forms_data['premises_map_doc']->getClientFilename())){
+						$file_name = $forms_data['premises_map_doc']->getClientFilename();
+						$file_size = $forms_data['premises_map_doc']->getSize();
+						$file_type = $forms_data['premises_map_doc']->getClientMediaType();
+						$file_local_path = $forms_data['premises_map_doc']->getStream()->getMetadata('uri');												
+						$premises_map_doc = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function					
+					}else{ $premises_map_doc = $section_form_details[0]['premises_map_doc']; }
+
+					if(!empty($forms_data['premises_machineries_doc']->getClientFilename())){
+						$file_name = $forms_data['premises_machineries_doc']->getClientFilename();
+						$file_size = $forms_data['premises_machineries_doc']->getSize();
+						$file_type = $forms_data['premises_machineries_doc']->getClientMediaType();
+						$file_local_path = $forms_data['premises_machineries_doc']->getStream()->getMetadata('uri');												
+						$premises_machineries_doc = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function					
+					}else{ $premises_machineries_doc = $section_form_details[0]['premises_machineries_doc']; }
+
 					$dataArray = array_merge($dataArray,array(
 						'premise_street'=>htmlentities($forms_data['premise_street'], ENT_QUOTES),
 						'premise_state'=>htmlentities($forms_data['premise_state'], ENT_QUOTES),
 						'premise_city'=>htmlentities($forms_data['premise_city'], ENT_QUOTES),
 						'premise_pin'=>htmlentities($forms_data['premise_pin'], ENT_QUOTES),
+						'premises_fssai_doc'=>$premises_fssai_doc,
+						'premises_gst_doc'=>$premises_gst_doc,
+						'premises_ownership_doc'=>$premises_ownership_doc,
+						'premises_map_doc'=>$premises_map_doc,
+						'premises_machineries_doc'=>$premises_machineries_doc,
 					));
 				}
 				if(in_array(6,$selectedValues)){
@@ -318,10 +365,23 @@
 					if ($firm_type==1 || $firm_type==3) {
 						
 						$selected_commodity = implode(',',$forms_data['selected_commodity']);
+
+						//added FFSAI fields on 17-05-2023
+						if(!empty($forms_data['commodity_fssai_doc']->getClientFilename())){
+							$file_name = $forms_data['commodity_fssai_doc']->getClientFilename();
+							$file_size = $forms_data['commodity_fssai_doc']->getSize();
+							$file_type = $forms_data['commodity_fssai_doc']->getClientMediaType();
+							$file_local_path = $forms_data['commodity_fssai_doc']->getStream()->getMetadata('uri');												
+							$commodity_fssai_doc = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function					
+						}else{ $commodity_fssai_doc = $section_form_details[0]['commodity_fssai_doc']; }
+						
 						$dataArray = array_merge($dataArray,array(
 							'comm_category'=>htmlentities($forms_data['comm_category'], ENT_QUOTES),
 							'commodity'=>htmlentities($selected_commodity, ENT_QUOTES),
+							'commodity_fssai_no'=>htmlentities($forms_data['commodity_fssai_no'], ENT_QUOTES),
+							'commodity_fssai_doc'=>$commodity_fssai_doc,
 						));
+
 						
 					} elseif ($firm_type==2) {
 						
@@ -460,6 +520,12 @@
 					'premise_state'=>htmlentities($forms_data['premise_state'], ENT_QUOTES),
 					'premise_city'=>htmlentities($forms_data['premise_city'], ENT_QUOTES),
 					'premise_pin'=>htmlentities($forms_data['premise_pin'], ENT_QUOTES),
+					//new fields for uploads added on 17-05-2023 for premises change
+					'premises_fssai_doc'=>$forms_data['premises_fssai_doc'],
+					'premises_gst_doc'=>$forms_data['premises_gst_doc'],
+					'premises_ownership_doc'=>$forms_data['premises_ownership_doc'],
+					'premises_map_doc'=>$forms_data['premises_map_doc'],
+					'premises_machineries_doc'=>$forms_data['premises_machineries_doc'],
 				));
 			}
 			if(in_array(6,$selectedValues)){
@@ -524,6 +590,8 @@
 					$dataArray = array_merge($dataArray,array(
 						'comm_category'=>htmlentities($forms_data['comm_category'], ENT_QUOTES),
 						'commodity'=>htmlentities($forms_data['selected_comm'], ENT_QUOTES),
+						'commodity_fssai_no'=>htmlentities($forms_data['commodity_fssai_no'], ENT_QUOTES),
+						'commodity_fssai_doc'=>$forms_data['commodity_fssai_doc'],
 					));
 					
 				} elseif ($firm_type==2) {
