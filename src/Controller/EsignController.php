@@ -45,7 +45,8 @@ class EsignController extends AppController {
 
 		$this->autoRender = false;
 		$customer_id = $this->Session->read('customer_id');
-		
+	
+
 		//if applicant proceed for esign, use username as customer id
 		//added on 12-05-2021 by Amol
 		if(empty($customer_id)){
@@ -58,8 +59,9 @@ class EsignController extends AppController {
 		
 		$Dmi_flow_wise_tables_list = TableRegistry::getTableLocator()->get('DmiFlowWiseTablesLists');
 		$Dmi_flow_wise_tables = $Dmi_flow_wise_tables_list->find('all',array('conditions'=>array('id IS'=>$flow_type)))->first();
+			
 		$Dmi_esign_status_tb = TableRegistry::getTableLocator()->get($Dmi_flow_wise_tables['esign_status']);
-		
+	
 		$current_level = $this->Session->read('current_level');
 		if(empty($current_level)){
 
@@ -127,7 +129,7 @@ class EsignController extends AppController {
 			//added this else part on 11-06-2019 by Amol to show esign failed message	
 			} else {
 				
-				$this->redirect('https://10.158.81.78/UAT-DMI/esign/esign_issue');//updated on 31-05-2021 for Form Based Esign method by Amol
+				$this->redirect('https://10.158.81.48/UAT-DMI/esign/esign_issue');//updated on 31-05-2021 for Form Based Esign method by Amol
 			}
 			
 		}
@@ -446,7 +448,7 @@ class EsignController extends AppController {
 		$txn_id = rand().time();
 		$asp_id = 'DMIC-001';
 		$document_hashed = hash_file('sha256',$doc_path);//create pdf hash		
-		$response_url = 'https://10.158.81.78/UAT-DMI/esign/'.$response_action;
+		$response_url = 'https://10.158.81.48/UAT-DMI/esign/'.$response_action;
 
 		if($current_level == 'level_2'){
 			$doc_info = 'Report Final Submit';
@@ -733,7 +735,7 @@ class EsignController extends AppController {
 		$txn_id = rand().time();
 		$asp_id = 'DMIC-001';
 		$document_hashed = hash_file('sha256',$doc_path);//create pdf hash		
-		$response_url = 'https://10.158.81.78/UAT-DMI/esign/'.$response_action;
+		$response_url = 'https://10.158.81.48/UAT-DMI/esign/'.$response_action;
 
 		if($current_level == 'level_2'){
 			$doc_info = 'Report Final Submit';
@@ -849,7 +851,7 @@ public function renewalRequestReEsign(){
 			$this->DmiApplAddedForReEsigns->updateAll(array('re_esign_status' => "Re_Esigned",'modified'=>"$date1"),array('customer_id IS' => $customer_id));
 			
 			
-			$main_domain_url = 'https://10.158.81.78/UAT-DMI/';
+			$main_domain_url = 'https://10.158.81.48/UAT-DMI/';
 			$url_to_redirect = 	$main_domain_url.'hoinspections/redirectGrantedApplications/1'; //default sending to new granted list
 			$this->Session->delete('pdf_file_name');
 			$this->Session->delete('re_esigning');
@@ -912,7 +914,7 @@ public function renewalRequestReEsign(){
 					
 				//calling final submit process now after signature appended in pdf.
 
-				$main_domain_url = 'https://10.158.81.78/UAT-DMI/';
+				$main_domain_url = 'https://10.158.81.48/UAT-DMI/';
 				$url_to_redirect =	$main_domain_url.$_SESSION['replica_for'].'/after_replica_allotment_esigned';				
 					
 				//this echo is used to redirect from CDAC to our Agarmark url.
@@ -922,7 +924,7 @@ public function renewalRequestReEsign(){
 			//by Amol to show esign failed message	
 			}else{
 				
-				$this->redirect('https://10.158.81.78/UAT-DMI/esign/esign_issue');//for Form Based Esign method by Amol
+				$this->redirect('https://10.158.81.48/UAT-DMI/esign/esign_issue');//for Form Based Esign method by Amol
 			}
 			
 		}
@@ -1031,7 +1033,7 @@ public function renewalRequestReEsign(){
 				$this->Session->delete('current_level');
 				$this->Session->delete('ren_esign_process');
 				
-				$this->redirect('https://10.158.81.78/UAT-DMI/esign/esign_issue');//updated on 31-05-2021 for Form Based Esign method by Amol
+				$this->redirect('https://10.158.81.48/UAT-DMI/esign/esign_issue');//updated on 31-05-2021 for Form Based Esign method by Amol
 			}
 			
 		}

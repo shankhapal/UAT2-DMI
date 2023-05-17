@@ -1,3 +1,8 @@
+//  Comment:This file updated as per change and suggestions for UAT module after test run
+// 	Reason: updated as per change and suggestions for UAT module after test run
+// 	Name of person : shankhpal shende
+// 	Date: 11-05-2023 - 16-05-2023
+// */ -->
 $(document).ready(function () {
   var application_mode = $("#application_mode").val();
 
@@ -179,17 +184,52 @@ $(document).ready(function () {
       }
     });
   }
-  var enumerate_briefly_suggestions = $(
-    "#e_briefly_suggestions_radio-yes"
-  ).val();
-  if (enumerate_briefly_suggestions == "yes") {
-    $("#briefly_suggestions").show();
+
+  var e_briefly_suggestions_radio = $("#e_briefly_suggestions_radio-no").val();
+  if (e_briefly_suggestions_radio == "no") {
+    $("#enumerate_briefly_suggestions").hide();
   }
+  $("#e_briefly_suggestions_radio-yes").on("click", function () {
+    $("#enumerate_briefly_suggestions").show();
+  });
+
   $("input[type=radio][name=e_briefly_suggestions_radio]").change(function () {
     if (this.value === "yes") {
       $("#briefly_suggestions").show();
     } else {
       $("#briefly_suggestions").val("").hide();
+    }
+  });
+
+  var minLength = 5;
+  var maxLength = 50;
+
+  // Added for max length of input box as per change request
+  // added by : shankhpal
+  // on 16/05/2023
+  $("#shortcomings_noticed").on("keyup", function () {
+    var char = $(this).val();
+    var charLength = $(this).val().length;
+    if (charLength < minLength) {
+      $("#error_shortcomings_noticed")
+        .show()
+        .text("Length is short, minimum " + minLength + " required.");
+      setTimeout(function () {
+        $("#error_shortcomings_noticed").fadeOut();
+      }, 8000);
+    } else if (charLength > maxLength) {
+      $("#error_shortcomings_noticed")
+        .show()
+        .text("Length is not valid, maximum " + maxLength + " allowed.");
+      setTimeout(function () {
+        $("#error_shortcomings_noticed").fadeOut();
+      }, 8000);
+      $(this).val(char.substring(0, maxLength));
+    } else {
+      $("#error_shortcomings_noticed").show().text("Length is valid");
+      setTimeout(function () {
+        $("#error_shortcomings_noticed").fadeOut();
+      }, 8000);
     }
   });
 });
@@ -307,6 +347,9 @@ function sample_table_validation(e) {
   }
 }
 
+//  Reason: this function are updated validation added
+// 	Name of person : shankhpal shende
+// 	Date: 11-05-2023 - 16-05-2023
 function routineInspectionFormValidation() {
   var section_form_id = $("#section_form_id").val();
 

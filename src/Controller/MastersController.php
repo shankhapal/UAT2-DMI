@@ -859,6 +859,10 @@ class MastersController extends AppController {
 
 				$form_id = 'edit_period';
 		  	$period_id = $this->Session->read('record_id');
+				//period added for master of routine inspection -> shankhpal 16/05/2023
+				$period_rti = array('1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8','9'=>'9','10'=>'10','11'=>'11','12'=>'12');
+        
+        $this->set('period_rti',$period_rti);
 	     
 				$this->loadModel('DmiCertificateTypes');
         $certificate_type = $this->DmiCertificateTypes->find('list',array('valueField'=>'certificate_type','conditions'=>array()))->toArray();
@@ -881,6 +885,7 @@ class MastersController extends AppController {
 
 			$postData = $this->request->getData();
 			//call to common Add/edit calling function
+		
 			$this->callAddEditCommonFunctions($masterId,$postData,$record_id);
 		
 			$this->redirect_to = 'list-master-records';

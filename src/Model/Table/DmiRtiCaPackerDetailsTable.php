@@ -24,6 +24,11 @@ class DmiRtiCaPackerDetailsTable extends Table{
 	);
 	
 	
+	/* Comment
+	Reason : Updated function as per change request 
+	Name of person : shankhpal shende
+	Date: 11-05-2023
+*/
 	public function sectionFormDetails($customer_id)
 	{
 	
@@ -109,7 +114,9 @@ class DmiRtiCaPackerDetailsTable extends Table{
 			// added by Amol on 21-10-2022 as per replica controller
 
 			$attached_lab = $DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'lab_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id asc'))->toList();
-				//get printing list
+			
+			//get printing list
+			// lab_list query updated list->all method are use -> shankhpal shende 12-05-2023
 			$lab_list = [];	
 			if(!empty($attached_lab)){
 				$lab_list = $DmiFirms->find('all',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/3/'.'%','delete_status IS NULL','id IN'=>$attached_lab),'order'=>'firm_name asc'))->toArray();
@@ -117,6 +124,7 @@ class DmiRtiCaPackerDetailsTable extends Table{
 			
 			$attached_pp = $DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'pp_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id asc'))->toList();    
 			
+			// printers_list query updated list->all method are use -> shankhpal shende 12-05-2023
 			$printers_list = [];
 			if(!empty($attached_pp)){
 			$printers_list = $DmiFirms->find('all',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/2/'.'%','delete_status IS Null','id IN'=>$attached_pp),'order'=>'firm_name asc'))->toArray();
@@ -125,13 +133,23 @@ class DmiRtiCaPackerDetailsTable extends Table{
 			$DmiChemistRegistrations = TableRegistry::getTableLocator()->get('DmiChemistRegistrations');
 
 			$self_registered_chemist = $DmiChemistRegistrations->find('all',array('conditions'=>array('created_by IS'=>$customer_id)))->toArray();
-   
-			return array($form_fields_details,$added_sample_details,$certificate_valid_upto,$sub_commodity_value,$lab_list,$printers_list,$self_registered_chemist);			
+      
+			$check_if_exist = $this->find()->select(['enumerate_briefly_suggestions'])->where(['customer_id IS' => $customer_id])->order('id desc')->first();
+     	$last_insp_sugg = '';
+			if(!empty($check_if_exist)){
+				$last_insp_sugg = $check_if_exist['enumerate_briefly_suggestions'];
+			}
+
+			return array($form_fields_details,$added_sample_details,$certificate_valid_upto,$sub_commodity_value,$lab_list,$printers_list,$self_registered_chemist,$last_insp_sugg);			
 	}
 	
-	
+	/* Comment
+	Reason : Updated saveFormDetails function as per change request 
+	Name of person : shankhpal shende
+	Date: 13-05-2023
+  */
 	public function saveFormDetails($customer_id,$forms_data){
-
+//  pr($forms_data);die;
 		$CustomersController = new CustomersController;			
 		$ca_bevo_applicant = $CustomersController->Customfunctions->checkCaBevo($customer_id); 
 		$Dmi_flow_wise_tables_list = TableRegistry::getTableLocator()->get('DmiFlowWiseTablesLists');
@@ -201,114 +219,120 @@ class DmiRtiCaPackerDetailsTable extends Table{
 				//taking id of multiple sub commodities	to show names in list	
 				$sub_comm_id = explode(',',(string) $added_firm_field['sub_commodity']); #For Deprecations
 				
-				$sub_commodity_value = $MCommodity->find('list',array('keyField'=>'id','valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
+				$sub_commodity_value = $MCommodity->find('all',array('keyField'=>'id','valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toArray();
 				
 				// Extract the keys as a comma-separated string
 				$commodity_value = implode(",", array_keys($sub_commodity_value));
 				// end
 
-		   	$date_last_inspection  =  $forms_data['date_last_inspection'];
-				$date_p_inspection  = $forms_data['date_p_inspection'];
-				$name_authorized_packer =   $forms_data['name_authorized_packer'];
-				$street_address = $forms_data['street_address'];
-				$email = $forms_data['email'];
-				$mobile_no =   $forms_data['mobile_no'];
-				$certificate_no =   $forms_data['certificate_no'];
-				$valid_upto  = $forms_data['valid_upto'];
-				$record_of_invice = $forms_data['record_of_invice'];
-				$chemist_incharge  = $forms_data['chemist_incharge'];
-				$present_time_of_inspection = $forms_data['present_time_of_inspection'];
-				$premises_adequately = $forms_data['premises_adequately'];
-				$lab_properly_equipped = $forms_data['lab_properly_equipped'];
-				$are_you_upto_date  = $forms_data['are_you_upto_date'];
-				$concerned_offices = $forms_data['concerned_offices'];
-				$last_lot_no  = $forms_data['last_lot_no'];
-				$last_lot_date  = $forms_data['last_lot_date'];
-				$month_upto  = $forms_data['month_upto'];
-				$replica_account_correct = $forms_data['replica_account_correct']; 
-				$discrepancies_replica_aco =  $forms_data['discrepancies_replica_aco'];
-				$fssai_approved = $forms_data['fssai_approved'];
-				$e_briefly_suggestions_radio = $forms_data['e_briefly_suggestions_radio']; 
-				$enumerate_briefly_suggestions =  $forms_data['enumerate_briefly_suggestions'];
-				$shortcomings_noticed  = $forms_data['shortcomings_noticed'];
-				$suggestions  = $forms_data['suggestions'];
-				$name_packer_representative = $forms_data['name_packer_representative'];   
-				$name_of_inspecting_officer  = $forms_data['name_of_inspecting_officer'];
-				$designation_inspecting_officer =   $forms_data['designation_inspecting_officer'];
+				// change variables -> shankhpal shende 13-05-2023
+				//html encoding post data before saving
+				
+		   	$date_last_inspection  =  htmlentities($forms_data['date_last_inspection'], ENT_QUOTES);
+				$date_p_inspection  = htmlentities($forms_data['date_p_inspection'], ENT_QUOTES);
+				$name_authorized_packer =   htmlentities($forms_data['name_authorized_packer'], ENT_QUOTES);
+				$street_address = htmlentities($forms_data['street_address'], ENT_QUOTES);
+				$email =  base64_encode($forms_data['email']); //for email encoding
+			
+				$mobile_no =  base64_encode($forms_data['mobile_no']); //for mobile encoding
+				$certificate_no =   htmlentities($forms_data['certificate_no'], ENT_QUOTES);
+				$valid_upto  = htmlentities($forms_data['valid_upto'], ENT_QUOTES);
+				$record_of_invice = htmlentities($forms_data['record_of_invice'], ENT_QUOTES);
+				$chemist_incharge  = htmlentities($forms_data['chemist_incharge'], ENT_QUOTES);
+				$present_time_of_inspection = htmlentities($forms_data['present_time_of_inspection'], ENT_QUOTES);
+				$premises_adequately = htmlentities($forms_data['premises_adequately'], ENT_QUOTES);
+				$lab_properly_equipped = htmlentities($forms_data['lab_properly_equipped'], ENT_QUOTES);
+				$are_you_upto_date  = htmlentities($forms_data['are_you_upto_date'], ENT_QUOTES);
+				$concerned_offices = htmlentities($forms_data['concerned_offices'], ENT_QUOTES);
+				$last_lot_no  = htmlentities($forms_data['last_lot_no'], ENT_QUOTES);
+				$last_lot_date  = htmlentities($forms_data['last_lot_date'], ENT_QUOTES);
+				$month_upto  = htmlentities($forms_data['month_upto'], ENT_QUOTES);
+				$replica_account_correct = htmlentities($forms_data['replica_account_correct'], ENT_QUOTES);
+				$discrepancies_replica_aco =  htmlentities($forms_data['discrepancies_replica_aco'], ENT_QUOTES);
+				$fssai_approved = htmlentities($forms_data['fssai_approved'], ENT_QUOTES);
+				$e_briefly_suggestions_radio = htmlentities($forms_data['e_briefly_suggestions_radio'], ENT_QUOTES);
+				$enumerate_briefly_suggestions =  htmlentities($forms_data['enumerate_briefly_suggestions'], ENT_QUOTES);
+				$shortcomings_noticed  = htmlentities($forms_data['shortcomings_noticed'], ENT_QUOTES);
+				$suggestions  = htmlentities($forms_data['suggestions'], ENT_QUOTES);
+				$name_packer_representative = htmlentities($forms_data['name_packer_representative'], ENT_QUOTES);
+				$name_of_inspecting_officer  = htmlentities($forms_data['name_of_inspecting_officer'], ENT_QUOTES);
+				$designation_inspecting_officer =   htmlentities($forms_data['designation_inspecting_officer'], ENT_QUOTES);
+				$analytical_results = htmlentities($forms_data['analytical_results'], ENT_QUOTES);
 		
-			if(!empty($forms_data['analytical_result_docs']->getClientFilename())){
+				if(!empty($forms_data['analytical_result_docs']->getClientFilename())){
 
-				$file_name = $forms_data['analytical_result_docs']->getClientFilename();
-				$file_size = $forms_data['analytical_result_docs']->getSize();
-				$file_type = $forms_data['analytical_result_docs']->getClientMediaType();
-				$file_local_path = $forms_data['analytical_result_docs']->getStream()->getMetadata('uri');
+					$file_name = $forms_data['analytical_result_docs']->getClientFilename();
+					$file_size = $forms_data['analytical_result_docs']->getSize();
+					$file_type = $forms_data['analytical_result_docs']->getClientMediaType();
+					$file_local_path = $forms_data['analytical_result_docs']->getStream()->getMetadata('uri');
 
-				$analytical_result_docs = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function
-			
-			}else{	
-				$analytical_result_docs = null;
-			}
-
-			if(!empty($forms_data['shortcomings_noticed_docs']->getClientFilename())){
-
-				$file_name = $forms_data['shortcomings_noticed_docs']->getClientFilename();
-				$file_size = $forms_data['shortcomings_noticed_docs']->getSize();
-				$file_type = $forms_data['shortcomings_noticed_docs']->getClientMediaType();
-				$file_local_path = $forms_data['shortcomings_noticed_docs']->getStream()->getMetadata('uri');
-
-				$shortcomings_noticed_docs = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function
-			
-			}else{	
-				$shortcomings_noticed_docs = null;
-			}
-
-			if(!empty($forms_data['signnature_of_packer_docs']->getClientFilename())){
-
-				$file_name = $forms_data['signnature_of_packer_docs']->getClientFilename();
-				$file_size = $forms_data['signnature_of_packer_docs']->getSize();
-				$file_type = $forms_data['signnature_of_packer_docs']->getClientMediaType();
-				$file_local_path = $forms_data['signnature_of_packer_docs']->getStream()->getMetadata('uri');
-
-				$signnature_of_packer_docs = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function
-			
-			}else{	
-				$signnature_of_packer_docs = null;
-			}
-
-			if(!empty($forms_data['signnature_of_inspecting_officer_docs']->getClientFilename())){
-
-				$file_name = $forms_data['signnature_of_inspecting_officer_docs']->getClientFilename();
-				$file_size = $forms_data['signnature_of_inspecting_officer_docs']->getSize();
-				$file_type = $forms_data['signnature_of_inspecting_officer_docs']->getClientMediaType();
-				$file_local_path = $forms_data['signnature_of_inspecting_officer_docs']->getStream()->getMetadata('uri');
-
-				$signnature_of_inspecting_officer_docs = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function
-			
-			}else{	
-				$signnature_of_inspecting_officer_docs = null;
-			}
-
-
-			//check if new file is selected	while reply if not save file path from db
-			if(!empty($section_form_details[0]['id'])){
-				if(empty($analytical_result_docs)){
-			
-					$analytical_result_docs = $section_form_details[0]['analytical_result_docs'];
+					$analytical_result_docs = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function
+				
+				}else{	
+					$analytical_result_docs = null;
 				}
+
+				if(!empty($forms_data['shortcomings_noticed_docs']->getClientFilename())){
+
+					$file_name = $forms_data['shortcomings_noticed_docs']->getClientFilename();
+					$file_size = $forms_data['shortcomings_noticed_docs']->getSize();
+					$file_type = $forms_data['shortcomings_noticed_docs']->getClientMediaType();
+					$file_local_path = $forms_data['shortcomings_noticed_docs']->getStream()->getMetadata('uri');
+
+					$shortcomings_noticed_docs = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function
+				
+				}else{	
+					$shortcomings_noticed_docs = null;
+				}
+
+				if(!empty($forms_data['signnature_of_packer_docs']->getClientFilename())){
+
+					$file_name = $forms_data['signnature_of_packer_docs']->getClientFilename();
+					$file_size = $forms_data['signnature_of_packer_docs']->getSize();
+					$file_type = $forms_data['signnature_of_packer_docs']->getClientMediaType();
+					$file_local_path = $forms_data['signnature_of_packer_docs']->getStream()->getMetadata('uri');
+
+					$signnature_of_packer_docs = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function
+				
+				}else{	
+					$signnature_of_packer_docs = null;
+				}
+
+				if(!empty($forms_data['signnature_of_inspecting_officer_docs']->getClientFilename())){
+
+					$file_name = $forms_data['signnature_of_inspecting_officer_docs']->getClientFilename();
+					$file_size = $forms_data['signnature_of_inspecting_officer_docs']->getSize();
+					$file_type = $forms_data['signnature_of_inspecting_officer_docs']->getClientMediaType();
+					$file_local_path = $forms_data['signnature_of_inspecting_officer_docs']->getStream()->getMetadata('uri');
+
+					$signnature_of_inspecting_officer_docs = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function
+				
+				}else{	
+					$signnature_of_inspecting_officer_docs = null;
+				}
+
+        // Added condition for update images or file  -> shankhpal shende 13-05-2023
+
 				//check if new file is selected	while reply if not save file path from db
 				if(!empty($section_form_details[0]['id'])){
-					if(empty($shortcomings_noticed_docs)){
+					if(empty($analytical_result_docs)){
 				
-						$shortcomings_noticed_docs = $section_form_details[0]['shortcomings_noticed_docs'];
+						$analytical_result_docs = $section_form_details[0]['analytical_result_docs'];
 					}
-				}
-				//check if new file is selected	while reply if not save file path from db
-				if(!empty($section_form_details[0]['id'])){
-					if(empty($signnature_of_packer_docs)){
-				
-						$signnature_of_packer_docs = $section_form_details[0]['signnature_of_packer_docs'];
+					//check if new file is selected	while reply if not save file path from db
+					if(!empty($section_form_details[0]['id'])){
+						if(empty($shortcomings_noticed_docs)){
+					
+							$shortcomings_noticed_docs = $section_form_details[0]['shortcomings_noticed_docs'];
+						}
 					}
-				}
+					//check if new file is selected	while reply if not save file path from db
+					if(!empty($section_form_details[0]['id'])){
+						if(empty($signnature_of_packer_docs)){
+					
+							$signnature_of_packer_docs = $section_form_details[0]['signnature_of_packer_docs'];
+						}
+					}
 				//check if new file is selected	while reply if not save file path from db
 				if(!empty($section_form_details[0]['id'])){
 					if(empty($signnature_of_inspecting_officer_docs)){
@@ -350,8 +374,8 @@ class DmiRtiCaPackerDetailsTable extends Table{
 			}
 		}						
 			
+		 // Updated saving code as per new variabls -> shankhpal shende 15-05-2023
 		$formSavedEntity = $this->newEntity(array(	
-
 
 				'id'=>$section_form_details[0]['id'],
 				'customer_id'=>$customer_id,
@@ -365,6 +389,7 @@ class DmiRtiCaPackerDetailsTable extends Table{
 				'mobile_no' => $mobile_no, 
 				'certificate_no' => $certificate_no, 
 				'valid_upto' => $valid_upto,
+				'commodity'=>null,
 				'grading_lab' => $grading_lab_keys, 
 				'printing_press' => $printing_press_keys, 
 				'record_of_invice' => $record_of_invice,
@@ -381,7 +406,8 @@ class DmiRtiCaPackerDetailsTable extends Table{
 				'discrepancies_replica_aco' => $discrepancies_replica_aco, 
 				'fssai_approved' => $fssai_approved,
 				'e_briefly_suggestions_radio' => $e_briefly_suggestions_radio,
-				'enumerate_briefly_suggestions' => $enumerate_briefly_suggestions, 
+				'enumerate_briefly_suggestions' => $enumerate_briefly_suggestions,
+				'analytical_results' => $analytical_results,
 				'shortcomings_noticed' => $shortcomings_noticed, 
 				'suggestions' => $suggestions, 
 				'name_packer_representative' => $name_packer_representative, 
@@ -399,36 +425,53 @@ class DmiRtiCaPackerDetailsTable extends Table{
 		if($this->save($formSavedEntity)){ return $message_id; }else{ $message_id = ""; return $message_id; }  		
 	}
 
-
+	/* Comment
+	Reason : Updated saveReferredBackComment function as per change request and 
+	// suggestion for UAT module after test run
+	Name of person : shankhpal shende
+	Date: 16-05-2023
+  */
 	public function saveReferredBackComment($customer_id,$report_details,$reffered_back_comment,$rb_comment_ul){
 
 		$formSavedEntity = $this->newEntity(array(			
 			'customer_id'=>$customer_id,
 			'user_email_id'=>$report_details['user_email_id'],
 			'user_once_no'=>$report_details['user_once_no'],
-			'date_p_inspection'=>$report_details['date_p_inspection'],
-			'date_last_inspection'=>$report_details['date_last_inspection'],
-			'record_of_invoice_up_to_date'=>$report_details['record_of_invoice_up_to_date'],
-			'premises_adequately'=>$report_details['premises_adequately'],
-			'lab_properly_equipped'=>$report_details['lab_properly_equipped'],
-			'up_to_date'=>$report_details['up_to_date'],
-			'last_lot_no'=>$report_details['last_lot_no'],
-			'quantity_graded'=>$report_details['quantity_graded'],
-			'shortcomings_noticed'=>$report_details['shortcomings_noticed'],
-			'concerned_offices'=>$report_details['concerned_offices'],
-			'replica_account_correct'=>$report_details['replica_account_correct'],
-			'discrepancies_replica_aco'=>$report_details['discrepancies_replica_aco'],
-			'signature'=>$report_details['signature'],
-			'signature_name'=>$report_details['signature_name'],
-			'fssai_approved_docs'=>$report_details['fssai_approved_docs'],
-			'up_to_date_docs'=>$report_details['up_to_date_docs'],
-			'name_inspecting_officer'=>$report_details['name_inspecting_officer'],
-			'designation_inspecting_officer'=>$report_details['designation_inspecting_officer'],
-			'name_of_packer'=>$report_details['name_of_packer'],
-		  'are_you_upto_date'=>$report_details['are_you_upto_date'],
-			'enumerate_briefly_suggestions'=>$report_details['enumerate_briefly_suggestions'],
-			'e_briefly_suggestions_radio'=>$report_details['e_briefly_suggestions_radio'],
-			'fssai_approved'=>$report_details['fssai_approved'],
+			'date_last_inspection' => $report_details['date_last_inspection'],
+			'date_p_inspection'  => $report_details['date_p_inspection'],
+			'name_authorized_packer'  => $report_details['name_authorized_packer'],
+			'street_address' => $report_details['street_address'],
+			'email' => $report_details['email'],
+			'mobile_no' => $report_details['mobile_no'],
+			'certificate_no' => $report_details['certificate_no'],
+			'valid_upto' => $report_details['valid_upto'],
+			'grading_lab' => $report_details['grading_lab'],
+			'printing_press' => $report_details['printing_press'],
+			'record_of_invice' => $report_details['record_of_invice'],
+			'chemist_incharge'  => $report_details['chemist_incharge'],
+			'present_time_of_inspection' => $report_details['present_time_of_inspection'],
+			'premises_adequately' => $report_details['premises_adequately'],
+			'lab_properly_equipped' => $report_details['lab_properly_equipped'],
+			'are_you_upto_date'  => $report_details['are_you_upto_date'],
+			'concerned_offices' => $report_details['concerned_offices'],
+			'last_lot_no' => $report_details['last_lot_no'],
+			'last_lot_date'  => $report_details['last_lot_date'],
+			'month_upto'  => $report_details['month_upto'],
+			'replica_account_correct'  => $report_details['replica_account_correct'],
+			'discrepancies_replica_aco' => $report_details['discrepancies_replica_aco'],
+			'fssai_approved' => $report_details['fssai_approved'],
+			'e_briefly_suggestions_radio' => $report_details['e_briefly_suggestions_radio'],
+			'enumerate_briefly_suggestions' => $report_details['enumerate_briefly_suggestions'],
+			'shortcomings_noticed' => $report_details['shortcomings_noticed'],
+			'suggestions' => $report_details['suggestions'],
+			'name_packer_representative' => $report_details['name_packer_representative'],
+			'name_of_inspecting_officer' => $report_details['name_of_inspecting_officer'],
+			'designation_inspecting_officer' => $report_details['designation_inspecting_officer'],
+			'analytical_results' => $report_details['analytical_results'],
+			'analytical_result_docs'=> $report_details['analytical_result_docs'],
+			'shortcomings_noticed_docs'=> $report_details['shortcomings_noticed_docs'],
+			'signnature_of_packer_docs'=> $report_details['signnature_of_packer_docs'],
+			'signnature_of_inspecting_officer_docs'=> $report_details['signnature_of_inspecting_officer_docs'],
 			'referred_back_comment'=>$reffered_back_comment,
 			'rb_comment_ul'=>$rb_comment_ul,
 			'referred_back_date'=>date('Y-m-d H:i:s'),

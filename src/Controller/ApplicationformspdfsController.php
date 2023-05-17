@@ -3304,11 +3304,18 @@ class ApplicationformspdfsController extends AppController{
 	// @Author : Shankhpal Shende
 	// #Date : 29/12/2022
 	// Note : For Routine Inspection (RTI)
+	
+	
+	// Description : Updated caRiReport function added new model name => DmiRtiCaPackerDetails
+	// @Author : Shankhpal Shende
+	// #Date : 12/05/2023
+	// Note : For Routine Inspection (RTI)
+
 
 	public function caRiReportPdf(){
 
-	
-		$this->loadModel('DmiRtiCaPackerDetails');	
+	  
+		$this->loadModel('DmiRtiCaPackerDetails');	 // changese modelname 13-05-2023
 		$this->loadModel('DmiFirms');	
 		$this->loadModel('DmiGrantCertificatesPdfs');
 		$this->loadModel('MCommodity');

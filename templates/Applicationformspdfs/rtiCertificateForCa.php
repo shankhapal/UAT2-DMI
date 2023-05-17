@@ -1,4 +1,9 @@
 
+<!--  Comment:This file updated as per change and suggestions for UAT module after test run
+	    Reason: updated as per change and suggestions for UAT module after test run
+	    Name of person : shankhpal shende
+	    Date: 15-05-2023
+*/ -->
 <?php //echo $rti_ca_data;die; ?>
 <style>
 	h4 {
@@ -106,17 +111,17 @@
 			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['lab_properly_equipped']; ?></td>
 		</tr>
     <tr>
-        <td style="padding:10px; vertical-align:top;">a) Are they up to date</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['are_you_upto_date']; ?></td>
+        <td style="padding:10px; vertical-align:top;">11. Grading Records :</td>
+       
 		</tr>
-     <tr>
-        <td style="padding:10px; vertical-align:top;">b) Are they being forwarded to the concerned offices in time?</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['concerned_offices']; ?></td>
+    <tr> 
+      <td style="padding:10px; vertical-align:top;">a) Are they up to date</td>
+      <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['are_you_upto_date']; ?></td>
 		</tr>
     <tr>
-        <td style="padding:10px; vertical-align:top;">11. Grading Records :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo "not added need to update"; ?></td>
-		</tr>
+        <td style="padding:10px; vertical-align:top;">b) Are they being forwarded to the concerned offices in time?</td>
+         <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['concerned_offices']; ?></td>
+    </tr>
     <tr>
       
         <td style="padding:10px; vertical-align:top;">12. Last lot No. dated And its analytical results.</td>
@@ -137,10 +142,9 @@
                   <td><?php echo $rti_ca_data['last_lot_no']; ?></td>
                   <td><?php echo $rti_ca_data['last_lot_date'] ?></td>
                   <td><?php echo $rti_ca_data['analytical_results']; ?></td>
-                  <td style="padding:10px; vertical-align:top;"><?php if(!empty($rti_ca_data['analytical_result_docs'])){?>
-                  <a target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$rti_ca_data['analytical_result_docs']); ?>">Preview</a>
-                  <?php }else{ echo "No File Attached";} ?></td>
-                 
+                  <td style="padding:10px; vertical-align:top;"><?php if(!empty($rti_ca_data['analytical_result_docs'])){ $split_file_path = explode("/",$rti_ca_data['analytical_result_docs']);$file_name = $split_file_path[count($split_file_path) - 1];?>
+				          <a href="<?php echo $rti_ca_data['analytical_result_docs']; ?>"><?php echo substr($file_name,23); ?></a><?php }else{ echo 'NA'; } ?>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -162,69 +166,11 @@
 		</tr>
     </table>
     <table width="100%" border="1">
-     <tr>
-        <td style="padding:10px; vertical-align:top;">16. Enumerate briefly suggestions given during last inspection and state, if carried out:</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['e_briefly_suggestions_radio']; ?></td>
-		</tr>
-    <tr>
-        <td style="padding:10px; vertical-align:top;">17. Shortcomings noticed in present inspection:</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['shortcomings_noticed']; ?></td>
-		</tr>
-     <tr>
-        <td style="padding:10px; vertical-align:top;">Shortcomings noticed Docs : </td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['e_briefly_suggestions_radio']; ?></td>
-		</tr>
-     <tr>
-        <td style="padding:10px; vertical-align:top;">18. Suggestions :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['suggestions']; ?></td>
-		</tr>
-    
-   
-    <tr>
-        <td style="padding:10px; vertical-align:top;">Name of the Packer or his representative:</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['name_packer_representative']; ?></td>
-		</tr>
-     <tr>
-        <td style="padding:10px; vertical-align:top;">Signnature of the Packer or his representative</td>
-			  <td style="padding:10px; vertical-align:top;">
-           <?php if(!empty($rti_ca_data['signnature_of_packer_docs'])){ $split_file_path = explode("/",$rti_ca_data['signnature_of_packer_docs']);$file_name = $split_file_path[count($split_file_path) - 1];?>
-					<a href="<?php echo $rti_ca_data['signnature_of_packer_docs']; ?>"><?php echo substr($file_name,23); ?></a><?php }else{ echo 'NA'; } ?>
-        </td>
-		</tr>
-    <tr>
-        <td style="padding:10px; vertical-align:top;">Name of the Inspecting Officer :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['name_of_inspecting_officer']; ?></td>
-		</tr>
-    <tr>
-        <td style="padding:10px; vertical-align:top;">Signature of the Inspecting Officer:</td>
-			  <td style="padding:10px; vertical-align:top;"><?php if(!empty($rti_ca_data['signnature_of_inspecting_officer_docs'])){ $split_file_path = explode("/",$rti_ca_data['signnature_of_inspecting_officer_docs']);$file_name = $split_file_path[count($split_file_path) - 1];?>
-																<a href="<?php echo $rti_ca_data['signnature_of_inspecting_officer_docs']; ?>"><?php echo substr($file_name,23); ?></a><?php }else{ echo 'NA'; } ?></td>
-		</tr>
-    <tr>
-        <td style="padding:10px; vertical-align:top;">Designation:</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['designation_inspecting_officer']; ?></td>
-		</tr>
-    <tr>
-        <td style="padding:10px; vertical-align:top;">Place:</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $firm_district_name.', '; echo $firm_state_name.'.';?></td>
-		</tr>
-    <tr>
-        <td style="padding:10px; vertical-align:top;">Date:</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $pdf_date;?></td>
-		</tr>
-    <table>					
-	 <tr>
-		<td  align="left"><br><br><br>
-		
-		</td>
-	</tr>
-</table>
-    <table width="100%" border="1">
-          <tr>
-              <td align="center" style="padding:5px;"><h4>19. Collection of check samples : -</h4></td>
-          </tr>
+      <tr>
+        <td style="padding:10px; vertical-align:top;">16. Collection of check samples</td>
+      </tr>
     </table>
-    <table width="100%" border="1">
+   <table width="100%" border="1">
         <tr>
              <th align="center" style="padding:5px;">S.No</th>
              <th align="center" style="padding:5px;">Commodity</th>
@@ -248,5 +194,66 @@
         </tr>   
         <?php $i=$i+1; } ?>
     </table>
+
+    <table width="100%" border="1">
+     <tr>
+        <td style="padding:10px; vertical-align:top;">17. Enumerate briefly suggestions given during last inspection and state, if carried out:</td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['e_briefly_suggestions_radio']; ?></td>
+		</tr>
+    
+    <tr>
+        <td style="padding:10px; vertical-align:top;">18. Shortcomings noticed in present inspection:</td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['shortcomings_noticed']; ?></td>
+		</tr>
+     <tr>
+        <td style="padding:10px; vertical-align:top;">Shortcomings noticed Docs : </td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['e_briefly_suggestions_radio']; ?></td>
+		</tr>
+     <tr>
+        <td style="padding:10px; vertical-align:top;">19. Suggestions :</td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['suggestions']; ?></td>
+		</tr>
+    
+   
+    <tr>
+        <td style="padding:10px; vertical-align:top;">Name of the Packer or his representative:</td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['name_packer_representative']; ?></td>
+		</tr>
+     <tr>
+        <td style="padding:10px; vertical-align:top;">Signnature of the Packer or his representative</td>
+			  <td style="padding:10px; vertical-align:top;">
+           <?php if(!empty($rti_ca_data['signnature_of_packer_docs'])){ $split_file_path = explode("/",$rti_ca_data['signnature_of_packer_docs']);$file_name = $split_file_path[count($split_file_path) - 1];?>
+					<a href="<?php echo $rti_ca_data['signnature_of_packer_docs']; ?>"><?php echo substr($file_name,23); ?></a><?php }else{ echo 'NA'; } ?>
+        </td>
+		</tr>
+    <tr>
+        <td style="padding:10px; vertical-align:top;">Name of the Inspecting Officer :</td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['name_of_inspecting_officer']; ?></td>
+		</tr>
+    <tr>
+        <td style="padding:10px; vertical-align:top;">Signature of the Inspecting Officer:</td>
+			  <td style="padding:10px; vertical-align:top;"><?php if(!empty($rti_ca_data['signnature_of_inspecting_officer_docs'])){ $split_file_path = explode("/",$rti_ca_data['signnature_of_inspecting_officer_docs']);$file_name = $split_file_path[count($split_file_path) - 1];?>
+				<a href="<?php echo $rti_ca_data['signnature_of_inspecting_officer_docs']; ?>"><?php echo substr($file_name,23); ?></a><?php }else{ echo 'NA'; } ?></td>
+		</tr>
+    <tr>
+        <td style="padding:10px; vertical-align:top;">Designation:</td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['designation_inspecting_officer']; ?></td>
+		</tr>
+    <tr>
+        <td style="padding:10px; vertical-align:top;">Place:</td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo $firm_district_name.', '; echo $firm_state_name.'.';?></td>
+		</tr>
+    <tr>
+        <td style="padding:10px; vertical-align:top;">Date:</td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo $pdf_date;?></td>
+		</tr>
+    <table>					
+	 <tr>
+		<td  align="left"><br><br><br>
+		
+		</td>
+	</tr>
+</table>
+    
 
 </table>

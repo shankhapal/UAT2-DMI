@@ -1,4 +1,12 @@
-<?php echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-data', 'id'=>$section)); ?>
+
+<!--    Comment:This file updated as per change and suggestions for UAT module after test run
+	    Reason: updated as per change and suggestions for UAT module after test run
+	    Name of person : shankhpal shende
+	    Date: 13-05-2023
+*/ -->
+<?php 
+//pr($section_form_details[7]);die;
+echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-data', 'id'=>$section)); ?>
 <section id="form_outer_main" class="content form-middle">
     <div class="container-fluid">
         <h5 class="mt-1 mb-2">Routine Inspection Report (CA-Packer)</h5>
@@ -325,7 +333,7 @@
                                                 <?php if($section_form_details[6] != null){?>    
                                                     <?php echo $this->Form->control('chemist_incharge', array('type'=>'text', 'placeholder'=>'Enter name of the chemist incharge','value'=>$section_form_details[6][0]['chemist_fname']." ".$section_form_details[6][0]['chemist_lname'],'readonly'=>true, 'id'=>'chemist_incharge', 'class'=>'form-control input-field', 'label'=>false)); ?>
                                                 <?php }else{ ?>
-                                                    <?php echo $this->Form->control('chemist_incharge', array('type'=>'text', 'readonly'=>true, 'id'=>'fax_no', 'class'=>'form-control input-field', 'label'=>false)); ?>
+                                                    <?php //echo $this->Form->control('chemist_incharge', array('type'=>'text', 'readonly'=>true, 'id'=>'fax_no', 'class'=>'form-control input-field', 'label'=>false)); ?>
                                                         <div class="colorWarning margin5 header-text col-form-label"> Chemist Register and mapped by CA on the System</div>
                                                     <span id="error_chemist_incharge" class="error invalid-feedback"></span>
                                                 <?php } ?>
@@ -730,7 +738,7 @@
                                                 <div class="form-group row">
                                                       <?php
                                                     $i=1;
-                                                    $fssai_approved = $section_form_details[0]['fssai_approved'];
+                                                    $fssai_approved = isset($section_form_details[0]['fssai_approved'])?$section_form_details[0]['fssai_approved']:"";
                                                     
                                                         if($fssai_approved == 'yes'){
                                                             $checked_yes = 'checked';
@@ -774,7 +782,7 @@
                                                 <div class="form-group row">
                                                          <?php
                                                             $i=1;
-                                                            $e_briefly_suggestions_radio = $section_form_details[0]['e_briefly_suggestions_radio'];
+                                                            $e_briefly_suggestions_radio = isset($section_form_details[0]['e_briefly_suggestions_radio'])?$section_form_details[0]['e_briefly_suggestions_radio']:"";
                                                             
                                                                 if($e_briefly_suggestions_radio == 'yes'){
                                                                     $checked_yes = 'checked';
@@ -797,7 +805,9 @@
                                                                 </label>
                                                             </div>
                                                             <div class="col-sm-9 hidden" id="briefly_suggestions">
-                                                                <?php echo $this->Form->control('enumerate_briefly_suggestions', array('type'=>'textarea', 'id'=>'enumerate_briefly_suggestions', 'escape'=>false, 'value'=>$section_form_details[0]['enumerate_briefly_suggestions'], 'class'=>'form-control input-field', 'label'=>false, 'placeholder'=>'Enter discrepancies here...')); ?>
+                                                                
+                                                                <?php $username = 'shankhpal';
+                                                                 echo $this->Form->control('enumerate_briefly_suggestions', array('type'=>'textarea', 'id'=>'enumerate_briefly_suggestions', 'escape'=>false,'value'=>isset($section_form_details[0]['enumerate_briefly_suggestions'])?$section_form_details[0]['enumerate_briefly_suggestions']:"", 'class'=>'form-control input-field', 'label'=>false, 'placeholder'=>'Enter discrepancies here...')); ?>
                                                                 <span id="error_enumerate_briefly_suggestions" class="error invalid-feedback"></span>
                                                             </div>    
                                                         </div>
@@ -819,7 +829,7 @@
                                             <div class="col-md-6">
                                                 <div class="form-group row">
                                                         <div class="col-sm">
-                                                    <?php echo $this->Form->control('shortcomings_noticed', array('type'=>'text', 'id'=>'shortcomings_noticed', 'class'=>'form-control', 'label'=>false,'value'=>$section_form_details[0]['shortcomings_noticed'])); ?>
+                                                    <?php echo $this->Form->control('shortcomings_noticed', array('type'=>'textarea', 'id'=>'shortcomings_noticed','placeholder'=>'Shortcomings noticed','class'=>'form-control', 'label'=>false,'value'=>isset($section_form_details[0]['shortcomings_noticed'])?$section_form_details[0]['shortcomings_noticed']:"")); ?>
                                                     <span id="error_shortcomings_noticed" class="error invalid-feedback"></span> 
                                                 </div> 
                                             </div>
@@ -869,7 +879,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group row">
                                             <div class="col-sm">
-                                                <?php echo $this->Form->control('suggestions', array('type'=>'textarea', 'id'=>'suggestions', 'value'=>$section_form_details[0]['suggestions'], 'class'=>'form-control input-field', 'placeholder'=>'Enter Suggestions', 'label'=>false)); ?>
+                                                <?php echo $this->Form->control('suggestions', array('type'=>'textarea', 'id'=>'suggestions', 'value'=>isset($section_form_details[0]['suggestions'])?$section_form_details[0]['suggestions']:"", 'class'=>'form-control input-field', 'placeholder'=>'Enter Suggestions', 'label'=>false)); ?>
                                                 <span id="error_suggestions" class="error invalid-feedback"></span>
                                             </div> 
                                         </div>
@@ -944,7 +954,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group row">
                                             <div class="col-sm">
-                                                <?php echo $this->Form->control('name_of_inspecting_officer', array('type'=>'text', 'id'=>'name_of_inspecting_officer', 'class'=>'form-control', 'label'=>false,'value'=>isset($section_form_details[0]['name_of_inspecting_officer'])?$section_form_details[0]['name_of_inspecting_officer']:"")); ?>
+                                                <?php echo $this->Form->control('name_of_inspecting_officer', array('type'=>'text', 'id'=>'name_of_inspecting_officer','placeholder'=>'Enter Name of the Inspecting Officer', 'class'=>'form-control', 'label'=>false,'value'=>isset($section_form_details[0]['name_of_inspecting_officer'])?$section_form_details[0]['name_of_inspecting_officer']:"")); ?>
                                                  <span id="error_name_of_inspecting_officer" class="error invalid-feedback"></span>
                                             </div> 
                                         </div>
@@ -963,7 +973,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group row">
                                             <div class="col-sm">
-                                                <?php echo $this->Form->control('designation_inspecting_officer', array('type'=>'text', 'id'=>'designation_inspecting_officer', 'class'=>'form-control','value '=>$section_form_details[0]['designation_inspecting_officer'], 'placeholder'=>'Please Enter Designation', 'label'=>false)); ?>
+                                                <?php echo $this->Form->control('designation_inspecting_officer', array('type'=>'text', 'id'=>'designation_inspecting_officer', 'class'=>'form-control','value '=>isset($section_form_details[0]['designation_inspecting_officer'])?$section_form_details[0]['designation_inspecting_officer']:"", 'placeholder'=>'Please Enter Designation', 'label'=>false)); ?>
                                                 <span id="error_designation_inspecting_officer" class="error invalid-feedback"></span>
                                             </div> 
                                         </div>
