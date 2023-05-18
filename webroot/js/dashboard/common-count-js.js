@@ -1351,6 +1351,61 @@ $(document).ready(function () {
         return false;
       }
     });
+
+    // Comment: Function added for reallocation tab
+    // Reason: whene click on reallocation button call this function and update record
+    // Date: 18/05/2023
+    // Module: RTI
+    // Author:Shankhpal Shende
+    $("#routine_inspection_re_allocate_btn").click(function () {
+      var appl_type = $("#alloc_appl_type").val();
+      var customer_id = $("#alloc_customer_id").val();
+      var io_user_id = $("#io_users_list").val();
+      var ro_scheduled_date = $("#ro_scheduled_date").val();
+
+      if (
+        appl_type != "" &&
+        io_user_id != null &&
+        customer_id != "" &&
+        customer_id != ""
+      ) {
+        $.ajax({
+          type: "POST",
+          async: true,
+          url: "../dashboard/re_allocate_appl_for_routine_inspection",
+          data: {
+            customer_id: customer_id,
+            appl_type: appl_type,
+            io_user_id: io_user_id,
+            ro_scheduled_date: ro_scheduled_date,
+          },
+          beforeSend: function (xhr) {
+            // Add this line
+            $(".loader").show();
+            $(".loadermsg").show();
+            xhr.setRequestHeader(
+              "X-CSRF-Token",
+              $('[name="_csrfToken"]').val()
+            );
+          },
+          success: function (data) {
+            $(".loader").hide();
+            $(".loadermsg").hide();
+            $("#inspection_alloction_Modal").hide();
+            alert(
+              "The Application " +
+                customer_id +
+                " is successfully allocated for Routine Inspection to IO user."
+            );
+            //to reload list after allocation
+            $("#for_routine_inspection_tab").click();
+          },
+        });
+      } else {
+        $.alert("Please Select All Details. It can not be blank");
+        return false;
+      }
+    });
   }
 
   //added method on 07-02-2023 for common ajax code inspection allocation

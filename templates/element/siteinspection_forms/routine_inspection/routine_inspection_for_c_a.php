@@ -1015,6 +1015,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
 </section>
 <input type="hidden" id="final_submit_status_id" value="<?php echo $final_submit_status; ?>">
 <input type="hidden" id="application_mode" value="<?php echo $_SESSION['application_mode']; ?>">
+<input type="hidden" id="current_level" value="<?php echo $_SESSION['current_level']; ?>">
 <input type="hidden" id="application_type_id" value="<?php echo $_SESSION['application_type']; ?>">
 <?php 
 echo $this->Html->css('RoutineInspection/routine_inspection_style');

@@ -5,19 +5,21 @@
 // */ -->
 $(document).ready(function () {
   var application_mode = $("#application_mode").val();
-
-  if (application_mode == "view") {
-    $(document).ready(function () {
-      $("#form_inner_main :input").prop("disabled", true);
-      $("#form_inner_main :input[type='radio']").prop("disabled", true);
-      $("#form_inner_main :input[type='select']").prop("disabled", true);
-      $("#form_inner_main :input[type='submit']").prop("disabled", true);
-      $("#form_inner_main :input[type='reset']").prop("disabled", true);
-      $("#form_inner_main :input[type='button']").prop("disabled", true);
-      $("#form_inner_main :input[type='submit']").hide();
-      $(".glyphicon-edit").css("display", "none");
-      $(".glyphicon-remove-sign").css("display", "none");
-    });
+  var current_level = $("#current_level").val();
+  // alert(current_level);
+  if (application_mode == "view" && current_level == "level_2") {
+    $("#section_form_id :input").prop("disabled", false);
+    // $(document).ready(function () {
+    //   $("#form_inner_main :input").prop("disabled", true);
+    //   $("#form_inner_main :input[type='radio']").prop("disabled", true);
+    //   $("#form_inner_main :input[type='select']").prop("disabled", true);
+    //   $("#form_inner_main :input[type='submit']").prop("disabled", true);
+    //   $("#form_inner_main :input[type='reset']").prop("disabled", true);
+    //   $("#form_inner_main :input[type='button']").prop("disabled", true);
+    //   $("#form_inner_main :input[type='submit']").hide();
+    //   $(".glyphicon-edit").css("display", "none");
+    //   $(".glyphicon-remove-sign").css("display", "none");
+    // });
   }
 
   var form_section_id = $("#form_section_id").val();

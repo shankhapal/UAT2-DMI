@@ -34,60 +34,74 @@ class DmiRtiCaPackerDetailsTable extends Table{
 
 			// select record for customer has approved or not
 			$DmiRtiFinalReports = TableRegistry::getTableLocator()->get('DmiRtiFinalReports');
+			$DmiRtiAllocations = TableRegistry::getTableLocator()->get('DmiRtiAllocations');
 			
 			$approved_record = $DmiRtiFinalReports->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id desc'))->first();
-     pr($approved_record);die;
+
+			$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,array('date(created) > '=>$approved_record['created'])),'order'=>'id desc'))->first();
+
+			
+
+			if(!empty($allocated_record)){
+
+			}
 			
 			$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
-	
 
-			if($latest_id != null){
+
+			if($latest_id != null && $allocated_record == null){
 				$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();		
 				$form_fields_details = $report_fields;
 				
 			}else{
-				$form_fields_details = Array (
-					'id' =>"", 
-					'customer_id' =>"", 
-					'io_reply_once_no' =>"",  
-					'referred_back_comment' =>"", 
-					'referred_back_date' =>"",
-					'date_last_inspection' =>"",
-					'date_p_inspection' =>"",
-					'name_authorized_packer' =>"",
-					'street_address' =>"",
-					'email' =>"",
-					'mobile_no' =>"",
-					'certificate_no' =>"",
-					'valid_upto' =>"",
-					'commodity' =>"",
-					'grading_lab' =>"",
-					'printing_press' =>"",
-					'record_of_invice' =>"",
-					'chemist_incharge' =>"",
-					'present_time_of_inspection' =>"",
-					'premises_adequately' =>"",
-					'lab_properly_equipped' =>"",
-					'are_you_upto_date' =>"",
-					'concerned_offices' =>"",
-					'last_lot_no' =>"",
-					'last_lot_date' =>"",
-					'analytical_results' =>"",
-					'month_upto' =>"",
-					'replica_account_correct' =>"",
-					'discrepancies_replica_aco' =>"",
-					'fssai_approved ' =>"",
-					'io_reply' =>"", 
-					'io_reply_date' =>"", 
-					'form_status' =>"",
-					'referred_back_by_email' =>"", 
-					'referred_back_by_once' =>"", 
-					'current_level' =>"", 
-					'delete_ro_referred_back' =>"",
-					'analytical_result_docs'=>""
-				); 
+
+					$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+					$result_data = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();
+					$enumerate_briefly_suggestions = $result_data['enumerate_briefly_suggestions'];	
+
+					$form_fields_details = Array (
+						'id' =>"", 
+						'customer_id' =>"", 
+						'io_reply_once_no' =>"",  
+						'referred_back_comment' =>"", 
+						'referred_back_date' =>"",
+						'date_last_inspection' =>"",
+						'date_p_inspection' =>"",
+						'name_authorized_packer' =>"",
+						'street_address' =>"",
+						'email' =>"",
+						'mobile_no' =>"",
+						'certificate_no' =>"",
+						'valid_upto' =>"",
+						'commodity' =>"",
+						'grading_lab' =>"",
+						'printing_press' =>"",
+						'record_of_invice' =>"",
+						'chemist_incharge' =>"",
+						'present_time_of_inspection' =>"",
+						'premises_adequately' =>"",
+						'lab_properly_equipped' =>"",
+						'are_you_upto_date' =>"",
+						'concerned_offices' =>"",
+						'last_lot_no' =>"",
+						'last_lot_date' =>"",
+						'analytical_results' =>"",
+						'month_upto' =>"",
+						'enumerate_briefly_suggestions'=>isset($enumerate_briefly_suggestions)?$enumerate_briefly_suggestions:"",
+						'replica_account_correct' =>"",
+						'discrepancies_replica_aco' =>"",
+						'fssai_approved ' =>"",
+						'io_reply' =>"", 
+						'io_reply_date' =>"", 
+						'form_status' =>"",
+						'referred_back_by_email' =>"", 
+						'referred_back_by_once' =>"", 
+						'current_level' =>"", 
+						'delete_ro_referred_back' =>"",
+						'analytical_result_docs'=>""
+					); 
 			
-		}
+			}
 		
 			$Dmi_grant_certificates_pdfs = TableRegistry::getTableLocator()->get('DmiGrantCertificatesPdfs');
 			$get_last_grant_date = $Dmi_grant_certificates_pdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>array('id desc')))->first();

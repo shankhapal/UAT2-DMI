@@ -13,7 +13,8 @@
 				<?php if($comm_with=='Not Allocated'){ ?>
 					<h4>Allocation for Routine Inspection</h4>
 				<?php }else{ ?>
-					<h4>Re-allocation for ROutine Inspection</h4>
+					<!-- updated name by shankhpal shende on 18/05/2023 -->
+					<h4>Re-allocation for Routine Inspection</h4>  
 				<?php } ?>
 			  <button type="button" class="close" data-dismiss="modal">&times;</button>
 			</div>
@@ -46,7 +47,8 @@
 										<a href="#" class="allocate_btn"  id="routine_inspection_allocate_btn">Allocate</a>
 										
 									<?php }else{ ?>
-										<a href="#" class="allocate_btn"  id="routine_inspection_allocate_btn">Reallocate</a>
+										<!-- updated id by shankhpal shende on 18/05/2023 -->
+										<a href="#" class="allocate_btn"  id="routine_inspection_re_allocate_btn">Reallocate</a>
 									<?php } ?>
 								</td>
 							</tr>
