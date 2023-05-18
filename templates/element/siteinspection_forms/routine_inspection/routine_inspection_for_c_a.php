@@ -5,7 +5,7 @@
 	    Date: 13-05-2023
 */ -->
 <?php 
-//pr($section_form_details[7]);die;
+// pr($section_form_details);die;
 echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-data', 'id'=>$section)); ?>
 <section id="form_outer_main" class="content form-middle">
     <div class="container-fluid">

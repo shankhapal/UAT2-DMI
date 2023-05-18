@@ -31,7 +31,13 @@ class DmiRtiCaPackerDetailsTable extends Table{
 */
 	public function sectionFormDetails($customer_id)
 	{
-	
+
+			// select record for customer has approved or not
+			$DmiRtiFinalReports = TableRegistry::getTableLocator()->get('DmiRtiFinalReports');
+			
+			$approved_record = $DmiRtiFinalReports->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id desc'))->first();
+     pr($approved_record);die;
+			
 			$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
 	
 

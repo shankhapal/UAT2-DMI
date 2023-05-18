@@ -1059,7 +1059,7 @@ class DashboardController extends AppController{
 							
 								// fetched record conditionaly 
 								$grant_record_list =  $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array($condition)), array('order'=>'id desc'))->distinct('customer_id')->toArray();
-				  
+				        
 								if(!empty($grant_record_list))
 								{
 								
@@ -1082,50 +1082,56 @@ class DashboardController extends AppController{
 										$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id);
 									
 										//check final submit status for level 2 & 3 and approved for each allocated id
-										$routine_inspection = $this->DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'pending'),array('order'=>'id desc')))->first();
-																	 
-										$created = ''; // by default blank 
+										$routine_inspection = $this->DmiRtiFinalReports->find('all',array('conditions'=>array('status'=>'approved')))->toArray();
+										// pr($routine_inspection);die;
+										
+										// $created = ''; // by default blank 
 										//if routine_inspection not empty 
-										if(!empty($routine_inspection)){
-											$created = $routine_inspection['created']; // hold created date
-										}else{
+										// if(!empty($routine_inspection)){
+
+										// 	foreach ($routine_inspection as $each_value) {
+										// 		$created = $each_value['created']; // hold created date
+										// 	}
+											
+										// }else{
 											 // if routine_inspection empty 
 											$site_inspection = $this->DmiSiteinspectionFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'pending'),array('order'=>'id desc')))->first();
 										
-											if(!empty($site_inspection)){
+											// if(!empty($site_inspection)){
 					  
-												$created = $site_inspection['created'];		// hold created date											
-											}
+											// 	$created = $site_inspection['created'];		// hold created date											
+											// }
 											 
-										}
+										// }
+										// pr($created);die;
 										 // when created date not empty 
-										 if(!empty($created)) {
+										//  if(!empty($created)) {
 											 
-											$split_created	= 	explode(' ',(string) $created); //conver into array 
+										// 	$split_created	= 	explode(' ',(string) $created); //conver into array 
 												
-											$date1 = $split_created[0]; //hold only date 
+										// 	$date1 = $split_created[0]; //hold only date 
 										
-											$date2 = date("Y/m/d"); // current date
+										// 	$date2 = date("Y/m/d"); // current date
 						
-											//calculate difference 
-											$diff = abs(strtotime(str_replace('/','-',$date2)) - strtotime(str_replace('/','-',$date1)));
+										// 	//calculate difference 
+										// 	$diff = abs(strtotime(str_replace('/','-',$date2)) - strtotime(str_replace('/','-',$date1)));
 
-											$years = floor($diff / (365*12*60*60*24)); // retrun years
+										// 	$years = floor($diff / (365*12*60*60*24)); // retrun years
 											
-											$months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24)); // return month
+										// 	$months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24)); // return month
 											
-											//check conditionally if month greter to period then do inspection yes
-											if($months > $period){
-												$inspection = 'yes';
-											}
+										// 	//check conditionally if month greter to period then do inspection yes
+										// 	if($months > $period){
+										// 		$inspection = 'yes';
+										// 	}
 										 
-										 }
-										 else{ // if created date is empty do inspection yes
-											 $inspection = 'yes';
-										 }
+										//  }
+										//  else{ // if created date is empty do inspection yes
+										// 	 $inspection = 'yes';
+										//  }
 										 
 										 
-										if($inspection == 'yes'){
+										// if($inspection == 'yes'){
 
 											$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id);
 											//get_form_type
@@ -1161,7 +1167,7 @@ class DashboardController extends AppController{
 											
 										
 											
-										}
+										// }
 				   
 										//creating array to list records with respect to above conditions
 										if($creat_array==true){
@@ -1619,6 +1625,7 @@ class DashboardController extends AppController{
 		$this->loadModel('DmiRoOffices');
 		$this->loadModel('DmiIoAllocationLogs');
 		$this->loadComponent('Customfunctions');
+		$this->loadModel('DmiRtiAllocationsLog'); // log model dedded by shankhpal on 17/05/2023
 
 		$ro_scheduled_date = $this->Customfunctions->dateFormatCheck($ro_scheduled_date);
 
@@ -1706,6 +1713,21 @@ class DashboardController extends AppController{
 						'io_scheduled_date'=>$ro_scheduled_date));
           
 					if($this->$allocation_table->save($allocation_entry)){
+
+						// Save the log of allocated application (Done by shankhpal shende on 17/05/2023)
+						$DmiRtiAllocationsLogEntity = $this->DmiRtiAllocationsLog->newEntity(array(
+							
+							$mo_column_name=>$io_user_id,
+							'customer_id'=>$customer_id,
+							'level_3' => $username, 
+							'current_level'=>$io_user_id,
+							'created'=>date('Y-m-d H:i:s'),
+							'modified'=>date('Y-m-d H:i:s'),
+							'ro_scheduled_date'=>$ro_scheduled_date,
+							'io_scheduled_date'=>$ro_scheduled_date
+
+						));
+						$this->DmiRtiAllocationsLog->save($DmiRtiAllocationsLogEntity);
 					
 					#SMS: Rutin Inspection   // commented by shankhpal shende on 09/12/2022
 					//$this->DmiSmsEmailTemplates->sendMessage($msg_id,$customer_id);

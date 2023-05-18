@@ -860,7 +860,8 @@ class MastersController extends AppController {
 				$form_id = 'edit_period';
 		  	$period_id = $this->Session->read('record_id');
 				//period added for master of routine inspection -> shankhpal 16/05/2023
-				$period_rti = array('1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8','9'=>'9','10'=>'10','11'=>'11','12'=>'12');
+				// updated period of master by shankhpal shende on 17/05/2023
+				$period_rti = array('0'=>'0','1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8','9'=>'9','10'=>'10','11'=>'11','12'=>'12');
         
         $this->set('period_rti',$period_rti);
 	     

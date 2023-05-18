@@ -16,6 +16,7 @@
 
 			
 		<div class="col-md-2 mt-2">
-			<?php echo $this->element('masters_management_elements/edit_submit_common_btn'); ?>
+			<!-- // commented for duplication of edit button commented by shankhpal shende 17/05/2023 -->
+			<?php //echo $this->element('masters_management_elements/edit_submit_common_btn'); ?>
 		</div>
 		<?php //echo $this->Html->script('element/masters_management_elements/edit_district'); ?>

@@ -1497,6 +1497,19 @@ class CustomersController extends AppController {
 
 		$this->set(compact('InprocessMsg','InprocessApplId'));
 	
+
+		// Comment: Added as per suggestion: 
+		// Suggestion: One Copy of inspection report needs to be sent to 
+		// packer for information and compliance of shortcomings after submission by inspection Officer.
+		// Author: Shankhpal Shende
+		// Date:17/05/2023
+		$this->loadModel('DmiRtiReportPdfRecords');
+
+		$fetch_max_pdf_id = $this->DmiRtiReportPdfRecords->find('list', array('valueField' => 'id', 'conditions' => array('customer_id IS' => $customer_id)))->toArray();
+
+		$approved_routine_inspection_pdf = $this->DmiRtiReportPdfRecords->find('all', array('conditions' => array('id IS' => max($fetch_max_pdf_id))))->toArray();
+
+		$this->set('approved_routine_inspection_pdf', $approved_routine_inspection_pdf);
 		
 	}
 
