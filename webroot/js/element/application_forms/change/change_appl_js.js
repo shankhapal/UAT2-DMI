@@ -32,6 +32,12 @@
 		//new fields added on 17-05-2023 by Amol
 		var commodity_fssai_no=$("#commodity_fssai_no").val();
 		var commodity_fssai_doc=$("#commodity_fssai_doc").val();
+		var premises_fssai_doc=$("#premises_fssai_doc").val();
+		var premises_gst_doc=$("#premises_gst_doc").val();
+		var premises_ownership_doc=$("#premises_ownership_doc").val();
+		var premises_map_doc=$("#premises_map_doc").val();
+		var premises_machineries_doc=$("#premises_machineries_doc").val();
+		var tbl_proforma_a2_doc =$("#tbl_proforma_a2_doc").val();
 		
 		var selectedValues = $("#selectedValues").val();
 		selectedValues = selectedValues.split(",");
@@ -67,6 +73,18 @@
 				value_return = 'false';
 			}*/
 		}
+
+		if(selectedValues.includes("3")==true){
+			//new validation script added for upload fields required for TBL change, 18-05-2023
+			if($("#tbl_proforma_a2_doc").text() == ''){	
+				if(check_file_upload_validation(tbl_proforma_a2_doc).result == false){			
+					$("#error_tbl_proforma_a2_doc").show().text("Please select related file");
+					$("#tbl_proforma_a2_doc").addClass("is-invalid");
+					$("#tbl_proforma_a2_doc").click(function(){$("#error_tbl_proforma_a2_doc").hide().text; $("#tbl_proforma_a2_doc").removeClass("is-invalid");});
+					value_return = 'false';
+				}
+			}
+		}
 		
 		if(selectedValues.includes("5")==true){
 			if(street_address==""){				
@@ -95,18 +113,49 @@
 			}
 
 			//new validation script added for upload fields required for premises change, 17-05-2023
-			if($("#premises_fssai_doc_value").text() == ''){			
-				$("#error_premises_fssai_doc").show().text("Please select related file");
-				$("#premises_fssai_doc").addClass("is-invalid");
-				$("#premises_fssai_doc").click(function(){$("#error_premises_fssai_doc").hide().text; $("#premises_fssai_doc").removeClass("is-invalid");});
-				value_return = 'false';
+			if($("#premises_fssai_doc_value").text() == ''){	
+				if(check_file_upload_validation(premises_fssai_doc).result == false){			
+					$("#error_premises_fssai_doc").show().text("Please select related file");
+					$("#premises_fssai_doc").addClass("is-invalid");
+					$("#premises_fssai_doc").click(function(){$("#error_premises_fssai_doc").hide().text; $("#premises_fssai_doc").removeClass("is-invalid");});
+					value_return = 'false';
+				}
 			}
 
-			if($("#premises_gst_doc_value").text() == ''){			
-				$("#error_premises_gst_doc").show().text("Please select related file");
-				$("#premises_gst_doc").addClass("is-invalid");
-				$("#premises_gst_doc").click(function(){$("#error_premises_gst_doc").hide().text; $("#premises_gst_doc").removeClass("is-invalid");});
-				value_return = 'false';
+			if($("#premises_gst_doc_value").text() == ''){	
+				if(check_file_upload_validation(premises_gst_doc).result == false){		
+					$("#error_premises_gst_doc").show().text("Please select related file");
+					$("#premises_gst_doc").addClass("is-invalid");
+					$("#premises_gst_doc").click(function(){$("#error_premises_gst_doc").hide().text; $("#premises_gst_doc").removeClass("is-invalid");});
+					value_return = 'false';
+				}
+			}
+
+			if($("#premises_ownership_doc_value").text() == ''){
+				if(check_file_upload_validation(premises_ownership_doc).result == false){			
+					$("#error_premises_ownership_doc").show().text("Please select related file");
+					$("#premises_ownership_doc").addClass("is-invalid");
+					$("#premises_ownership_doc").click(function(){$("#error_premises_ownership_doc").hide().text; $("#premises_ownership_doc").removeClass("is-invalid");});
+					value_return = 'false';
+				}
+			}
+
+			if($("#premises_map_doc_value").text() == ''){	
+				if(check_file_upload_validation(premises_map_doc).result == false){			
+					$("#error_premises_map_doc").show().text("Please select related file");
+					$("#premises_map_doc").addClass("is-invalid");
+					$("#premises_map_doc").click(function(){$("#error_premises_map_doc").hide().text; $("#premises_map_doc").removeClass("is-invalid");});
+					value_return = 'false';
+				}
+			}
+
+			if($("#premises_machineries_doc_value").text() == ''){	
+				if(check_file_upload_validation(premises_machineries_doc).result == false){			
+					$("#error_premises_machineries_doc").show().text("Please select related file");
+					$("#premises_machineries_doc").addClass("is-invalid");
+					$("#premises_machineries_doc").click(function(){$("#error_premises_machineries_doc").hide().text; $("#premises_machineries_doc").removeClass("is-invalid");});
+					value_return = 'false';
+				}
 			}
 
 		}

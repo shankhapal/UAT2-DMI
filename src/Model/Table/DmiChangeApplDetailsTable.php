@@ -36,7 +36,8 @@
 											   'reffered_back_date' => "", 'form_status' =>"", 'customer_reply' =>"", 'customer_reply_date' =>"", 'approved_date' => "",
 											   'user_email_id' => "", 'current_level' => "",'mo_comment' =>"", 'mo_comment_date' => "", 'ro_reply_comment' =>"", 'ro_reply_comment_date' =>"", 'delete_mo_comment' =>"", 'delete_ro_reply' => "",
 											   'delete_ro_referred_back' => "", 'delete_customer_reply' => "", 'ro_current_comment_to' => "",
-											   'rb_comment_ul'=>"",'mo_comment_ul'=>"",'rr_comment_ul'=>"",'cr_comment_ul'=>"",'dist_list'=>"",'business_type'=>"",'rel_doc'=>"",'commodity_fssai_no'=>"",'commodity_fssai_doc'=>""); 
+											   'rb_comment_ul'=>"",'mo_comment_ul'=>"",'rr_comment_ul'=>"",'cr_comment_ul'=>"",'dist_list'=>"",'business_type'=>"",'rel_doc'=>"",'commodity_fssai_no'=>"",'commodity_fssai_doc'=>"",'premises_fssai_doc'=>"",
+											   'premises_gst_doc'=>"",'premises_ownership_doc'=>"",'premises_map_doc'=>"",'premises_machineries_doc'=>"",'tbl_proforma_a2_doc'=>""); 
 				
 			}
 
@@ -261,6 +262,20 @@
 						));
 					}
 					
+				}
+				//added on 18-05-2023 for upload, required in TBL change
+				if(in_array(3,$selectedValues)){
+					if(!empty($forms_data['tbl_proforma_a2_doc']->getClientFilename())){
+						$file_name = $forms_data['tbl_proforma_a2_doc']->getClientFilename();
+						$file_size = $forms_data['tbl_proforma_a2_doc']->getSize();
+						$file_type = $forms_data['tbl_proforma_a2_doc']->getClientMediaType();
+						$file_local_path = $forms_data['tbl_proforma_a2_doc']->getStream()->getMetadata('uri');												
+						$tbl_proforma_a2_doc = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function					
+					}else{ $tbl_proforma_a2_doc = $section_form_details[0]['tbl_proforma_a2_doc']; }
+
+					$dataArray = array_merge($dataArray,array(
+						'tbl_proforma_a2_doc'=>$tbl_proforma_a2_doc,
+					));
 				}
 				if(in_array(5,$selectedValues)){
 
@@ -512,6 +527,12 @@
 					'mobile_no'=>htmlentities($forms_data['mobile_no'], ENT_QUOTES),
 					'email_id'=>htmlentities($forms_data['email_id'], ENT_QUOTES),
 					'phone_no'=>htmlentities($forms_data['phone_no'], ENT_QUOTES),
+				));
+			}
+			//added on 18-05-2023 for upload, required in TBL change
+			if(in_array(3,$selectedValues)){
+				$dataArray = array_merge($dataArray,array(
+					'tbl_proforma_a2_doc'=>$forms_data['tbl_proforma_a2_doc'],
 				));
 			}
 			if(in_array(5,$selectedValues)){
