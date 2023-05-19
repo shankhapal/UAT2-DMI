@@ -669,12 +669,24 @@ class DashboardController extends AppController{
 
 			$find_ro_id = $this->DmiRoOffices->find('list',array('valueField'=>'id','conditions'=>array('ro_email_id IS'=>$username)))->toList();
 
+			//below updates are applied on 19-05-2023 as suggested by DMi through email.
+			//Because RO incharge wants the list of IO users from SO jurisdiction under it. as per application.
+			//get application jurisdiction
+			$this->loadModel('DmiApplWithRoMappings');
+			$appl_office_id = $this->DmiApplWithRoMappings->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+			//check first the application jurisdiction not same with current login user, else show as it is
+			//else show users from both jurisdictions
+			if(!in_array($appl_office_id['office_id'],$find_ro_id)){
+				$conditionCheck = array('OR'=>array('posted_ro_office IN'=>$find_ro_id,'posted_ro_office IS'=>$appl_office_id['office_id']),'status'=>'active');
+			}else{
+				$conditionCheck = array('posted_ro_office IN'=>$find_ro_id,'status'=>'active');
+			}
+
 			$io_users_list = array();
 			if(!empty($find_ro_id))
 			{
-				$ro_id = $find_ro_id;
-
-				$find_user_belongs = $this->DmiUsers->find('list',array('keyField'=>'id', 'valueField'=>'email','conditions'=>array('posted_ro_office IN'=>$ro_id,'status'=>'active')))->toList();
+				//condition variable "$conditionCheck" is applied in 19-05-2023 as per above updates
+				$find_user_belongs = $this->DmiUsers->find('list',array('keyField'=>'id', 'valueField'=>'email','conditions'=>$conditionCheck))->toList();
 
 				$io_users_list = $this->DmiUserRoles->find('list',array('keyField'=>'user_email_id','valueField'=>'user_email_id','conditions'=>array('user_email_id IN'=>$find_user_belongs,'io_inspection'=>'yes')))->toArray();
 
