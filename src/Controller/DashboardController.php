@@ -1076,29 +1076,50 @@ class DashboardController extends AppController{
 				   
 										$splited_secondary_id_value		= 	$split_secondary_id[1];  // splited type of id like 1,2,3
 										// condition added for check allocation by shankhpal 18/05/2023
-										$get_allocations = $this->DmiRtiAllocations->find('all',array('conditions' => array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
 
-										if(!empty($get_allocations)){
+										$routin_inspection_period = $this->DmiRoutineInspectionPeriod->find('all',array('conditions'=>array('firm_type IS'=>$splited_secondary_id_value)))->first();
+										
+										$period = $routin_inspection_period['period'];
 
-												$allocation_date = $get_allocations['created'];
+										
+										
+									 // if routine_inspection empty 
+										$site_inspection = $this->DmiSiteinspectionFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),array('order'=>'id desc')))->first();
+										
+										if(!empty($site_inspection)){
+												$inspection = 'yes';
+										}
+
+										if(!empty($site_inspection)){
+											
+												$get_allocations = $this->DmiRtiAllocations->find('all',array('conditions' => array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+												if(!empty($get_allocations)){
+													$allocation_date = $get_allocations['created'];
+												}
+											
 												
 												$routine_inspection = $this->DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),array('order'=>'id desc')))->first();
 												
 												if(!empty($routine_inspection)){
 														$approval_date = $routine_inspection['created'];
-
-														if($allocation_date > $approval_date){
+														$currentDate = date('Y-m-d');
+														$date_diff = abs(strtotime($currentDate) - strtotime($approval_date));
+														$years = floor($date_diff / (365*60*60*24));
+														$months = floor(($date_diff - $years * 365*60*60*24) / (30*60*60*24));
+														
+													// if allocation date > approval date and month is < period then not display allocate button 
+														if($allocation_date > $approval_date && $months < $period){
 														
 															$mo_user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$get_allocations['level_2'])))->first();
 											
 															$comm_with = $mo_user_details['f_name'].' '.$mo_user_details['l_name'];
-														}else{
+														}
+														else{
 															$comm_with='Not Allocated';
 														}
+												}
 													
-
-													
-										 			$inspection = 'yes';
+										 			// $inspection = 'yes';
 
 													if($inspection == 'yes'){
 
@@ -1118,6 +1139,17 @@ class DashboardController extends AppController{
 														$this->loadModel('DmiUsers');
 														$this->loadModel('DmiRtiAllocations');
 																
+														if(!empty($get_allocations))
+														{
+															$mo_user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$get_allocations['level_2'])))->first();
+														
+															$comm_with = $mo_user_details['f_name'].' '.$mo_user_details['l_name'];
+
+														}else{
+															
+															$comm_with='Not Allocated';
+														}
+
 														$creat_array = true;
 														//creating array to list records with respect to above conditions
 														if($creat_array==true){
@@ -1135,7 +1167,7 @@ class DashboardController extends AppController{
 														$i=$i+1;
 													}
 									
-												}
+												// }
 							
 										}
              

@@ -1506,8 +1506,13 @@ class CustomersController extends AppController {
 		$this->loadModel('DmiRtiReportPdfRecords');
 
 		$fetch_max_pdf_id = $this->DmiRtiReportPdfRecords->find('list', array('valueField' => 'id', 'conditions' => array('customer_id IS' => $customer_id)))->toArray();
-
-		$approved_routine_inspection_pdf = $this->DmiRtiReportPdfRecords->find('all', array('conditions' => array('id IS' => max($fetch_max_pdf_id))))->toArray();
+		 
+		$approved_routine_inspection_pdf = [];
+		if(!empty($fetch_max_pdf_id)){  //added !empty condition on 19/05/2023 by shankhpal
+			
+			$approved_routine_inspection_pdf = $this->DmiRtiReportPdfRecords->find('all', array('conditions' => array('id IS' => max($fetch_max_pdf_id))))->toArray();
+		}
+	
 
 		$this->set('approved_routine_inspection_pdf', $approved_routine_inspection_pdf);
 		

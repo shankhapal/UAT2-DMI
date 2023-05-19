@@ -21,9 +21,9 @@
                 </tr> 
               </thead>      
                 <div id="packaging_each_row">
-                  <?php //pr($section_form_details);die;
+                  <?php //pr($section_form_details[3]);die;
 				             	$i=1; 
-                     foreach ($section_form_details[1] as $each_packer){
+                     foreach ($section_form_details[1] as $each_packer){pr($each_packer);die;
                       ?>
                           <tr>
                               <td><?php echo $i; ?></td>

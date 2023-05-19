@@ -1340,7 +1340,10 @@ $(document).ready(function () {
             alert(
               "The Application " +
                 customer_id +
-                " is successfully allocated for Routine Inspection to IO user."
+                " is successfully allocated for Routine Inspection to IO user." +
+                " " +
+                "Forwarded to:" +
+                atob(io_user_id)
             );
             //to reload list after allocation
             $("#for_routine_inspection_tab").click();

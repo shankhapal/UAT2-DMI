@@ -2351,7 +2351,9 @@ class AjaxFunctionsController extends AppController{
 		$this->loadModel('DmiFirms');
 		$this->loadModel('DmiAllTblsDetails');
 
-		$tbl_list = $this->DmiAllTblsDetails->find('list',array('keyField'=>'tbl_code','valueField'=>'tbl_name', 'conditions'=>array('customer_id IN'=>$packer_id)))->toList();
+		// updated query by shankhpal shende on 19/05/2023
+		$tbl_list = $this->DmiAllTblsDetails->find('list',array('keyField'=>'tbl_code','valueField'=>'tbl_name', 'conditions'=>array('customer_id IN'=>$packer_id,'delete_status IS NULL')))->toList();
+
 		if(!empty($tbl_list)){
 			$result = array('tbl_name'=>$tbl_list);
 			echo '~'.json_encode($result).'~';

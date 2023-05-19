@@ -38,12 +38,9 @@ class DmiRtiCaPackerDetailsTable extends Table{
 			
 			$approved_record = $DmiRtiFinalReports->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id desc'))->first();
 
-			$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,array('date(created) > '=>$approved_record['created'])),'order'=>'id desc'))->first();
-
-			
-
-			if(!empty($allocated_record)){
-
+			if(!empty($approved_record)){
+				
+				$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,array('date(created) > '=>$approved_record['created'])),'order'=>'id desc'))->first();
 			}
 			
 			$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
@@ -56,8 +53,12 @@ class DmiRtiCaPackerDetailsTable extends Table{
 			}else{
 
 					$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
-					$result_data = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();
-					$enumerate_briefly_suggestions = $result_data['enumerate_briefly_suggestions'];	
+				  if(!empty($latest_id)){
+
+							$result_data = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();
+							$enumerate_briefly_suggestions = $result_data['enumerate_briefly_suggestions'];	
+					}
+				
 
 					$form_fields_details = Array (
 						'id' =>"", 
