@@ -163,7 +163,7 @@
 
 					<?php if (in_array(3,$selectedValues)) { // for TBL details ?>
 						<!-- fields for new change value-->
-						<div class="col-md-12"><div class="card card-success"><div class="card-header"><h3 class="card-title">TBL Details</h3></div></div></div>
+						<div class="col-md-12"><div class="card card-success"><div class="card-header"><h3 class="card-title">TBL/Brand Details</h3></div></div></div>
 						<div class="clearfix"></div>
 
 						<div class="col-md-12">
