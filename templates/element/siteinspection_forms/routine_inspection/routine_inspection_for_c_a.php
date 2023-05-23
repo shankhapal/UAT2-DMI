@@ -806,7 +806,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                                                             </div>
                                                             <div class="col-sm-9 hidden" id="briefly_suggestions">
                                                                 
-                                                                <?php $username = 'shankhpal';
+                                                                <?php 
                                                                  echo $this->Form->control('enumerate_briefly_suggestions', array('type'=>'textarea', 'id'=>'enumerate_briefly_suggestions', 'escape'=>false,'value'=>isset($section_form_details[0]['enumerate_briefly_suggestions'])?$section_form_details[0]['enumerate_briefly_suggestions']:"", 'class'=>'form-control input-field', 'label'=>false, 'placeholder'=>'Enter discrepancies here...')); ?>
                                                                 <span id="error_enumerate_briefly_suggestions" class="error invalid-feedback"></span>
                                                             </div>    

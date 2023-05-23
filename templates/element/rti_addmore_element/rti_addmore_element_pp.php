@@ -1,7 +1,8 @@
- <?php //pr($section_form_details);die; ?>
- <div class="form-horizontal">
-    <div class="card-body">
-     <div class="row">
+
+	<!-- Comment : Updated element file 
+	Name of person : shankhpal shende
+	Date: 23-05-2023 -->
+
         <!-- table-->
           <table id="printed_packaging_table" class="table table-bordered table-hover table-striped">
             <thead class="tablehead">
@@ -21,9 +22,9 @@
                 </tr> 
               </thead>      
                 <div id="packaging_each_row">
-                  <?php //pr($section_form_details[3]);die;
-				             	$i=1; 
-                     foreach ($section_form_details[1] as $each_packer){pr($each_packer);die;
+                  <?php 
+				    $i=1; 
+                     foreach ($section_form_details[1] as $each_packer){
                       ?>
                           <tr>
                               <td><?php echo $i; ?></td>
@@ -37,7 +38,9 @@
                                   <a href="#" class="delete_packer_id glyphicon glyphicon-remove-sign machine_delete" id="<?php echo $each_packer['id']; ?>" ></a>
                               </td>
                           </tr>
-                          <?php $i=$i+1; } ?>   
+                    <?php $i=$i+1; } ?>
+                        
+                    
               <div id="error_machinery" class="text-red float-right text-sm"></div>
                     <!-- for edit machine details -->
                   <?php 
@@ -76,15 +79,18 @@
                                     <span id="error_packer_id" class="error invalid-feedback"></span>
                                 </td>
                                 <td>
-                                    <?php echo $this->Form->control('indent', array('type'=>'text', 'id'=>'indent', 'escape'=>false, 'class'=>'form-control input-field', 'label'=>false)); ?>
+                                    <!-- //added type = number by shankhpal on 23/05/2023 -->
+                                    <?php echo $this->Form->control('indent', array('type'=>'text', 'id'=>'indent', 'escape'=>false, 'class'=>'form-control input-field indent', 'label'=>false)); ?>
                                     <span id="error_indent" class="error invalid-feedback"></span>
                                 </td>
                                 <td>
-                                    <?php echo $this->Form->control('supplied', array('type'=>'text', 'id'=>'supplied', 'escape'=>false, 'class'=>'form-control input-field', 'label'=>false)); ?>
+                                    <!-- //added type = number by shankhpal on 23/05/2023 -->
+                                    <?php echo $this->Form->control('supplied', array('type'=>'text', 'id'=>'supplied', 'escape'=>false, 'class'=>'form-control input-field supplied', 'label'=>false)); ?>
                                     <span id="error_supplied" class="error invalid-feedback"></span>
                                 </td>
                                 <td> 
-                                    <?php echo $this->Form->control('balance', array('type'=>'text', 'id'=>'balance', 'escape'=>false, 'class'=>'form-control input-field', 'label'=>false)); ?>
+                                    <!-- //added type = number and readonly by shankhpal on 23/05/2023 -->
+                                    <?php echo $this->Form->control('balance', array('type'=>'text', 'id'=>'balance', 'escape'=>false,'readonly'=>'readonly', 'class'=>'form-control input-field', 'label'=>false)); ?>
                                     <span id="error_balance" class="error invalid-feedback"></span>
                                 </td>
                                 <td>
@@ -99,6 +105,4 @@
                       <?php } ?>
                 </div>
             </table>
-        </div>
-    </div>
-</div>                                                       
+                                                        

@@ -87,7 +87,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
-                                                <?php echo $this->Form->control('mobile_no', array('type'=>'text','value'=>base64_decode($firm_details['mobile_no']),'id'=>'mobile_no', 'class'=>'form-control', 'label'=>false)); ?>
+                                                <?php echo $this->Form->control('mobile_no', array('type'=>'text','value'=>base64_decode($firm_details['mobile_no']),'id'=>'mobile_no','readonly'=>'readonly', 'class'=>'form-control', 'label'=>false)); ?>
                                                 <span id="error_mobile_no" class="error invalid-feedback"></span>
                                             </div>
                                             <div class="col-md-2">
@@ -96,7 +96,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
-                                            <?php echo $this->Form->control('email', array('type'=>'email', 'placeholder'=>'Enter firm email id','value'=>$section_form_details[0]['email'], 'id'=>'email', 'class'=>'form-control input-field', 'label'=>false)); ?>
+                                            <?php echo $this->Form->control('email', array('type'=>'email', 'placeholder'=>'Enter firm email id','value'=>base64_decode($firm_details['email']),'readonly'=>'readonly', 'id'=>'email', 'class'=>'form-control input-field', 'label'=>false)); ?>
                                                 <span id="error_email" class="error invalid-feedback"></span>
                                             </div>
                                         </div>
@@ -110,7 +110,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
-                                            <?php echo $this->Form->control('registered_office', array('type'=>'textarea','value'=>$section_form_details[4], 'id'=>'registered_office','disabled'=>'disabled', 'class'=>'form-control input-field', 'label'=>false)); ?>
+                                            <?php echo $this->Form->control('registered_office', array('type'=>'textarea','value'=>$section_form_details[4], 'id'=>'registered_office','readonly'=>'readonly', 'class'=>'form-control input-field', 'label'=>false)); ?>
                                                 <span id="error_registered_office" class="error invalid-feedback"></span>
                                             </div>
                                             <div class="col-md-2">
@@ -119,7 +119,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
-                                            <?php echo $this->Form->control('press_premises', array('type'=>'textarea','value'=>$section_form_details[5], 'class'=>'form-control input-field','disabled'=>'disabled', 'label'=>false)); ?>
+                                            <?php echo $this->Form->control('press_premises', array('type'=>'textarea','value'=>$section_form_details[5], 'class'=>'form-control input-field','readonly'=>'readonly', 'label'=>false)); ?>
                                             </div>
                                         </div>
                                     </div>
@@ -136,7 +136,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
-                                                <?php echo $this->Form->control('valid_upto', array('type'=>'text', 'id'=>'valid_upto', 'escape'=>false,'maxlength'=>'10', 'minlength'=>'10','value'=>$section_form_details[6], 'class'=>'cvOn cvReq cvDate form-control', 'disabled'=>'disabled', 'label'=>false)); ?>
+                                                <?php echo $this->Form->control('valid_upto', array('type'=>'text', 'id'=>'valid_upto', 'escape'=>false,'maxlength'=>'10', 'minlength'=>'10','value'=>$section_form_details[6], 'class'=>'cvOn cvReq cvDate form-control', 'readonly'=>'readonly', 'label'=>false)); ?>
                                                     <span id="error_valid_upto" class="error invalid-feedback"></span>
                                                 </div>
                                             </div>
@@ -154,7 +154,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
-                                                          <?php echo $this->Form->control('sub_commodity', array('type'=>'select', 'options'=>$section_form_details[7], 'multiple'=>'multiple', 'label'=>false, 'disabled'=>'disabled', 'class'=>'form-control')); ?>
+                                                          <?php echo $this->Form->control('packaging_material', array('type'=>'select', 'options'=>$section_form_details[7], 'multiple'=>'multiple', 'label'=>false, 'readonly'=>'readonly', 'class'=>'form-control')); ?>
                                                     </div>
                                                 </div>
                                             </div>
@@ -162,10 +162,16 @@
                                         <!-- 5. List of packers granted permission to print Agmark Replica by the printing press -->
                                     <div class="card-header sub-card-header-firm"><h3 class="card-title">5. List of packers granted permission to print Agmark Replica by the printing press</h3></div>
                                     <?php echo $this->element('rti_addmore_element/rti_list_of_packers_granted_element'); ?>
+                                     <ol class="badge mt-2">
+                                    <a target="_blank" href="/testdocs/DMI/manuals/applicant/Manual_mapping_lab_pp.pdf">Manual for Mapping of CA With Lab/Printing Press</a></ol>
                                     <!--6.Available stock of printed packaging material with Agmark replica (packer wise) -->
                                     <div class="card-header sub-card-header-firm"><h3 class="card-title">6. Available stock of printed packaging material with Agmark replica (packer wise)</h3></div>
-                                        <?php echo $this->element('rti_addmore_element/rti_addmore_element_pp'); ?>
-
+                                     <div class="form-horizontal">
+                                        <div class="card-body">
+                                             <div class="row">
+                                                 <?php echo $this->element('rti_addmore_element/rti_addmore_element_pp'); ?>
+                                             </div>
+                                        </div>    
                                 <!-- 7. Whether the printed material as in column 6 above is in order as per physical check -->
                                 <div class="card-header sub-card-header-firm"><h3 class="card-title">7. Whether the printed material as in column 6 above is in order as per physical check</h3></div>
                                     <div class="form-horizontal">
@@ -332,7 +338,7 @@
                                                 </div>
                                             </div>
                                         </div> 
-                                    <!-- 11. Whether press is using right quality of printing ink and food grade packaging material. (Check Certificates) -->
+                                    <!-- 11. Whether press is using right quality of printing ink and food grade packaging material. (Check Certificates)  -->
                                     <div class="card-header sub-card-header-firm"><h3 class="card-title">11. Whether press is using right quality of printing ink and food grade packaging material. (Check Certificates)</h3></div>
                                         <div class="form-horizontal">
                                             <!-- card body start -->
@@ -382,7 +388,7 @@
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                             <div class="form-group row">
-                                                                    <label for="inputEmail3" class="col-sm col-form-label">Whether press is using right quality of printing ink and food grade packaging material. (Check Certificates)<span class="cRed">*</span></label>
+                                                                    <label for="inputEmail3" class="col-sm col-form-label">Whether the printing press is making logo of printing unit on packaging material.<span class="cRed">*</span></label>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6">
@@ -416,68 +422,100 @@
                                                     </div>
                                                 </div>
                                             </div> 
-                                            <!-- 13. Suggestions given during the last inspection, if any & whether corrective action taken -->
-                                            <div class="card-header sub-card-header-firm"><h3 class="card-title">13. Suggestions given during the last inspection, if any & whether corrective action taken</h3></div>
-                                                <div class="form-horizontal">
-                                                    <!-- card body start -->
-                                                    <div class="card-body border">
-                                                        <div class="row">
-                                                            <div class="col-md-6">
-                                                                <div class="form-group row">
-                                                                        <label for="inputEmail3" class="col-sm col-form-label">Suggestions given during the last inspection, if any & whether corrective action taken <span class="cRed">*</span></label>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <?php echo $this->Form->control('last_insp_suggestion', array('type'=>'textarea', 'id'=>'last_insp_suggestion', 'class'=>'form-control input-field', 'placeholder'=>'Enter Suggestions given during the last inspection','value'=>$section_form_details[0]['last_insp_suggestion'],  'label'=>false)); ?>
-                                                                        <span id="error_last_insp_suggestion" class="error invalid-feedback"></span>
-                                                                    </div>
-                                                                <span id="error_concerned_offices" class="error invalid-feedback"></span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div> 
-                                            <!-- 14. Shortcomings observed during the present Inspection. -->
-                                            <div class="card-header sub-card-header-firm"><h3 class="card-title">14. Shortcomings observed during the present Inspection.</h3></div>
-                                                <div class="form-horizontal">
-                                                    <!-- card body start -->
-                                                    <div class="card-body border">
-                                                        <div class="row">
-                                                            <div class="col-md-6">
-                                                                <div class="form-group row">
-                                                                        <label for="inputEmail3" class="col-sm col-form-label">Shortcomings observed during the present Inspection.<span class="cRed">*</span></label>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6">
+                                <!-- 13. Suggestions given during the last inspection, if any & whether corrective action taken -->
+                                <div class="card-header sub-card-header-firm"><h3 class="card-title">13. Suggestions given during the last inspection, if any & whether corrective action taken</h3></div>
+                                <div class="form-horizontal">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                      <label for="inputEmail3" class="col-sm col-form-label">Suggestions given during the last inspection, if any & whether corrective action taken<span class="cRed">*</span></label>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                         <?php
+                                                            $i=1;
+                                                            $suggestions_last_ins = isset($section_form_details[0]['suggestions_last_ins_yes_no'])?$section_form_details[0]['suggestions_last_ins_yes_no']:"";
                                                             
-                                                        <?php
-                                                                $i=1;
-                                                                $short_obserd = $section_form_details[0]['short_obserd'];
-                                                                
-                                                                    if($short_obserd == 'yes'){
-                                                                        $checked_yes = 'checked';
-                                                                        $checked_no = '';
-                                                                    } else {
+                                                                if($suggestions_last_ins == 'yes'){
+                                                                    $checked_yes = 'checked';
+                                                                    $checked_no = '';
+                                                                } else {
 
-                                                                        $checked_yes = '';
-                                                                        $checked_no = 'checked';
-                                                                    }
-                                                                    $i++;
-                                                                ?>
-                                                                <div class=" d-inline">
-                                                                    <input type="radio" name="short_obserd" checked="" id="short_obserd-yes" value="yes" <?php echo $checked_yes; ?>>
-                                                                    <label for="short_obserd-yes">Yes
-                                                                    </label>
+                                                                    $checked_yes = '';
+                                                                    $checked_no = 'checked';
+                                                                }
+                                                                $i++;
+                                                            ?>
+                                                            <div class="d-inline">
+                                                                <input type="radio" name="suggestions_last_ins_yes_no" checked="" id="suggestions_last_ins-yes" value="yes" <?php echo $checked_yes; ?>>
+                                                                <label for="suggestions_last_ins-yes">Yes
+                                                                </label>
+                                                            </div>
+                                                            <div class=" d-inline">
+                                                                <input type="radio" name="suggestions_last_ins_yes_no" id="suggestions_last_ins-no" value="no" <?php echo $checked_no; ?>>
+                                                                <label for="suggestions_last_ins-no">No
+                                                                </label>
+                                                            </div>
+                                                            <div class="col-sm-9 " id="briefly_suggestions">
+                                                                 <?php echo $this->Form->control('last_insp_suggestion', array('type'=>'textarea', 'id'=>'last_insp_suggestion', 'class'=>'form-control input-field', 'placeholder'=>'Enter discrepancies here...','value'=>$section_form_details[0]['last_insp_suggestion'],  'label'=>false)); ?>
+                                                                <span id="error_last_insp_suggestion" class="error invalid-feedback"></span>
+                                                            </div>    
+                                                        </div>
+                                                     </div>    
+                                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                            <!-- 14. Shortcomings observed during the present Inspection. -->
+                                   
+                                                
+                                        <div class="card-header sub-card-header-firm"><h3 class="card-title">14. Shortcomings observed during the present Inspection.</h3></div>
+                                                <div class="form-horizontal">
+                                                    <div class="card-body border">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group row">
+                                                                    <label for="inputEmail3" class="col-sm col-form-label">Shortcomings observed during the present Inspection.<span class="cRed"> * </span></label>
                                                                 </div>
-                                                                <div class=" d-inline">
-                                                                    <input type="radio" name="short_obserd" id="short_obserd-no" value="no" <?php echo $checked_no; ?>>
-                                                                    <label for="short_obserd-no">No
-                                                                    </label>
-                                                                </div>
-                                                                <span id="error_short_obserd" class="error invalid-feedback"></span>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group row">
+                                                                        <div class="col-sm">
+                                                                    <?php echo $this->Form->control('shortcomings_noticed', array('type'=>'textarea', 'id'=>'shortcomings_noticed','placeholder'=>'Shortcomings noticed','class'=>'form-control', 'label'=>false,'value'=>isset($section_form_details[0]['shortcomings_noticed'])?$section_form_details[0]['shortcomings_noticed']:"")); ?>
+                                                                    <span id="error_shortcomings_noticed" class="error invalid-feedback"></span> 
+                                                                </div> 
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>                              
+                                                </div>
+                                            </div>
+                                            <div class="form-horizontal">
+                                                    <div class="card-body">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group row">
+                                                                    <label for="field3" class="col-sm col-form-label"><span><?php if ($current_level == 'level_2' && $application_mode == 'edit' ) { echo 'Shortcomings noticed Docs'; } else { echo 'Shortcomings noticed Docs'; } ?></span></label>
+
+                                                                    <span class="float-right"><?php if ($current_level == 'level_2' && $application_mode == 'edit' && empty($section_form_details[0]['shortcomings_noticed_docs'])) { echo 'Attach docs'; }else{ echo 'Attached docs'; } ?> :
+                                                                    <?php if (!empty($section_form_details[0]['shortcomings_noticed_docs'])) { ?>
+                                                                        <a id="shortcomings_noticed_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['shortcomings_noticed_docs']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['shortcomings_noticed_docs'])), -1))[0],23);?></a>
+                                                                    <?php }else{ echo "No Document Provided" ;} ?>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group row">
+                                                                    <div class="custom-file col-sm">
+                                                                        <input type="file" name="shortcomings_noticed_docs" class="form-control" id="shortcomings_noticed_docs" multiple='multiple'>
+                                                                        <span id="error_shortcomings_noticed_docs" class="error invalid-feedback"></span>
+                                                                        <span id="error_type_shortcomings_noticed_docs" class="error invalid-feedback"></span>
+                                                                        <span id="error_size_shortcomings_noticed_docs" class="error invalid-feedback"></span>
+                                                                    </div>
+                                                                </div> 
+                                                                <p class="lab_form_note float-right mt-3"><i class="fa fa-info-circle"></i> File type: PDF, jpg &amp; max size upto 2 MB</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <!-- 15. Suggestions, if any -->
                                             <div class="card-header sub-card-header-firm"><h3 class="card-title">15. Suggestions, if any</h3></div>
                                                 <div class="form-horizontal">
@@ -524,19 +562,19 @@
                                                                         <div class="form-group row">
                                                                             <label for="field3" class="col-sm col-form-label"><span><?php if ($current_level == 'level_2' && $application_mode == 'edit' ) { echo 'Signature of Inspection with official Stamp'; } else { echo 'Signature of Inspection with official Stamp'; } ?></span></label>
 
-                                                                            <span class="float-left"><?php if ($current_level == 'level_2' && $application_mode == 'edit' && empty($section_form_details[0]['signnature_of_inspecting_officer_docs'])) { echo 'Attach docs'; }else{ echo 'Attached docs'; } ?> :
-                                                                            <?php if (!empty($section_form_details[0]['signnature_of_inspecting_officer_docs'])) { ?>
-                                                                                <a id="signnature_of_inspecting_officer_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['signnature_of_inspecting_officer_docs']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['signnature_of_inspecting_officer_docs'])), -1))[0],23);?></a>
+                                                                            <span class="float-left"><?php if ($current_level == 'level_2' && $application_mode == 'edit' && empty($section_form_details[0]['signnature_io_docs'])) { echo 'Attach docs'; }else{ echo 'Attached docs'; } ?> :
+                                                                            <?php if (!empty($section_form_details[0]['signnature_io_docs'])) { ?>
+                                                                                <a id="signnature_io_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['signnature_io_docs']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['signnature_io_docs'])), -1))[0],23);?></a>
                                                                             <?php }else{ echo "No Document Provided" ;} ?>
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-md-6">
                                                                         <div class="form-group row">
                                                                             <div class="custom-file col-sm">
-                                                                                    <input type="file" name="signnature_of_inspecting_officer_docs" class="form-control" id="signnature_of_inspecting_officer_docs" multiple='multiple'>
-                                                                                    <span id="error_signnature_of_inspecting_officer_docs" class="error invalid-feedback"></span>
-                                                                                    <span id="error_type_signnature_of_inspecting_officer_docs" class="error invalid-feedback"></span>
-                                                                                    <span id="error_size_signnature_of_inspecting_officer_docs" class="error invalid-feedback"></span>
+                                                                                    <input type="file" name="signnature_io_docs" class="form-control" id="signnature_io_docs" multiple='multiple'>
+                                                                                    <span id="error_signnature_io_docs" class="error invalid-feedback"></span>
+                                                                                    <span id="error_type_signnature_io_docs" class="error invalid-feedback"></span>
+                                                                                    <span id="error_size_signnature_io_docs" class="error invalid-feedback"></span>
                                                                                     </div>
                                                                             </div> 
                                     <p class="lab_form_note float-right mt-3"><i class="fa fa-info-circle"></i> File type: PDF, jpg &amp; max size upto 2 MB</p>

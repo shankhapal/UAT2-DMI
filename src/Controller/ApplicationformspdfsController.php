@@ -3405,6 +3405,11 @@ class ApplicationformspdfsController extends AppController{
 	// #Date : 29/12/2022
 	// Note : For Routine Inspection (RTI)
 
+	// Description : Updated the Report PDF for printing press for the flow of RTI.
+	// @Author : Shankhpal Shende
+	// #Date : 23/05/2023
+	// Note : For Routine Inspection (RTI)
+
 	public function ppRiReportPdf(){
 
 
@@ -3424,57 +3429,79 @@ class ApplicationformspdfsController extends AppController{
 		$this->set('firm_details',$firm_details);	
 
 		$conn = ConnectionManager::get('default');
-		$users = "SELECT
-				tbl.customer_id, dff.firm_name,dff.sub_commodity,tbl.tbl_name
+
+		$users = "SELECT DISTINCT map.customer_id, dff.firm_name,dff.sub_commodity
 				FROM dmi_firms AS df
 				INNER JOIN dmi_ca_pp_lab_mapings AS map ON map.pp_id=df.id::varchar
 				INNER JOIN dmi_firms AS dff ON dff.customer_id = map.customer_id
-				INNER JOIN dmi_all_tbls_details AS tbl ON tbl.customer_id = map.customer_id
-				WHERE df.customer_id = '$customer_id'";
+				WHERE df.customer_id = '$customer_id' AND map.pp_id IS NOT NULL AND map.map_type = 'pp'";		
 
 		$q = $conn->execute($users);
 
 		$all_packers_records = $q->fetchAll('assoc');
 		$this->loadModel('MCommodity');
+		$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
 
-		$i=0;
-		$all_packers_value=array();
-
-		$sub_commodity_value = array();
-		foreach($all_packers_records as $value) // use for show list of CA id's
-		{
-			$all_packers_value[$i]['customer_id'] = $value['customer_id'];
-			$all_packers_value[$i]['firm_name'] = $value['firm_name'];
-
-			// to fetch grant date
-			$get_last_grant_date = $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('customer_id IS'=>$value['customer_id']),'order'=>array('id desc')))->first();
-
-			$last_grant_date = $get_last_grant_date['date'];
-
-			$certificate_valid_upto = $this->Customfunctions->getCertificateValidUptoDate($value['customer_id'],$last_grant_date);
-
-			$all_packers_value[$i]['validupto'] = $certificate_valid_upto;
-
-			$tbl_list = $this->DmiAllTblsDetails->find('list',array('keyField'=>'tbl_code','valueField'=>'tbl_name', 'conditions'=>array('customer_id IN'=>$value['customer_id'])))->toList();
-
-			$all_packers_value[$i]['tbl_name'] = $tbl_list;
-
-			$sub_commodity_value = $this->MCommodity->find('list',array('keyField'=>'commodity_code','valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>explode(',',$value['sub_commodity']))))->toList();
-
-			$all_packers_value[$i]['sub_commodity'] = $sub_commodity_value;
-
-			$i=$i+1;
+			$i=0;
+				$all_packers_value=array();
 			
+				foreach($all_packers_records as $value) // use for show list of CA id's
+				{
+						$packers_customer_id = $value['customer_id'];
+						$all_packers_value[$i]['customer_id'] = $value['customer_id'];
+						$all_packers_value[$i]['firm_name'] = $value['firm_name'];
+					
+						$Dmi_grant_certificates_pdfs = TableRegistry::getTableLocator()->get('DmiGrantCertificatesPdfs');
+						$get_last_grant_date = $Dmi_grant_certificates_pdfs->find('all',array('conditions'=>array('customer_id IS'=>$value['customer_id']),'order'=>array('id desc')))->first();
+				
+						$last_grant_date = $get_last_grant_date['date'];
+					
+						$CustomersController = new CustomersController;
+						$certificate_valid_upto = $CustomersController->Customfunctions->getCertificateValidUptoDate($value['customer_id'],$last_grant_date);
+				
+						$all_packers_value[$i]['validupto'] = $certificate_valid_upto;
+					
+						$DmiAllTblsDetails = TableRegistry::getTableLocator()->get('DmiAllTblsDetails');
+						// query updated by shankhpal on 19/05/2023
+						$tbl_list = $DmiAllTblsDetails->find('list',array('keyField'=>'id','valueField'=>'tbl_name', 'conditions'=>array('customer_id IN'=>$packers_customer_id,'delete_status IS NULL')))->toList();
 
-		}
+						$all_packers_value[$i]['tbl_name'] = $tbl_list;
+					
+						$sub_commodity_value = $MCommodity->find('list',array('keyField'=>'commodity_code','valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>explode(',',$value['sub_commodity']))))->toList();
+						$all_packers_value[$i]['sub_commodity'] = $sub_commodity_value;
+
+						$i=$i+1;
+				}
 
 		$this->loadModel('DmiRtiPackerDetails');
+		$this->loadModel('DmiFirms'); // added by shankhpal on 23/05/2023 for to office address
 		$added_packers_details = $this->DmiRtiPackerDetails->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'delete_status IS NULL'),'order'=>'id'))->toArray();
+		
+		$firm_data = $this->DmiFirms->find('all',array('keyField'=>'commodity_code','valueField'=>'commodity_name', 'conditions'=>array('customer_id IN'=> $customer_id)))->first(); // updated query toArray to first on 19/05/2023
 
+		$registered_office_address = $firm_data['street_address']; // added for Registered office address by shankhpal 19/05/2023
+
+		// load model DmiPrintingPremisesProfiles on 19/05/2023
+		$this->loadModel('DmiPrintingPremisesProfiles');
+		$premises_data = $this->DmiPrintingPremisesProfiles->find('all', array('valueField'=>'street_address', 'conditions'=>array('customer_id IS'=>$customer_id)))->first();
+		
+		$printing_premises_address = $premises_data['street_address'];   //to get printing_premises_address
+
+		$this->loadModel('DmiPackingTypes');
+		$added_firms = $this->DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->toArray();	
+	
+		$added_firm_field = $added_firms[0];
+		//taking id of multiple Packaging Materials types to show names in list	
+		$packaging_type_id = explode(',',(string) $added_firm_field['packaging_materials']); #For Deprecations
+
+		$packaging_materials_value = $this->DmiPackingTypes->find('list',array('valueField'=>'packing_type', 'conditions'=>array('id IN'=>$packaging_type_id)))->toList();
+   
 		$this->set('added_packers_details',$added_packers_details);	
 		$this->set('sub_commodity_value',$sub_commodity_value);	
 		$this->set('all_packers_value',$all_packers_value);	
-
+		$this->set('registered_office_address',$registered_office_address);
+		$this->set('printing_premises_address',$printing_premises_address);
+		$this->set('packaging_materials_value',$packaging_materials_value);
 		$this->generateReportPdf('/Applicationformspdfs/rtiCertificateForPp'); 
 		$this->redirect(array('controller'=>'dashboard','action'=>'home'));
 	

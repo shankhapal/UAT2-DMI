@@ -138,6 +138,7 @@ class DmiRoutineInspectionPpReportsTable extends Table{
 
 	public function saveFormDetails($customer_id,$forms_data){
 
+		//  pr($forms_data);die;
 		$CustomersController = new CustomersController;
 
 		$ca_bevo_applicant = $CustomersController->Customfunctions->checkCaBevo($customer_id);
@@ -173,53 +174,74 @@ class DmiRoutineInspectionPpReportsTable extends Table{
 
 		}
 
-		//html encoding post data before saving
+				//html encoding post data before saving
+				/* Comment
+				Reason : Updated function as per change request 
+				Name of person : shankhpal shende
+				Date: 23-05-2023
+				*/
 		    $htmlencoded_date_last_inspection = htmlentities($forms_data['date_last_inspection'], ENT_QUOTES);
 				$htmlencoded_date_p_inspection = htmlentities($forms_data['date_p_inspection'], ENT_QUOTES);
-				$htmlencoded_email = htmlentities($forms_data['email'], ENT_QUOTES);
-				$htmlencoded_mobile_no = htmlentities($forms_data['mobile_no'], ENT_QUOTES);
-				$htmlencoded_packaging_material = htmlentities($forms_data['packaging_material'], ENT_QUOTES);
-				$htmlencoded_valid_upto = htmlentities($forms_data['valid_upto'], ENT_QUOTES);
+				$htmlencoded_printing_press_name = htmlentities($forms_data['printing_press'], ENT_QUOTES);
 				$htmlencoded_street_address = htmlentities($forms_data['street_address'], ENT_QUOTES);
-				$htmlencoded_registered_office = htmlentities($forms_data['registered_office'], ENT_QUOTES);
-				$htmlencoded_press_premises = htmlentities($forms_data['press_premises'], ENT_QUOTES);
+				$htmlencoded_mobile_no = base64_encode($forms_data['mobile_no']);
+				$htmlencoded_email = base64_encode($forms_data['email']);
 				$htmlencoded_physical_check = htmlentities($forms_data['physical_check'], ENT_QUOTES);
 				$htmlencoded_is_printing = htmlentities($forms_data['is_printing'], ENT_QUOTES);
 				$htmlencoded_storage_facilities = htmlentities($forms_data['storage_facilities'], ENT_QUOTES);
-				$htmlencoded_lab_properly_equipped = htmlentities($forms_data['lab_properly_equipped'], ENT_QUOTES);
 				$htmlencoded_maintains_proper = htmlentities($forms_data['maintains_proper'], ENT_QUOTES);
 				$htmlencoded_right_quality_of_printing = htmlentities($forms_data['right_quality_of_printing'], ENT_QUOTES);
+				$htmlencoded_valid_upto = htmlentities($forms_data['valid_upto'],ENT_QUOTES);
 				$htmlencoded_press_is_marking_logo = htmlentities($forms_data['press_is_marking_logo'], ENT_QUOTES);
-				$htmlencoded_short_obserd = htmlentities($forms_data['short_obserd'], ENT_QUOTES);
+				$htmlencoded_suggestions_last_ins_yes_no = htmlentities($forms_data['suggestions_last_ins_yes_no'], ENT_QUOTES);
+				$htmlencoded_last_insp_suggestion = htmlentities($forms_data['last_insp_suggestion'], ENT_QUOTES);
+				$htmlencoded_shortcomings_noticed = htmlentities($forms_data['shortcomings_noticed'], ENT_QUOTES);
 				$htmlencoded_if_any_sugg = htmlentities($forms_data['if_any_sugg'], ENT_QUOTES);
-        $htmlencoded_last_insp_suggestion = htmlentities($forms_data['last_insp_suggestion'],ENT_QUOTES);
+				$htmlencoded_name_of_inspecting_officer = htmlentities($forms_data['name_of_inspecting_officer'], ENT_QUOTES);
 
-      // pr($forms_data);die;
-				if(!empty($forms_data['signature']->getClientFilename())){
+				
+				if(!empty($forms_data['shortcomings_noticed_docs']->getClientFilename())){
 
-				$file_name = $forms_data['signature']->getClientFilename();
-				$file_size = $forms_data['signature']->getSize();
-				$file_type = $forms_data['signature']->getClientMediaType();
-				$file_local_path = $forms_data['signature']->getStream()->getMetadata('uri');
+					$file_name = $forms_data['shortcomings_noticed_docs']->getClientFilename();
+					$file_size = $forms_data['shortcomings_noticed_docs']->getSize();
+					$file_type = $forms_data['shortcomings_noticed_docs']->getClientMediaType();
+					$file_local_path = $forms_data['shortcomings_noticed_docs']->getStream()->getMetadata('uri');
 
-				$signature = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function
+					$shortcomings_noticed_docs = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function
+				
+				}else{	
+					$shortcomings_noticed_docs = null;
+				}
 
-			}else{
-				$signature = '';
-			}
+				if(!empty($forms_data['signnature_io_docs']->getClientFilename())){
 
+					$file_name = $forms_data['signnature_io_docs']->getClientFilename();
+					$file_size = $forms_data['signnature_io_docs']->getSize();
+					$file_type = $forms_data['signnature_io_docs']->getClientMediaType();
+					$file_local_path = $forms_data['signnature_io_docs']->getStream()->getMetadata('uri');
 
-			if(!empty($forms_data['signature_name']->getClientFilename())){
+					$signnature_io_docs = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function
+				
+				}else{	
+					$signnature_io_docs = null;
+				}
 
-				$file_name = $forms_data['signature_name']->getClientFilename();
-				$file_size = $forms_data['signature_name']->getSize();
-				$file_type = $forms_data['signature_name']->getClientMediaType();
-				$file_local_path = $forms_data['signature_name']->getStream()->getMetadata('uri');
+				// Added condition for update images or file  -> shankhpal shende 23-05-2023
 
-				$signature_name = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function
-
-			}else{
-				$signature_name = '';
+				//check if new file is selected	while reply if not save file path from db
+				if(!empty($section_form_details[0]['id'])){
+					if(empty($shortcomings_noticed_docs)){
+				
+						$shortcomings_noticed_docs = $section_form_details[0]['shortcomings_noticed_docs'];
+					}
+					//check if new file is selected	while reply if not save file path from db
+					if(!empty($section_form_details[0]['id'])){
+						if(empty($signnature_io_docs)){
+					
+							$signnature_io_docs = $section_form_details[0]['signnature_io_docs'];
+						}
+					}
+					
 			}
 
 		if(!empty($report_final_status)){
@@ -258,27 +280,26 @@ class DmiRoutineInspectionPpReportsTable extends Table{
 			'customer_id'=>$customer_id,
 			'user_email_id'=>$_SESSION['username'],
 			'user_once_no'=>$_SESSION['once_card_no'],
-			'date_last_inspection'=>$htmlencoded_date_last_inspection,
-			'date_p_inspection'=>$htmlencoded_date_p_inspection,
-			'email'=>$htmlencoded_email,
-			'mobile_no'=>$htmlencoded_mobile_no,
-			'packaging_material'=>$htmlencoded_packaging_material,
-			'valid_upto'=>$htmlencoded_valid_upto,
+			'date_last_inspection'=>	$htmlencoded_date_last_inspection,
+			'date_p_inspection'=> $htmlencoded_date_p_inspection,
+			'printing_press'=> $htmlencoded_printing_press_name,
 			'street_address'=>$htmlencoded_street_address,
-			'registered_office'=>$htmlencoded_registered_office,
-			'press_premises'=>$htmlencoded_press_premises,
-			'last_insp_suggestion'=>$htmlencoded_last_insp_suggestion,
-			'physical_check'=>$htmlencoded_physical_check,
-			'is_printing'=>$htmlencoded_is_printing,
-			'storage_facilities'=>$htmlencoded_storage_facilities,
-			'lab_properly_equipped'=>$htmlencoded_lab_properly_equipped,
-			'maintains_proper'=>$htmlencoded_maintains_proper,
-			'right_quality_of_printing'=>$htmlencoded_right_quality_of_printing,
-			'press_is_marking_logo'=>$htmlencoded_press_is_marking_logo,
-			'short_obserd'=>$htmlencoded_short_obserd,
+			'mobile_no'=> $htmlencoded_mobile_no,
+			'email'=> $htmlencoded_email,
+			'physical_check'=> $htmlencoded_physical_check,
+			'is_printing'=> $htmlencoded_is_printing,
+			'storage_facilities'=> $htmlencoded_storage_facilities,
+			'maintains_proper'=> $htmlencoded_maintains_proper,
+			'right_quality_of_printing' => $htmlencoded_right_quality_of_printing,
+			'valid_upto'=>$htmlencoded_valid_upto,
+			'press_is_marking_logo'=> $htmlencoded_press_is_marking_logo,
+			'suggestions_last_ins_yes_no' => $htmlencoded_suggestions_last_ins_yes_no,
+			'last_insp_suggestion'=> $htmlencoded_last_insp_suggestion,
+			'shortcomings_noticed'=>$htmlencoded_shortcomings_noticed,
 			'if_any_sugg'=>$htmlencoded_if_any_sugg,
-      'signature'=>$signature,
-			'signature_name'=>$signature_name,
+			'shortcomings_noticed_docs'=>$shortcomings_noticed_docs,
+			'name_of_inspecting_officer'=> $htmlencoded_name_of_inspecting_officer,
+			'signnature_io_docs'=>$signnature_io_docs,
 			'form_status'=>'saved',
 			'created'=>date('Y-m-d H:i:s'),
 			'modified'=>date('Y-m-d H:i:s')

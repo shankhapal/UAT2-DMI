@@ -995,8 +995,60 @@ function routineInspectionFormValidation() {
     var if_any_sugg = $("#if_any_sugg").val();
     var date_last_inspection = $("#date_last_inspection").val();
     var date_p_inspection = $("#date_p_inspection").val();
-
+    const name_of_inspecting_officer = $("#name_of_inspecting_officer").val(); // added on 23/05/2023 by shankhpal
+    const signnature_io_docs = $("#signnature_io_docs").val();
+    const shortcomings_noticed_docs = $("#shortcomings_noticed_docs").val();
     var value_return = "true";
+
+    if (name_of_inspecting_officer == "") {
+      $("#error_name_of_inspecting_officer")
+        .show()
+        .text("Input field is required");
+      setTimeout(function () {
+        $("#error_name_of_inspecting_officer").fadeOut();
+      }, 8000);
+      $("#name_of_inspecting_officer").addClass("is-invalid");
+      $("#name_of_inspecting_officer").click(function () {
+        $("#error_name_of_inspecting_officer").hide().text;
+        $("#name_of_inspecting_officer").removeClass("is-invalid");
+      });
+      value_return = "false";
+    }
+
+    // Change Condition for validation and error message by shankhpal 23-05-2023
+    if ($("#signnature_io_docs_value").text() == "") {
+      if (check_file_upload_validation(signnature_io_docs).result == false) {
+        $("#error_signnature_io_docs")
+          .show()
+          .text(check_file_upload_validation(signnature_io_docs).error_message);
+        $("#signnature_io_docs").addClass("is-invalid");
+        $("#signnature_io_docs").click(function () {
+          $("#error_signnature_io_docs").hide().text;
+          $("#signnature_io_docs").removeClass("is-invalid");
+        });
+        value_return = "false";
+      }
+    }
+
+    // Change Condition for validation and error message by shankhpal 23-05-2023
+    if ($("#shortcomings_noticed_docs_value").text() == "") {
+      if (
+        check_file_upload_validation(shortcomings_noticed_docs).result == false
+      ) {
+        $("#error_shortcomings_noticed_docs")
+          .show()
+          .text(
+            check_file_upload_validation(shortcomings_noticed_docs)
+              .error_message
+          );
+        $("#shortcomings_noticed_docs").addClass("is-invalid");
+        $("#shortcomings_noticed_docs").click(function () {
+          $("#error_shortcomings_noticed_docs").hide().text;
+          $("#shortcomings_noticed_docs").removeClass("is-invalid");
+        });
+        value_return = "false";
+      }
+    }
 
     if (street_address == "") {
       $("#error_street_address").show().text("Please Enter street address");
@@ -1537,5 +1589,24 @@ $("#replica_appl_list_table").on("change", ".packer_id", function () {
         $("#sub_commodity").append(response["sub_commodity"]);
       }
     },
+  });
+});
+
+// added by shankhpal shende on 23/05/2023
+$(document).ready(function () {
+  var last_insp_suggestion = $("#last_insp_suggestion");
+  var radioValue = $("input[name='suggestions_last_ins_yes_no']:checked").val();
+
+  if (radioValue === "no") {
+    last_insp_suggestion.hide();
+  } else {
+    last_insp_suggestion.show();
+  }
+
+  $("#suggestions_last_ins-yes").on("click", function () {
+    last_insp_suggestion.show();
+  });
+  $("#suggestions_last_ins-no").on("click", function () {
+    last_insp_suggestion.hide();
   });
 });
