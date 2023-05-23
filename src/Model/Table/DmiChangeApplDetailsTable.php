@@ -819,7 +819,7 @@
 
 
 		//to update all changed details to original tables after grant.
-		//to refelct the change in overall application once grant.
+		//to reflect the change in overall application once grant.
 		//this method is called after grant esigned while creating grant pdf, but before entry in grant table
 		//on 20-04-2023
 		public function updateChangeDetailsAftergrant($customer_id){
@@ -841,12 +841,13 @@
 			if(in_array(1,$selectedValues)){
 				//get last firm name from table to store in log table
 				$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
-				$getFirmName = $DmiFirms->find('all',array('fields'=>'firm_name',array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc')))->first();
+				$getFirmName = $DmiFirms->find('all',array('fields'=>'firm_name','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+				
 				//save details in logs table first				
 				$result = $this->saveRecordGrantLogs($customer_id,'Firm Name',$getFirmName['firm_name'],$getChangeApplDetails['firm_name'],$version);
 				//to update details in firm table
 				if($result==true){					
-					$DmiFirms->updateAll(array('firm_name'=>$getChangeApplDetails['firm_name']),array('customer_id'=>$customer_id));
+					$DmiFirms->updateAll(array('firm_name'=>$getChangeApplDetails['firm_name'],'modified'=>date('Y-m-d H:i:s')),array('customer_id'=>$customer_id));
 				}
 				
 			}
@@ -854,7 +855,7 @@
 				
 				//get last firm name from table to store in log table
 				$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
-				$getFirmdetails = $DmiFirms->find('all',array('fields'=>array('email','mobile_no','fax_no'),array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc')))->first();
+				$getFirmdetails = $DmiFirms->find('all',array('fields'=>array('email','mobile_no','fax_no'),'conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
 				//save details in logs table first
 				$changedFields = 'Firm Contact (Mobile, Email, Phone)';
 				$prevValue = $getFirmdetails['email'].', '.$getFirmdetails['mobile_no'].', '.$getFirmdetails['fax_no'];
@@ -862,7 +863,8 @@
 				//to update details in firm table
 				$result = $this->saveRecordGrantLogs($customer_id,$changedFields,$prevValue,$newValue,$version);
 				if($result==true){					
-					$DmiFirms->updateAll(array('email'=>$getChangeApplDetails['email_id'],'mobile_no'=>$getChangeApplDetails['mobile_no'],'fax_no'=>$getChangeApplDetails['phone_no']),
+					$DmiFirms->updateAll(array('email'=>$getChangeApplDetails['email_id'],'mobile_no'=>$getChangeApplDetails['mobile_no'],
+											'fax_no'=>$getChangeApplDetails['phone_no'],'modified'=>date('Y-m-d H:i:s')),
 										array('customer_id'=>$customer_id));
 				}
 			}
@@ -871,7 +873,7 @@
 				//get last firm name from table to store in log table
 				//to update premises details in firm table
 				$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
-				$getFirmdetails = $DmiFirms->find('all',array('fields'=>array('street_address','state','district','postal_code'),array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc')))->first();				
+				$getFirmdetails = $DmiFirms->find('all',array('fields'=>array('street_address','state','district','postal_code'),'conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();				
 				//save details in logs table first
 				$changedFields = 'Premise/Location in firm table';
 				$prevValue = $getFirmdetails['street_address'].', '.$getFirmdetails['state'].', '.$getFirmdetails['district'].', '.$getFirmdetails['postal_code'];
@@ -881,7 +883,8 @@
 				if($result==true){
 					
 					$DmiFirms->updateAll(array('street_address'=>$getChangeApplDetails['premise_street'],'state'=>$getChangeApplDetails['premise_state'],
-												'district'=>$getChangeApplDetails['district'],'postal_code'=>$getChangeApplDetails['premise_pin']),
+												'district'=>$getChangeApplDetails['premise_city'],'postal_code'=>$getChangeApplDetails['premise_pin'],
+												'modified'=>date('Y-m-d H:i:s')),
 										array('customer_id'=>$customer_id));
 				}
 				
@@ -893,25 +896,30 @@
 				}else{
 					$PremisesProfilesTable = TableRegistry::getTableLocator()->get('DmiPrintingPremisesProfiles');
 				}
-				$getPremisesetails = $PremisesProfilesTable->find('all',array('fields'=>array('id','street_address','state','district','postal_code'),array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc')))->first();
-				//save details in logs table first
-				$changedFields = 'Premise/Location in premises profile table';
-				$prevValue = $getPremisesetails['street_address'].', '.$getPremisesetails['state'].', '.$getPremisesetails['district'].', '.$getPremisesetails['postal_code'];
-				//save details in logs table first
-				$result2 = $this->saveRecordGrantLogs($customer_id,$changedFields,$prevValue,$newValue,$version);	
-				if($result2==true){
-					
-					$PremisesProfilesTable->updateAll(array('street_address'=>$getChangeApplDetails['premise_street'],'state'=>$getChangeApplDetails['premise_state'],
-												'district'=>$getChangeApplDetails['district'],'postal_code'=>$getChangeApplDetails['premise_pin']),
-										array('id'=>$getPremisesetails['id'],'customer_id'=>$customer_id));
-										
+				
+				if($firm_type==1 || $firm_type==2){
+					$getPremisesetails = $PremisesProfilesTable->find('all',array('fields'=>array('id','street_address','state','district','postal_code'),'conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+					//save details in logs table first
+					$changedFields = 'Premise/Location in premises profile table';
+					$prevValue = $getPremisesetails['street_address'].', '.$getPremisesetails['state'].', '.$getPremisesetails['district'].', '.$getPremisesetails['postal_code'];
+					//save details in logs table first
+					$result2 = $this->saveRecordGrantLogs($customer_id,$changedFields,$prevValue,$newValue,$version);	
+					if($result2==true){
+						
+						$PremisesProfilesTable->updateAll(array('street_address'=>$getChangeApplDetails['premise_street'],'state'=>$getChangeApplDetails['premise_state'],
+													'district'=>$getChangeApplDetails['premise_city'],'postal_code'=>$getChangeApplDetails['premise_pin'],
+													'modified'=>date('Y-m-d H:i:s')),
+											array('id'=>$getPremisesetails['id'],'customer_id'=>$customer_id));
+											
+					}
 				}
+				
 
 			}
 			if(in_array(6,$selectedValues)){
 				
 				$DmiCustomerLaboratoryDetails = TableRegistry::getTableLocator()->get('DmiCustomerLaboratoryDetails');
-				$getLabDetails = $DmiCustomerLaboratoryDetails->find('all',array('fields'=>array('id','laboratory_type','laboratory_name','consent_letter_docs','lab_equipped_docs','chemist_detail_docs'),array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc')))->first();
+				$getLabDetails = $DmiCustomerLaboratoryDetails->find('all',array('fields'=>array('id','laboratory_type','laboratory_name','consent_letter_docs','lab_equipped_docs','chemist_detail_docs'),'conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
 				//save details in logs table first
 				$changedFields = 'Laboratory Details';
 				$prevValue = $getLabDetails['laboratory_type'].', '.$getLabDetails['laboratory_name'].', '.$getLabDetails['consent_letter_docs'].', '.$getLabDetails['lab_equipped_docs'].', '.$getLabDetails['chemist_detail_docs'];
@@ -922,7 +930,7 @@
 					
 					$DmiCustomerLaboratoryDetails->updateAll(array('laboratory_type'=>$getChangeApplDetails['lab_type'],'laboratory_name'=>$getChangeApplDetails['lab_name'],
 												'consent_letter_docs'=>$getChangeApplDetails['lab_consent_docs'],'lab_equipped_docs'=>$getChangeApplDetails['lab_equipped_docs'],
-												'chemist_detail_docs'=>$getChangeApplDetails['chemist_details_docs']),
+												'chemist_detail_docs'=>$getChangeApplDetails['chemist_details_docs'],'modified'=>date('Y-m-d H:i:s')),
 										array('id'=>$getLabDetails['id'],'customer_id'=>$customer_id));
 										
 				}
@@ -931,7 +939,7 @@
 
 				//get last category and commodities from table to store in log table
 				$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
-				$getFirmDetails = $DmiFirms->find('all',array('fields'=>array('commodity','sub_commodity','packaging_materials'),array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc')))->first();
+				$getFirmDetails = $DmiFirms->find('all',array('fields'=>array('commodity','sub_commodity','packaging_materials'),'conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
 				
 				$CustomersController = new CustomersController;
 				$firm_type = $CustomersController->Customfunctions->firmType($customer_id);
@@ -943,7 +951,7 @@
 					$result = $this->saveRecordGrantLogs($customer_id,'Category/Commodity',$prevValue,$newValue,$version);
 					//to update details in firm table				
 					if($result==true){					
-						$DmiFirms->updateAll(array('commodity'=>$getChangeApplDetails['comm_category'],'sub_commodity'=>$getChangeApplDetails['commodity']),array('customer_id'=>$customer_id));
+						$DmiFirms->updateAll(array('commodity'=>$getChangeApplDetails['comm_category'],'sub_commodity'=>$getChangeApplDetails['commodity'],'modified'=>date('Y-m-d H:i:s')),array('customer_id'=>$customer_id));
 					}
 
 					
@@ -955,7 +963,7 @@
 					$result = $this->saveRecordGrantLogs($customer_id,'Packing type',$prevValue,$newValue,$version);
 					//to update details in firm table				
 					if($result==true){					
-						$DmiFirms->updateAll(array('packaging_materials'=>$getChangeApplDetails['packing_types']),array('customer_id'=>$customer_id));
+						$DmiFirms->updateAll(array('packaging_materials'=>$getChangeApplDetails['packing_types'],'modified'=>date('Y-m-d H:i:s')),array('customer_id'=>$customer_id));
 					}
 				}
 			}
@@ -972,7 +980,7 @@
 					$firmProfilesTable = TableRegistry::getTableLocator()->get('DmiLaboratoryFirmDetails');
 				}
 				
-				$getBusinessType = $firmProfilesTable->find('all',array('fields'=>array('id','business_type'),array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc')))->first();
+				$getBusinessType = $firmProfilesTable->find('all',array('fields'=>array('id','business_type'),'conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
 				$prevValue = $getBusinessType['business_type'];
 				$newValue = $getChangeApplDetails['business_type'];
 				
@@ -980,7 +988,7 @@
 				$result = $this->saveRecordGrantLogs($customer_id,'Business type',$prevValue,$newValue,$version);
 				//to update details in profile table table				
 				if($result==true){					
-					$firmProfilesTable->updateAll(array('business_type'=>$getChangeApplDetails['business_type']),array('id'=>$getBusinessType['id'],'customer_id'=>$customer_id));
+					$firmProfilesTable->updateAll(array('business_type'=>$getChangeApplDetails['business_type'],'modified'=>date('Y-m-d H:i:s')),array('id'=>$getBusinessType['id'],'customer_id'=>$customer_id));
 				}
 				
 			}
@@ -998,7 +1006,7 @@
 			
 			$dataArray = array(			
 				'customer_id'=>$customer_id,
-				'grant_by'=>$this->Session->read('username'),
+				'grant_by'=>$_SESSION['username'],
 				'changed_field'=>$changed_field,
 				'prev_value'=>$prev_value,
 				'new_value'=>$new_value,
@@ -1006,8 +1014,8 @@
 				'version'=>$version		
 			);
 			
-			$grantedLogsEntity = $DmiChangeGrantedLogs->newEntity($dataArray);				
-			if($this->save($grantedLogsEntity)){ 			
+			$grantedLogsEntity = $DmiChangeGrantedLogs->newEntity($dataArray);
+			if($DmiChangeGrantedLogs->save($grantedLogsEntity)){	
 				return true; 
 			}
 			return false;

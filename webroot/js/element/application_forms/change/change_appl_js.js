@@ -76,7 +76,7 @@
 
 		if(selectedValues.includes("3")==true){
 			//new validation script added for upload fields required for TBL change, 18-05-2023
-			if($("#tbl_proforma_a2_doc").text() == ''){	
+			if($("#tbl_proforma_a2_doc_value").text() == ''){	
 				if(check_file_upload_validation(tbl_proforma_a2_doc).result == false){			
 					$("#error_tbl_proforma_a2_doc").show().text("Please select related file");
 					$("#tbl_proforma_a2_doc").addClass("is-invalid");
@@ -175,25 +175,34 @@
 			}
 			
 			if($('#lab_type').val() == 1){
-				if($("#chemist_detail_docs_value").text() == ''){		
-					$("#error_chemist_details_docs").show().text("Please select related file");
-					$("#chemist_details_docs").addClass("is-invalid");
-					$("#chemist_details_docs").click(function(){$("#error_chemist_details_docs").hide().text; $("#chemist_details_docs").removeClass("is-invalid");});
-					value_return = 'false';
+				if($("#chemist_detail_docs_value").text() == ''){
+					if(check_file_upload_validation(chemist_details_docs).result == false){			
+						$("#error_chemist_details_docs").show().text("Please select related file");
+						$("#chemist_details_docs").addClass("is-invalid");
+						$("#chemist_details_docs").click(function(){$("#error_chemist_details_docs").hide().text; $("#chemist_details_docs").removeClass("is-invalid");});
+						value_return = 'false';
+					}
 				}
-				if($("#lab_equipped_docs_value").text() == ''){			
-					$("#error_lab_equipped_docs").show().text("Please select related file");
-					$("#lab_equipped_docs").addClass("is-invalid");
-					$("#lab_equipped_docs").click(function(){$("#error_lab_equipped_docs").hide().text; $("#lab_equipped_docs").removeClass("is-invalid");});
-					value_return = 'false';
+
+				if($("#lab_equipped_docs_value").text() == ''){
+					if(check_file_upload_validation(lab_equipped_docs).result == false){			
+						$("#error_lab_equipped_docs").show().text("Please select related file");
+						$("#lab_equipped_docs").addClass("is-invalid");
+						$("#lab_equipped_docs").click(function(){$("#error_lab_equipped_docs").hide().text; $("#lab_equipped_docs").removeClass("is-invalid");});
+						value_return = 'false';
+					}
 				}
+
 			}else{
-				if($("#consent_letter_docs_value").text() == ''){			
-					$("#error_lab_consent_docs").show().text("Please select related file");
-					$("#lab_consent_docs").addClass("is-invalid");
-					$("#lab_consent_docs").click(function(){$("#error_lab_consent_docs").hide().text; $("#lab_consent_docs").removeClass("is-invalid");});
-					value_return = 'false';
+				if($("#consent_letter_docs_value").text() == ''){
+					if(check_file_upload_validation(lab_consent_docs).result == false){			
+						$("#error_lab_consent_docs").show().text("Please select related file");
+						$("#lab_consent_docs").addClass("is-invalid");
+						$("#lab_consent_docs").click(function(){$("#error_lab_consent_docs").hide().text; $("#lab_consent_docs").removeClass("is-invalid");});
+						value_return = 'false';
+					}
 				}
+
 			}
 			
 			
@@ -283,9 +292,27 @@
         file_browse_onclick('rel_doc');
     });
 
-	//added on 17-05-2023 by Amol
+	//added on 17-05-2023 for new upload fields by Amol
 	$("#commodity_fssai_doc").change(function(){
         file_browse_onclick('commodity_fssai_doc');
+    });
+	$("#tbl_proforma_a2_doc").change(function(){
+        file_browse_onclick('tbl_proforma_a2_doc');
+    });
+	$("#premises_fssai_doc").change(function(){
+        file_browse_onclick('premises_fssai_doc');
+    });
+	$("#premises_gst_doc").change(function(){
+        file_browse_onclick('premises_gst_doc');
+    });
+	$("#premises_ownership_doc").change(function(){
+        file_browse_onclick('premises_ownership_doc');
+    });
+	$("#premises_map_doc").change(function(){
+        file_browse_onclick('premises_map_doc');
+    });
+	$("#premises_machineries_doc").change(function(){
+        file_browse_onclick('premises_machineries_doc');
     });
 
 

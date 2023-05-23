@@ -424,6 +424,14 @@ class ApplicationformspdfsController extends AppController{
 				//changed file path from temp to files
 				$file_path = '/testdocs/DMI/certificates/'.$folderName.'/'.$rearranged_id.'('.$current_pdf_version.')'.'.pdf';						
 				
+				//to updated the changed fields in main table, and save log for the same.
+				//added on 23-05-2023 by Amol
+				if($application_type==3){
+					
+					$this->loadModel('DmiChangeApplDetails');
+					$this->DmiChangeApplDetails->updateChangeDetailsAftergrant($customer_id);
+				}
+				
 				$grantPdfRecords = $Dmi_grant_pdf_record->newEntity(array(		
 					'customer_id'=>$customer_id,
 					'user_email_id'=>$user_email_id,
@@ -2488,6 +2496,7 @@ class ApplicationformspdfsController extends AppController{
 		//generatin pdf starts here
 		//create new pdf using tcpdf including signature apprearence to generate its hash below
 		require_once(ROOT . DS .'vendor' . DS . 'tcpdf' . DS . 'tcpdf.php');
+		//below line is added on 23-05-2023 by Amol, to print water mark on pdf
 		require_once(ROOT . DS . 'vendor' . DS . 'tcpdf' . DS . 'tcpdf_text.php');
 
 		//This below condition is updated for the Surrender (SOC) Application PDFs watermarks - Akash [12-05-2023]
