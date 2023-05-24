@@ -851,9 +851,6 @@
                                     </div>
                                 </div>
                             </div>
-                          
-
-                       
                 <!-- Signnature and Name of the Packer or his representative-->          
                     <div class="card-header sub-card-header-firm"><h3 class="card-title">Signature and Name of the Packer or his representative</h3></div>
                             <div class="form-horizontal">
@@ -901,9 +898,6 @@
                                     </div>
                                 </div>
                             </div>
-
-
-
                        
                     <!-- Signature and Name of the Inspecting Officer -->     
                     <div class="card-header sub-card-header-firm"><h3 class="card-title">Signature and Name of the Inspecting Officer</h3></div>
