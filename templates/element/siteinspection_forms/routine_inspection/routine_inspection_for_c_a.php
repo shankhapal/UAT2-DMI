@@ -4,9 +4,7 @@
 	    Name of person : shankhpal shende
 	    Date: 13-05-2023
 */ -->
-<?php 
-// pr($section_form_details[0]['analytical_results']);die;
-echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-data', 'id'=>$section)); ?>
+<?php echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-data', 'id'=>$section)); ?>
 <section id="form_outer_main" class="content form-middle">
     <div class="container-fluid">
         <h5 class="mt-1 mb-2">Routine Inspection Report (CA-Packer)</h5>
@@ -857,7 +855,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
 
                        
                 <!-- Signnature and Name of the Packer or his representative-->          
-                    <div class="card-header sub-card-header-firm"><h3 class="card-title">Signnature and Name of the Packer or his representative</h3></div>
+                    <div class="card-header sub-card-header-firm"><h3 class="card-title">Signature and Name of the Packer or his representative</h3></div>
                             <div class="form-horizontal">
                                 <div class="card-body border">
                                     <div class="row">
@@ -881,7 +879,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group row">
-                                                     <label for="field3" class="col-sm col-form-label"><span><?php if ($current_level == 'level_2' && $application_mode == 'edit' ) { echo 'Signnature'; } else { echo 'Signnature'; } ?></span></label>
+                                                     <label for="field3" class="col-sm col-form-label"><span><?php if ($current_level == 'level_2' && $application_mode == 'edit' ) { echo 'Signature'; } else { echo 'Signature'; } ?></span></label>
 
                                                     <span class="float-left"><?php if ($current_level == 'level_2' && $application_mode == 'edit' && empty($section_form_details[0]['signnature_of_packer_docs'])) { echo 'Attach doc'; }else{ echo 'Attached doc'; } ?> :
                                                     <?php if (!empty($section_form_details[0]['signnature_of_packer_docs'])) { ?>
@@ -907,8 +905,8 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
 
 
                        
-                    <!-- Signnature and Name of the Inspecting Officer -->     
-                    <div class="card-header sub-card-header-firm"><h3 class="card-title">Signnature and Name of the Inspecting Officer</h3></div>
+                    <!-- Signature and Name of the Inspecting Officer -->     
+                    <div class="card-header sub-card-header-firm"><h3 class="card-title">Signature and Name of the Inspecting Officer</h3></div>
                         <div class="form-horizontal">
                             <div class="form-horizontal">
                                 <div class="card-body border">
@@ -952,7 +950,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group row">
-                                                    <label for="field3" class="col-sm col-form-label"><span><?php if ($current_level == 'level_2' && $application_mode == 'edit' ) { echo 'Signnature'; } else { echo 'Signnature'; } ?></span></label>
+                                                    <label for="field3" class="col-sm col-form-label"><span><?php if ($current_level == 'level_2' && $application_mode == 'edit' ) { echo 'Signature'; } else { echo 'Signature'; } ?></span></label>
 
                                                     <span class="float-left"><?php if ($current_level == 'level_2' && $application_mode == 'edit' && empty($section_form_details[0]['signnature_of_inspecting_officer_docs'])) { echo 'Attach docs'; }else{ echo 'Attached docs'; } ?> :
                                                     <?php if (!empty($section_form_details[0]['signnature_of_inspecting_officer_docs'])) { ?>
