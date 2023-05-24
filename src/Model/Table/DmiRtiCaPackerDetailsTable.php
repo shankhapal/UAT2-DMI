@@ -37,7 +37,7 @@ class DmiRtiCaPackerDetailsTable extends Table{
 			$DmiRtiAllocations = TableRegistry::getTableLocator()->get('DmiRtiAllocations');
 			
 			$approved_record = $DmiRtiFinalReports->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id desc'))->first();
-
+      $allocated_record = '';
 			if(!empty($approved_record)){
 				
 				$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,array('date(created) > '=>$approved_record['created'])),'order'=>'id desc'))->first();
@@ -259,7 +259,7 @@ class DmiRtiCaPackerDetailsTable extends Table{
 				$certificate_no =   htmlentities($forms_data['certificate_no'], ENT_QUOTES);
 				$valid_upto  = htmlentities($forms_data['valid_upto'], ENT_QUOTES);
 				$record_of_invice = htmlentities($forms_data['record_of_invice'], ENT_QUOTES);
-				$chemist_incharge  = htmlentities($forms_data['chemist_incharge'], ENT_QUOTES);
+				$chemist_incharge  = isset($forms_data['chemist_incharge'])?$forms_data['chemist_incharge']:null;
 				$present_time_of_inspection = htmlentities($forms_data['present_time_of_inspection'], ENT_QUOTES);
 				$premises_adequately = htmlentities($forms_data['premises_adequately'], ENT_QUOTES);
 				$lab_properly_equipped = htmlentities($forms_data['lab_properly_equipped'], ENT_QUOTES);

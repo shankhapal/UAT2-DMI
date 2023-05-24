@@ -51,7 +51,7 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group row">
-                                                    <label for="inputEmail3" class="col-sm col-form-label">Name of the Printing Press <span class="cRed">*</span></label>
+                                                    <label for="inputEmail3" class="col-sm col-form-label">Name of the Printing Press </label>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -73,7 +73,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
-                                                <?php echo $this->Form->control('street_address', array('type'=>'textarea', 'id'=>'street_address','value'=>$section_form_details[0]['street_address'], 'placeholder'=>'Enter street address', 'class'=>'form-control input-field', 'label'=>false)); ?>
+                                                <?php echo $this->Form->control('street_address', array('type'=>'textarea', 'id'=>'street_address','value'=>$section_form_details[0]['street_address'], 'placeholder'=>'Enter Full Address', 'class'=>'form-control input-field', 'label'=>false)); ?>
                                                 <span id="error_street_address" class="error invalid-feedback"></span>
                                             </div>
                                         </div>
@@ -83,7 +83,7 @@
                                         <div class="row">
                                             <div class="col-md-2">
                                                 <div class="form-group row">
-                                                        <label for="inputEmail3" class="col-sm col-form-label">Telephone nos. <span class="cRed">*</span></label>
+                                                        <label for="inputEmail3" class="col-sm col-form-label">Telephone nos.</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
@@ -92,7 +92,7 @@
                                             </div>
                                             <div class="col-md-2">
                                                 <div class="form-group row">
-                                                    <label for="inputEmail3" class="col-sm col-form-label">Email <span class="cRed">*</span></label>
+                                                    <label for="inputEmail3" class="col-sm col-form-label">Email</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
@@ -132,7 +132,7 @@
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group row">
-                                                            <label for="inputEmail3" class="col-sm col-form-label">Permission valid upto <span class="cRed">*</span></label>
+                                                            <label for="inputEmail3" class="col-sm col-form-label">Permission valid upto</label>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
@@ -150,7 +150,7 @@
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="form-group row">
-                                                                <label for="inputEmail3" class="col-sm col-form-label">Permitted packaging material <span class="cRed">*</span></label>
+                                                                <label for="inputEmail3" class="col-sm col-form-label">Permitted packaging material </label>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">

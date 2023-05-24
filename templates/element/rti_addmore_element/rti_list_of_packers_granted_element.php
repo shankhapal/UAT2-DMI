@@ -15,8 +15,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php //pr($section_form_details);die;
-                    //if(!empty($replica_appl_list)){
+                    <?php 
                         $i=0;
                         $sr_no = 1;
                         foreach($section_form_details[3] as $each_details){ ?>

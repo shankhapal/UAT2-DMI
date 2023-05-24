@@ -22,11 +22,11 @@
 	
       <tr>
           <td style="padding:10px; vertical-align:top;">Date of Last Inspection :</td>
-          <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['date_p_inspection'])?$rti_pp_data['date_p_inspection']:"Nill"; ?></td>
+          <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['date_last_inspection'])?$rti_pp_data['date_last_inspection']:"Nill"; ?></td>
       </tr>
       <tr>
           <td style="padding:10px; vertical-align:top;">Date & Time of present Inspection :</td>
-          <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['date_last_inspection'])?$rti_pp_data['date_last_inspection']:"Nill"; ?></td>
+          <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['date_p_inspection'])?$rti_pp_data['date_p_inspection']:"Nill"; ?></td>
       </tr>
       <tr>
           <td style="padding:10px; vertical-align:top;">1. Name of the Printing Press :</td>
@@ -83,8 +83,8 @@
           foreach ($all_packers_value as $each_value) {  ?>
           <tr>
             <td align="center" style="padding:5px;"><?php echo $i; ?></td>
-            <td align="center" style="padding:5px;"><?php echo $each_value['customer_id']; ?></td>
             <td align="center" style="padding:5px;"><?php echo $each_value['firm_name']; ?></td>
+            <td align="center" style="padding:5px;"><?php echo $each_value['customer_id']; ?></td>
             <td align="center" style="padding:5px;"><?php echo $each_value['validupto']; ?></td>
             <td align="center" style="padding:5px;"><?php echo implode(",",$each_value['sub_commodity']); ?></td>
             <td align="center" style="padding:5px;"><?php echo implode(",",$each_value['tbl_name']); ?></td>

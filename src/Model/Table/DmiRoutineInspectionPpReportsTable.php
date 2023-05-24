@@ -307,34 +307,37 @@ class DmiRoutineInspectionPpReportsTable extends Table{
 		if($this->save($formSavedEntity)){ return $message_id; }else{ $message_id = ""; return $message_id; }
 	}
 
-
+	/* Comment
+	Reason : Updated function as per change request 
+	Name of person : shankhpal shende
+	Date: 24-05-2023
+*/
 	public function saveReferredBackComment($customer_id,$report_details,$reffered_back_comment,$rb_comment_ul){
-
+			
 		$formSavedEntity = $this->newEntity(array(
 			'customer_id'=>$customer_id,
 			'user_email_id'=>$report_details['user_email_id'],
 			'user_once_no'=>$report_details['user_once_no'],
-			'date_last_inspection'=>$report_details['date_last_inspection'],
-			'date_p_inspection'=>$report_details['date_p_inspection'],
-			'registered_office'=>$report_details['registered_office'],
-			'press_premises'=>$report_details['press_premises'],
-			'physical_check'=>$report_details['physical_check'],
-			'is_printing'=>$report_details['is_printing'],
-			'storage_facilities'=>$report_details['storage_facilities'],
-			'lab_properly_equipped'=>$report_details['lab_properly_equipped'],
-			'maintains_proper'=>$report_details['maintains_proper'],
-			'right_quality_of_printing'=>$report_details['right_quality_of_printing'],
-			'press_is_marking_logo'=>$report_details['press_is_marking_logo'],
-			'last_insp_suggestion'=>$report_details['last_insp_suggestion'],
-			'short_obserd'=>$report_details['short_obserd'],
-			'if_any_sugg'=>$report_details['if_any_sugg'],
-			'signature'=>$report_details['signature'],
-			'signature_name'=>$report_details['signature_name'],
-			'email'=>$report_details['email'],
-			'mobile_no'=>$report_details['mobile_no'],
-			'packaging_material'=>$report_details['packaging_material'],
-			'valid_upto'=>$report_details['valid_upto'],
-			'street_address'=>$report_details['street_address'],
+			'date_last_inspection'=> $report_details['date_last_inspection'],
+			'date_p_inspection'=> $report_details['date_p_inspection'],
+			'printing_press'=> $report_details['printing_press'],
+			'street_address'=> $report_details['street_address'],
+			'mobile_no'=> $report_details['mobile_no'],
+			'email'=> $report_details['email'],
+			'physical_check'=> $report_details['physical_check'],
+			'is_printing'=> $report_details['is_printing'],
+			'storage_facilities'=> $report_details['storage_facilities'],
+			'maintains_proper'=> $report_details['maintains_proper'],
+			'right_quality_of_printing' => $report_details['right_quality_of_printing'],
+			'valid_upto'=> $report_details['valid_upto'],
+			'press_is_marking_logo'=> $report_details['press_is_marking_logo'],
+			'suggestions_last_ins_yes_no' => $report_details['suggestions_last_ins_yes_no'],
+			'last_insp_suggestion'=> $report_details['last_insp_suggestion'],
+			'shortcomings_noticed'=> $report_details['shortcomings_noticed'],
+			'if_any_sugg'=> $report_details['if_any_sugg'],
+			'shortcomings_noticed_docs'=> $report_details['shortcomings_noticed_docs'],
+			'name_of_inspecting_officer'=> $report_details['name_of_inspecting_officer'],
+			'signnature_io_docs'=> $report_details['signnature_io_docs'],
 			'referred_back_comment'=>$reffered_back_comment,
 			'rb_comment_ul'=>$rb_comment_ul,
 			'referred_back_date'=>date('Y-m-d H:i:s'),

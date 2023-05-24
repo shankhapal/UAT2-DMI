@@ -187,22 +187,6 @@ $(document).ready(function () {
     });
   }
 
-  var e_briefly_suggestions_radio = $("#e_briefly_suggestions_radio-no").val();
-  if (e_briefly_suggestions_radio == "no") {
-    $("#enumerate_briefly_suggestions").hide();
-  }
-  $("#e_briefly_suggestions_radio-yes").on("click", function () {
-    $("#enumerate_briefly_suggestions").show();
-  });
-
-  $("input[type=radio][name=e_briefly_suggestions_radio]").change(function () {
-    if (this.value === "yes") {
-      $("#briefly_suggestions").show();
-    } else {
-      $("#briefly_suggestions").val("").hide();
-    }
-  });
-
   var minLength = 5;
   var maxLength = 50;
 
@@ -261,9 +245,9 @@ function sample_table_validation(e) {
     });
     value_return = "false";
   }
-
+  // updated error message by shankhpal on 24/05/2023
   if (best_before == "") {
-    $("#error_best_before").show().text("Please Enter value");
+    $("#error_best_before").show().text("Best Before cannot be blank");
     setTimeout(function () {
       $("#error_best_before").fadeOut();
     }, 8000);
@@ -288,8 +272,9 @@ function sample_table_validation(e) {
     value_return = "false";
   }
 
+  // updated error message by shankhpal on 24/05/2023
   if (replica_si_no == "") {
-    $("#error_replica_si_no").show().text("Please Enter Pack Size");
+    $("#error_replica_si_no").show().text("Please enter replica si. no");
     setTimeout(function () {
       $("#error_replica_si_no").fadeOut();
     }, 8000);
@@ -1467,10 +1452,10 @@ $(document).ready(function () {
     format: "dd/mm/yyyy",
     autoclose: true,
   });
-  $("#valid_upto").datepicker({
-    format: "dd/mm/yyyy",
-    autoclose: true,
-  });
+  // $("#valid_upto").datepicker({
+  //   format: "dd/mm/yyyy",
+  //   autoclose: true,
+  // });
 
   $("#date_of_packing").datepicker({
     format: "dd/mm/yyyy",
@@ -1595,7 +1580,13 @@ $("#replica_appl_list_table").on("change", ".packer_id", function () {
 // added by shankhpal shende on 23/05/2023
 $(document).ready(function () {
   var last_insp_suggestion = $("#last_insp_suggestion");
+  var enumerate_briefly_suggestions = $("#enumerate_briefly_suggestions");
+
   var radioValue = $("input[name='suggestions_last_ins_yes_no']:checked").val();
+
+  var e_briefly_suggestions_radio = $(
+    "input[name='e_briefly_suggestions_radio']:checked"
+  ).val();
 
   if (radioValue === "no") {
     last_insp_suggestion.hide();
@@ -1603,10 +1594,23 @@ $(document).ready(function () {
     last_insp_suggestion.show();
   }
 
+  if (e_briefly_suggestions_radio == "yes") {
+    enumerate_briefly_suggestions.show();
+  } else {
+    enumerate_briefly_suggestions.hide();
+  }
+
   $("#suggestions_last_ins-yes").on("click", function () {
     last_insp_suggestion.show();
   });
   $("#suggestions_last_ins-no").on("click", function () {
     last_insp_suggestion.hide();
+  });
+
+  $("#e_briefly_suggestions_radio-yes").on("click", function () {
+    enumerate_briefly_suggestions.show();
+  });
+  $("#e_briefly_suggestions_radio-no").on("click", function () {
+    enumerate_briefly_suggestions.hide();
   });
 });

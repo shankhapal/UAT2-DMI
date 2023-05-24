@@ -5,7 +5,7 @@
 	    Date: 13-05-2023
 */ -->
 <?php 
-// pr($section_form_details);die;
+// pr($section_form_details[0]['analytical_results']);die;
 echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-data', 'id'=>$section)); ?>
 <section id="form_outer_main" class="content form-middle">
     <div class="container-fluid">
@@ -64,22 +64,6 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-horizontal">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group row">
-                                                     <label for="inputEmail3" class="col-sm col-form-label">Mobile No.<span class="cRed">*</span></label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <?php echo $this->Form->control('mobile_no', array('type'=>'text','value'=>base64_decode($firm_details['mobile_no']),'id'=>'mobile_no', 'class'=>'form-control', 'label'=>false)); ?>
-                                                <span id="error_mobile_no" class="error invalid-feedback"></span>
-                                                 </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
                                 <!-- 2. Address of the Authorized Premises -->
                             <div class="card-header sub-card-header-firm"><h3 class="card-title">2. Address of the Authorized Premises</h3></div>
                                 <div class="form-horizontal">
@@ -97,22 +81,6 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-horizontal">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group row">
-                                                     <label for="inputEmail3" class="col-sm col-form-label">Mobile No.<span class="cRed">*</span></label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <?php echo $this->Form->control('mobile_no', array('type'=>'text','value'=>base64_decode($firm_details['mobile_no']),'id'=>'mobile_no', 'class'=>'form-control', 'label'=>false)); ?>
-                                                <span id="error_mobile_no" class="error invalid-feedback"></span>
-                                                 </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
                             <!-- 3. Contact Details of the packer -->
                             <div class="card-header sub-card-header-firm"><h3 class="card-title">3. Contact Details of the packer</h3></div>
                                 <div class="form-horizontal">
@@ -804,8 +772,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                                                                 <label for="e_briefly_suggestions_radio-no">No
                                                                 </label>
                                                             </div>
-                                                            <div class="col-sm-9 hidden" id="briefly_suggestions">
-                                                                
+                                                            <div class="col-sm-9">
                                                                 <?php 
                                                                  echo $this->Form->control('enumerate_briefly_suggestions', array('type'=>'textarea', 'id'=>'enumerate_briefly_suggestions', 'escape'=>false,'value'=>isset($section_form_details[0]['enumerate_briefly_suggestions'])?$section_form_details[0]['enumerate_briefly_suggestions']:"", 'class'=>'form-control input-field', 'label'=>false, 'placeholder'=>'Enter discrepancies here...')); ?>
                                                                 <span id="error_enumerate_briefly_suggestions" class="error invalid-feedback"></span>

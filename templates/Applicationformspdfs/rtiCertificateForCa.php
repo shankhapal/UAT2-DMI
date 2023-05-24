@@ -29,64 +29,79 @@
 	
 		<tr>
 			  <td style="padding:10px; vertical-align:top;">Date of Last Inspection :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['date_last_inspection']; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_ca_data['date_last_inspection'])?$rti_ca_data['date_last_inspection']:"Nill"; ?></td>
 		</tr>
     <tr>
 			  <td style="padding:10px; vertical-align:top;">Date & Time of present Inspection :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['date_p_inspection']; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_ca_data['date_p_inspection'])?$rti_ca_data['date_p_inspection']:"Nill"; ?></td>
 		</tr>
     <tr>
         <td style="padding:10px; vertical-align:top;">1. Name of Authorized Packer :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $firm_details['firm_name']; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($firm_details['firm_name'])?$firm_details['firm_name']:"Nill"; ?></td>
 		</tr>
     <tr>
         <td style="padding:10px; vertical-align:top;">2. Address of the Authorized Premises :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $firm_details['street_address']; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($firm_details['street_address'])?$firm_details['street_address']:"Nill"; ?></td>
 		</tr>
     <tr>
         <td style="padding:10px; vertical-align:top;">3. Contact details of the packer Mobile:</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo 'Mobile :'. base64_decode($firm_details['mobile_no'])." , ".'Email ID :'.base64_decode($firm_details['email']); ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo 'Mobile :'. base64_decode(isset($firm_details['mobile_no'])?$firm_details['mobile_no']:"Nill")." , ".'Email ID :'.base64_decode(isset($firm_details['email'])?$firm_details['email']:"Nill"); ?></td>
 		</tr>
     <tr>
         <td style="padding:10px; vertical-align:top;">4. Certificate of Authorization No and valid upto :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo 'Certificate No :'. $firm_details['customer_id'].',','valid upto :'. $certificate_valid_upto; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo 'Certificate No :'. isset($firm_details['customer_id'])?$firm_details['customer_id']:"Nill".',','valid upto :'. isset($certificate_valid_upto)?$certificate_valid_upto:"Nill"; ?></td>
 		</tr>
     
     <tr>
         <td style="padding:10px; vertical-align:top;">5. Commodity (ies) for which CA is granted :</td>
 			  <td style="padding:10px; vertical-align:top;">
         <?php 
-        $i=0;
-        foreach ($sub_commodity_value as $value) {
-            $comma = ($i!=0)?', ':'';
-            echo $comma.$value;
-            $i++;
-        } 
+        if(!empty($sub_commodity_value)){
+          $i=0;
+          foreach ($sub_commodity_value as $value) {
+              $comma = ($i!=0)?', ':'';
+              echo $comma.$value;
+              $i++;
+          } 
+        }else{
+          echo "Nill";
+        }
         ?>
       </td>
 		</tr>
     <tr>
         <td style="padding:10px; vertical-align:top;">6. Name of the grading Laboratory :</td>
 			  <td style="padding:10px; vertical-align:top;">
-         <?php 
-            $i=0;
-            foreach ($lab_list as $value) {
-                $comma = ($i!=0)?', ':'';
-                echo $comma.$value;
-                $i++;
-            } 
-        ?>
+         <?php
+              if (!empty($lab_list)) {
+                $i = 0;
+                foreach ($lab_list as $value) {
+                  $comma = ($i != 0)?',':'';
+                  echo $comma.$value;
+                  $i++;
+                }
+              }else{
+                echo "Nill";
+              }
+              ?>
       </td>
 		</tr>
     <tr>
         <td style="padding:10px; vertical-align:top;">7. Name of approved Printing press :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php 
-            $i=0;
-            foreach ($printers_list as $value) {
-                $comma = ($i!=0)?', ':'';
-                echo $comma.$value;
-                $i++;
-            }  ?></td>
+			  <td style="padding:10px; vertical-align:top;">
+            <?php
+              if (!empty($printers_list)) {
+                $i = 0;
+                foreach ($printers_list as $value) {
+                  $comma = ($i != 0) ? ', ' : '';
+                  echo $comma . $value;
+                  $i++;
+                }
+              } else {
+                echo "Nill";
+              }
+              ?>
+          </td>
 		</tr>
     <tr>
         <td style="padding:10px; vertical-align:top;">a) Record of invoice of print Agmark replica is upto date or not? :</td>
@@ -98,7 +113,7 @@
            if(!empty($self_registered_chemist)){
                echo $self_registered_chemist[0]['chemist_fname']." ".$self_registered_chemist[0]['chemist_lname'];
            }else{
-            echo "NULL";
+            echo "Nill";
            }
       ?></td>
 		</tr>
