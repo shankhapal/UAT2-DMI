@@ -3836,22 +3836,27 @@ class CustomersController extends AppController {
 			// added for
 		// When attaching the printing press and laboratory, they must display some identifying information such as address and ID. added by shankhpal on 22/02/2023
 		
+		//Handle the case when $get_office_record is null
+		// added by shankhpal shende on 24/05/2023
 
-		$i=0;
-		foreach ($lab_list as $lab_list_value) {
+			$i = 0;
+			foreach ($lab_list as $lab_list_value) {
+					$app_id = $lab_list_value['customer_id'];
+					$get_office_record = $this->DmiApplWithRoMappings->getOfficeDetails($app_id);
 
-			$app_id = $lab_list_value['customer_id'];
-			$get_office_record = $this->DmiApplWithRoMappings->getOfficeDetails($app_id);
-			
-			$office_type = $get_office_record['office_type'];
-			$ro_office = $get_office_record['ro_office'];
-			$id = $lab_list_value['id'];
+					if ($get_office_record !== null) {
+							$office_type = $get_office_record['office_type'];
+							$ro_office = $get_office_record['ro_office'];
+							$id = $lab_list_value['id'];
 
-			$lab_data[$id] = $lab_list_value['firm_name'].", #"."Address: ".$lab_list_value['street_address'].", #"."Applicant ID: ".$lab_list_value['customer_id'].", #"."Office: ".$ro_office.", #"."Office Type: ".$office_type;
-			$i++;
-			
-		}
-		
+							$lab_data[$id] = $lab_list_value['firm_name'] . ", #" . "Address: " . $lab_list_value['street_address'] . ", #" . "Applicant ID: " . $lab_list_value['customer_id'] . ", #" . "Office: " . $ro_office . ", #" . "Office Type: " . $office_type;
+							$i++;
+					} else {
+							// Handle the case when $get_office_record is null
+							// Display an error message or take appropriate action
+					}
+			}
+
 		$this->set('lab_data',$lab_data);
 		
 		$printers_list = $this->DmiFirms->find('all',array('keyField'=>'id','valueField'=>'firm_name','joins'=>array(array('table' => 'dmi_grant_certificates_pdfs','alias' => 'dmigcp','type' => 'INNER','conditions' => array('dmigcp.customer_id = DmiFirms.customer_id'))),
