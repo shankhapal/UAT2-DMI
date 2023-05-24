@@ -293,6 +293,10 @@ class FlowbuttonsComponent extends Component {
 					}if($inspection == 'no' && $firm_type ==2){
 						
 						$ForwarBtn = 'RO';
+						
+					//to check if CA with BEVO then forward to RO, added on 24-05-2023 by Amol
+					}if($inspection == 'no' && $firm_type ==1 && $ca_bevo_applicant == 'yes'){
+						$ForwarBtn = 'RO';										
 					}
 					
 				}elseif($office_type == 'RO'){
@@ -397,7 +401,8 @@ class FlowbuttonsComponent extends Component {
 				
 				if($office_type == 'SO'){
 					
-					if($inspection == 'no' && $firm_type ==1 ){
+					//added CA Bevo condition on 24-05-2023 by Amol
+					if($inspection == 'no' && $firm_type ==1 && $ca_bevo_applicant != 'yes'){
 						
 						$GrantBtn = 'yes';
 					}
