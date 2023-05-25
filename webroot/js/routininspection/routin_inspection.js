@@ -1,7 +1,14 @@
+//  Comment:This file updated as per change and suggestions for UAT module after test run
+// 	Reason: updated as per change and suggestions for UAT module after test run
+// 	Name of person : shankhpal shende
+// 	Date: 11-05-2023 - 16-05-2023
+// */ -->
 $(document).ready(function () {
   var application_mode = $("#application_mode").val();
-
+  var current_level = $("#current_level").val();
+  // alert(current_level);
   if (application_mode == "view") {
+    $("#section_form_id :input").prop("disabled", false);
     $(document).ready(function () {
       $("#form_inner_main :input").prop("disabled", true);
       $("#form_inner_main :input[type='radio']").prop("disabled", true);
@@ -179,6 +186,38 @@ $(document).ready(function () {
       }
     });
   }
+
+  var minLength = 5;
+  var maxLength = 50;
+
+  // Added for max length of input box as per change request
+  // added by : shankhpal
+  // on 16/05/2023
+  $("#shortcomings_noticed").on("keyup", function () {
+    var char = $(this).val();
+    var charLength = $(this).val().length;
+    if (charLength < minLength) {
+      $("#error_shortcomings_noticed")
+        .show()
+        .text("Length is short, minimum " + minLength + " required.");
+      setTimeout(function () {
+        $("#error_shortcomings_noticed").fadeOut();
+      }, 8000);
+    } else if (charLength > maxLength) {
+      $("#error_shortcomings_noticed")
+        .show()
+        .text("Length is not valid, maximum " + maxLength + " allowed.");
+      setTimeout(function () {
+        $("#error_shortcomings_noticed").fadeOut();
+      }, 8000);
+      $(this).val(char.substring(0, maxLength));
+    } else {
+      $("#error_shortcomings_noticed").show().text("Length is valid");
+      setTimeout(function () {
+        $("#error_shortcomings_noticed").fadeOut();
+      }, 8000);
+    }
+  });
 });
 
 function sample_table_validation(e) {
@@ -206,9 +245,9 @@ function sample_table_validation(e) {
     });
     value_return = "false";
   }
-
+  // updated error message by shankhpal on 24/05/2023
   if (best_before == "") {
-    $("#error_best_before").show().text("Please Enter value");
+    $("#error_best_before").show().text("Best Before cannot be blank");
     setTimeout(function () {
       $("#error_best_before").fadeOut();
     }, 8000);
@@ -233,8 +272,9 @@ function sample_table_validation(e) {
     value_return = "false";
   }
 
+  // updated error message by shankhpal on 24/05/2023
   if (replica_si_no == "") {
-    $("#error_replica_si_no").show().text("Please Enter Pack Size");
+    $("#error_replica_si_no").show().text("Please enter replica si. no");
     setTimeout(function () {
       $("#error_replica_si_no").fadeOut();
     }, 8000);
@@ -294,6 +334,9 @@ function sample_table_validation(e) {
   }
 }
 
+//  Reason: this function are updated validation added
+// 	Name of person : shankhpal shende
+// 	Date: 11-05-2023 - 16-05-2023
 function routineInspectionFormValidation() {
   var section_form_id = $("#section_form_id").val();
 
@@ -318,13 +361,22 @@ function routineInspectionFormValidation() {
     var date_p_inspection = $("#date_p_inspection").val();
     var name_of_packer = $("#name_of_packer").val();
     var name_inspecting_officer = $("#name_inspecting_officer").val();
-    var Designation_inspecting_officer = $(
+    var name_packer_representative = $("#name_packer_representative").val();
+    var name_of_inspecting_officer = $("#name_of_inspecting_officer").val();
+    var analytical_result_docs = $("#analytical_result_docs").val();
+    var signnature_of_packer_docs = $("#signnature_of_packer_docs").val();
+    var signnature_of_inspecting_officer_docs = $(
+      "#signnature_of_inspecting_officer_docs"
+    ).val();
+    var last_lot_date = $("#last_lot_date").val();
+
+    var analytical_results = $("#analytical_results").val();
+    var designation_inspecting_officer = $(
       "#designation_inspecting_officer"
     ).val();
-    var up_to_date_docs = $("#up_to_date_docs").val();
 
-    var fssai_approved_docs = $("#fssai_approved_docs").val();
-
+    var month_upto = $("#month_upto").val();
+    var shortcomings_noticed = $("#shortcomings_noticed").val();
     var value_return = "true";
 
     if ($("#fssai_approved-yes").is(":checked")) {
@@ -374,6 +426,157 @@ function routineInspectionFormValidation() {
       value_return = "false";
     }
 
+    if (analytical_results == "") {
+      $("#error_analytical_results")
+        .show()
+        .text("Please Enter analytical results");
+      setTimeout(function () {
+        $("#error_analytical_results").fadeOut();
+      }, 8000);
+      $("#analytical_results").addClass("is-invalid");
+      $("#analytical_results").click(function () {
+        $("#error_analytical_results").hide().text;
+        $("#analytical_results").removeClass("is-invalid");
+      });
+      value_return = "false";
+    }
+
+    if (month_upto == "") {
+      $("#error_month_upto")
+        .show()
+        .text("Select Quantity Graded During Current Month Upto");
+      setTimeout(function () {
+        $("#error_month_upto").fadeOut();
+      }, 8000);
+      $("#month_upto").addClass("is-invalid");
+      $("#month_upto").click(function () {
+        $("#error_month_upto").hide().text;
+        $("#month_upto").removeClass("is-invalid");
+      });
+      value_return = "false";
+    }
+
+    if (designation_inspecting_officer == "") {
+      $("#error_designation_inspecting_officer")
+        .show()
+        .text("Please Enter Designation");
+      setTimeout(function () {
+        $("#error_designation_inspecting_officer").fadeOut();
+      }, 8000);
+      $("#designation_inspecting_officer").addClass("is-invalid");
+      $("#designation_inspecting_officer").click(function () {
+        $("#error_designation_inspecting_officer").hide().text;
+        $("#designation_inspecting_officer").removeClass("is-invalid");
+      });
+      value_return = "false";
+    }
+
+    if (shortcomings_noticed == "") {
+      // Check if shortcomings_noticed is an empty string
+      $("#error_shortcomings_noticed") // Select the error message element
+        .show() // Show the error message
+        .text("Shortcomings noticed cannot be empty!"); // Set the error message text
+      setTimeout(function () {
+        // Set a timeout to hide the error message after 8 seconds
+        $("#error_shortcomings_noticed").fadeOut();
+      }, 8000);
+      $("#shortcomings_noticed").addClass("is-invalid"); // Add the is-invalid class to the input field
+      $("#shortcomings_noticed").click(function () {
+        // Set a click event listener on the input field
+        $("#error_shortcomings_noticed").hide().text; // Hide the error message and clear its text
+        $("#shortcomings_noticed").removeClass("is-invalid"); // Remove the is-invalid class from the input field
+      });
+      value_return = "false"; // Set the value_return variable to false
+    }
+
+    if (name_packer_representative == "") {
+      $("#error_name_packer_representative")
+        .show()
+        .text("Please Enter Name of Packer or his Representative");
+      setTimeout(function () {
+        $("#error_name_packer_representative").fadeOut();
+      }, 8000);
+      $("#name_packer_representative").addClass("is-invalid");
+      $("#name_packer_representative").click(function () {
+        $("#error_name_packer_representative").hide().text;
+        $("#name_packer_representative").removeClass("is-invalid");
+      });
+      value_return = "false";
+    }
+
+    if (name_of_inspecting_officer == "") {
+      $("#error_name_of_inspecting_officer")
+        .show()
+        .text("Please Enter Name of Inspecting Officer");
+      setTimeout(function () {
+        $("#error_name_of_inspecting_officer").fadeOut();
+      }, 8000);
+      $("#name_of_inspecting_officer").addClass("is-invalid");
+      $("#name_of_inspecting_officer").click(function () {
+        $("#error_name_of_inspecting_officer").hide().text;
+        $("#name_of_inspecting_officer").removeClass("is-invalid");
+      });
+      value_return = "false";
+    }
+
+    // Change Condition for validation and error message by shankhpal 11-05-2023
+    if ($("#analytical_result_docs_value").text() == "") {
+      if (
+        check_file_upload_validation(analytical_result_docs).result == false
+      ) {
+        $("#error_analytical_result_docs")
+          .show()
+          .text(
+            check_file_upload_validation(analytical_result_docs).error_message
+          );
+        $("#analytical_result_docs").addClass("is-invalid");
+        $("#analytical_result_docs").click(function () {
+          $("#error_analytical_result_docs").hide().text;
+          $("#analytical_result_docs").removeClass("is-invalid");
+        });
+        value_return = "false";
+      }
+    }
+
+    if ($("#signnature_of_inspecting_officer_docs_value").text() == "") {
+      if (
+        check_file_upload_validation(signnature_of_inspecting_officer_docs)
+          .result == false
+      ) {
+        $("#error_signnature_of_inspecting_officer_docs")
+          .show()
+          .text(
+            check_file_upload_validation(signnature_of_inspecting_officer_docs)
+              .error_message
+          );
+        $("#signnature_of_inspecting_officer_docs").addClass("is-invalid");
+        $("#signnature_of_inspecting_officer_docs").click(function () {
+          $("#error_signnature_of_inspecting_officer_docs").hide().text;
+          $("#signnature_of_inspecting_officer_docs").removeClass("is-invalid");
+        });
+        value_return = "false";
+      }
+    }
+
+    if ($("#signnature_of_packer_docs_value").text() == "") {
+      if (
+        check_file_upload_validation(signnature_of_packer_docs).result == false
+      ) {
+        $("#error_signnature_of_packer_docs")
+          .show()
+          .text(
+            check_file_upload_validation(signnature_of_packer_docs)
+              .error_message
+          );
+        $("#signnature_of_packer_docs").addClass("is-invalid");
+        $("#signnature_of_packer_docs").click(function () {
+          $("#error_signnature_of_packer_docs").hide().text;
+          $("#signnature_of_packer_docs").removeClass("is-invalid");
+        });
+        value_return = "false";
+      }
+    }
+
     if (name_inspecting_officer == "") {
       $("#error_name_inspecting_officer")
         .show()
@@ -385,21 +588,6 @@ function routineInspectionFormValidation() {
       $("#name_inspecting_officer").click(function () {
         $("#error_name_inspecting_officer").hide().text;
         $("#name_inspecting_officer").removeClass("is-invalid");
-      });
-      value_return = "false";
-    }
-
-    if (Designation_inspecting_officer == "") {
-      $("#error_designation_inspecting_officer")
-        .show()
-        .text("Please Enter Designation o Inspecting Officer");
-      setTimeout(function () {
-        $("#error_designation_inspecting_officer").fadeOut();
-      }, 8000);
-      $("#error_designation_inspecting_officer").addClass("is-invalid");
-      $("#error_designation_inspecting_officer").click(function () {
-        $("#error_designation_inspecting_officer").hide().text;
-        $("#error_designation_inspecting_officer").removeClass("is-invalid");
       });
       value_return = "false";
     }
@@ -440,6 +628,19 @@ function routineInspectionFormValidation() {
       });
       value_return = "false";
     }
+    if (last_lot_date == "") {
+      $("#error_last_lot_date").show().text("Please Select date");
+      setTimeout(function () {
+        $("#error_last_lot_date").fadeOut();
+      }, 8000);
+      $("#last_lot_date").addClass("is-invalid");
+      $("#last_lot_date").click(function () {
+        $("#error_last_lot_date").hide().text;
+        $("#last_lot_date").removeClass("is-invalid");
+      });
+      value_return = "false";
+    }
+
     if (quantity_graded == "") {
       $("#error_quantity_graded").show().text("Please Enter Quantity graded");
       setTimeout(function () {
@@ -510,20 +711,7 @@ function routineInspectionFormValidation() {
         value_return = "false";
       }
     }
-    if ($("#sample_table tr td:first").text() == "") {
-      $("#error_sample")
-        .show()
-        .text("Sorry. There should be minimum 1 check samples details added.");
-      setTimeout(function () {
-        $("#error_person").fadeOut();
-      }, 8000);
-      $("#person_details_table").addClass("is-invalid");
-      $("#person_details_table").click(function () {
-        $("#error_person").hide().text;
-        $("#person_details_table").removeClass("is-invalid");
-      });
-      value_return = "false";
-    }
+
     if (doinspection == "") {
       $("#error_doi").show().text("Please Select Date");
       setTimeout(function () {
@@ -792,8 +980,60 @@ function routineInspectionFormValidation() {
     var if_any_sugg = $("#if_any_sugg").val();
     var date_last_inspection = $("#date_last_inspection").val();
     var date_p_inspection = $("#date_p_inspection").val();
-
+    const name_of_inspecting_officer = $("#name_of_inspecting_officer").val(); // added on 23/05/2023 by shankhpal
+    const signnature_io_docs = $("#signnature_io_docs").val();
+    const shortcomings_noticed_docs = $("#shortcomings_noticed_docs").val();
     var value_return = "true";
+
+    if (name_of_inspecting_officer == "") {
+      $("#error_name_of_inspecting_officer")
+        .show()
+        .text("Input field is required");
+      setTimeout(function () {
+        $("#error_name_of_inspecting_officer").fadeOut();
+      }, 8000);
+      $("#name_of_inspecting_officer").addClass("is-invalid");
+      $("#name_of_inspecting_officer").click(function () {
+        $("#error_name_of_inspecting_officer").hide().text;
+        $("#name_of_inspecting_officer").removeClass("is-invalid");
+      });
+      value_return = "false";
+    }
+
+    // Change Condition for validation and error message by shankhpal 23-05-2023
+    if ($("#signnature_io_docs_value").text() == "") {
+      if (check_file_upload_validation(signnature_io_docs).result == false) {
+        $("#error_signnature_io_docs")
+          .show()
+          .text(check_file_upload_validation(signnature_io_docs).error_message);
+        $("#signnature_io_docs").addClass("is-invalid");
+        $("#signnature_io_docs").click(function () {
+          $("#error_signnature_io_docs").hide().text;
+          $("#signnature_io_docs").removeClass("is-invalid");
+        });
+        value_return = "false";
+      }
+    }
+
+    // Change Condition for validation and error message by shankhpal 23-05-2023
+    if ($("#shortcomings_noticed_docs_value").text() == "") {
+      if (
+        check_file_upload_validation(shortcomings_noticed_docs).result == false
+      ) {
+        $("#error_shortcomings_noticed_docs")
+          .show()
+          .text(
+            check_file_upload_validation(shortcomings_noticed_docs)
+              .error_message
+          );
+        $("#shortcomings_noticed_docs").addClass("is-invalid");
+        $("#shortcomings_noticed_docs").click(function () {
+          $("#error_shortcomings_noticed_docs").hide().text;
+          $("#shortcomings_noticed_docs").removeClass("is-invalid");
+        });
+        value_return = "false";
+      }
+    }
 
     if (street_address == "") {
       $("#error_street_address").show().text("Please Enter street address");
@@ -1176,12 +1416,6 @@ function routineInspectionFormValidation() {
   }
 }
 
-$(function () {
-  $("#datetimepicker1").datetimepicker({
-    format: "DD/MM/YYYY HH:mm",
-  });
-});
-
 function check_file_upload_validation(field_value) {
   var error_message = "Please upload the required file";
 
@@ -1191,10 +1425,23 @@ function check_file_upload_validation(field_value) {
 
   return true;
 }
+
 $(document).ready(function () {
   $("#date_p_inspection").datepicker({
     format: "dd/mm/yyyy",
     autoclose: true,
+  });
+  $("#last_lot_date").datepicker({
+    format: "dd/mm/yyyy",
+    autoclose: true,
+  });
+  $("#month_upto").datepicker({
+    format: "dd/mm/yyyy",
+    autoclose: true,
+  });
+
+  $("#time_p_inspection").datetimepicker({
+    format: "hh:mm:ss a",
   });
 
   $("#date").datepicker({
@@ -1205,10 +1452,10 @@ $(document).ready(function () {
     format: "dd/mm/yyyy",
     autoclose: true,
   });
-  $("#valid_upto").datepicker({
-    format: "dd/mm/yyyy",
-    autoclose: true,
-  });
+  // $("#valid_upto").datepicker({
+  //   format: "dd/mm/yyyy",
+  //   autoclose: true,
+  // });
 
   $("#date_of_packing").datepicker({
     format: "dd/mm/yyyy",
@@ -1327,5 +1574,43 @@ $("#replica_appl_list_table").on("change", ".packer_id", function () {
         $("#sub_commodity").append(response["sub_commodity"]);
       }
     },
+  });
+});
+
+// added by shankhpal shende on 23/05/2023
+$(document).ready(function () {
+  var last_insp_suggestion = $("#last_insp_suggestion");
+  var enumerate_briefly_suggestions = $("#enumerate_briefly_suggestions");
+
+  var radioValue = $("input[name='suggestions_last_ins_yes_no']:checked").val();
+
+  var e_briefly_suggestions_radio = $(
+    "input[name='e_briefly_suggestions_radio']:checked"
+  ).val();
+
+  if (radioValue === "no") {
+    last_insp_suggestion.hide();
+  } else {
+    last_insp_suggestion.show();
+  }
+
+  if (e_briefly_suggestions_radio == "yes") {
+    enumerate_briefly_suggestions.show();
+  } else {
+    enumerate_briefly_suggestions.hide();
+  }
+
+  $("#suggestions_last_ins-yes").on("click", function () {
+    last_insp_suggestion.show();
+  });
+  $("#suggestions_last_ins-no").on("click", function () {
+    last_insp_suggestion.hide();
+  });
+
+  $("#e_briefly_suggestions_radio-yes").on("click", function () {
+    enumerate_briefly_suggestions.show();
+  });
+  $("#e_briefly_suggestions_radio-no").on("click", function () {
+    enumerate_briefly_suggestions.hide();
   });
 });

@@ -40,7 +40,18 @@ $(document).ready(function () {
           },
           success: function (response) {
             $("#printed_packaging_table").html(response);
-            $("#printed_packaging_table :input[type='text']").val("");
+            // $("#printed_packaging_table :input[type='text']").val("");
+            $("#printed_packaging_table")
+              .closest("form")
+              .find("input[type=text], select")
+              .val("");
+            // $("#indent").val(
+            //   $("#yourNumberInputId").prop("defaultValue")
+            // );
+            // $("#printed_packaging_table :input[type='number']").trigger(
+            //   "reset"
+            // );
+            // $("#printed_packaging_table ")[0].reset();
             add_function();
             edit_function();
             delete_function();
@@ -278,5 +289,38 @@ $("#printed_packaging_table").on("change", ".packer_id", function () {
         $("#tbl_name").html(tbl_option);
       }
     },
+  });
+});
+
+// Added for Available stock of printed packaging material with Agmark replica (packer wise)
+// Author: shankhpal shende
+// Date 23/05/2023
+$(document).ready(function () {
+  $("#indent, #supplied").keyup(function () {
+    // Get the value of the "indent" input field or set it to 0 if empty
+    const indent_value = $("#indent").val() || 0;
+
+    // Get the value of the "supplied" input field or set it to 0 if empty
+    const supplied_value = $("#supplied").val() || 0;
+
+    // Calculate the sum of the "indent" and "supplied" values
+    const balance_value = parseFloat(indent_value) + parseFloat(supplied_value);
+
+    // Set the calculated sum as the value of the "balance" input field
+    $("#balance").val(balance_value);
+  });
+
+  $(".indent").keypress(function (e) {
+    if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+      $("#error_indent").html("Number Only").stop().show().fadeOut("slow");
+      return false;
+    }
+  });
+
+  $(".supplied").keypress(function (e) {
+    if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+      $("#error_supplied").html("Number Only").stop().show().fadeOut("slow");
+      return false;
+    }
   });
 });

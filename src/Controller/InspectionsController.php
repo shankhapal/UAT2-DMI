@@ -229,6 +229,7 @@ class InspectionsController extends AppController{
 		$this->set('section_model_name',$section_model_name);
 		
 		$section_model = TableRegistry::getTableLocator()->get($section_model_name);
+		
 		$section = $section_details['section_name'];
 			
 		//addded by akash thakre to display section details
@@ -290,6 +291,19 @@ class InspectionsController extends AppController{
 		$show_message = '';
 		$redirect_url = '../inspections/inspection-report';			
 		
+		// Description : Display Comodity
+		// Author : Shankhpal Shende
+		// Date : 13/05/2023
+		// For Module :Routine Inspection
+		//taking id of multiple sub commodities	to show names in list	
+		$this->loadModel('MCommodity');
+		$added_firms = $this->DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+		$sub_comm_id = explode(',',(string) $added_firms['sub_commodity']); #For Deprecations
+ 
+		$sub_commodity_value = $this->MCommodity->find('list',array('valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
+		$this->set('sub_commodity_value',$sub_commodity_value);
+
+
 		//For edit referred_back						
 		if(null!== ($this->request->getData('save_edited_reply'))){
 			

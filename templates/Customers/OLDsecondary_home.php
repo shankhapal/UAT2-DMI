@@ -95,7 +95,7 @@
                     <div class="row">
                         <section class="col-lg-12 connectedSortable">
                             <div class="card card-info">
-                                <div class="card-header"><h3 class="card-title-new">Granted Certificate Versions</h3></div>
+                                <div class="card-header"><h3 class="card-title-new">Granted Certificate Versions1</h3></div>
                                 <div class="card-body">
                                     <table id="example2" class="table m-0 table-bordered">
                                         <thead class="tablehead">

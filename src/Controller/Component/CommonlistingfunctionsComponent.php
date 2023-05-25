@@ -251,7 +251,8 @@
 				if($for_status == 'pending') { 
 					$check_final_reported = $final_submit_table->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved','OR'=>array('current_level IN'=>array('level_2','level_3')),$grantDateCondition)))->first();		
 					
-					if (empty($check_final_reported)) {
+					//added $appl_type_id = 10 for routine inspection list by shankhpal shende on 18/05/2023
+					if (empty($check_final_reported) || $appl_type_id == '10') {
 						$creat_array = $each_alloc['modified'];
 					}
 				}
