@@ -976,6 +976,8 @@
 <input type="hidden" id="application_mode" value="<?php echo $_SESSION['application_mode']; ?>">
 <input type="hidden" id="current_level" value="<?php echo $_SESSION['current_level']; ?>">
 <input type="hidden" id="application_type_id" value="<?php echo $_SESSION['application_type']; ?>">
+<input type="hidden" id="firm_type" value="<?php echo $firm_type; ?>">
+<!-- //firm type is use to validate form fields added by shankhpal on 25/05/023 -->
 <?php 
 echo $this->Html->css('RoutineInspection/routine_inspection_style');
 echo $this->Html->script('routininspection/routin_inspection');?>

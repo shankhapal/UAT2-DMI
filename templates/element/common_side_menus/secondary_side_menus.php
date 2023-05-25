@@ -95,7 +95,9 @@
 
 								<?php } ?>
 
-								<?php if($split_user_name[1] == 1 && $IsApproved=='yes') { ?>
+								<?php
+								# This is for Packer Menus
+								if($split_user_name[1] == 1 && $IsApproved=='yes') { ?>
 
 									<li class="nav-item">
 										<a href="<?php echo $this->request->getAttribute("webroot");?>replica/replica_application" class="nav-link">
@@ -152,6 +154,19 @@
 										</li>
 
 									<?php } ?>
+
+								<?php } 
+								
+								#This is for the Lab Menus added on 25/05/2023 by shankhpal
+								if($split_user_name[1] == 3 && $IsApproved=='yes') { ?>
+								
+									<li class="nav-item">
+										<a href="<?php echo $this->request->getAttribute("webroot");?>chemist/chemist_registration" class="nav-link">
+										<i class="nav-icon fas fa-plus-circle"></i>
+										<p class="nav-icon-p">Chemist Registration</p>
+										</a>
+									</li>
+								
 								<?php } ?>
 							</ul>
 						</li>

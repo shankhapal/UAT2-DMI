@@ -658,7 +658,8 @@ class InspectionsController extends AppController{
 		$this->set('section_form_details',$section_form_details);
 		
 		$this->set('message',$message);
-		$this->set('redirect_to',$redirect_to);	 
+		$this->set('redirect_to',$redirect_to);	
+		$this->set('firm_type',$firm_type);  # to set the firm_type for validation in RTI MOdule added by shankhpal on 25/05/2023
 	
 		//exit;
 	}

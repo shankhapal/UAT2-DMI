@@ -338,9 +338,10 @@ function sample_table_validation(e) {
 // 	Name of person : shankhpal shende
 // 	Date: 11-05-2023 - 16-05-2023
 function routineInspectionFormValidation() {
-  var section_form_id = $("#section_form_id").val();
+  var firm_type = $("#firm_type").val(); // firm type check which type of form is open
 
-  if (section_form_id == "routine_inspection_form_ca") {
+  // firm_type = 1 added by shankhpal on 25/05/2023
+  if (firm_type == 1) {
     var last_lot_no = $("#last_lot_no").val();
     var quantity_graded = $("#quantity_graded").val();
     var shortcomings_noticed = $("#shortcomings_noticed").val();
@@ -966,8 +967,8 @@ function routineInspectionFormValidation() {
       exit();
     }
   }
-
-  if (section_form_id == "routine_inspection_form_pp") {
+  // firm_type =2 added by shankhpal on 25/05/2023
+  if (firm_type == 2) {
     var email = $("#email").val();
     var mobile_no = $("#mobile_no").val();
     var packaging_material = $("#packaging_material").val();
@@ -1218,7 +1219,8 @@ function routineInspectionFormValidation() {
         .fadeOut("slow");
     }
   }
-  if (section_form_id == "routine_inspection_form_lab") {
+  // firm_type = 3 added by shankhpal on 25/05/2023
+  if (firm_type == 3) {
     var date_last_inspection = $("#date_last_inspection").val();
     var date_p_inspection = $("#date_p_inspection").val();
     var approved_chemist = $("#approved_chemist").val();
