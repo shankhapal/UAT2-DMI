@@ -765,13 +765,25 @@
 			//added condition for lab export, as there will be no siteinspection, so default set to true
 			//29-09-2021 by Amol
 			
+			$flagToShowApplWOReport = null;//new common flag to use in below conditions 
 			if($split_customer_id[1]==3 && ($export_unit_status == 'yes' || $NablDate != null)){//updated on 30-09-2021
 
 				$all_report_status = 'true';
+				$flagToShowApplWOReport = 'yes';
 			
 			//The Below code is added for appl 9 : Surrender Flow to avoid the site inspection- Akash[02-12-2022]
 			}elseif($appl_type_id == 9){ 
 				$all_report_status = 'true';
+				$flagToShowApplWOReport = 'yes';
+			
+			//added condition on 24-05-2023 by Amol for change flow
+			}elseif($appl_type_id == 3){ 
+				$changeInspection = $this->Controller->Customfunctions->inspRequiredForChangeApp($customer_id,$appl_type_id);
+				if($changeInspection=='no'){
+					$all_report_status = 'true';
+					$flagToShowApplWOReport = 'yes';
+				}
+				
 			}
 
 			if($this->Session->read('username') == $office_email_id)
@@ -786,8 +798,10 @@
 						
 						$this->Session->write('ho_comments_readonly','yes');
 						
-						//to get list of lab export appln allocated to HO without Report.					
-						if($split_customer_id[1]==3 && empty($find_id_list) && ($export_unit_status == 'yes' || $NablDate != null))
+						//to get list of lab export appln allocated to HO without Report.
+						//commented condition and used common flag as set from above, on 24-05-2023 by Amol					
+						if(/*$split_customer_id[1]==3 && empty($find_id_list) && ($export_unit_status == 'yes' || $NablDate != null)*/
+							$flagToShowApplWOReport == 'yes')
 						{											
 							$check_if_commented = $ho_comments_table->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'to_user'=>'ro')))->first();
 
@@ -818,8 +832,10 @@
 				elseif($for_status == 'ref_back'){
 					
 					$this->Session->write('ho_comments_readonly','yes');
-					//to get list of lab export appln allocated to HO without Report.					
-					if($split_customer_id[1]==3 && empty($find_id_list) && ($export_unit_status == 'yes' || $NablDate != null))
+					//to get list of lab export appln allocated to HO without Report.
+					//commented condition and used common flag as set from above, on 24-05-2023 by Amol					
+					if(/*$split_customer_id[1]==3 && empty($find_id_list) && ($export_unit_status == 'yes' || $NablDate != null)*/
+						$flagToShowApplWOReport == 'yes')
 					{
 						$check_if_commented = $ho_comments_table->find('list',array('conditions'=>array('customer_id IS'=>$customer_id,'to_user'=>'ro')))->toList();
 						
@@ -877,7 +893,9 @@
 					if(!empty($app_current_pending) && $all_report_status=='true'){
 						
 						//to get list of lab export appln allocated to HO without Report.
-						if($split_customer_id[1]==3 && empty($find_id_list) && ($export_unit_status == 'yes' || $NablDate != null))
+						//commented condition and used common flag as set from above, on 24-05-2023 by Amol	
+						if(/*$split_customer_id[1]==3 && empty($find_id_list) && ($export_unit_status == 'yes' || $NablDate != null)*/
+							$flagToShowApplWOReport == 'yes')
 						{
 							$check_if_commented = $ho_comments_table->find('list',array('conditions'=>array('customer_id IS'=>$customer_id,'to_user'=>'ro')))->toList();
 							

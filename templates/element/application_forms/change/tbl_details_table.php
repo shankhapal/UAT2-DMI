@@ -2,10 +2,11 @@
         <table id="tbls_table_view" class="table table-bordered table-striped">
             <thead class="tablehead">
                 <th>Sr.No.</th>
-                <th>TBL Name</th>
+                <th>TBL/Brand Name</th>
+                <th>Commodity Name</th>
                 <th>Registered?</th>
                 <th>Reg. No.</th>
-                <th>Upload File</th>
+                <th>Upload File(Art Work of the Brand Label)</th>
                 <th>Action</th>
             </thead>
             <div id="machinery_each_row">
@@ -15,10 +16,11 @@
                 <tr>
                     <td><?php echo $i; ?></td>
                     <td><?php echo $each_tbl['tbl_name']; ?></td>
+                    <td><?php echo $this->Form->control('tbl_comm', array('type'=>'select','options'=>$selected_commodities,'value'=>$each_tbl['tbl_comm'],'empty'=>'select', 'label'=>false, 'class'=>'form-control')); ?></td>
                     <td><?php echo $each_tbl['tbl_registered']; ?></td>
                     <td><?php echo $each_tbl['tbl_registered_no']; ?></td>
                     <td><?php if($each_tbl['tbl_registration_docs'] != null){?>
-                            <a target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$each_tbl['tbl_registration_docs']); ?>">Preview</a>
+                            <a target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$each_tbl['tbl_registration_docs']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$each_tbl['tbl_registration_docs'])), -1))[0],23);?></a>
                         <?php }else{ echo "No File Attached";} ?></td>
                     <td><?php echo $this->Html->link('', array('controller' => 'application', 'action'=>'edit_tbl_id',$each_tbl['id']),array('class'=>'glyphicon glyphicon-edit tbl_edit', 'title'=>'Edit')); ?> |
                         <?php echo $this->Html->link('', array('controller' => 'application', 'action'=>'delete_tbl_id',$each_tbl['id']),array('class'=>'glyphicon glyphicon-remove-sign tbl_delete', 'title'=>'Delete')); ?>
@@ -32,6 +34,7 @@
                 <tr>
                     <td></td>
                     <td><?php  echo $this->Form->control('tbl_name', array('type'=>'text', 'id'=>'tbl_name', 'value'=>$section_form_details[3][1]['tbl_name'], 'escape'=>false, 'class'=>'form-control input-field', 'label'=>false)); ?></td>
+                    <td><?php echo $this->Form->control('tbl_comm', array('type'=>'select','options'=>$selected_commodities,'empty'=>'--Select--', 'label'=>false, 'class'=>'form-control')); ?></td>
                     <td>
                         <?php
                         $tbl_registered_radio = $section_form_details[3][1]['tbl_registered'];
@@ -79,6 +82,7 @@
                     <td><?php  echo $this->Form->control('tbl_name', array('type'=>'text', 'id'=>'tbl_name', 'escape'=>false, 'class'=>'input-field', 'label'=>false, 'class'=>'form-control')); ?>
                         <span id="error_tbl_name" class="error invalid-feedback"></span>
                     </td>
+                    <td><?php echo $this->Form->control('tbl_comm', array('type'=>'select','options'=>$selected_commodities,'empty'=>'--Select--', 'label'=>false, 'class'=>'form-control')); ?></td>
                     <td>
                         <div class="icheck-success d-inline">
                         <input type="radio" name="tbl_registered" id="tbl_registered-yes" value="yes" checked="">

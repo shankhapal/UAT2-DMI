@@ -237,7 +237,11 @@
 		}
 
 		// Change Condition for validation and error message by pravin 12-07-2017
-		if(check_number_with_decimal_two_validation(machine_capacity).result == false){
+		//if(check_number_with_decimal_two_validation(machine_capacity).result == false){
+
+		//commented no. validation and added text validation on 16-05-2023 by Amol
+		//as suggested in UAT2 it is not applicable for some printers, to input N/A
+		if(check_whitespace_validation_textbox(machine_capacity).result == false){
 
 			$("#error_machine_capacity").show().text("Please enter Machine capacity");
 			// $("#error_machine_capacity").css({"color":"red","font-size":"14px","font-weight":"500","text-align":"right"});

@@ -175,9 +175,10 @@ class RomoioapplicantcommunicationactionsComponent extends Component {
 					//condition added on 13-04-2023 by Amol, to avoid redirect after all section scrutinized
 					//FLOWS : Chemist , Surrender, Change
 					$office_type = $this->Customfunctions->getApplDistrictOffice($customer_id);
-					if($application_type==3 || $application_type==4 || $application_type==9){ 
+					if($application_type==3 || $application_type==4 || $application_type==9){
 					
-						if ($office_type=='RO' && $application_type==3) {
+						//added officetype =='SO' on 24-05-2023 by Amol, to stay on same page after scrutiny
+						if (($office_type=='RO' || $office_type=='SO') && $application_type==3) {
 							$changeInspection = $this->Customfunctions->inspRequiredForChangeApp($customer_id,$application_type);
 							if ($changeInspection=='no') {
 								return 2;

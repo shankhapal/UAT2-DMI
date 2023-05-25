@@ -2081,10 +2081,18 @@ class CustomfunctionsComponent extends Component {
 				//as per new order by 01-04-2021 from DMI
 				//if lab is NABL accreditated then valid upto the NABL accreditation date
 				//applied on 29-09-2021 by Amol
-				$NablDate = $this->Randomfunctions->checkIfLabNablAccreditated($customer_id);
-				if ($NablDate != null) {
-					$NablDate = str_replace('/','-',$NablDate);//replaced / with -
-					$valid_upto_date = $NablDate;
+				
+				//only Lab export will have NABL date as validity date, No Domestic Lab either accredited or not
+				//updated applied as per the suugestion from DMI in Tarun Sir's Delhi Meeting in April 2023.
+				//updates applied on 19-05-2023 by Amol
+				$exportUnit = $this->checkApplicantExportUnit($customer_id);
+				//only for Lab export
+				if($exportUnit=='yes'){
+					$NablDate = $this->Randomfunctions->checkIfLabNablAccreditated($customer_id);
+					if ($NablDate != null) {
+						$NablDate = str_replace('/','-',$NablDate);//replaced / with -
+						$valid_upto_date = $NablDate;
+					}
 				}
 			}
 		}

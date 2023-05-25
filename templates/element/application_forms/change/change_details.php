@@ -121,7 +121,11 @@
 										<span id="error_premise_pin" class="error invalid-feedback"></span>
 								</div>
 							</div>
+							
+							<?php echo $this->element('application_forms/change/premises_change_uploads'); ?>							
+		
 						</div>
+						
 						<!-- fields to show last value-->
 						<div class="col-md-6 last_details_change">
 							<p><b>Last Details</b></p>
@@ -159,9 +163,32 @@
 
 					<?php if (in_array(3,$selectedValues)) { // for TBL details ?>
 						<!-- fields for new change value-->
-						<div class="col-md-12"><div class="card card-success"><div class="card-header"><h3 class="card-title">TBL Details</h3></div></div></div>
+						<div class="col-md-12"><div class="card card-success"><div class="card-header"><h3 class="card-title">TBL/Brand Details</h3></div></div></div>
 						<div class="clearfix"></div>
-						<?php echo $this->element('application_forms/change/tbl_details_table'); ?>
+
+						<div class="col-md-12">
+							<?php echo $this->element('application_forms/change/tbl_details_table'); ?>
+						</div>
+						<!-- added new field to upload affidavit doc for change in TBL on 18-05-2023-->
+						<div class="col-md-6">
+							<div class="d-inline-block">
+								<p class="bg-info pl-2 p-1 rounded text-sm"><i class="fa fa-info-circle"></i> Affidavit in Proforma A-2</p>
+									<div class="form-group row">
+										<label for="inputEmail3" class="col-sm-3 col-form-label">Attach File: <span class="cRed">*</span></label>
+											<?php if(!empty($section_form_details[0]['tbl_proforma_a2_doc'])){?>
+												<a id="tbl_proforma_a2_doc_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['tbl_proforma_a2_doc']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['tbl_proforma_a2_doc'])), -1))[0],23);?></a>
+											<?php } ?>
+										
+										<div class="custom-file col-sm-9">
+											<input type="file" name="tbl_proforma_a2_doc" class="form-control" id="tbl_proforma_a2_doc", multiple='multiple'>
+											<span id="error_tbl_proforma_a2_doc" class="error invalid-feedback"></span>
+											<span id="error_type_tbl_proforma_a2_doc" class="error invalid-feedback"></span>
+											<span id="error_size_tbl_proforma_a2_doc" class="error invalid-feedback"></span>
+										</div>
+									</div>
+								<p class="lab_form_note"><i class="fa fa-info-circle"></i> File type: PDF, jpg &amp; max size upto 2 MB</p>
+							</div><div class="clearfix"></div>
+						</div>
 
 					<?php } ?>
 
@@ -345,7 +372,7 @@
 					<!-- new block added on 03-05-2023 by Amol, for new field for uploading relevant document -->
 					<div class="col-md-6">
 						<div class="d-inline-block">
-							<p class="bg-info pl-2 p-1 rounded text-sm"><i class="fa fa-info-circle"></i> Relevant Document</p>
+							<p class="bg-info pl-2 p-1 rounded text-sm"><i class="fa fa-info-circle"></i> Any Relevant Document</p>
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-3 col-form-label">Attach File:</label>
 									<?php if(!empty($section_form_details[0]['rel_doc'])){?>

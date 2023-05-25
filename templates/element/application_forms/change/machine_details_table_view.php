@@ -37,7 +37,9 @@
 							<td><?php echo $this->Form->control('machine_name', array('type'=>'text', 'id'=>'machine_name', 'value'=>$find_machines_details['machine_name'], 'escape'=>false, 'class'=>'form-control input-field', 'label'=>false)); ?></td>
 							<td><?php echo $this->Form->control('machine_type', array('type'=>'select', 'id'=>'machine_type', 'value'=>$machine_type_value_edit, 'options'=>$section_form_details[6][0], 'escape'=>false, 'class'=>'form-control input-field', 'label'=>false)); ?></td>
 							<td><?php echo $this->Form->control('machine_no', array('type'=>'text', 'id'=>'machine_no', 'value'=>$find_machines_details['machine_no'], 'escape'=>false, 'class'=>'form-control input-field', 'label'=>false)); ?></td>
-							<td><?php echo $this->Form->control('machine_capacity', array('type'=>'text', 'id'=>'machine_capacity', 'value'=>$find_machines_details['machine_capacity'], 'escape'=>false, 'class'=>'form-control input-field', 'label'=>false)); ?></td>
+							
+							<!-- added place holder if not applicable enter N/A, on 16-05-2023 by Amol -->
+							<td><?php echo $this->Form->control('machine_capacity', array('type'=>'text', 'id'=>'machine_capacity', 'value'=>$find_machines_details['machine_capacity'], 'placeholder'=>'Enter N/A if not applicable', 'escape'=>false, 'class'=>'form-control input-field', 'label'=>false)); ?></td>
 							<td>
 								<div class="form-buttons"><a href="#" id="save_machine_details" class="btn btn-info btn-sm">Save</a></div>
 								<?php //echo $this->form->submit('save', array('name'=>'edit_machine_details', 'id'=>'edit_machine_details', 'onclick'=>'validate_machinery_details();return false', 'label'=>false)); ?>
@@ -58,7 +60,8 @@
 									<td><?php echo $this->Form->control('machine_no', array('type'=>'text', 'id'=>'machine_no', 'escape'=>false, 'class'=>'form-control input-field', 'label'=>false)); ?>
 										<span id="error_machine_no" class="error invalid-feedback"></span>
 									</td>
-									<td><?php echo $this->Form->control('machine_capacity', array('type'=>'text', 'id'=>'machine_capacity', 'escape'=>false, 'class'=>'form-control input-field', 'label'=>false)); ?>
+									<!-- added place holder if not applicable enter N/A, on 16-05-2023 by Amol -->
+									<td><?php echo $this->Form->control('machine_capacity', array('type'=>'text', 'id'=>'machine_capacity', 'escape'=>false, 'class'=>'form-control input-field', 'placeholder'=>'Enter N/A if not applicable', 'label'=>false)); ?>
 										<span id="error_machine_capacity" class="error invalid-feedback"></span>
 									</td>
 									<td>
