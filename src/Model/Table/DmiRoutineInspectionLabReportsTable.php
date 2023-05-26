@@ -76,7 +76,8 @@ class DmiRoutineInspectionLabReportsTable extends Table{
 			$q = $conn->execute($approved_chemist);
 
 			$all_approved_chemist = $q->fetchAll('assoc');
-			$all_approved_chemist = [];
+			$chemist_full_name = [];
+			
 			if (!empty($all_approved_chemist)) {
 				$chemist_full_name = [];
 				foreach ($all_approved_chemist as $each_chemist) {
@@ -84,13 +85,39 @@ class DmiRoutineInspectionLabReportsTable extends Table{
 						$chemist_full_name[$full_name] = $full_name;
 				}
 			}else{
-					$chemist_full_name = ['' => ''];
+					$chemist_full_name = [];
 					// Add other manual options if needed
 				
 			}
 		
-		
-			return array($form_fields_details,$sub_commodity_value,$chemist_full_name);			
+			# We use mapping table to fetch how much ca packer are attached this laboratory 
+			$DmiCaPpLabMapings = TableRegistry::getTableLocator()->get('DmiCaPpLabMapings');
+			$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+
+			# To get table id of lab
+			$firm_data = $DmiFirms->find('all')->select(['id'])->where(['customer_id' => $customer_id])->first();
+			
+			$lab_tabl_id = [];
+			if(!empty($firm_data)){
+					$lab_tabl_id = $firm_data['id'];
+					
+					# To get the list of attached lab with ca packer
+					$attached_lab_with_ca = $DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'customer_id','conditions'=>array('lab_id IS'=>$lab_tabl_id),'order'=>'id asc'))->toList();
+					# To get name of packers
+					$packer_data = $DmiFirms->find('all',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id IN'=>$attached_lab_with_ca),'order'=>'firm_name asc'))->toArray();
+
+					if(!empty($packer_data)){
+						$list_of_packer = [];
+						foreach ($packer_data as $each_data) {
+							$packer_name = $each_data['firm_name'];
+							$list_of_packer[$packer_name] = $packer_name;
+						}
+					}else{
+						$list_of_packer = [];
+					}
+			}
+			
+			return array($form_fields_details,$sub_commodity_value,$chemist_full_name,$list_of_packer);			
 	}
 	
 	

@@ -1031,7 +1031,8 @@ class DashboardController extends AppController{
 								
 								$this->loadModel('DmiGrantCertificatesPdfs');
 								$this->loadModel('DmiRtiFinalReports');
-								$this->loadModel('DmiRoutineInspectionLabReports');
+								// $this->loadModel('DmiRoutineInspectionLabReports'); // This model was commented by shankhpal on 26/05/2023 for replcement of new model
+								$this->loadModel('DmiRtiLaboratoryDetails');  // new replacement added by shank
 								$this->loadModel('DmiRoOffices');
 								$this->loadModel('DmiRoutineInspectionPeriod');
 

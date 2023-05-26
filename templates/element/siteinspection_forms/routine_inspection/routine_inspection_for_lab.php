@@ -56,8 +56,8 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                 </div>
             </div>
             <div class="col-md-3">
-                <?php echo $this->Form->control('name_authorized_packer', array('type'=>'text', 'id'=>'name_authorized_packer','value'=>$firm_details['firm_name'],'class'=>'form-control','label'=>false)); ?>
-                <span id="error_name_authorized_packer" class="error invalid-feedback"></span>
+                <?php echo $this->Form->control('name_of_lab', array('type'=>'text', 'id'=>'name_of_lab','value'=>$firm_details['firm_name'],'class'=>'form-control','label'=>false,'readonly'=>'readonly')); ?>
+                <span id="error_name_of_lab" class="error invalid-feedback"></span>
             </div>
             <div class="col-md-3">
                 <div class="form-group row">
@@ -127,13 +127,14 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                     
                     $options = $section_form_details[2];
                     $options = ['' => 'Select Approved Chemist'] + $options;
-
+                    $selectedValues = $section_form_details[0]['approved_chemist']; // Provide the values you 
                     echo $this->Form->control('approved_chemist', [
                         'type' => 'select',
                         'options' => $options,
                         'id' => 'approved_chemist',
                         'class' => 'form-control input-field',
-                        'label' => false
+                        'label' => false,
+                        'value' => $selectedValues,
                     ]);?>
                  <?php if (empty($section_form_details[2])) : ?>
                     <ol class="badge">
@@ -147,7 +148,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
     </div>
 </div>
 <!-- 4.  Present at the time of inspection -->
-<div class="card-header sub-card-header-firm"><h3 class="card-title">4. Name of the approved chemist Present at the time of inspection</h3></div>
+<div class="card-header sub-card-header-firm"><h3 class="card-title">4.Whether present at the time of Inspection </h3></div>
 <div class="form-horizontal">
     <div class="card-body">
         <div class="row">
@@ -202,9 +203,9 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                 <div class="form-group row">
                  <?php
                         $i=1;
-                        $properly_equipped = $section_form_details[0]['properly_equipped'];
+                        $is_lab_well_lighted = isset($section_form_details[0]['is_lab_well_lighted'])?$section_form_details[0]['is_lab_well_lighted']:"";
                     
-                        if($properly_equipped == 'yes'){
+                        if($is_lab_well_lighted == 'yes'){
                             $checked_yes = 'checked';
                             $checked_no = '';
                         } else {
@@ -216,14 +217,14 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                     ?>
                 <div class="col-sm-6">
                     <div class=" d-inline">
-                        <input type="radio" name="properly_equipped" checked="" id="properly_equipped-yes" value="yes" <?php echo $checked_yes; ?>>
-                        <label for="properly_equipped-yes">Yes</label>
+                        <input type="radio" name="is_lab_well_lighted" checked="" id="is_lab_well_lighted-yes" value="yes" <?php echo $checked_yes; ?>>
+                        <label for="is_lab_well_lighted-yes">Yes</label>
                     </div>
                     <div class=" d-inline">
-                        <input type="radio" name="properly_equipped" id="properly_equipped-no" value="no" <?php echo $checked_no; ?>>
-                        <label for="properly_equipped-no">No</label>
+                        <input type="radio" name="is_lab_well_lighted" id="is_lab_well_lighted-no" value="no" <?php echo $checked_no; ?>>
+                        <label for="is_lab_well_lighted-no">No</label>
                     </div>
-                    <span id="error_properly_equipped" class="error invalid-feedback"></span>
+                    <span id="error_is_lab_well_lighted" class="error invalid-feedback"></span>
                 </div>
             </div>
         </div>
@@ -243,8 +244,8 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                 <div class="form-group row">
                     <?php
                         $i=1;
-                        $is_equipment = $section_form_details[0]['is_equipment'];
-                        if($is_equipment == 'yes'){
+                        $is_properly_equipped = isset($section_form_details[0]['is_properly_equipped'])?$section_form_details[0]['is_properly_equipped']:"";
+                        if($is_properly_equipped == 'yes'){
                             $checked_yes = 'checked';
                             $checked_no = '';
                         } else {
@@ -255,14 +256,14 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                     ?>
                 <div class="col-sm-9">
                     <div class=" d-inline">
-                        <input type="radio" name="is_equipment" checked="" id="is_equipment-yes" value="yes"<?php echo $checked_yes; ?>>
-                        <label for="is_equipment-yes">Yes</label>
+                        <input type="radio" name="is_properly_equipped" checked="" id="is_properly_equipped-yes" value="yes"<?php echo $checked_yes; ?>>
+                        <label for="is_properly_equipped-yes">Yes</label>
                     </div>
                     <div class=" d-inline">
-                        <input type="radio" name="is_equipment" id="is_equipment-no" value="no" <?php echo $checked_no; ?>>
-                        <label for="is_equipment-rn">No</label>
+                        <input type="radio" name="is_properly_equipped" id="is_properly_equipped-no" value="no" <?php echo $checked_no; ?>>
+                        <label for="is_properly_equipped-rn">No</label>
                     </div>
-                    <span id="is_equipment-rn" class="error invalid-feedback"></span>
+                    <span id="is_properly_equipped-rn" class="error invalid-feedback"></span>
                 </div>
             </div>
         </div>
@@ -320,8 +321,8 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                 <div class="form-group row">
                     <?php
                         $i=1;
-                        $lab_properly_maintained = $section_form_details[0]['lab_properly_maintain'];
-                        if($lab_properly_maintained == 'yes'){
+                        $is_analytical_reg_maintained = isset($section_form_details[0]['is_analytical_reg_maintained'])?$section_form_details[0]['is_analytical_reg_maintained']:"";
+                        if($is_analytical_reg_maintained == 'yes'){
                             $checked_yes = 'checked';
                             $checked_no = '';
                         } else {
@@ -331,14 +332,14 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                         $i++;
                     ?>
                     <div class=" d-inline">
-                        <input type="radio" name="lab_properly_maintained" checked="" id="lab_properly_maintained-yes" value="yes" <?php echo $checked_yes; ?>>
-                        <label for="lab_properly_maintained-yes">Yes</label>
+                        <input type="radio" name="is_analytical_reg_maintained" checked="" id="is_analytical_reg_maintained-yes" value="yes" <?php echo $checked_yes; ?>>
+                        <label for="is_analytical_reg_maintained-yes">Yes</label>
                     </div>
                     <div class=" d-inline">
-                        <input type="radio" name="lab_properly_maintained" id="lab_properly_maintained-no" value="no"<?php echo $checked_no; ?>>
-                        <label for="lab_properly_maintained-no">No</label>
+                        <input type="radio" name="is_analytical_reg_maintained" id="is_analytical_reg_maintained-no" value="no"<?php echo $checked_no; ?>>
+                        <label for="is_analytical_reg_maintained-no">No</label>
                     </div>
-                    <span id="error_lab_properly_maintained" class="error invalid-feedback"></span>
+                    <span id="error_is_analytical_reg_maintained" class="error invalid-feedback"></span>
                 </div>
             </div>
         </div>
@@ -358,8 +359,8 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                 <div class="form-group row">
                     <?php
                         $i=1;
-                        $concerned_offices = isset($section_form_details[0]['fwd_concerned_offices'])?$section_form_details[0]['fwd_concerned_offices']:"";
-                        if($concerned_offices == 'yes'){
+                        $are_up_to_date = isset($section_form_details[0]['are_up_to_date'])?$section_form_details[0]['are_up_to_date']:"";
+                        if($are_up_to_date == 'yes'){
                             $checked_yes = 'checked';
                             $checked_no = '';
                         } else {
@@ -369,14 +370,14 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                         $i++;
                     ?>
                     <div class=" d-inline">
-                        <input type="radio" name="concerned_offices" checked="" id="concerned_offices-yes" value="yes"<?php echo $checked_yes; ?>>
-                        <label for="concerned_offices-yes">Yes</label>
+                        <input type="radio" name="are_up_to_date" checked="" id="are_up_to_date-yes" value="yes"<?php echo $checked_yes; ?>>
+                        <label for="are_up_to_date-yes">Yes</label>
                     </div>
                     <div class=" d-inline">
-                        <input type="radio" name="concerned_offices" id="concerned_offices-no" value="no" <?php echo $checked_no; ?>>
-                        <label for="concerned_offices-no">No</label>
+                        <input type="radio" name="are_up_to_date" id="are_up_to_date-no" value="no" <?php echo $checked_no; ?>>
+                        <label for="are_up_to_date-no">No</label>
                     </div>
-                    <span id="error_concerned_offices" class="error invalid-feedback"></span>
+                    <span id="error_are_up_to_date" class="error invalid-feedback"></span>
                 </div>
             </div>
             <div class="col-md-3">
@@ -388,9 +389,9 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                 <div class="form-group row">
                     <?php
                         $i=1;
-                        $concerned_offices = isset($section_form_details[0]['fwd_concerned_offices'])?$section_form_details[0]['fwd_concerned_offices']:"";
+                        $being_forwarded = isset($section_form_details[0]['being_forwarded'])?$section_form_details[0]['being_forwarded']:"";
                     
-                        if($concerned_offices == 'yes'){
+                        if($being_forwarded == 'yes'){
                             $checked_yes = 'checked';
                             $checked_no = '';
                         } else {
@@ -430,11 +431,11 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
             </div>
             <div class="col-md-2">
                 <div class="form-group row">
-                    <label for="inputEmail3" class="col-sm col-form-label">Date : <span class="cRed">*</span></label>
+                    <label for="inputEmail3" class="col-sm col-form-label">Last lot date : <span class="cRed">*</span></label>
                 </div>
             </div>
             <div class="col-md-4">
-                  <?php echo $this->Form->control('date', array('type'=>'text', 'id'=>'date', 'escape'=>false, 'placeholder'=>'Enter DD/MM/YYYY', 'value'=>$section_form_details[0]['dates'],'maxlength'=>'10', 'minlength'=>'10', 'class'=>'cvOn cvReq cvDate form-control', 'disabled'=>false, 'label'=>false)); ?>
+                  <?php echo $this->Form->control('lat_lot_date', array('type'=>'text', 'id'=>'date', 'escape'=>false, 'placeholder'=>'Enter DD/MM/YYYY', 'value'=>$section_form_details[0]['lat_lot_date'],'maxlength'=>'10', 'minlength'=>'10', 'class'=>'cvOn cvReq cvDate form-control', 'disabled'=>false, 'label'=>false)); ?>
                 <span id="error_date" class="error invalid-feedback"></span>
             </div>
             <div class="col-md-2">
@@ -452,8 +453,24 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                 </div>
             </div>
             <div class="col-md-4">
-                  <?php echo $this->Form->control('p_analytical_reg', array('type'=>'text', 'id'=>'p_analytical_reg','value'=>$section_form_details[0]['p_analytical_reg'], 'class'=>'form-control input-field', 'placeholder'=>'Enter Packers name', 'label'=>false)); ?>
-                <span id="error_p_analytical_reg" class="error invalid-feedback"></span>
+                <?php
+                    $options = $section_form_details[3];
+                    $options = ['' => 'Select Packers'] + $options;
+                    $selectedValues = $section_form_details[0]['name_of_packers']; // Provide the values you want to select as an array
+                    echo $this->Form->control('name_of_packers', [
+                        'type' => 'select',
+                        'options' => $options,
+                        'id' => 'name_of_packers',
+                        'class' => 'form-control input-field',
+                        'label' => false,
+                        'value' => $selectedValues // Set the selected values directly in the control options
+                    ]);?>
+                 <?php if (empty($section_form_details[2])) : ?>
+                    <ol class="badge">
+                      <a target="_blank" href="/testdocs/DMI/manuals/applicant/Chemist Registration.pdf">Manual for Chemist Registration</a>
+                    </ol>
+                <?php endif; ?>
+                <span id="error_name_of_packers" class="error invalid-feedback"></span>
             </div>
             <div class="col-md-2">
                 <div class="form-group row">
@@ -463,6 +480,33 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
             <div class="col-md-4">
                   <?php echo $this->Form->control('p_analytical_reg', array('type'=>'textarea', 'id'=>'p_analytical_reg','value'=>$section_form_details[0]['p_analytical_reg'], 'class'=>'form-control input-field', 'placeholder'=>'Type here..', 'label'=>false)); ?>
                 <span id="error_p_analytical_reg" class="error invalid-feedback"></span>
+            </div>
+        </div>
+    </div>
+</div>
+  <div class="form-horizontal">
+        <div class="card-body border">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                            <label for="field3" class="col-sm col-form-label"><span><?php if ($current_level == 'level_2' && $application_mode == 'edit' ) { echo 'Analytical Results Doc'; } else { echo 'Analytical Results Doc'; } ?></span></label>
+
+                        <span class="float-left"><?php if ($current_level == 'level_2' && $application_mode == 'edit' && empty($section_form_details[0]['analytical_result_docs'])) { echo 'Attach doc'; }else{ echo 'Attached doc'; } ?> :
+                        <?php if (!empty($section_form_details[0]['analytical_result_docs'])) { ?>
+                            <a id="analytical_result_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['analytical_result_docs']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['analytical_result_docs'])), -1))[0],23);?></a>
+                        <?php }else{ echo "No Document Provided" ;} ?>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <div class="custom-file col-sm">
+                            <input type="file" name="analytical_result_docs" class="form-control" id="analytical_result_docs" multiple='multiple'>
+                            <span id="error_analytical_result_docs" class="error invalid-feedback"></span>
+                            <span id="error_type_analytical_result_docs" class="error invalid-feedback"></span>
+                            <span id="error_size_analytical_result_docs" class="error invalid-feedback"></span>
+                            </div>
+                    </div> 
+                    <p class="lab_form_note float-right mt-3"><i class="fa fa-info-circle"></i> File type: PDF, jpg &amp; max size upto 2 MB</p>
             </div>
         </div>
     </div>
@@ -478,8 +522,35 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                 </div>
             </div>
             <div class="col-md-6">
-               <?php echo $this->Form->control('suggestion_during_last', array('type'=>'textarea','value'=>$section_form_details[0]['suggestion_during_last'], 'id'=>'suggestion_during_last', 'class'=>'form-control input-field', 'placeholder'=>'Type here..', 'label'=>false)); ?>
-                <span id="error_suggestion_during_last" class="error invalid-feedback"></span>
+                <div class="form-group row">
+                <?php
+                $i=1;
+                $e_briefly_suggestions_radio = isset($section_form_details[0]['e_briefly_suggestions_radio'])?$section_form_details[0]['e_briefly_suggestions_radio']:"";
+                
+                    if($e_briefly_suggestions_radio == 'yes'){
+                        $checked_yes = 'checked';
+                        $checked_no = '';
+                    } else {
+
+                        $checked_yes = '';
+                        $checked_no = 'checked';
+                    }
+                    $i++;
+                ?>
+                <div class="d-inline">
+                    <input type="radio" name="e_briefly_suggestions_radio" checked="" id="e_briefly_suggestions_radio-yes" value="yes" <?php echo $checked_yes; ?>>
+                    <label for="e_briefly_suggestions_radio-yes">Yes
+                    </label>
+                </div>
+                <div class=" d-inline">
+                    <input type="radio" name="e_briefly_suggestions_radio" id="e_briefly_suggestions_radio-no" value="no" <?php echo $checked_no; ?>>
+                    <label for="e_briefly_suggestions_radio-no">No</label>
+                </div>    
+                <div class="col-sm-9">
+                <?php 
+                    echo $this->Form->control('enumerate_briefly_suggestions', array('type'=>'textarea', 'id'=>'enumerate_briefly_suggestions', 'escape'=>false,'value'=>isset($section_form_details[0]['enumerate_briefly_suggestions'])?$section_form_details[0]['enumerate_briefly_suggestions']:"", 'class'=>'form-control input-field', 'label'=>false, 'placeholder'=>'Enter discrepancies here...')); ?>
+                <span id="error_enumerate_briefly_suggestions" class="error invalid-feedback"></span>
+            </div>    
             </div>
         </div>
     </div>
@@ -495,8 +566,8 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                 </div>
             </div>
             <div class="col-md-6">
-                <?php echo $this->Form->control('short_noticed', array('type'=>'textarea', 'id'=>'short_noticed', 'value'=>$section_form_details[0]['short_noticed'],'class'=>'form-control input-field', 'placeholder'=>'Type here..', 'label'=>false)); ?>
-                <span id="error_short_noticed" class="error invalid-feedback"></span>
+                <?php echo $this->Form->control('shortcomings_noticed', array('type'=>'textarea', 'id'=>'shortcomings_noticed', 'value'=>$section_form_details[0]['shortcomings_noticed'],'class'=>'form-control input-field', 'placeholder'=>'Type here..', 'label'=>false)); ?>
+                <span id="error_shortcomings_noticed" class="error invalid-feedback"></span>
             </div>
         </div>
     </div>
@@ -531,8 +602,8 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
         <div class="col-md-6">
             <div class="form-group row">
                 <div class="col-sm">
-                        <?php echo $this->Form->control('name_packer_representative', array('type'=>'text', 'id'=>'name_packer_representative','value'=>isset($section_form_details[0]['name_packer_representative'])?$section_form_details[0]['name_packer_representative']:"", 'placeholder'=>'Enter name', 'class'=>'form-control', 'label'=>false)); ?>
-                    <span id="error_name_packer_representative" class="error invalid-feedback"></span>
+                        <?php echo $this->Form->control('authorized_persion_name', array('type'=>'text', 'id'=>'authorized_persion_name','value'=>isset($section_form_details[0]['authorized_persion_name'])?$section_form_details[0]['authorized_persion_name']:"", 'placeholder'=>'Enter name', 'class'=>'form-control', 'label'=>false)); ?>
+                    <span id="error_authorized_persion_name" class="error invalid-feedback"></span>
                 </div> 
             </div>
         </div>
@@ -543,21 +614,21 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group row">
-                            <label for="field3" class="col-sm col-form-label"><span><?php if ($current_level == 'level_2' && $application_mode == 'edit' ) { echo 'Signnature'; } else { echo 'Signnature'; } ?></span></label>
+                            <label for="field3" class="col-sm col-form-label"><span><?php if ($current_level == 'level_2' && $application_mode == 'edit' ) { echo 'Signature'; } else { echo 'Signature'; } ?></span></label>
 
-                        <span class="float-left"><?php if ($current_level == 'level_2' && $application_mode == 'edit' && empty($section_form_details[0]['signnature_of_packer_docs'])) { echo 'Attach doc'; }else{ echo 'Attached doc'; } ?> :
-                        <?php if (!empty($section_form_details[0]['signnature_of_packer_docs'])) { ?>
-                            <a id="signnature_of_packer_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['signnature_of_packer_docs']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['signnature_of_packer_docs'])), -1))[0],23);?></a>
+                        <span class="float-left"><?php if ($current_level == 'level_2' && $application_mode == 'edit' && empty($section_form_details[0]['authorized_signature_docs'])) { echo 'Attach doc'; }else{ echo 'Attached doc'; } ?> :
+                        <?php if (!empty($section_form_details[0]['authorized_signature_docs'])) { ?>
+                            <a id="authorized_signature_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['authorized_signature_docs']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['authorized_signature_docs'])), -1))[0],23);?></a>
                         <?php }else{ echo "No Document Provided" ;} ?>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group row">
                         <div class="custom-file col-sm">
-                                <input type="file" name="signnature_of_packer_docs" class="form-control" id="signnature_of_packer_docs" multiple='multiple'>
-                            <span id="error_signnature_of_packer_docs" class="error invalid-feedback"></span>
-                            <span id="error_type_signnature_of_packer_docs" class="error invalid-feedback"></span>
-                            <span id="error_size_signnature_of_packer_docs" class="error invalid-feedback"></span>
+                                <input type="file" name="authorized_signature_docs" class="form-control" id="authorized_signature_docs" multiple='multiple'>
+                            <span id="error_authorized_signature_docs" class="error invalid-feedback"></span>
+                            <span id="error_type_authorized_signature_docs" class="error invalid-feedback"></span>
+                            <span id="error_size_authorized_signature_docs" class="error invalid-feedback"></span>
                             </div>
                     </div> 
                     <p class="lab_form_note float-right mt-3"><i class="fa fa-info-circle"></i> File type: PDF, jpg &amp; max size upto 2 MB</p>
@@ -635,7 +706,6 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
     </div>
 </div>
 </section>
-</div>
 <input type="hidden" id="final_submit_status_id" value="<?php echo $final_submit_status; ?>">
 <input type="hidden" id="application_mode" value="<?php echo $_SESSION['application_mode']; ?>">
 <input type="hidden" id="application_type_id" value="<?php echo $_SESSION['application_type']; ?>">                                             
