@@ -36,7 +36,7 @@ class DmiRtiLaboratoryDetailsTable extends Table{
 			if($latest_id != null){
 				$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();		
 				$form_fields_details = $report_fields;
-				// pr($form_fields_details);die;
+				
 			}else{
 				$form_fields_details = Array ( 
           'id' =>"", 
@@ -90,8 +90,12 @@ class DmiRtiLaboratoryDetailsTable extends Table{
 			$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
 			$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
 	
-			$added_firms = $DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->toArray();		
-			$added_firm_field = $added_firms[0];			
+			$added_firms = $DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+      $added_firm_field = [];		
+      if(!empty($added_firms)){
+	        $added_firm_field = $added_firms[0];		
+      }
+			
 			
 			//taking id of multiple sub commodities	to show names in list	
 			$sub_comm_id = explode(',',(string) $added_firm_field['sub_commodity']); #For Deprecations
@@ -136,25 +140,29 @@ class DmiRtiLaboratoryDetailsTable extends Table{
 
 			# To get table id of lab
 			$firm_data = $DmiFirms->find('all')->select(['id'])->where(['customer_id' => $customer_id])->first();
-			
+		
 			$lab_tabl_id = [];
+      $list_of_packer = [];
 			if(!empty($firm_data)){
-					$lab_tabl_id = $firm_data['id'];
 					
+        $lab_tabl_id = $firm_data['id'];
+				
 					# To get the list of attached lab with ca packer
 					$attached_lab_with_ca = $DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'customer_id','conditions'=>array('lab_id IS'=>$lab_tabl_id),'order'=>'id asc'))->toList();
-					# To get name of packers
-					$packer_data = $DmiFirms->find('all',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id IN'=>$attached_lab_with_ca),'order'=>'firm_name asc'))->toArray();
-
-					if(!empty($packer_data)){
-						$list_of_packer = [];
-						foreach ($packer_data as $each_data) {
+        
+         if(!empty($attached_lab_with_ca)){
+            # To get name of packers
+          
+				  	$packer_data = $DmiFirms->find('all',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id IN'=>$attached_lab_with_ca),'order'=>'firm_name asc'))->toArray();
+          
+            foreach ($packer_data as $each_data) {
 							$packer_name = $each_data['firm_name'];
 							$list_of_packer[$packer_name] = $packer_name;
 						}
-					}else{
-						$list_of_packer = [];
-					}
+         }
+				
+
+				
 			}
 			
 			return array($form_fields_details,$sub_commodity_value,$chemist_full_name,$list_of_packer);			
@@ -378,7 +386,6 @@ class DmiRtiLaboratoryDetailsTable extends Table{
 			'customer_id'=>$customer_id,
 			'user_email_id'=>$report_details['user_email_id'],
 			'user_once_no'=>$report_details['user_once_no'],
-			
       'date_last_inspection' => $report_details['date_last_inspection'],
       'date_p_inspection' => $report_details['date_p_inspection'],
       'name_of_lab' => $report_details['name_of_lab'],
@@ -409,7 +416,6 @@ class DmiRtiLaboratoryDetailsTable extends Table{
       'authorized_signature_docs' => $report_details['authorized_signature_docs'],
       'signnature_of_inspecting_officer_docs' => $report_details['signnature_of_inspecting_officer_docs'],
       'analytical_result_docs' => $report_details['analytical_result_docs'],
-
 			'referred_back_comment'=>$reffered_back_comment,
 			'rb_comment_ul'=>$rb_comment_ul,
 			'referred_back_date'=>date('Y-m-d H:i:s'),

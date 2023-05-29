@@ -2064,6 +2064,7 @@ class AjaxFunctionsController extends AppController{
 		//$this->autoRender = false;
 		// taking editmode data in Session variables
 		$this->Session->write('adpupdatemode','yes');
+		$this->Session->write('rtiupdatemode','yes');   // create session variable for RTI module added by shankhpal on 29/05/2023
 		echo 'yes';
 		exit;
 			

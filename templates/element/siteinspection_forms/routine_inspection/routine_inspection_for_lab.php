@@ -4,11 +4,14 @@
 	    Name of person : shankhpal shende
 	    Date: 24-05-2023
 */ -->
-<?php //pr($section_form_details);die;
+<?php 
 echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-data', 'id'=>$section)); ?>
 <section id="form_outer_main" class="content form-middle">
 <div class="container-fluid">
 <h5 class="mt-1 mb-2">Routine Inspection Report (Approved Laboratory)</h5>
+<?php //if($report_status == 'approved'){  ?>
+<!-- <button class="btn btn-primary  mb-2" type="submit" id="wanttoedit">Proceed to Update</button> -->
+<?php //} ?>
 <div id='form_inner_main'>
 <div class="row">
 <div class="col-md-12">
@@ -467,7 +470,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                     ]);?>
                  <?php if (empty($section_form_details[2])) : ?>
                     <ol class="badge">
-                      <a target="_blank" href="/testdocs/DMI/manuals/applicant/Chemist Registration.pdf">Manual for Chemist Registration</a>
+                      <a target="_blank" href="/testdocs/DMI/manuals/applicant/Manual_mapping_lab_pp.pdf">Manual for Mapping of CA With Lab/Printing Press</a>
                     </ol>
                 <?php endif; ?>
                 <span id="error_name_of_packers" class="error invalid-feedback"></span>
@@ -710,6 +713,11 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
 <input type="hidden" id="application_mode" value="<?php echo $_SESSION['application_mode']; ?>">
 <input type="hidden" id="application_type_id" value="<?php echo $_SESSION['application_type']; ?>">                                             
 <input type="hidden" id="firm_type" value="<?php echo $firm_type; ?>">
+<!-- added for if session value is set -->
+<?php if(!empty($_SESSION['rtiupdatemode'])) { ?>
+    <input type="hidden" id="checkeditsession" value="<?php echo $_SESSION['rtiupdatemode']; ?>">
+<?php } ?>
 <!-- //firm type is use to validate form fields added by shankhpal on 25/05/023 -->
 <?php echo $this->Html->script('routininspection/routin_inspection'); ?>
+<?php echo $this->Html->script('routininspection/want_to_edit_rti'); ?>
 

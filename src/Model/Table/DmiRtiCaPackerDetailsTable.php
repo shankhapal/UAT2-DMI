@@ -170,7 +170,7 @@ class DmiRtiCaPackerDetailsTable extends Table{
 	Date: 13-05-2023
   */
 	public function saveFormDetails($customer_id,$forms_data){
-//  pr($forms_data);die;
+
 		$CustomersController = new CustomersController;			
 		$ca_bevo_applicant = $CustomersController->Customfunctions->checkCaBevo($customer_id); 
 		$Dmi_flow_wise_tables_list = TableRegistry::getTableLocator()->get('DmiFlowWiseTablesLists');
@@ -234,7 +234,7 @@ class DmiRtiCaPackerDetailsTable extends Table{
 				$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
 
 				$added_firms = $DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->toArray();	
-				// pr($added_firms);die;	
+				
 				$added_firm_field = $added_firms[0];			
    
 				//taking id of multiple sub commodities	to show names in list	

@@ -28,11 +28,11 @@
 	
 		<tr>
 			  <td style="padding:10px; vertical-align:top;">Date of Last Inspection :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_lab_data['date_last_inspection']; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_lab_data['date_last_inspection'])?$rti_lab_data['date_last_inspection']:"Nill"; ?></td>
 		</tr>
     <tr>
 			  <td style="padding:10px; vertical-align:top;">Date & Time of present Inspection :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_lab_data['date_p_inspection']; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_lab_data['date_p_inspection'])?$rti_lab_data['date_p_inspection']:"Nill"; ?></td>
 		</tr>
     <tr>
         <td style="padding:10px; vertical-align:top;">1. Name and addres of the laboratory Contact details :</td>
@@ -44,8 +44,8 @@
 		</tr>
 		
     <tr>
-        <td style="padding:10px; vertical-align:top;">2. Certificate No :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $firm_details['customer_id']; ?></td>
+        <td style="padding:10px; vertical-align:top;">Certificate No :</td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($firm_details['customer_id'])?$firm_details['customer_id']:"Nill"; ?></td>
 		</tr>
     <tr>
         <td style="padding:10px; vertical-align:top;">2. Commodities for which approved :</td>
@@ -63,37 +63,37 @@
     
     <tr>
         <td style="padding:10px; vertical-align:top;">3. Name of the approved chemist Present at the time of inspection :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_lab_data['approved_chemist']; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_lab_data['approved_chemist'])?$rti_lab_data['approved_chemist']:"Nill"; ?></td>
 		</tr>
 		<tr>
         <td style="padding:10px; vertical-align:top;">4. Whether present at the time of Inspection :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_lab_data['present_time_of_inspection']; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_lab_data['present_time_of_inspection'])?$rti_lab_data['present_time_of_inspection']:"Nill"; ?></td>
 		</tr>
 		
      <tr>
-        <td style="padding:10px; vertical-align:top;">5. Is the laboratory well lighted Ventilated and hygienic :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_lab_data['is_lab_well_lighted']; ?></td>
+        <td style="padding:10px; vertical-align:top;">5. Is the laboratory well lighted Ventilated and hygienic  :</td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_lab_data['is_lab_well_lighted'])?$rti_lab_data['is_lab_well_lighted']:"Nill"; ?></td>
 		</tr>
     <tr>
-        <td style="padding:10px; vertical-align:top;">6. Is the Laboratory properly equipped for the grading of the commodities:</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_lab_data['is_properly_equipped']; ?></td>
+        <td style="padding:10px; vertical-align:top;">6. Is the Laboratory properly equipped for the grading of the commodities :</td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_lab_data['is_properly_equipped'])?$rti_lab_data['is_properly_equipped']:"Nill"; ?></td>
 		</tr>
 		<tr>
         <td style="padding:10px; vertical-align:top;">	7. Is the equipment is in working order :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_lab_data['eq_working_order']; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_lab_data['eq_working_order'])?$rti_lab_data['eq_working_order']:"Nill"; ?></td>
 		</tr>
 		<tr>
-        <td style="padding:10px; vertical-align:top;">8. Is the analytical register properly Maintained. </td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_lab_data['is_analytical_reg_maintained']; ?></td>
+        <td style="padding:10px; vertical-align:top;">8. Is the analytical register properly Maintained. :</td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_lab_data['is_analytical_reg_maintained'])?$rti_lab_data['is_analytical_reg_maintained']:"Nill"; ?></td>
 		</tr>
 		<tr>
-        <td style="padding:10px; vertical-align:top;">9. Grading records. </td>
+        <td style="padding:10px; vertical-align:top;">9. Grading records. :</td>
 			  <td style="padding:10px; vertical-align:top;"><?php echo 
 				'1) Are the up to date ? : '.$rti_lab_data['are_up_to_date']."<br>".
 				'2) Are they being forwarded to Concerned offices in time : '.$rti_lab_data['being_forwarded']; ?></td>
 		</tr>
 		<tr>
-			<td style="padding:10px; vertical-align:top;">10. Last lot analyzed</td>
+			<td style="padding:10px; vertical-align:top;">10. Last lot analyzed :</td>
 			<td style="padding:10px; vertical-align:top;">
 				<?php
 				echo 'Lot No: ' . $rti_lab_data['last_lot_no'] . "<br>" .
@@ -114,52 +114,43 @@
 			</td>
 		</tr>
 
-     <tr>
-        <td style="padding:10px; vertical-align:top;">7. Commodities </td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_lab_data['commodity']; ?></td>
+		<tr>
+        <td style="padding:10px; vertical-align:top;">11. Suggestions given during last :</td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_lab_data['e_briefly_suggestions_radio'])?$rti_lab_data['e_briefly_suggestions_radio']:"Nill"; ?></td>
 		</tr>
-   
-     
-    <tr>
-        <td style="padding:10px; vertical-align:top;">13) Are they being forwarded to Concerned offices in time</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_lab_data['fwd_concerned_offices']; ?></td>
+		<tr>
+        <td style="padding:10px; vertical-align:top;">12. Shortcomings noticed in present Inspection :</td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_lab_data['shortcomings_noticed'])?$rti_lab_data['shortcomings_noticed']:"Nill"; ?></td>
 		</tr>
-    <tr>
-        <td style="padding:10px; vertical-align:top;">14) Last lot analyzed Lot No.</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_lab_data['last_lot_no']; ?></td>
+			<tr>
+        <td style="padding:10px; vertical-align:top;">13. Suggestions :</td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_lab_data['suggestions'])?$rti_lab_data['suggestions']:"Nill"; ?></td>
 		</tr>
-    
+		
     <tr>
-        <td style="padding:10px; vertical-align:top;">16) Name of the Packers and it’s Analytical results.</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_lab_data['p_analytical_reg']; ?></td>
+        <td style="padding:10px; vertical-align:top;">Name of the Office Authorized person :</td>
+				<td style="padding:10px; vertical-align:top;"><?php echo isset($rti_lab_data['authorized_persion_name'])?$rti_lab_data['authorized_persion_name']:"Nill"; ?></td>
 		</tr>
     <tr>
-        <td style="padding:10px; vertical-align:top;">16) Shortcomings noticed in present Inspection.</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_lab_data['short_noticed']; ?></td>
-		</tr>
-    <tr>
-        <td style="padding:10px; vertical-align:top;">16) Suggestions.</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_lab_data['suggestions']; ?></td>
-		</tr>
-    <tr>
-        <td style="padding:10px; vertical-align:top;">16) Suggestions given during last.</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_lab_data['suggestion_during_last']; ?></td>
-		</tr>
-    <tr>
-        <td style="padding:10px; vertical-align:top;">Signature of the authorized person Officerof the printing press or any representative</td>
+        <td style="padding:10px; vertical-align:top;">Signature of the Office Authorized person of the laboratory :</td>
 			  <td style="padding:10px; vertical-align:top;">
-           <?php if(!empty($rti_lab_data['signature'])){ $split_file_path = explode("/",$rti_lab_data['signature']);$file_name = $split_file_path[count($split_file_path) - 1];?>
-																<a href="<?php echo $rti_lab_data['signature']; ?>"><?php echo substr($file_name,23); ?></a><?php }else{ echo 'NA'; } ?>
+           <?php if(!empty($rti_lab_data['authorized_signature_docs'])){ $split_file_path = explode("/",$rti_lab_data['authorized_signature_docs']);$file_name = $split_file_path[count($split_file_path) - 1];?>
+					<a href="<?php echo $rti_lab_data['authorized_signature_docs']; ?>"><?php echo substr($file_name,23); ?></a><?php }else{ echo 'NA'; } ?>
         </td>
 		</tr>
-    <tr>
-        <td style="padding:10px; vertical-align:top;">Signature of Inspection with official Stamp:</td>
+		 <tr>
+        <td style="padding:10px; vertical-align:top;">Name of the Inspecting Officer :</td>
+				<td style="padding:10px; vertical-align:top;"><?php echo isset($rti_lab_data['name_of_inspecting_officer'])?$rti_lab_data['name_of_inspecting_officer']:"Nill"; ?></td>
+		</tr>
+		<tr>
+        <td style="padding:10px; vertical-align:top;">Designation of the Inspecting Officer :</td>
+				<td style="padding:10px; vertical-align:top;"><?php echo isset($rti_lab_data['designation_inspecting_officer'])?$rti_lab_data['designation_inspecting_officer']:"Nill"; ?></td>
+		</tr>
+		<tr>
+        <td style="padding:10px; vertical-align:top;">Signature of the  Inspecting Officer :</td>
 			  <td style="padding:10px; vertical-align:top;">
-           <?php if(!empty($rti_lab_data['signature_name'])){ $split_file_path = explode("/",$rti_lab_data['signature_name']);$file_name = $split_file_path[count($split_file_path) - 1];?>
-																<a href="<?php echo $rti_lab_data['signature_name']; ?>"><?php echo substr($file_name,23); ?></a><?php }else{ echo 'NA'; } ?>
+           <?php if(!empty($rti_lab_data['signnature_of_inspecting_officer_docs'])){ $split_file_path = explode("/",$rti_lab_data['signnature_of_inspecting_officer_docs']);$file_name = $split_file_path[count($split_file_path) - 1];?>
+					<a href="<?php echo $rti_lab_data['signnature_of_inspecting_officer_docs']; ?>"><?php echo substr($file_name,23); ?></a><?php }else{ echo 'NA'; } ?>
         </td>
 		</tr>
-    
-    
-
 </table>
