@@ -548,7 +548,7 @@
                                                         <div class="col-md-6">
                                                             <div class="form-group row">
                                                                 <div class="col-sm">
-                                                                    <?php echo $this->Form->control('name_of_inspecting_officer', array('type'=>'text', 'id'=>'name_of_inspecting_officer','placeholder'=>'Enter Name of the Inspecting Officer', 'class'=>'form-control', 'label'=>false,'value'=>isset($section_form_details[0]['name_of_inspecting_officer'])?$section_form_details[0]['name_of_inspecting_officer']:"")); ?>
+                                                                    <?php echo $this->Form->control('name_of_inspecting_officer', array('type'=>'text', 'id'=>'name_of_inspecting_officer','placeholder'=>'Enter Name of the authorized person', 'class'=>'form-control', 'label'=>false,'value'=>isset($section_form_details[0]['name_of_inspecting_officer'])?$section_form_details[0]['name_of_inspecting_officer']:"")); ?>
                                                                         <span id="error_name_of_inspecting_officer" class="error invalid-feedback"></span>
                                                                 </div> 
                                                             </div>
@@ -590,11 +590,12 @@
 <input type="hidden" id="final_submit_status_id" value="<?php echo $final_submit_status; ?>">
 <input type="hidden" id="application_mode" value="<?php echo $_SESSION['application_mode']; ?>">
 <input type="hidden" id="application_type_id" value="<?php echo $_SESSION['application_type']; ?>">
+<input type="hidden" id="firm_type" value="<?php echo $firm_type; ?>">
+<!-- //firm type is use to validate form fields added by shankhpal on 25/05/023 -->
 <?php
 	echo $this->Html->css('multiselect/jquery.multiselect');
 	echo $this->Html->script('multiselect/jquery.multiselect');
 	echo $this->Html->script('routininspection/routin_inspection');
     echo $this->Html->script('routininspection/routine_inspection_add_more_pp');
-    
 ?>
 

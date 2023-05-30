@@ -338,9 +338,10 @@ function sample_table_validation(e) {
 // 	Name of person : shankhpal shende
 // 	Date: 11-05-2023 - 16-05-2023
 function routineInspectionFormValidation() {
-  var section_form_id = $("#section_form_id").val();
+  var firm_type = $("#firm_type").val(); // firm type check which type of form is open
 
-  if (section_form_id == "routine_inspection_form_ca") {
+  // firm_type = 1 added by shankhpal on 25/05/2023
+  if (firm_type == 1) {
     var last_lot_no = $("#last_lot_no").val();
     var quantity_graded = $("#quantity_graded").val();
     var shortcomings_noticed = $("#shortcomings_noticed").val();
@@ -966,8 +967,8 @@ function routineInspectionFormValidation() {
       exit();
     }
   }
-
-  if (section_form_id == "routine_inspection_form_pp") {
+  // firm_type =2 added by shankhpal on 25/05/2023
+  if (firm_type == 2) {
     var email = $("#email").val();
     var mobile_no = $("#mobile_no").val();
     var packaging_material = $("#packaging_material").val();
@@ -1218,7 +1219,8 @@ function routineInspectionFormValidation() {
         .fadeOut("slow");
     }
   }
-  if (section_form_id == "routine_inspection_form_lab") {
+  // firm_type = 3 added by shankhpal on 25/05/2023
+  if (firm_type == 3) {
     var date_last_inspection = $("#date_last_inspection").val();
     var date_p_inspection = $("#date_p_inspection").val();
     var approved_chemist = $("#approved_chemist").val();
@@ -1231,6 +1233,132 @@ function routineInspectionFormValidation() {
     var p_analytical_reg = $("#p_analytical_reg").val();
     var suggestion_during_last = $("#suggestion_during_last").val();
     var commodity = $("#commodity").val();
+    const shortcomings_noticed = $("#shortcomings_noticed").val();
+    const authorized_persion_name = $("#authorized_persion_name").val();
+    const authorized_signature_docs = $("#authorized_signature_docs").val();
+    const name_of_inspecting_officer = $("#name_of_inspecting_officer").val();
+    const designation_inspecting_officer = $(
+      "#designation_inspecting_officer"
+    ).val();
+    const signnature_of_inspecting_officer_docs = $(
+      "#signnature_of_inspecting_officer_docs"
+    ).val();
+
+    const name_of_packers = $("#name_of_packers").val();
+
+    if (name_of_packers == "") {
+      $("#error_name_of_packers").show().text("Please select packer name");
+      setTimeout(function () {
+        $("#error_name_of_packers").fadeOut();
+      }, 8000);
+      $("#name_of_packers").addClass("is-invalid");
+      $("#name_of_packers").click(function () {
+        $("#error_name_of_packers").hide().text;
+        $("#name_of_packers").removeClass("is-invalid");
+      });
+      value_return = "false";
+    }
+
+    // Change Condition for validation and error message by shankhpal 23-05-2023
+    if ($("#signnature_of_inspecting_officer_docs_value").text() == "") {
+      if (
+        check_file_upload_validation(signnature_of_inspecting_officer_docs)
+          .result == false
+      ) {
+        $("#error_signnature_of_inspecting_officer_docs")
+          .show()
+          .text(
+            check_file_upload_validation(signnature_of_inspecting_officer_docs)
+              .error_message
+          );
+        $("#signnature_of_inspecting_officer_docs").addClass("is-invalid");
+        $("#signnature_of_inspecting_officer_docs").click(function () {
+          $("#error_signnature_of_inspecting_officer_docs").hide().text;
+          $("#signnature_of_inspecting_officer_docs").removeClass("is-invalid");
+        });
+        value_return = "false";
+      }
+    }
+
+    if (designation_inspecting_officer == "") {
+      $("#error_designation_inspecting_officer")
+        .show()
+        .text("Please Enter Designation");
+      setTimeout(function () {
+        $("#error_designation_inspecting_officer").fadeOut();
+      }, 8000);
+      $("#designation_inspecting_officer").addClass("is-invalid");
+      $("#designation_inspecting_officer").click(function () {
+        $("#error_designation_inspecting_officer").hide().text;
+        $("#designation_inspecting_officer").removeClass("is-invalid");
+      });
+      value_return = "false";
+    }
+
+    if (name_of_inspecting_officer == "") {
+      $("#error_name_of_inspecting_officer")
+        .show()
+        .text("Please Enter Name of the Inspecting Officer");
+      setTimeout(function () {
+        $("#error_name_of_inspecting_officer").fadeOut();
+      }, 8000);
+      $("#name_of_inspecting_officer").addClass("is-invalid");
+      $("#name_of_inspecting_officer").click(function () {
+        $("#error_name_of_inspecting_officer").hide().text;
+        $("#name_of_inspecting_officer").removeClass("is-invalid");
+      });
+      value_return = "false";
+    }
+
+    // Change Condition for validation and error message by shankhpal 23-05-2023
+    if ($("#authorized_signature_docs_value").text() == "") {
+      if (
+        check_file_upload_validation(authorized_signature_docs).result == false
+      ) {
+        $("#error_authorized_signature_docs")
+          .show()
+          .text(
+            check_file_upload_validation(authorized_signature_docs)
+              .error_message
+          );
+        $("#authorized_signature_docs").addClass("is-invalid");
+        $("#authorized_signature_docs").click(function () {
+          $("#error_authorized_signature_docs").hide().text;
+          $("#authorized_signature_docs").removeClass("is-invalid");
+        });
+        value_return = "false";
+      }
+    }
+
+    if (authorized_persion_name == "") {
+      $("#error_authorized_persion_name")
+        .show()
+        .text("Please Enter Name of the Office Authorized person");
+      setTimeout(function () {
+        $("#error_authorized_persion_name").fadeOut();
+      }, 8000);
+      $("#authorized_persion_name").addClass("is-invalid");
+      $("#authorized_persion_name").click(function () {
+        $("#error_authorized_persion_name").hide().text;
+        $("#authorized_persion_name").removeClass("is-invalid");
+      });
+      value_return = "false";
+    }
+
+    if (shortcomings_noticed == "") {
+      $("#error_shortcomings_noticed")
+        .show()
+        .text("Please Enter shortcomings noticed");
+      setTimeout(function () {
+        $("#error_shortcomings_noticed").fadeOut();
+      }, 8000);
+      $("#shortcomings_noticed").addClass("is-invalid");
+      $("#shortcomings_noticed").click(function () {
+        $("#error_shortcomings_noticed").hide().text;
+        $("#shortcomings_noticed").removeClass("is-invalid");
+      });
+      value_return = "false";
+    }
 
     if (commodity == "") {
       $("#error_commodity").show().text("Please Enter commodity");
@@ -1286,7 +1414,7 @@ function routineInspectionFormValidation() {
     }
 
     if (approved_chemist == "") {
-      $("#error_approved_chemist").show().text("Please Enter Approved Chemist");
+      $("#error_approved_chemist").show().text("Please select chemist");
       setTimeout(function () {
         $("#error_approved_chemist").fadeOut();
       }, 8000);

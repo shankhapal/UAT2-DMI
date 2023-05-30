@@ -3583,14 +3583,16 @@ class ApplicationformspdfsController extends AppController{
 	public function labRiReportPdf(){
 
 		#Load Models
-		$this->loadModel('DmiRoutineInspectionLabReports');
+		// $this->loadModel('DmiRoutineInspectionLabReports');  // Commented by shankhapl on 26/05/2023 for replce of new model name
+		$this->loadModel('DmiRtiLaboratoryDetails'); // added new table for rti module on 26/05/2023
 		$this->loadModel('DmiFirms');
 		$this->loadModel('MCommodity');
 
 		$customer_id = $this->Session->read('customer_id');
 		$this->set('customer_id',$customer_id);
 
-		$rti_lab_data = $this->DmiRoutineInspectionLabReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+		// added DmiRtiLaboratoryDetails table by shankhpal on 26/05/2023
+		$rti_lab_data = $this->DmiRtiLaboratoryDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
 		$this->set('rti_lab_data',$rti_lab_data);
 
 		$firm_details = $this->DmiFirms->firmDetails($customer_id);
