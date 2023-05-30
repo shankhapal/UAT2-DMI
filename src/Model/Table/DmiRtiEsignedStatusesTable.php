@@ -11,8 +11,12 @@
 	
 	public function getEsignedStatus($customer_id,$current_level){
 		
+		// added applivation type to get application type of RTI module by shankhpal on 30/05/2023
+		$application_type = $this->Session->read('application_type');
 		$CustomersController = new CustomersController;
-		$grantDateCondition = $CustomersController->Customfunctions->returnGrantDateCondition($customer_id);
+		// pass argument for application type = 10 
+		// added by shankhpal shende on 30/05/2023
+		$grantDateCondition = $CustomersController->Customfunctions->returnGrantDateCondition($customer_id,$application_type);
 		
 		//create other model objects
 		$Dmi_firm = TableRegistry::getTableLocator()->get('DmiFirms');
@@ -59,15 +63,19 @@
 		//taking condition for query conditionally
 		if($current_level == 'applicant' || $current_level == 'level_2'){
 			$query_conditions = array('customer_id'=>$customer_id, 'application_type'=>$type, 'application_status'=>$status ,$grantDateCondition);
+			
 		}else{
 			$query_conditions = array('customer_id'=>$customer_id, 'application_type'=>$type, $grantDateCondition);
 		}
 		
-		$get_esign_details = $this->find('all',array('conditions'=>$query_conditions))->first();		
+		$get_esign_details = $this->find('all',array('customer_id'=>$customer_id,'application_status'=>$query_conditions['application_status']))->first();		
+		
+		// $get_esign_details = $this->find('all',array('conditions'=>$query_conditions))->first();		
+		
 		$esign_status = 'no';
 		
 		if(!empty($get_esign_details)){
-		
+	
 			if($current_level == 'applicant'){
 				
 				if($get_esign_details['application_esigned']=='yes'){
@@ -91,7 +99,7 @@
 			}
 		
 		}
-		
+	
 		return $esign_status;
 	}
 	
@@ -103,9 +111,11 @@
 		}else{
 			$customer_id = $_SESSION['username'];
 		}
+		// added applivation type to get application type of RTI module by shankhpal on 30/05/2023
+		$application_type = $this->Session->read('application_type');
 		
 		$CustomersController = new CustomersController;
-		$grantDateCondition = $CustomersController->Customfunctions->returnGrantDateCondition($customer_id);
+		$grantDateCondition = $CustomersController->Customfunctions->returnGrantDateCondition($customer_id,$application_type);
 		
 		$current_level = $_SESSION['current_level'];
 		

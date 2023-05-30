@@ -2808,6 +2808,12 @@ class CustomfunctionsComponent extends Component {
 
 			$DmiGrantCertificatesPdfs = TableRegistry::getTableLocator()->get('DmiAdpGrantCertificatePdfs');
 			$grantDate = $DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
+		
+		}	elseif ($application_type == 10) { //added on 30-05-2023 by shankhpal to get RTI grant date
+			// For application type = 10 then fetch grant date from DmiRtiFinalReports
+			$DmiRtiFinalReports = TableRegistry::getTableLocator()->get('DmiRtiFinalReports');
+			$grantDate = $DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
+		
 		}
 
 

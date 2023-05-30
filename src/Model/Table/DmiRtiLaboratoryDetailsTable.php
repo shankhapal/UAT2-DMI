@@ -108,14 +108,20 @@ class DmiRtiLaboratoryDetailsTable extends Table{
 		
 			$DmiChemistFinalSubmits = TableRegistry::getTableLocator()->get('DmiChemistFinalSubmits');
 
-			# This sql query are use to fetch registered chemist with status is approved
+			# This sql query are use to fetch approved registered chemist list 
+      # Condition : if chemist training is completed or null and status = "approved" AND current_level = 'level_1' OR chemist training not completed AND status = 'approved' AND current_level = 'level_3'
+      # both condition are use to display chemist list 
+      # Condition 1 : if chemist are approve on scrutiny level 1 then it display
+      # condition 2: If chemist are approved with level 3 then it will be display
 			# addded by shankhpal on 25/05/2023
 			$conn = ConnectionManager::get('default');
 
 			$approved_chemist = "SELECT  cr.chemist_fname, cr.chemist_lname, cr.chemist_id,cr. created_by
 			FROM dmi_chemist_registrations AS cr
 			INNER JOIN dmi_chemist_final_submits AS cfs ON cfs.customer_id = cr.chemist_id
-			WHERE cr.created_by = '$customer_id' AND status = 'approved' AND current_level = 'level_3'";
+			WHERE cr.created_by = '$customer_id' AND 
+			(((cr.is_training_completed IS NULL OR cr.is_training_completed='yes') AND status = 'approved' AND current_level = 'level_1')
+			OR (cr.is_training_completed='no' AND status = 'approved' AND current_level = 'level_3'))";
 
 			$q = $conn->execute($approved_chemist);
 

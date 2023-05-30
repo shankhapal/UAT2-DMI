@@ -6,12 +6,12 @@
 */ -->
 <?php echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-data', 'id'=>$section)); ?>
 <section id="form_outer_main" class="content form-middle">
-    <div class="container-fluid">
+    <div class="container-fluid" id="form_outer_main">
         <h5 class="mt-1 mb-2">Routine Inspection Report (CA-Packer)</h5>
             <div id='form_inner_main'>
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="card card-success" id="form_outer_main">
+                        <div class="card card-success" >
                             <!-- Initial Details -->
                             <div class="card-header sub-card-header-firm"><h3 class="card-title">Initial Details</h3></div>
                                 <div class="form-horizontal">
@@ -977,8 +977,12 @@
 <input type="hidden" id="current_level" value="<?php echo $_SESSION['current_level']; ?>">
 <input type="hidden" id="application_type_id" value="<?php echo $_SESSION['application_type']; ?>">
 <input type="hidden" id="firm_type" value="<?php echo $firm_type; ?>">
+
+<!-- allocated_record_rti -->
+
 <!-- //firm type is use to validate form fields added by shankhpal on 25/05/023 -->
 <?php 
 echo $this->Html->css('RoutineInspection/routine_inspection_style');
 echo $this->Html->script('routininspection/routin_inspection');?>
+
 

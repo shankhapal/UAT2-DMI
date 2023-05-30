@@ -9,9 +9,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
 <section id="form_outer_main" class="content form-middle">
 <div class="container-fluid">
 <h5 class="mt-1 mb-2">Routine Inspection Report (Approved Laboratory)</h5>
-<?php //if($report_status == 'approved'){  ?>
-<!-- <button class="btn btn-primary  mb-2" type="submit" id="wanttoedit">Proceed to Update</button> -->
-<?php //} ?>
+
 <div id='form_inner_main'>
 <div class="row">
 <div class="col-md-12">

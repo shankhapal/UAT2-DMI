@@ -1145,9 +1145,24 @@ class DashboardController extends AppController{
 											//get Nodal officer details
 											$this->loadModel('DmiUsers');
 											$this->loadModel('DmiRtiAllocations');
+											$this->loadModel('DmiRtiFinalReports');
 										
+
+											$approved_record = $this->DmiRtiFinalReports->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id desc'))->first();
+										
+											$allocated_record = [];
+											if(!empty($approved_record)){
+				
+												$allocated_record = $this->DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,array('date(created) > '=>$approved_record['created'])),'order'=>'id desc'))->first();
+											
+											}
+											
 											$get_allocations = $this->DmiRtiAllocations->find('all',array('conditions' => array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
-						
+										
+											if(!is_null($allocated_record))
+											{
+												$comm_with='Not Allocated';
+											}
 											if(!empty($get_allocations))
 											{
 												$mo_user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$get_allocations['level_2'])))->first();

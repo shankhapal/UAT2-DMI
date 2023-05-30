@@ -116,6 +116,14 @@
 
 		<tr>
         <td style="padding:10px; vertical-align:top;">11. Suggestions given during last :</td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_lab_data['e_briefly_suggestions_radio'])?$rti_lab_data['e_briefly_suggestions_radio']:"Nill"; ?><br>
+				<?php if($rti_lab_data['e_briefly_suggestions_radio'] == 'yes'){
+					echo $rti_lab_data['enumerate_briefly_suggestions'];
+				}
+				?></td> 
+		</tr>
+		<tr>
+        <td style="padding:10px; vertical-align:top;">Suggestions given during last :</td>
 			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_lab_data['e_briefly_suggestions_radio'])?$rti_lab_data['e_briefly_suggestions_radio']:"Nill"; ?></td>
 		</tr>
 		<tr>
