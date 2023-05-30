@@ -327,10 +327,13 @@
 				
 			</tr>
 			
-			<!-- element call to show change updates added on 05-04-2023-->
-			<?php echo $this->element('application_forms/change/elementChangeUpdatesOnCertificate'); ?>
-																		  
-																					  
+			<!-- element call to show change updates added on 02-01-2023-->
+			<?php
+				//condition added on 26-05-2023, to get changed details only when appl. is for change or already changed earlier 
+				if($_SESSION['application_type']==3 || !empty($getNoOfAppl)){
+					echo $this->element('application_forms/change/elementChangeUpdatesOnCertificate');
+				}
+			?>														  
 		
 		
 		</table>

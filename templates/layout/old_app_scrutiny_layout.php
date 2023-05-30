@@ -69,6 +69,11 @@
 					<?php echo $this->element('main_site_header'); ?>
 						<div class="row">
 							<div class="col-9"><h6 class="applicationtextcolor">Applicant ID: <?php echo $_SESSION['customer_id']; ?> - <?php echo $firm_details['firm_name']; ?></h6></div>
+						
+							<!-- added link to show appl. pdf link for old appl on sections, on 29-05-2023 by Amol -->
+							<div class="col-3">
+								<a href="<?php echo $download_application_pdf;?>" target="blank" class="float-right fa fa-download mr-3 text-danger" title="Download Pdf Version Form"><span class="fa fa-file-powerpoint-o text-danger"></span></a>
+							</div>
 						</div>
 						<div class="clearfix"></div>
 

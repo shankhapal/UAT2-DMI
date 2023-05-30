@@ -325,17 +325,20 @@
 		
 		
 		<table width="100%" border="1" >
-				<tr>
-					<th style="padding:10px;" width="25%" cellspacing="50" align="left"><b>Date of Application</b></th>
-					<th style="padding:10px;" width="45%" cellspacing="50" align="left"><b>Details of the changes recorded</b></th>
-					<th style="padding:10px;" width="30%" cellspacing="50" align="left"><b>Signature & Designation of Authorised Officer</b></th>
-					
-				</tr>
+			<tr>
+				<th style="padding:10px;" width="25%" cellspacing="50" align="left"><b>Date of Application</b></th>
+				<th style="padding:10px;" width="45%" cellspacing="50" align="left"><b>Details of the changes recorded</b></th>
+				<th style="padding:10px;" width="30%" cellspacing="50" align="left"><b>Signature & Designation of Authorised Officer</b></th>
 				
-				<!-- element call to show change updates added on 02-01-2023-->
-				<?php echo $this->element('application_forms/change/elementChangeUpdatesOnCertificate'); ?>
-																		   
-																					   
+			</tr>
+				
+			<!-- element call to show change updates added on 02-01-2023-->
+			<?php
+				//condition added on 26-05-2023, to get changed details only when appl. is for change or already changed earlier 
+				if($_SESSION['application_type']==3 || !empty($getNoOfAppl)){
+					echo $this->element('application_forms/change/elementChangeUpdatesOnCertificate');
+				}
+			?>																   
 		 
 		
 		</table>

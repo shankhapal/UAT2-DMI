@@ -2,9 +2,11 @@
 <?php echo $this->Html->css('element/show_old_certificate_details_popup'); ?>
 <?php $customer_id = $_SESSION['customer_id']; ?>
 
-<button type="button" class="btn btn-primary" id="show_old_cert_details" data-toggle="modal" data-target=".bd-example-modal-lg">Click to View/Edit Old Grant Date </button>
+<!-- changed the "data-target" value to ".old_date_popup" on 29-05-2023 by Amol, as it was conflicting with other popup. -->
+<button type="button" class="btn btn-primary" id="show_old_cert_details" data-toggle="modal" data-target=".old_date_popup">Click to View/Edit Old Grant Date </button>
 
-<div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<!-- added the changed "data-target" value "old_date_popup" in modal class name, on 29-05-2023 by Amol -->
+<div class="modal fade old_date_popup" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="modal-header"><h5 class="modal-title" id="exampleModalLabel">Old Granted Certificate Details</h5>
