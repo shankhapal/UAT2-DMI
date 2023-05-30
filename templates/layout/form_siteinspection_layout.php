@@ -56,9 +56,11 @@
 				<div class="col-9">
 					<h6 class="applicationtextcolor ">Applicant ID: <?php echo $_SESSION['customer_id']; ?> - <?php echo $firm_details['firm_name']; ?></h6>
 				</div>
-				<!--<div class="col-3">
-					<a href="<?php // echo $download_application_pdf;?>" target="blank" style="float:right; color:#f09609; margin-right:20px;"><b>Download PDF Version</b></a>
-				</div>-->		<!-- commented by akash on 09-03-2021-->
+				<!-- commented by akash on 09-03-2021-->
+				<!-- Uncommented by Amol on 29-05-2023 to show report pdf link on report sections -->
+				<div class="col-3">
+					<a href="<?php echo $download_report_pdf;?>" target="blank" class="float-right fa fa-download mr-3 text-danger" title="Download Pdf Version Report"><span class="fa fa-file-powerpoint-o text-danger"></span></a>
+				</div>		
 			</div>
 			<div class="clearfix"></div>
 

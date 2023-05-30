@@ -569,9 +569,11 @@ use App\Network\Response\Response;
 
 		
 	//to redirect on granted applications window	
-		public function redirectGrantedApplications($appl_type_id){
+	//added new parameter "$is_old=null" and set session to manage old applications list, on 29-05-2023 by Amol
+		public function redirectGrantedApplications($appl_type_id,$is_old=null){
 			
 			$this->Session->write('ap_id',$appl_type_id);
+			$this->Session->write('is_old',$is_old);
 			$this->redirect(array('controller'=>'hoinspections', 'action'=>'grantCertificatesList'));
 		}
 
@@ -628,7 +630,15 @@ use App\Network\Response\Response;
 			
 			
 			//set common values conditionally
-			if($appl_type_id == '1'){//for new
+			//added code to get old appl flag from session, and show old verified appl. listing, on 29-05-2023 by Amol
+			$is_old = $this->Session->read('is_old');
+			if($appl_type_id == '1' && !empty($is_old)){//for new
+				
+				$condition = array('pdf_version'=>'1','user_email_id IS'=>'old_application','date(created) >=' => $from_dt, 'date(created) <=' => $to_dt);
+				$report_pdf_field = 'pdf_file';
+			
+			}
+			elseif($appl_type_id == '1'){//for new
 				
 				$condition = array('pdf_version'=>'1','user_email_id !='=>'old_application','date(created) >=' => $from_dt, 'date(created) <=' => $to_dt);
 				$report_pdf_field = 'pdf_file';
@@ -643,6 +653,7 @@ use App\Network\Response\Response;
 				$condition = array('user_email_id !='=>'old_application','date(created) >=' => $from_dt, 'date(created) <=' => $to_dt);
 				$report_pdf_field = 'pdf_file';
 			}
+			
 			
 			//get user roles
 			$this->loadModel('DmiUserRoles');
