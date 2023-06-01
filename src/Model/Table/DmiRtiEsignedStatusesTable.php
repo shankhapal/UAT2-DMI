@@ -12,11 +12,11 @@
 	public function getEsignedStatus($customer_id,$current_level){
 		
 		// added applivation type to get application type of RTI module by shankhpal on 30/05/2023
-		$application_type = $this->Session->read('application_type');
+		// $application_type = $this->Session->read('application_type');
 		$CustomersController = new CustomersController;
 		// pass argument for application type = 10 
 		// added by shankhpal shende on 30/05/2023
-		$grantDateCondition = $CustomersController->Customfunctions->returnGrantDateCondition($customer_id,$application_type);
+		$grantDateCondition = $CustomersController->Customfunctions->returnGrantDateCondition($customer_id,10);
 		
 		//create other model objects
 		$Dmi_firm = TableRegistry::getTableLocator()->get('DmiFirms');
@@ -63,19 +63,20 @@
 		//taking condition for query conditionally
 		if($current_level == 'applicant' || $current_level == 'level_2'){
 			$query_conditions = array('customer_id'=>$customer_id, 'application_type'=>$type, 'application_status'=>$status ,$grantDateCondition);
-			
 		}else{
 			$query_conditions = array('customer_id'=>$customer_id, 'application_type'=>$type, $grantDateCondition);
 		}
 		
-		$get_esign_details = $this->find('all',array('customer_id'=>$customer_id,'application_status'=>$query_conditions['application_status']))->first();		
-		
-		// $get_esign_details = $this->find('all',array('conditions'=>$query_conditions))->first();		
+		// Added condition for final submit redirect to dashboard by shankhpal on 31/05/2023		
+		if($query_conditions[0] == null){
+				$get_esign_details = $this->find('all',array('conditions'=>$query_conditions,'order'=>'id desc'))->first();	
+		}else{
+				$get_esign_details = $this->find('all',array('customer_id'=>$customer_id,'application_status'=>$query_conditions['application_status'],'order'=>'id desc'))->first();		
+		}
 		
 		$esign_status = 'no';
 		
 		if(!empty($get_esign_details)){
-	
 			if($current_level == 'applicant'){
 				
 				if($get_esign_details['application_esigned']=='yes'){
@@ -111,11 +112,10 @@
 		}else{
 			$customer_id = $_SESSION['username'];
 		}
-		// added applivation type to get application type of RTI module by shankhpal on 30/05/2023
-		$application_type = $this->Session->read('application_type');
+		
 		
 		$CustomersController = new CustomersController;
-		$grantDateCondition = $CustomersController->Customfunctions->returnGrantDateCondition($customer_id,$application_type);
+		$grantDateCondition = $CustomersController->Customfunctions->returnGrantDateCondition($customer_id,10);
 		
 		$current_level = $_SESSION['current_level'];
 		

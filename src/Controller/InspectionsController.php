@@ -661,6 +661,21 @@ class InspectionsController extends AppController{
 		$this->set('redirect_to',$redirect_to);	
 		$this->set('firm_type',$firm_type);  # to set the firm_type for validation in RTI MOdule added by shankhpal on 25/05/2023
 	
+		// Comment: Added for checking if report is final submit then want to re-applay
+		// Reason : As per the comment and suggestions of UAT
+		// Name of person : Shankhpal Shende
+		// Date: 29/05/2023
+					
+		// if($application_type == 10){
+		
+		// 	$form_type = "RTI";
+		// 	$this->loadModel('DmiRtiFinalReports');  
+		// 	$checkIfgrant = $this->DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
+
+		// 	$report_status = $checkIfgrant->toArray()['status'];
+   	//   $this->set('report_status', $report_status);
+		// }
+		
 		//exit;
 	}
 	

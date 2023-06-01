@@ -28,20 +28,144 @@ class DmiRoutineInspectionPpReportsTable extends Table{
 
 	public function sectionFormDetails($customer_id)
 	{
-				$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+				// select record for customer has approved or not
+				$DmiRtiFinalReports = TableRegistry::getTableLocator()->get('DmiRtiFinalReports');
+				$DmiRtiAllocations = TableRegistry::getTableLocator()->get('DmiRtiAllocations');
 
-				if($latest_id != null){
-					$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();
-					$form_fields_details = $report_fields;
+				// fetch packer approve data
+				$approved_record = $DmiRtiFinalReports->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id desc'))->first();
 
+				
+			
+				$allocated_record = '';
+				if(!empty($approved_record)){
+				
+					// if packer is approved then compair approve date to allocation date
+					
+					$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'date(created) > '=>$approved_record['created']),'order'=>'id desc'))->first();
+					
+				
+
+					if(!empty($allocated_record)){
+
+						$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+						
+						if(!empty($latest_id)){
+							
+							$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();
+									
+							$form_fields_details = $report_fields;
+							$last_inspection_sugg = $form_fields_details['last_insp_suggestion'];
+						}else{
+						
+								$form_fields_details = Array (  
+								'id' =>"", 
+								'customer_id' =>"",
+								'date_last_inspection'=>"",
+								'date_p_inspection'=>"",
+								'email'=>"",
+								'mobile_no'=>"",
+								'packaging_material'=>"",
+								'valid_upto'=>"",
+								'street_address'=>"",
+								'registered_office'=>"",
+								'press_premises'=>"",
+								'physical_check'=>"",
+								'is_printing'=>"",
+								'storage_facilities'=>"",
+								'lab_properly_equipped'=>"",
+								'maintains_proper'=>"",
+								'right_quality_of_printing'=>"",
+								'press_is_marking_logo'=>"",
+								'last_insp_suggestion'=>isset($last_inspection_sugg)?$last_inspection_sugg:"",
+								'short_obserd'=>"",
+								'if_any_sugg'=>"",
+								'signature'=>"",
+								'signature_name'=>"",
+								'io_reply_once_no' =>"", 
+								'user_email_id' =>"",
+								'user_once_no' =>"", 
+								'referred_back_comment' =>"", 
+								'referred_back_date' =>"", 
+								'io_reply' =>"", 
+								'io_reply_date' =>"", 
+								'form_status' =>"",
+								'approved_date' =>"",
+								'referred_back_by_email' =>"", 
+								'referred_back_by_once' =>"", 
+								'current_level' =>"", 
+								'constituent_oil_mill_docs' =>"", 
+								'separate_pipe_lines' =>"no", 
+								'delete_ro_referred_back' =>"");
+						}
+
+					}else{
+							$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+						
+							if(!empty($latest_id)){
+								
+								$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();
+										
+								$form_fields_details = $report_fields;
+								
+							}
+					}
 				}else{
-					$form_fields_details = Array (  'id' =>"", 'customer_id' =>"",'date_last_inspection'=>"",'date_p_inspection'=>"",
-					'email'=>"",'mobile_no'=>"",'packaging_material'=>"",'valid_upto'=>"",'street_address'=>"",
-					'registered_office'=>"",'press_premises'=>"",'physical_check'=>"",'is_printing'=>"",'storage_facilities'=>"",'lab_properly_equipped'=>"",'maintains_proper'=>"",'right_quality_of_printing'=>"",'press_is_marking_logo'=>"",'last_insp_suggestion'=>"",'short_obserd'=>"",'if_any_sugg'=>"",'signature'=>"",'signature_name'=>"",'io_reply_once_no' =>"", 'user_email_id' =>"",'user_once_no' =>"", 'referred_back_comment' =>"", 'referred_back_date' =>"", 'io_reply' =>"", 'io_reply_date' =>"", 'form_status' =>"",'approved_date' =>"",'referred_back_by_email' =>"", 'referred_back_by_once' =>"", 'current_level' =>"", 'constituent_oil_mill_docs' =>"", 'separate_pipe_lines' =>"no", 'delete_ro_referred_back' =>"");
 
+					$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+						
+					if(!empty($latest_id)){
+						
+						$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();
+								
+						$form_fields_details = $report_fields;
+						$last_inspection_sugg = $form_fields_details['last_insp_suggestion'];
+					}else{
+						$form_fields_details = Array (  
+						'id' =>"", 
+						'customer_id' =>"",
+						'date_last_inspection'=>"",
+						'date_p_inspection'=>"",
+						'email'=>"",
+						'mobile_no'=>"",
+						'packaging_material'=>"",
+						'valid_upto'=>"",
+						'street_address'=>"",
+						'registered_office'=>"",
+						'press_premises'=>"",
+						'physical_check'=>"",
+						'is_printing'=>"",
+						'storage_facilities'=>"",
+						'lab_properly_equipped'=>"",
+						'maintains_proper'=>"",
+						'right_quality_of_printing'=>"",
+						'press_is_marking_logo'=>"",
+						'last_insp_suggestion'=>"",
+						'short_obserd'=>"",
+						'if_any_sugg'=>"",
+						'signature'=>"",
+						'signature_name'=>"",
+						'io_reply_once_no' =>"", 
+						'user_email_id' =>"",
+						'user_once_no' =>"", 
+						'referred_back_comment' =>"", 
+						'referred_back_date' =>"", 
+						'io_reply' =>"", 
+						'io_reply_date' =>"", 
+						'form_status' =>"",
+						'approved_date' =>"",
+						'referred_back_by_email' =>"", 
+						'referred_back_by_once' =>"", 
+						'current_level' =>"", 
+						'constituent_oil_mill_docs' =>"", 
+						'separate_pipe_lines' =>"no", 
+						'delete_ro_referred_back' =>"");
+					}
+
+					
 				}
 
-
+				
 				$user_email_id = $_SESSION['username'];
 
 				$DmiCaPpLabMapings = TableRegistry::getTableLocator()->get('DmiCaPpLabMapings');

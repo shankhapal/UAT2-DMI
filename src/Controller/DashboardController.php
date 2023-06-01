@@ -1085,45 +1085,48 @@ class DashboardController extends AppController{
 										$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id);
 									
 										//check final submit status for level 2 & 3 and approved for each allocated id
-										$routine_inspection = $this->DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'pending'),array('order'=>'id desc')))->first();
-																	 
+										$routine_inspection = $this->DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),array('order'=>'id desc')))->first();
+											
 										$created = ''; // by default blank 
 										//if routine_inspection not empty 
 										if(!empty($routine_inspection)){
 											$created = $routine_inspection['created']; // hold created date
-										}else{
-											 // if routine_inspection empty 
-											$site_inspection = $this->DmiSiteinspectionFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'pending'),array('order'=>'id desc')))->first();
-										
-											if(!empty($site_inspection)){
-					  
-												$created = $site_inspection['created'];		// hold created date											
-											}
-											 
+											
 										}
+											 // if routine_inspection empty 
+										
+										$site_inspection = $this->DmiSiteinspectionFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'pending'),array('order'=>'id desc')))->first();
+									
+										// if(!empty($site_inspection)){
+					
+										// 	$created = $site_inspection['created'];		// hold created date											
+										// }
+											 
+											
 										 // when created date not empty 
 										 if(!empty($created)) {
 											 
 											$split_created	= 	explode(' ',(string) $created); //conver into array 
 												
 											$date1 = $split_created[0]; //hold only date 
-										
+											
 											$date2 = date("Y/m/d"); // current date
-						
+									
 											//calculate difference 
 											$diff = abs(strtotime(str_replace('/','-',$date2)) - strtotime(str_replace('/','-',$date1)));
 
 											$years = floor($diff / (365*12*60*60*24)); // retrun years
 											
 											$months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24)); // return month
-										
+											
 											//check conditionally if month greter to period then do inspection yes
 											if($months > $period){
 												$inspection = 'yes';
+												
 											}
 										 
 										 }
-										 else{ // if created date is empty do inspection yes
+										 else{ // if created date is empty do inspection yes 
 											 $inspection = 'yes';
 										 }
 										 
@@ -1147,34 +1150,83 @@ class DashboardController extends AppController{
 											$this->loadModel('DmiRtiAllocations');
 											$this->loadModel('DmiRtiFinalReports');
 										
+										
+											$approved_record = $this->DmiRtiFinalReports->find('all', ['conditions' => ['customer_id IS' => $customer_id, 'status' => 'approved'],'order' => 'id desc'])->first();
+										
+											// if exist in DmiRtiFinalReports then get last created date
+											$lastCreatedRecord = null;
+											if (!empty($approved_record)) {
+													$lastCreatedRecord = strtotime($approved_record['created']);
+											}
+										
+											$RecentAllocated_record = $this->DmiRtiAllocations->find('all', [
+													'conditions' => ['customer_id IS' => $customer_id],
+													'order' => ['created' => 'desc'],
+													'limit' => 1
+											])->first();
+												
+											$mostRecentData = null;
+											$comm_with = 'Not Allocated';
 
-											$approved_record = $this->DmiRtiFinalReports->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id desc'))->first();
-										
-											$allocated_record = [];
-											if(!empty($approved_record)){
-				
-												$allocated_record = $this->DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,array('date(created) > '=>$approved_record['created'])),'order'=>'id desc'))->first();
-											
+											if ($RecentAllocated_record) {
+													$mostRecentData = strtotime($RecentAllocated_record['created']);
+													
+													$mo_user_details = $this->DmiUsers->find('all', [
+															'conditions' => ['email IS' => $RecentAllocated_record['level_2']]
+													])->first();
+
+													if ($mo_user_details) {
+															$comm_with = $mo_user_details['f_name'] . ' ' . $mo_user_details['l_name'];
+													}
 											}
-											
-											$get_allocations = $this->DmiRtiAllocations->find('all',array('conditions' => array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
 										
-											if(!is_null($allocated_record))
-											{
-												$comm_with='Not Allocated';
-											}
-											if(!empty($get_allocations))
-											{
-												$mo_user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$get_allocations['level_2'])))->first();
-											
+											if ($mostRecentData > $lastCreatedRecord) {
+												
+												// Perform actions when $mostRecentData is greater than $lastCreatedRecord
+												$mo_user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$RecentAllocated_record['level_2'])))->first();
 												$comm_with = $mo_user_details['f_name'].' '.$mo_user_details['l_name'];
 
-											}else{
-												
-												$comm_with='Not Allocated';
+											} elseif ($mostRecentData < $lastCreatedRecord) {
+													// Perform actions when $mostRecentData is less than $lastCreatedRecord
+													$comm_with='Not Allocated';
+											} else {
+													// Perform actions when $mostRecentData is equal to $lastCreatedRecord
+													if(!empty($RecentAllocated_record['level_2'])){
+															$mo_user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$RecentAllocated_record['level_2'])))->first();
+															$comm_with = $mo_user_details['f_name'].' '.$mo_user_details['l_name'];
+													}
+													
 											}
-						
+											//  $get_allocations = $this->DmiRtiAllocations->find('all',array('conditions' => array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+											 
+											
+											// $lastCreatedRecord = [];
+											// if(!empty($approved_record)){
+											// 	$lastCreatedRecord = strtotime($approved_record['created']); // Assuming $approved_record contains the last created record
+											// }
+											
+											// pr($lastCreatedRecord);die;
+											// $allocated_record = [];
+											// if(!empty($approved_record)){
+				
+											// 	 $allocated_record = $this->DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,array('date(created) > '=>$approved_record['created'])),'order'=>'id desc'))->first();
+											// }
+										
+										//  $get_allocations = $this->DmiRtiAllocations->find('all',array('conditions' => array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+											
+								/////////////////////////////////////////////////////////////////	
+								# This logic is use for Allocation once application approved and want to reapplay		
+											// if(!empty($get_allocations))
+											// {
+											// 	$mo_user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$get_allocations['level_2'])))->first();
+											
+											// 	$comm_with = $mo_user_details['f_name'].' '.$mo_user_details['l_name'];
+
+											// }else{
 												
+											// 	$comm_with='Not Allocated';
+											// }
+								///////////////////////////////////////////////////////////////
 											$creat_array = true;
 											
 										

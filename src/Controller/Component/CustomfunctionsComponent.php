@@ -582,24 +582,27 @@ class CustomfunctionsComponent extends Component {
 	// Get application final submit details
 	public function finalSubmitDetails($customer_id,$field_name,$application_type=null) {
 
-		$grantDateCondition = $this->returnGrantDateCondition($customer_id);
+		
 
 		if ($application_type==null) {
 
 			$application_type = $this->Session->read('application_type');
 		}
-
+		// added application id by shankhpal on 31-05-2023
+		$grantDateCondition = $this->returnGrantDateCondition($customer_id,$application_type);
+		
 		$Dmi_flow_wise_tables_list = TableRegistry::getTableLocator()->get('DmiFlowWiseTablesLists');
 		$Dmi_final_submit_tb = $Dmi_flow_wise_tables_list->find('all',array('conditions'=>array('application_type IS'=>$application_type)))->first();
 		$Dmi_final_submit = TableRegistry::getTableLocator()->get($Dmi_final_submit_tb[$field_name]);
+	
 		$final_submit_deatil = $Dmi_final_submit->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,$grantDateCondition),'order'=>'id DESC'))->first();
-
+		
 		if (!empty($final_submit_deatil)) {
 			$final_submit_deatils = $final_submit_deatil;
 		} else {
 			$final_submit_deatils = "";
 		}
-
+		
 		return $final_submit_deatils;
 	}
 
@@ -2798,7 +2801,7 @@ class CustomfunctionsComponent extends Component {
 		$DmiAdvPaymentDetails = TableRegistry::getTableLocator()->get('DmiAdvPaymentDetails');
 
 		$grantDate = $DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'pdf_version >'=>'1'),'order'=>'id DESC'))->first();
-
+		
 		if ($application_type == 3) {
 
 			$DmiGrantCertificatesPdfs = TableRegistry::getTableLocator()->get('DmiChangeGrantCertificatesPdfs');
@@ -2809,12 +2812,19 @@ class CustomfunctionsComponent extends Component {
 			$DmiGrantCertificatesPdfs = TableRegistry::getTableLocator()->get('DmiAdpGrantCertificatePdfs');
 			$grantDate = $DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
 		
-		}	elseif ($application_type == 10) { //added on 30-05-2023 by shankhpal to get RTI grant date
-			// For application type = 10 then fetch grant date from DmiRtiFinalReports
-			$DmiRtiFinalReports = TableRegistry::getTableLocator()->get('DmiRtiFinalReports');
-			$grantDate = $DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
-		
-		}
+		}	
+		// elseif ($application_type == 10) { //added on 30-05-2023 by shankhpal to get RTI grant date
+		// 	// For application type = 10 then fetch grant date from DmiRtiFinalReports
+		// 	$DmiRtiFinalReports = TableRegistry::getTableLocator()->get('DmiRtiFinalReports');
+		// 	$resultData = $DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
+			
+		// 	if(isset($resultData['status']) && $resultData['status'] == 'approved'){
+		// 		$grantDate = $DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
+			
+		// 	}
+			
+			
+		// }
 
 
 		if ($advancepayment == 'yes') {

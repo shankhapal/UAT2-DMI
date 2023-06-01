@@ -31,43 +31,36 @@ class DmiRtiCaPackerDetailsTable extends Table{
 */
 	public function sectionFormDetails($customer_id)
 	{
-
-			// select record for customer has approved or not
+		
+		// select record for customer has approved or not
 			$DmiRtiFinalReports = TableRegistry::getTableLocator()->get('DmiRtiFinalReports');
 			$DmiRtiAllocations = TableRegistry::getTableLocator()->get('DmiRtiAllocations');
 			
 			// fetch packer approve data
 			$approved_record = $DmiRtiFinalReports->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id desc'))->first();
 			
-			$allocated_record = '';
-			if(!empty($approved_record)){
-				// if packer is approved then compair approve date to allocation date
-				$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'date(created) > '=>$approved_record['created']),'order'=>'id desc'))->first();
-			}
+			
+			// $allocated_record = '';
+			// if(!empty($approved_record)){
+			// 	// if packer is approved then compair approve date to allocation date
+			// 	$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'date(created) > '=>$approved_record['created']),'order'=>'id desc'))->first();
+			// }
 			
 			$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
 			
-
-			if($latest_id != null && $allocated_record == null){
+			
+			if($latest_id != null){
 				$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();		
 				$form_fields_details = $report_fields;
 				
 			}else{
-
-				$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id,'date(created) > '=>$allocated_record['created'])))->toArray();
-				
-				if(!empty($latest_id)){
 					
-					$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();		
-					$form_fields_details = $report_fields;
-
-					
-				}else{
-						
 					$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
-				
-					$result_data = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();
-					$enumerate_briefly_suggestions = $result_data['enumerate_briefly_suggestions'];	
+					
+					if(!empty($latest_id)){
+						$result_data = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();
+						$enumerate_briefly_suggestions = $result_data['enumerate_briefly_suggestions'];	
+					}
 					
 					$form_fields_details = Array (
 						'id' =>"", 
@@ -116,7 +109,7 @@ class DmiRtiCaPackerDetailsTable extends Table{
 
 					
 			
-			}
+			// }
 		
 			$Dmi_grant_certificates_pdfs = TableRegistry::getTableLocator()->get('DmiGrantCertificatesPdfs');
 			
