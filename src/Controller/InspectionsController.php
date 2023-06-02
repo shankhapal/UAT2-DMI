@@ -108,7 +108,7 @@ class InspectionsController extends AppController{
 		$this->set('customer_id',$customer_id);
 		
 		$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id);
-					//print_r($grantDateCondition); exit;
+		
 
 		$form_final_submit_details = $this->Customfunctions->finalSubmitDetails($customer_id,'application_form');
 		
@@ -245,7 +245,8 @@ class InspectionsController extends AppController{
 		$added_directors_details = $this->DmiAllDirectorsDetails->allDirectorsDetail($customer_id);	
 		$this->set('added_directors_details',$added_directors_details);
 					
-		$final_submit_status = $this->Customfunctions->finalSubmitDetails($customer_id,'inspection_report');			
+		$final_submit_status = $this->Customfunctions->finalSubmitDetails($customer_id,'inspection_report');	
+				
 		$this->set('final_submit_status',$final_submit_status);
 		
 		//added on 13-05-2021 by Amol, to be used in view side

@@ -35,33 +35,39 @@ class DmiRtiCaPackerDetailsTable extends Table{
 		// select record for customer has approved or not
 			$DmiRtiFinalReports = TableRegistry::getTableLocator()->get('DmiRtiFinalReports');
 			$DmiRtiAllocations = TableRegistry::getTableLocator()->get('DmiRtiAllocations');
-			
+			$CustomersController = new CustomersController;
 			// fetch packer approve data
 			$approved_record = $DmiRtiFinalReports->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id desc'))->first();
 			
-			
-			// $allocated_record = '';
-			// if(!empty($approved_record)){
-			// 	// if packer is approved then compair approve date to allocation date
-			// 	$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'date(created) > '=>$approved_record['created']),'order'=>'id desc'))->first();
-			// }
-			
-			$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
-			
-			
-			if($latest_id != null){
+			$allocated_record = '';
+		
+			if(!empty($approved_record)){
+				// if packer is approved then compair approve date to allocation date
+				$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'date(created) > '=>$approved_record['created']),'order'=>'id desc'))->first();
+			}
+			if(empty($allocated_record)){
+				
+				$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
+				$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();
+				// if($current_version == 1){
+				// 	$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();	
+				// }else{
+				// 	$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$last_version)))->first();
+				// 	$last_version = $current_version - 1;
+				// }
+			}
+			if(!empty($allocated_record)){
+				$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
+				$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();	
+			}
+			if($last_report_details != null){
+				
+				$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
 				$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();		
 				$form_fields_details = $report_fields;
+			}
+			else{
 				
-			}else{
-					
-					$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
-					
-					if(!empty($latest_id)){
-						$result_data = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();
-						$enumerate_briefly_suggestions = $result_data['enumerate_briefly_suggestions'];	
-					}
-					
 					$form_fields_details = Array (
 						'id' =>"", 
 						'customer_id' =>"", 
@@ -90,7 +96,7 @@ class DmiRtiCaPackerDetailsTable extends Table{
 						'last_lot_date' =>"",
 						'analytical_results' =>"",
 						'month_upto' =>"",
-						'enumerate_briefly_suggestions'=>isset($enumerate_briefly_suggestions)?$enumerate_briefly_suggestions:"",
+						'enumerate_briefly_suggestions'=>"",
 						'replica_account_correct' =>"",
 						'discrepancies_replica_aco' =>"",
 						'fssai_approved ' =>"",
@@ -105,11 +111,6 @@ class DmiRtiCaPackerDetailsTable extends Table{
 					); 
 					
 				}
-				
-
-					
-			
-			// }
 		
 			$Dmi_grant_certificates_pdfs = TableRegistry::getTableLocator()->get('DmiGrantCertificatesPdfs');
 			
@@ -404,6 +405,9 @@ class DmiRtiCaPackerDetailsTable extends Table{
 			}
 		}						
 			
+		$CustomersController = new CustomersController;
+		$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
+
 		 // Updated saving code as per new variabls -> shankhpal shende 15-05-2023
 		$formSavedEntity = $this->newEntity(array(	
 
@@ -447,6 +451,7 @@ class DmiRtiCaPackerDetailsTable extends Table{
 				'shortcomings_noticed_docs'=>$shortcomings_noticed_docs,
 				'signnature_of_packer_docs'=>$signnature_of_packer_docs,
 				'signnature_of_inspecting_officer_docs'=>$signnature_of_inspecting_officer_docs,
+				'version'=>$current_version,
 				'form_status'=>'saved',
 				'created'=>date('Y-m-d H:i:s'),
 				'modified'=>date('Y-m-d H:i:s')
@@ -462,6 +467,9 @@ class DmiRtiCaPackerDetailsTable extends Table{
 	Date: 16-05-2023
   */
 	public function saveReferredBackComment($customer_id,$report_details,$reffered_back_comment,$rb_comment_ul){
+
+		$CustomersController = new CustomersController;
+		$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
 
 		$formSavedEntity = $this->newEntity(array(			
 			'customer_id'=>$customer_id,
@@ -508,6 +516,7 @@ class DmiRtiCaPackerDetailsTable extends Table{
 			'referred_back_by_email'=>$_SESSION['username'],
 			'referred_back_by_once'=>$_SESSION['once_card_no'],
 			'form_status'=>'referred_back',
+			'version'=>$current_version,
 			'current_level'=>$_SESSION['current_level'],
 			'created'=>date('Y-m-d H:i:s'),
 			'modified'=>date('Y-m-d H:i:s')				

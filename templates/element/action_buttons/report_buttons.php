@@ -4,7 +4,8 @@
 		<a id="previous_btn" class="btn btn-secondary float-left" href="<?php echo $this->request->getAttribute('webroot');?>inspections/section/<?php echo $section_details['section_id']-1; ?>" >Previous Section</a>
 	<?php } ?>
 
-	<?php if ($application_mode == 'edit') {
+	<?php 
+	if ($application_mode == 'edit') {
 
 			$reset_btn = '';
 			if ($section_form_details[0]['form_status'] == 'saved') { $btn_label = 'Update'; }
@@ -15,6 +16,7 @@
 			if (!empty($section_details['save_btn']) && empty($final_submit_status)) {
 				echo $this->Form->submit($btn_label, array('name'=>'save', 'id'=>'save_btn', 'class'=>'btn btn-success', 'label'=>false));
 			}
+		
 			if (!empty($section_details['final_submit_btn']) && empty($final_submit_status) ) {
 				echo $this->Form->submit('Final Submit', array('name'=>'final_submit', 'id'=>'final_submit_btn', 'class'=>'btn btn-success dnone','title'=>'Be sure all fields and details are properly filled for application before final submission', 'label'=>false));
 			}
@@ -64,7 +66,7 @@
 					echo $this->Form->submit('Reject', array('name'=>'reject_btn', 'id'=>'reject_btn', 'label'=>false,'class'=>'btn btn-danger'));
 				}
 
-			}
+		}
 
 	?>
 

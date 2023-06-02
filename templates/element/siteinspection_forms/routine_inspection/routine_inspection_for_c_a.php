@@ -573,7 +573,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group row">
                                             <div class="col-sm">
-                                                <?php echo $this->Form->control('analytical_results', array('type'=>'text', 'id'=>'analytical_results', 'class'=>'form-control', 'placeholder'=>'Type here..','value '=>isset($section_form_details[0]['analytical_results'])?$section_form_details[0]['analytical_results']:"", 'label'=>false)); ?>
+                                                <?php echo $this->Form->control('analytical_results', array('type'=>'text', 'id'=>'analytical_results', 'class'=>'form-control', 'placeholder'=>'Enter Analytical Results','value '=>isset($section_form_details[0]['analytical_results'])?$section_form_details[0]['analytical_results']:"", 'label'=>false)); ?>
                                                 <span id="error_analytical_results" class="error invalid-feedback"></span>
                                             </div> 
                                         </div>

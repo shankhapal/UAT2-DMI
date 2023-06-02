@@ -34,7 +34,7 @@ class DmiRoutineInspectionPpReportsTable extends Table{
 
 				// fetch packer approve data
 				$approved_record = $DmiRtiFinalReports->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id desc'))->first();
-
+			
 				
 			
 				$allocated_record = '';

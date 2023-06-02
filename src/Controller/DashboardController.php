@@ -1060,6 +1060,109 @@ class DashboardController extends AppController{
 								
 								$this->loadModel('DmiSiteinspectionFinalReports');
 							
+								// routine inspection for approved record for CA,PP, Lab
+								// $approved_record = $this->DmiRtiFinalReports->find('all',array('conditions'=>array($condition),'status' => 'approved'))->distinct('customer_id')->toArray();
+								$approved_record =  $this->DmiRtiFinalReports->find('all',array('conditions'=>array($condition)), array('order'=>'id desc'))->distinct('customer_id')->toArray();
+								
+								if(!empty($approved_record)){
+									foreach ($approved_record as $each_approved) {
+										
+										
+										$creat_array='';//clear variable each time
+										$customer_id = $each_approved['customer_id'];
+										$split_secondary_id				= 	explode('/',(string) $customer_id);
+										$splited_secondary_id_value		= 	$split_secondary_id[1];  // splited type of id like 1,2,3
+										
+										$routine_inspection = $this->DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),array('order'=>'id desc')))->first();
+										
+										
+										$created = ''; // by default blank 
+										//if routine_inspection not empty 
+										if(!empty($routine_inspection)){
+											$created = $routine_inspection['created']; // hold created date
+											
+										}
+										
+										if(!empty($created)){
+
+											$routin_inspection_period = $this->DmiRoutineInspectionPeriod->find('all',array('conditions'=>array('firm_type IS'=>$splited_secondary_id_value)))->first();
+											$period = $routin_inspection_period['period'];
+											$split_created	= 	explode(' ',(string) $created); //conver into array 
+
+											$date1 = $split_created[0]; //hold only date 
+											
+											$date2 = date("Y/m/d"); // current date
+										
+											//calculate difference 
+											$diff = abs(strtotime(str_replace('/','-',$date2)) - strtotime(str_replace('/','-',$date1)));
+
+											$years = floor($diff / (365*12*60*60*24)); // retrun years
+											
+											$months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24)); // return month
+										
+											if($months > $period){
+												 $inspection = 'yes';
+											}else {
+														$inspection = 'no';
+											}
+										}
+										
+										
+										if($inspection == "yes"){
+											
+											$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id);
+											//get_form_type
+											$form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
+											
+											//get firm details
+											$firm_details = $this->DmiFirms->firmDetails($customer_id);
+											
+											$firm_name = $firm_details['firm_name'];
+											$firm_table_id = $firm_details['id'];
+											$appl_type_id = $each_flow['application_type'];
+											$appl_view_link = '../scrutiny/form_scrutiny_fetch_id/'.$firm_table_id.'/view/'.$appl_type_id;
+
+											//get Nodal officer details
+											$this->loadModel('DmiUsers');
+											$this->loadModel('DmiRtiAllocations');
+										
+											$get_allocations = $this->DmiRtiAllocations->find('all',array('conditions' => array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+											
+											if(!empty($get_allocations))
+											{
+												$mo_user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$get_allocations['level_2'])))->first();
+											
+												$comm_with = $mo_user_details['f_name'].' '.$mo_user_details['l_name'];
+
+											}else{
+												
+												$comm_with='Not Allocated';
+											}
+						
+												
+											$creat_array = true;
+										}
+										
+											//creating array to list records with respect to above conditions
+										if($creat_array==true){
+
+											$appl_list_array[$i]['appl_type'] = 'Routine Inspection';
+											$appl_list_array[$i]['customer_id'] = $customer_id.'-'.$form_type;
+											$appl_list_array[$i]['firm_name'] = $firm_name;
+											$appl_list_array[$i]['comm_with'] = $comm_with;
+											$appl_list_array[$i]['appl_view_link'] = $appl_view_link;
+											$appl_list_array[$i]['appl_edit_link'] = '';
+											$appl_list_array[$i]['alloc_sub_tab']='routine_inspection_allocation_tab';
+					   
+										}
+
+										$i=$i+1;
+										
+									}
+									
+								}
+								
+							
 								// fetched record conditionaly 
 								$grant_record_list =  $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array($condition)), array('order'=>'id desc'))->distinct('customer_id')->toArray();
 				  
@@ -1072,63 +1175,27 @@ class DashboardController extends AppController{
 										$creat_array='';//clear variable each time
 										$customer_id = $each_alloc['customer_id'];
 								  
-										$split_secondary_id				= 	explode('/',(string) $customer_id);
-				   
-										$splited_secondary_id_value		= 	$split_secondary_id[1];  // splited type of id like 1,2,3
-										
-										$routin_inspection_period = $this->DmiRoutineInspectionPeriod->find('all',array('conditions'=>array('firm_type IS'=>$splited_secondary_id_value)))->first();
-									
-										$period = $routin_inspection_period['period'];
-									
 										$inspection = 'no'; //by default
 
 										$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id);
 									
-										//check final submit status for level 2 & 3 and approved for each allocated id
-										$routine_inspection = $this->DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),array('order'=>'id desc')))->first();
-											
 										$created = ''; // by default blank 
 										//if routine_inspection not empty 
-										if(!empty($routine_inspection)){
-											$created = $routine_inspection['created']; // hold created date
-											
-										}
-											 // if routine_inspection empty 
-										
-										$site_inspection = $this->DmiSiteinspectionFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'pending'),array('order'=>'id desc')))->first();
 									
-										// if(!empty($site_inspection)){
-					
-										// 	$created = $site_inspection['created'];		// hold created date											
-										// }
+											 // if routine_inspection empty 
+											$site_inspection = $this->DmiSiteinspectionFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'pending'),array('order'=>'id desc')))->first();
+										
+											if(!empty($site_inspection)){
+					  
+												$created = $site_inspection['created'];		// hold created date											
+											}
 											 
-											
+										
 										 // when created date not empty 
 										 if(!empty($created)) {
-											 
-											$split_created	= 	explode(' ',(string) $created); //conver into array 
-												
-											$date1 = $split_created[0]; //hold only date 
-											
-											$date2 = date("Y/m/d"); // current date
-									
-											//calculate difference 
-											$diff = abs(strtotime(str_replace('/','-',$date2)) - strtotime(str_replace('/','-',$date1)));
-
-											$years = floor($diff / (365*12*60*60*24)); // retrun years
-											
-											$months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24)); // return month
-											
-											//check conditionally if month greter to period then do inspection yes
-											if($months > $period){
-												$inspection = 'yes';
-												
-											}
+											  $inspection = 'yes';
+										 }
 										 
-										 }
-										 else{ // if created date is empty do inspection yes 
-											 $inspection = 'yes';
-										 }
 										 
 										 
 										if($inspection == 'yes'){
@@ -1148,85 +1215,21 @@ class DashboardController extends AppController{
 											//get Nodal officer details
 											$this->loadModel('DmiUsers');
 											$this->loadModel('DmiRtiAllocations');
-											$this->loadModel('DmiRtiFinalReports');
 										
-										
-											$approved_record = $this->DmiRtiFinalReports->find('all', ['conditions' => ['customer_id IS' => $customer_id, 'status' => 'approved'],'order' => 'id desc'])->first();
-										
-											// if exist in DmiRtiFinalReports then get last created date
-											$lastCreatedRecord = null;
-											if (!empty($approved_record)) {
-													$lastCreatedRecord = strtotime($approved_record['created']);
-											}
-										
-											$RecentAllocated_record = $this->DmiRtiAllocations->find('all', [
-													'conditions' => ['customer_id IS' => $customer_id],
-													'order' => ['created' => 'desc'],
-													'limit' => 1
-											])->first();
-												
-											$mostRecentData = null;
-											$comm_with = 'Not Allocated';
-
-											if ($RecentAllocated_record) {
-													$mostRecentData = strtotime($RecentAllocated_record['created']);
-													
-													$mo_user_details = $this->DmiUsers->find('all', [
-															'conditions' => ['email IS' => $RecentAllocated_record['level_2']]
-													])->first();
-
-													if ($mo_user_details) {
-															$comm_with = $mo_user_details['f_name'] . ' ' . $mo_user_details['l_name'];
-													}
-											}
-										
-											if ($mostRecentData > $lastCreatedRecord) {
-												
-												// Perform actions when $mostRecentData is greater than $lastCreatedRecord
-												$mo_user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$RecentAllocated_record['level_2'])))->first();
+											$get_allocations = $this->DmiRtiAllocations->find('all',array('conditions' => array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+						
+											if(!empty($get_allocations))
+											{
+												$mo_user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$get_allocations['level_2'])))->first();
+											
 												$comm_with = $mo_user_details['f_name'].' '.$mo_user_details['l_name'];
 
-											} elseif ($mostRecentData < $lastCreatedRecord) {
-													// Perform actions when $mostRecentData is less than $lastCreatedRecord
-													$comm_with='Not Allocated';
-											} else {
-													// Perform actions when $mostRecentData is equal to $lastCreatedRecord
-													if(!empty($RecentAllocated_record['level_2'])){
-															$mo_user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$RecentAllocated_record['level_2'])))->first();
-															$comm_with = $mo_user_details['f_name'].' '.$mo_user_details['l_name'];
-													}
-													
-											}
-											//  $get_allocations = $this->DmiRtiAllocations->find('all',array('conditions' => array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
-											 
-											
-											// $lastCreatedRecord = [];
-											// if(!empty($approved_record)){
-											// 	$lastCreatedRecord = strtotime($approved_record['created']); // Assuming $approved_record contains the last created record
-											// }
-											
-											// pr($lastCreatedRecord);die;
-											// $allocated_record = [];
-											// if(!empty($approved_record)){
-				
-											// 	 $allocated_record = $this->DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,array('date(created) > '=>$approved_record['created'])),'order'=>'id desc'))->first();
-											// }
-										
-										//  $get_allocations = $this->DmiRtiAllocations->find('all',array('conditions' => array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
-											
-								/////////////////////////////////////////////////////////////////	
-								# This logic is use for Allocation once application approved and want to reapplay		
-											// if(!empty($get_allocations))
-											// {
-											// 	$mo_user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$get_allocations['level_2'])))->first();
-											
-											// 	$comm_with = $mo_user_details['f_name'].' '.$mo_user_details['l_name'];
-
-											// }else{
+											}else{
 												
-											// 	$comm_with='Not Allocated';
-											// }
-								///////////////////////////////////////////////////////////////
+												$comm_with='Not Allocated';
+											}
+						
+												
 											$creat_array = true;
 											
 										

@@ -582,8 +582,6 @@ class CustomfunctionsComponent extends Component {
 	// Get application final submit details
 	public function finalSubmitDetails($customer_id,$field_name,$application_type=null) {
 
-		
-
 		if ($application_type==null) {
 
 			$application_type = $this->Session->read('application_type');
@@ -2813,18 +2811,12 @@ class CustomfunctionsComponent extends Component {
 			$grantDate = $DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
 		
 		}	
-		// elseif ($application_type == 10) { //added on 30-05-2023 by shankhpal to get RTI grant date
-		// 	// For application type = 10 then fetch grant date from DmiRtiFinalReports
-		// 	$DmiRtiFinalReports = TableRegistry::getTableLocator()->get('DmiRtiFinalReports');
-		// 	$resultData = $DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
-			
-		// 	if(isset($resultData['status']) && $resultData['status'] == 'approved'){
-		// 		$grantDate = $DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
-			
-		// 	}
-			
-			
-		// }
+		//  elseif ($application_type == 10) { //added on 30-05-2023 by shankhpal to get RTI grant date
+		//  	// For application type = 10 then fetch grant date from DmiRtiFinalReports
+		//  	$DmiRtiFinalReports = TableRegistry::getTableLocator()->get('DmiRtiFinalReports');
+		//  	$grantDate = $DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id DESC'))->first();
+
+		//  }
 
 
 		if ($advancepayment == 'yes') {
@@ -3652,5 +3644,18 @@ class CustomfunctionsComponent extends Component {
     }
 
 
+		//currentVersion
+		//Description: Returns current version.
+		//@Author : shankhpal shende
+		//Date : 02/06/2023
+		public function currentVersion($customer_id){
+			$DmiRtiFinalReports = TableRegistry::getTableLocator()->get('DmiRtiFinalReports');
+			// fetch packer approve data
+			$approved_record = $DmiRtiFinalReports->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id desc'))->toArray();
+			
+			return count($approved_record) + 1;
+			
+		}
+		
 }
 ?>
