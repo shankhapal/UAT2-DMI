@@ -15,20 +15,53 @@
 	}
 </style>
 
-	<?php if ($isSurrender== 'yes') { ?>
-		<table width="100%" border="1">
-			<tr>
-				<td>
-					<h4 class="cRed">
-						This Certificate of Authorisation is cancelled by the competent authority dated <b> <?php echo date('d-m-Y'); ?> </b> 
-						Applicant do not grade and mark "<?php echo $commodityNames ?>" commodity/ies under AGMARK.
-						If, violation is observed than action shall be taken as per APGM Act and GGM Rule.
-					</h4>
-				</td>
-			</tr>
-		</table>
-	<?php } ?>
 
+	<!--  This Below Blocks Are used for the Surrender , Suspension and Cancellation of Certificate - Akash [05-06-2023] -->
+		<?php if ($isSurrender== 'yes') { ?>
+			<table width="100%" border="1">
+				<tr>
+					<td>
+						<h4 class="cRed">
+							This Certificate of Authorisation is cancelled by the competent authority dated <b> <?php echo date('d-m-Y'); ?> </b> 
+							Applicant do not grade and mark "<?php echo $commodityNames ?>" commodity/ies under AGMARK.
+							If, violation is observed than action shall be taken as per APGM Act and GGM Rule.
+						</h4>
+					</td>
+				</tr>
+			</table>
+		<?php } elseif ($isForSuspension != null && $isForSuspension == 'Yes') { ?>
+
+			<table width="100%" border="1">
+				<tr>
+					<td>
+						<h4 class="cRed">
+							This Certificate of Authorisation is Suspended by the competent authority dated <b> <?php echo date('d-m-Y'); ?> </b> 
+							Applicant do not grade and mark "<?php echo $commodityNames ?>" commodity/ies under AGMARK.
+							If, violation is observed than action shall be taken as per APGM Act and GGM Rule.
+						</h4>
+					</td>
+				</tr>
+			</table>
+
+	 	<?php } elseif ($isForCancellation !=null && $isForCancellation == 'Yes') { ?>
+
+			<table width="100%" border="1">
+				<tr>
+					<td>
+						<h4 class="cRed">
+							This Certificate of Authorisation is cancelled by the competent authority dated <b> <?php echo date('d-m-Y'); ?> </b> 
+							Applicant do not grade and mark "<?php echo $commodityNames ?>" commodity/ies under AGMARK.
+							If, violation is observed than action shall be taken as per APGM Act and GGM Rule.
+						</h4>
+					</td>
+				</tr>
+			</table>
+
+		<?php } ?>
+	<!--- End of Block -->
+	
+	
+	
 	<table width="100%" border="1">
 		<tr>				
 			<td width="12%" align="center">
@@ -495,21 +528,47 @@
 		
 		
 		
-		<!-- for cancellation in certification part -->
-		<p></p>
-		<table width="100%" border="1" style="margin-top:50px;">
-				<tr>
-					<th style="padding:10px;" width="50%" cellspacing="50" align="left"><b>PART IV</b></th>
-					<th style="padding:10px;" width="50%" cellspacing="50" align="left"><b>See Rule no. 7</b></th>		
-					
-				</tr>
-				
-				<tr>
-					<td style="padding:10px; vertical-align:top;">Endorsement of the competent authority about suspension or cancellation of the Certificate of Authorization:</td>
-					<td style="padding:10px; vertical-align:top;">E-signed By: <?php echo 'NA'; ?><br>Date: <?php echo 'NA'; ?></td>
-				</tr>
-				
-		</table>
-       <!-- QR Code added by shankhpal shende on 16/08/2022 -->
-		<div style="text-align: left;"> <img width="100" height="100" src="<?php echo $result_for_qr['qr_code_path']; ?>"></div>
+	<!-- for cancellation in certification part This updated for the suspension / cancellation process  : Akash [01-06-2023] -->
+	<p></p>
+	<table width="100%" border="1" style="margin-top:50px;">
+		<tr>
+			<th style="padding:10px;" width="50%" cellspacing="50" align="left"><b>PART IV</b></th>
+			<th style="padding:10px;" width="50%" cellspacing="50" align="left"><b>See Rule no. 7</b></th>		
+		</tr>
+		<tr>
+			<td style="padding:10px; vertical-align:top;">Endorsement of the competent authority about suspension or cancellation of the Certificate of Authorization:</td>
+			<td style="padding:10px; vertical-align:top;">
+				E-signed By:	<?php if(!empty($suspended_by)){ echo $suspended_by; }else{ echo 'NA'; } ?><br>
+				Date: <?php echo date("d-m-y"); ?>
+			</td>
+		</tr>
+		<tr>
+			<td style="padding:10px; vertical-align:top;">
+					<?php if ($isForSuspension != null && $isForSuspension == 'Yes') {
+						echo "This is the	". $details_of_action['misgrade_level'] ."	for this Packer therefore this Certificate is Suspended For	". $details_of_action['misgarde_details'];
+					} else if ($isForCancellation !=null && $isForCancellation == 'Yes') { 
+						echo "This Certificate is Cancelled For Misgrading";
+					}?> 
+			</td>
+			<td style="padding:10px; vertical-align:top;">
+				<table width="100%" border="1">
+					<tr>
+						<td style="padding:10px; vertical-align:top;"><b>Suspension/Cancellation</b></td>
+						<td style="padding:10px; vertical-align:top;"><b>For Period</b></td>
+					</tr>
+					<tr>
+						<td style="padding:10px; vertical-align:top;">
+						 	<b class="cRed"><?php echo $details_of_action['actionName']; ?></b>
+						</td>
+						<td style="padding:10px; vertical-align:top;">
+							<b class="cRed"><?php echo $details_of_action['periodMonth']; ?></b>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+
+	<!-- QR Code added by shankhpal shende on 16/08/2022 -->
+	<div style="text-align: left;"> <img width="100" height="100" src="<?php echo $result_for_qr['qr_code_path']; ?>"></div>
 	

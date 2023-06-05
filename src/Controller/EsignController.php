@@ -851,8 +851,27 @@ public function renewalRequestReEsign(){
 			$this->DmiApplAddedForReEsigns->updateAll(array('re_esign_status' => "Re_Esigned",'modified'=>"$date1"),array('customer_id IS' => $customer_id));
 			
 			
-			$main_domain_url = 'https://10.158.81.48/UAT-DMI/';
-			$url_to_redirect = 	$main_domain_url.'hoinspections/redirectGrantedApplications/1'; //default sending to new granted list
+			$main_domain_url = 'https://10.158.81.78/DMI-SUR/';
+
+			//Below Block Is added to Change the Redirection Paths the Firm is Suspended or Cancelled- Akash [02-06-2023]
+			if ($this->Session->check('for_module')) {
+
+				$for_module = $this->Session->read('for_module');
+				
+				if ($for_module === 'Suspension') {
+					$url_to_redirect = 	$main_domain_url.'othermodules/misgrading_home'; //default sending to new granted list
+					$model = 'DmiMmrSuspendedFirmsLogs';
+
+				} elseif ($for_module === 'Cancellation') {
+					$url_to_redirect = 	$main_domain_url.'othermodules/misgrading_home'; //default sending to new granted list
+					$model = 'DmiMmrCancelledFirmsLogs';
+				} 
+
+			} else {
+				$url_to_redirect = 	$main_domain_url.'hoinspections/redirectGrantedApplications/1'; //default sending to new granted list
+			}
+
+
 			$this->Session->delete('pdf_file_name');
 			$this->Session->delete('re_esigning');
 			$this->Session->delete('re_esign_grant_date');
@@ -872,6 +891,10 @@ public function renewalRequestReEsign(){
 			$this->LoadModel('DmiGrantCertificatesPdfs');
 			$this->DmiGrantCertificatesPdfs->updateAll(array('pdf_file'=>$newpath),array('pdf_version'=>$pdfversion,'customer_id'=>$customer_id));
 			
+			//Entry For the Suspended / Cancelled Firms in the Database and Update Status after esigning.
+			$this->loadModel($model);
+			$this->$model->saveLog($customer_id,$newpath,$pdfversion);
+
 			$objMoveFile = new ApplicationformspdfsController();//creating object for class of another controller
 			$objMoveFile->moveFile($pdf_file_name,$source,$destination);
 
@@ -879,7 +902,7 @@ public function renewalRequestReEsign(){
 
 		}
 			
-}
+	}
 
 
 	//This will be used when Chemist approve the replica allotment and esign the letter

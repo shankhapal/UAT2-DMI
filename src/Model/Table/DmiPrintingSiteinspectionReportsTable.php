@@ -137,7 +137,7 @@ class DmiPrintingSiteinspectionReportsTable extends Table{
 		
 		if(!empty($section_form_details[0]['id'])){	
 		
-			$message_id = 2;
+			$message_id = 2;																	
 			$id = $section_form_details[0]['id'];
 			
 			if(isset($forms_data['io_reply'])){$io_reply = $forms_data['io_reply']; }else{ $io_reply = null; }

@@ -193,8 +193,8 @@
 						value_return = 'false';
 					}
 
-				 	//first valid no. for mob.no, applid on 16-02-2021 by Amol
-					var validfirstno = ['7','8','9'];
+					//In this array added '6' as suggested by Tarun Sir on 26-04-2023 - Akash [27-04-2023]
+					var validfirstno = ['6','7','8','9'];
 					//get first character of mobile no.
 					var f_m_no = mobile_no.charAt(0);
 
@@ -912,8 +912,8 @@
 				return {result: false, error_message: error_message1};
 		}				
 
-		//first valid no. for mob.no, applid on 16-02-2021 by Amol
-		var validfirstno = ['7','8','9'];
+		//In this array added '6' as suggested by Tarun Sir on 26-04-2023 - Akash [27-04-2023]
+		var validfirstno = ['6','7','8','9'];
 		//get first character of mobile no.
 		var f_m_no = field_value.charAt(0);
 		if($.inArray(f_m_no,validfirstno) != -1){

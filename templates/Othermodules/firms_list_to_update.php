@@ -3,7 +3,7 @@
 	<div class="content-header">
 		<div class="container-fluid">
 			<div class="row mb-2">
-				<div class="col-sm-6"><label class="badge badge-primary">Update Firm Details</label></div>
+				<div class="col-sm-6"><label class="badge badge-info">Update Firm Details</label></div>
 				<div class="col-sm-6">
 					<ol class="breadcrumb float-sm-right">
 						<li class="breadcrumb-item"><?php echo $this->Html->link('Dashboard', array('controller' => 'dashboard', 'action'=>'home'));?></a></li>

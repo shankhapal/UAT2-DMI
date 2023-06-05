@@ -843,7 +843,7 @@ class ApplicationformspdfsController extends AppController{
 		/*--Code end by pravin 18/3/2017--*/
 		
 		
-	// to show firm address name form id
+		// to show firm address name form id
 	
 		$fetch_district_name = $this->DmiDistricts->find('all',array('fields'=>'district_name','conditions'=>array('id IS'=>$customer_firm_data['district'])))->first();
 		$firm_district_name = $fetch_district_name['district_name'];
@@ -1720,11 +1720,25 @@ class ApplicationformspdfsController extends AppController{
 		$this->set('get_grant_details',$get_grant_details);
 		$this->set('user_full_name',$user_full_name);
 		$this->set('certificate_valid_upto',$certificate_valid_upto);
+
+		//This is added to check the URL without the passed values for Suspension / Cancellation Module - Akash [01-06-2023]
+		$url = $this->request->referer();
+		$parsedUrl = parse_url($url);
+		if (isset($parsedUrl['path'])) {
+			$path = $parsedUrl['path'];
+		} 
 		
+
+
 		//added this condition on 08-06-2019 by Amol
 		//to proceed for re esigning renewal grant if session is set and check previous URL
 		if($this->Session->read('re_esigning')=='yes' && 
-			($this->request->referer('/',true)=='/othermodules/re_esign_module' || $this->request->referer('/',true)=='/othermodules/update-firm-details')){//updated new condition on 24-12-2021 by Amol, re-esign for firm details updates
+			(
+				$this->request->referer('/',true)=='/othermodules/re_esign_module' || 
+				$this->request->referer('/',true)=='/othermodules/update-firm-details' ||
+				$path //=> This is added for Suspension / Cancellation PDF changes. - Akash [01-06-2023]
+		
+			)){//updated new condition on 24-12-2021 by Amol, re-esign for firm details updates
 			
 			//added below code and conditions on 08-01-2021 by Amol
 			$user_full_name = array();
@@ -1764,14 +1778,53 @@ class ApplicationformspdfsController extends AppController{
 			$firm_name_forqr = $customer_firm_data['firm_name'];//updated on 25-04-2023, to get updated details, if changed appl in process
 			$data = [$customer_id,$pdf_date,$certificate_valid_upto,$firm_name_forqr];
 			
-			//this condition is updated for the surrender application - Akash [11-05-2023]
-			if ($_SESSION['application_type'] == '9') {
+			
+			if ($_SESSION['application_type'] == '9') {	 		//For Suspension [Application Type = 9] - (SOC) -> Akash [02-05-2023]
 				$result_for_qr = $this->Customfunctions->getQrCode($data,'SOC');
+			} elseif ($_SESSION['application_type'] == 13) { 	//For Suspension [tempprary Application Type = 13] - (SPN) -> Akash [02-05-2023]
+				$result_for_qr = $this->Customfunctions->getQrCode($data,'SPN');
+			} elseif ($_SESSION['application_type'] == 14) {	//For Suspension [tempprary Application Type = 13] - (CAN) -> Akash [02-05-2023]
+				$result_for_qr = $this->Customfunctions->getQrCode($data,'CAN');
 			} else {
 				$result_for_qr = $this->Customfunctions->getQrCode($data);
 			}
-
+			
 			$this->set('result_for_qr',$result_for_qr);
+			
+			#To check if the application is for Surrender Flow - Akash [14-04-2023]
+			$isSurrender = $this->DmiSurrenderFinalSubmits->checkIfSurrender($customer_id);
+			$this->set('isSurrender',$isSurrender);
+
+			#Check if the application is for Suspension / Cancellation - Akash [01-06-2023]
+			$this->loadModel('DmiMmrActionFinalSubmits');
+			$actionDetails = $this->DmiMmrActionFinalSubmits->find()->where(['customer_id' => $customer_id, 'sample_code' => $_SESSION['sample_code']])->order('id DESC')->first();
+		
+			if (!empty($actionDetails)) {
+				$isForSuspension = ($actionDetails['for_suspension'] == 'Yes') ? 'Yes' : 'No';
+				$isForCancellation = ($actionDetails['for_cancel'] == 'Yes') ? 'Yes' : 'No';
+				$suspended_by = $this->DmiUsers->getFullName($actionDetails['by_user']);
+				$status_mmr = $actionDetails['status'];
+				$details_of_action = $this->DmiMmrActionFinalSubmits->detailsForPdf($actionDetails['customer_id']);
+				
+			} else {
+				$isForSuspension = null;
+				$isForCancellation = null;
+				$suspended_by = null;
+				$status_mmr = null;
+				$details_of_action = array();
+			}
+			
+			//To give the commodities 
+			$commodityNames = $this->Customfunctions->commodityNames($customer_id);
+			$this->set('commodityNames',$commodityNames);
+
+			$this->set('isForSuspension',$isForSuspension);
+			$this->set('isForCancellation',$isForCancellation);
+			$this->set('suspended_by',$suspended_by);
+			$this->set('status_mmr',$status_mmr);
+			$this->set('details_of_action',$details_of_action);
+
+		
 
 			$this->generateGrantCerticateToReEsignPdf('/Applicationformspdfs/grantCaCertificatePdf'); 
 			//$this->create_grant_certificate_pdf_to_re_esign();
@@ -1801,9 +1854,12 @@ class ApplicationformspdfsController extends AppController{
 			$firm_name_forqr = $customer_firm_data['firm_name'];//updated on 25-04-2023, to get updated details, if changed appl in process
 			$data = [$customer_id,$pdf_date,$certificate_valid_upto,$firm_name_forqr];
 
-			//this condition is updated for the surrender application - Akash [11-05-2023]
-			if ($_SESSION['application_type'] == '9') {
+			if ($_SESSION['application_type'] == '9') {	 		//For Suspension [Application Type = 9] - (SOC) -> Akash [02-05-2023]
 				$result_for_qr = $this->Customfunctions->getQrCode($data,'SOC');
+			} elseif ($_SESSION['application_type'] == 13) { 	//For Suspension [tempprary Application Type = 13] - (SPN) -> Akash [02-05-2023]
+				$result_for_qr = $this->Customfunctions->getQrCode($data,'SPN');
+			} elseif ($_SESSION['application_type'] == 14) {	//For Suspension [tempprary Application Type = 13] - (CAN) -> Akash [02-05-2023]
+				$result_for_qr = $this->Customfunctions->getQrCode($data,'CAN');
 			} else {
 				$result_for_qr = $this->Customfunctions->getQrCode($data);
 			}
@@ -1828,7 +1884,6 @@ class ApplicationformspdfsController extends AppController{
 	}
 	
 	
-	
 	public function grantPrintingCertificatePdf(){
 		
 		$this->loadModel('DmiFirms');		
@@ -1851,6 +1906,7 @@ class ApplicationformspdfsController extends AppController{
 		
 		#To check if the application is for Surrender Flow - Akash [14-04-2023]
 		$isSurrender = $this->DmiSurrenderFinalSubmits->checkIfSurrender($customer_id);
+	
 		$this->set('isSurrender',$isSurrender);
 
 
@@ -2469,8 +2525,8 @@ class ApplicationformspdfsController extends AppController{
 	//this function is created to generate pdf using tcpdf plugin
 	//This is called at place of Mpdf output function with required parameteres.
 	//on 23-01-2020 by Amol
-	public function callTcpdf($html,$mode,$customer_id,$pdf_for){
-		
+	public function callTcpdf($html,$mode,$customer_id,$pdf_for,$file_path=null){
+	
 		$with_esign = $this->Session->read('with_esign');
 		$current_level = $this->Session->read('current_level');
 		$file_name = $this->Session->read('pdf_file_name');
@@ -2488,7 +2544,10 @@ class ApplicationformspdfsController extends AppController{
 			$folderName = $this->Customfunctions->getFolderName($customer_id);
 		
 			$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/applications/'.$folderName.'/'.$file_name;
-			
+		
+		#For SCN moved file directly to the Specific Folder - Akash[03-01-2022]
+		}elseif($pdf_for == 'showcause_notice'){
+			$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/showcause_notice/'.$file_name;
 		}else{
 			$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/temp/'.$file_name;
 		}
@@ -2499,13 +2558,26 @@ class ApplicationformspdfsController extends AppController{
 		//below line is added on 23-05-2023 by Amol, to print water mark on pdf
 		require_once(ROOT . DS . 'vendor' . DS . 'tcpdf' . DS . 'tcpdf_text.php');
 
+		
+
 		//This below condition is updated for the Surrender (SOC) Application PDFs watermarks - Akash [12-05-2023]
 		if ($appl_type == 9 && $current_level != 'applicant') { 
+
+			$this->Session->write('for_module','Surrender');
 			$pdf = new PDF_Rotate(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+
+		//This is added to add the watermark on the pdf if the pdf for suspension or cancelletion - Akash [05-06-2023]
+		} elseif ($this->Session->check('for_module')) {
+	
+			$for_module = $this->Session->read('for_module');
+			if ($for_module === 'Suspension' || $for_module === 'Cancellation') {
+				$pdf = new PDF_Rotate(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+			}
+
 		}else{
 			$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);	
 		}
-		
+			
 			// set default monospaced font
 		//	$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
 
@@ -2518,7 +2590,8 @@ class ApplicationformspdfsController extends AppController{
 		//added condition if renewal certificate and user is PAO/DDO
 		//then signature appearence not required
 		//on 16-09-2021 by Amol
-		if (!($appl_type==2 && $current_level=='pao')) {
+		#Updated : added the showcause_notice condtion for Shoe Cause Notices -> Akash[02-12-2022]
+		if (!($appl_type==2 && $current_level=='pao' && $pdf_for == 'showcause_notice')) {
 
 			//only for save mode 'F' else no need in preview mode 'I'
 			if($mode == 'F' && $pdf_for != 'old' && $with_esign != 'no') {
@@ -2565,8 +2638,8 @@ class ApplicationformspdfsController extends AppController{
 		//added condition if renewal certificate and user is PAO/DDO
 		//then signature appearence not required
 		//on 16-09-2021 by Amol
-		if (!($appl_type==2 && $current_level=='pao')) {
-
+		if (!($appl_type==2 && $current_level=='pao' && $pdf_for="showcause_notice")) {
+		
 			//only for save mode 'F' else no need in preview mode 'I'
 			//to show esigned by block on pdf
 			if($mode == 'F' && $pdf_for != 'old' && $with_esign != 'no') {
@@ -3609,9 +3682,167 @@ class ApplicationformspdfsController extends AppController{
 		$this->redirect(array('controller'=>'dashboard','action'=>'home'));
 	
 	}
-
-
 	
+	
+	
+		// Description : To generate the showcause notice PDF.
+		// @Author : Akash Thakre
+		// #Date : 05-06-2023
+		// Note : For: Management of Misgrading (MMR)
+
+		public function showcauseApplPdf(){
+
+		$this->loadModel('DmiFirms');
+		$this->loadModel('DmiCustomers');
+		$this->loadModel('DmiDistricts');
+		$this->loadModel('DmiStates');
+		$this->loadModel('MCommodity');
+		$this->loadModel('MCommodityCategory');
+		$this->loadModel('DmiMmrShowcauseNoticePdfs');
+		$this->loadModel('DmiRoOffices');
+		$this->loadModel('DmiUsers');
+		$this->loadModel('DmiUserRoles');
+		$this->loadModel('DmiMmrFinalSubmits');
+		$this->loadModel('SampleInward');
+		$this->loadModel('MSampleType');
+		$this->loadModel('MGradeDesc');
+		$this->loadModel('DmiAllTblsDetails');
+		$this->loadModel('DmiMmrActionHomeLogs');
+		$this->loadModel('DmiMmrCategories');
+		$this->loadModel('SampleInwardDetails');
+		$this->loadModel('DmiMmrLevels');
+
+		$customer_id = $this->Session->read('firm_id');
+		$this->set('customer_id',$customer_id);
+		
+		$username = $this->Session->read('username');
+		
+		//get nodal office of the applied PP
+		$this->loadModel('DmiApplWithRoMappings');
+		$get_office = $this->DmiApplWithRoMappings->getOfficeDetails($customer_id);
+		$this->set('get_office',$get_office);
+		
+		// tbl DATA
+		$all_tbls_details = $this->DmiAllTblsDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, 'OR'=>array('delete_status IS NULL','delete_status ='=>'no'))))->toArray();
+		$this->set('all_tbls_details',$all_tbls_details);
+				
+		
+		
+		$pdf_date = date('d-m-Y');
+		$this->set('pdf_date',$pdf_date);
+
+		//Sample Code
+
+
+		$mmrcate = $this->DmiMmrActionHomeLogs->find()->where(['customer_id IS' => $customer_id])->order('id DESC')->first();
+		
+		if(!empty($mmrcate)){
+			
+			$misgrade_category = $this->DmiMmrCategories->getMisgradingCategory($mmrcate['misgrade_category']);
+			$misgrade_level = $this->DmiMmrLevels->getMisgradingLevel($mmrcate['misgrade_category']);
+
+			$actionArray = [
+				'misgrade_level_name'=> $misgrade_level['misgrade_level_name'],
+				'misgrade_category' => $misgrade_category['misgrade_category_name']. " : ".$misgrade_category['misgrade_category_dscp']
+			];
+		} else {
+			$actionArray = null;
+		}
+	
+
+		$sampleDetails = $this->SampleInward->find()->where(['org_sample_code' => $_SESSION['sample_code']])->first();
+		$this->set('sampleDetails',$sampleDetails);
+	
+		$commodity_name = $this->MCommodity->getCommodity($sampleDetails['commodity_code']);
+
+		$sample_type_code = $this->MSampleType->find()->where(['sample_type_code' => $sampleDetails['sample_type_code'],'display' => 'Y'])->first();
+
+		$grade_descrition = $this->MGradeDesc->find()->select(['grade_desc'])->where(['grade_code' => $sampleDetails['grade'],'display' => 'Y'])->first();
+		
+		$sample_inward_details = $this->SampleInwardDetails->find()->where(['org_sample_code' => $_SESSION['sample_code']])->order('id DESC')->first();
+
+
+		$sampleArray = [
+			'sample_code' => $sampleDetails['org_sample_code'],
+			'sample_type' => $sample_type_code['sample_type_desc'],
+			'commodity' => $commodity_name,
+			'grade_desc' => $grade_descrition['grade_desc'],
+			'smpl_drwl_dt' => $sample_inward_details['sample_inward_details'],
+			'replica_serial_no' => $sample_inward_details['replica_serial_no'],
+			'tbl' => $sample_inward_details['tbl'],
+			'pack_size' => $sample_inward_details['pack_size'],
+		];
+
+		$this->set('sampleArray',$sampleArray);
+		$this->set('actionArray',$actionArray);
+
+
+		// data from DMI Firm Table
+		$firmData = $this->DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+		$this->set('firmData',$firmData);
+
+		// data from DMI Customer Table
+		$customerData = $this->DmiCustomers->getCustomerDetails($firmData['customer_primary_id']);
+		$this->set('customerData',$customerData);
+
+		// to show firm distric name form id	
+		$firm_district_name = $this->DmiDistricts->getDistrictNameById($firmData['district']);
+		$this->set('firm_district_name',$firm_district_name);
+		
+		// to show firm state name form id	
+		$firm_state_name = $this->DmiStates->getStateNameById($firmData['state']);
+		$this->set('firm_state_name',$firm_state_name);		
+		
+		//Designation
+		$designation = $this->DmiUserRoles->getUserRoles($username);
+		$this->set('designation',$designation);
+
+		$all_data_pdf = $this->render('/Applicationformspdfs/showcauseApplPdf');
+		
+		$split_customer_id = explode('/',(string) $customer_id); #For Deprecations
+		
+		$pdfPrefix = 'SCN-';
+	
+		$rearranged_id = $pdfPrefix.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
+		//check applicant last record version to increment		
+		$list_id = $this->DmiMmrShowcauseNoticePdfs->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+
+		if(!empty($list_id)){
+			$max_id = $this->DmiMmrShowcauseNoticePdfs->find('all', array('fields'=>'pdf_version', 'conditions'=>array('id'=>max($list_id))))->first();
+			$last_pdf_version 	=	$max_id['pdf_version'];
+		} else { 
+			$last_pdf_version = 0;	
+		}
+	
+		$current_pdf_version = $last_pdf_version+1; //increment last version by 1
+		
+		//taking complete file name in session, which will be use in esign controller to esign the file.
+		$this->Session->write('pdf_file_name',$rearranged_id.'('.$current_pdf_version.')'.'.pdf');
+	
+		//creating filename and file path to save
+		$file_path = '/writereaddata/DMI/showcause_notice/'.$rearranged_id.'('.$current_pdf_version.')'.'.pdf';
+		
+		$showcauseNoticeEntity = $this->DmiMmrShowcauseNoticePdfs->newEntity(array(
+	
+			'customer_id'=>$customer_id,
+			'pdf_file'=>$file_path,
+			'date'=>date('Y-m-d H:i:s'),
+			'pdf_version'=>$current_pdf_version,
+			'created'=>date('Y-m-d H:i:s'),
+			'modified'=>date('Y-m-d H:i:s')	
+		));
+
+		$this->DmiMmrShowcauseNoticePdfs->save($showcauseNoticeEntity);
+
+		$file_path = $_SERVER["DOCUMENT_ROOT"].$file_path;
+
+		//to preview application
+		///$this->callTcpdf($all_data_pdf,'I',$customer_id,'showcause_notice',$file_path);//on 23-01-2020 with preview mode
+		$this->callTcpdf($all_data_pdf,'F',$customer_id,'showcause_notice',$file_path);//on 23-01-2020 with save mode
+		$this->redirect('/dashboard/home');
+
+
+	}
 
 	
 	
