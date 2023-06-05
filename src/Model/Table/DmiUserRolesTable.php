@@ -218,6 +218,12 @@
 		
 		return $ho_scrutinizer_list;
 	}
+
+
+	public function getUserRoles($user){
+		
+		return $this->find('all')->where(['user_email_id' => $user])->first();
+	}
 }
 
 ?>

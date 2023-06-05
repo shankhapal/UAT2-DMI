@@ -440,4 +440,14 @@ class SampleInwardTable extends Table
 		
 		return $details;
     }
+    
+    // Description : Return the Details of sample in beahlf of org_sample_code form session.
+	// Author : Akash Thakre
+	// Date : 22-06-2022
+
+    public function sampleInformation($code){
+		$details = $this->find('all')->where(['org_sample_code' => $code])->first();
+		return $details;
+    }
 }
+?>

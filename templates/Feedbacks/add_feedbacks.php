@@ -1,9 +1,7 @@
 
 <?php
-
 	echo $this->element('get_captcha_random_code');
 	$captchacode = $_SESSION["code"];
-
 ?>
 
 <section class="form-middle content">

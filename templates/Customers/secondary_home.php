@@ -31,107 +31,116 @@
 							<?php 
 								$customer_id = $_SESSION['username']; 
 
-								#First check the application is surrendered . if it is surrender block all the things on Secondary Dashboard
-								if ($soc_final_submit_status == 'approved' && $soc_final_submit_level == 'level_3') {
-									echo $this->element('customer_elements/dash_messages/surrender_appl_msg');
-									echo $this->element('customer_elements/pdf_table_view/grant/surr_grant');
+								#check the application is Suspended . if it is surrender block all the things on Secondary Dashboard
+								if (!empty($suspension_record)) {
+									echo $this->element('customer_elements/dash_messages/suspension_message');
+									echo $this->element('customer_elements/pdf_table_view/grant/suspension_grant');
 								} else {
 
-									/* For Misgrading Actions - Dashboard Messages 
-									if (!empty($actionSubmitted)) {
-										echo $this->element('customer_elements/dash_messages/action_taken_msg');
-									}
-									
-									#For Show Cause Actions - Dashboard Messages 
-									if (!empty($showCauseNotice)) {
-										echo $this->element('customer_elements/dash_messages/show_cause_notice');
-									}
-									*/
-
-									#For Advance Payment - Dashboard Messages 
-									if (!empty($advance_payment_status)) {
-										echo $this->element('customer_elements/dash_messages/advance_payment');
-									}
-
-									#For Surrender - Dashboard Messages & Application PDF
-									if ($soc_final_submit_status != 'no_final_submit') {
+									#check the application is surrendered . if it is surrender block all the things on Secondary Dashboard
+									if ($soc_final_submit_status == 'approved' && $soc_final_submit_level == 'level_3') {
 										echo $this->element('customer_elements/dash_messages/surrender_appl_msg');
-										echo $this->element('customer_elements/pdf_table_view/application/surrender_application_pdf');
-									}
-
-									#For General Applications - Messages & PDFs
-									if ($final_submit_status == 'no_final_submit') {
-										echo $this->element('customer_elements/dash_messages/new_or_old');
+										echo $this->element('customer_elements/pdf_table_view/grant/surr_grant');
 									} else {
 	
-										if ($is_already_granted == 'no') {
-
-											#This Below Block is added to Show the Message when the application is rejected -= Akash [25-11-2022]
-											if($is_appl_rejected != NULL){
-												echo $this->element('customer_elements/dash_messages/for_rejected');
+										/* For Misgrading Actions - Dashboard Messages 
+										if (!empty($actionSubmitted)) {
+											echo $this->element('customer_elements/dash_messages/action_taken_msg');
+										}
+										*/
+	
+										#For Show Cause Actions - Dashboard Messages 
+										if (!empty($showCauseNotice)) {
+											echo "<p class='alert alert-info'>Please Click on the Show Cause Notice Tab for the Details</p>";
+										}
+								
+	
+										#For Advance Payment - Dashboard Messages 
+										if (!empty($advance_payment_status)) {
+											echo $this->element('customer_elements/dash_messages/advance_payment');
+										}
+	
+										#For Surrender - Dashboard Messages & Application PDF
+										if ($soc_final_submit_status != 'no_final_submit') {
+											echo $this->element('customer_elements/dash_messages/surrender_appl_msg');
+											echo $this->element('customer_elements/pdf_table_view/application/surrender_application_pdf');
+										}
+	
+										#For General Applications - Messages & PDFs
+										if ($final_submit_status == 'no_final_submit') {
+											echo $this->element('customer_elements/dash_messages/new_or_old');
+										} else {
+		
+											if ($is_already_granted == 'no') {
+	
+												#This Below Block is added to Show the Message when the application is rejected -= Akash [25-11-2022]
+												if($is_appl_rejected != NULL){
+													echo $this->element('customer_elements/dash_messages/for_rejected');
+												}
+												
+												#For Displaying the Application PDF Table#
+												echo $this->element('customer_elements/pdf_table_view/application/general_application');
+												
+											} else if (!($final_submit_status == 'approved' && $final_submit_level == 'level_3')) {
+												
+												#This Below Block is added to Show the Message when the application is rejected - Akash [25-11-2022]
+												if($is_appl_rejected != NULL){
+													echo $this->element('customer_elements/dash_messages/for_rejected');
+												}else{
+													echo $this->element('customer_elements/dash_messages/for_old_appl_saved');
+												} 
 											}
+										}
+		
+										$show_grant_table = null;
+		
+										//check if primary application approved
+										if ($final_submit_status == 'approved' && $final_submit_level == 'level_3') {
 											
-											#For Displaying the Application PDF Table#
-											echo $this->element('customer_elements/pdf_table_view/application/general_application');
-											
-										} else if (!($final_submit_status == 'approved' && $final_submit_level == 'level_3')) {
-											
-											#This Below Block is added to Show the Message when the application is rejected - Akash [25-11-2022]
-											if($is_appl_rejected != NULL){
-												echo $this->element('customer_elements/dash_messages/for_rejected');
-											}else{
-												echo $this->element('customer_elements/dash_messages/for_old_appl_saved');
+											//check if old application
+											if ($is_already_granted == 'yes') {
+												
+												//check if old application online renewal granted
+												if ($renewal_final_submit_status == 'approved' && $renewal_final_submit_level == 'level_3') {
+													$show_grant_table = 'yes'; 
+												} else { 
+													$show_grant_table = 'no';
+												}
+												
+											} else { //if new application
+												$show_grant_table = 'yes';
+											}
+		
+											#For Displaying the Grant PDF Table#
+											if ($show_grant_table == 'yes') {
+												echo $this->element('customer_elements/pdf_table_view/grant/gen_grant');
+											}
+		
+											#For Displaying the Renewal PDF Table#
+											if (!empty($renewal_final_submit_details)) { 
+												echo $this->element('customer_elements/pdf_table_view/grant/renewal');
 											} 
+		
 										}
-									}
-	
-									$show_grant_table = null;
-	
-									//check if primary application approved
-									if ($final_submit_status == 'approved' && $final_submit_level == 'level_3') {
-										
-										//check if old application
-										if ($is_already_granted == 'yes') {
-											
-											//check if old application online renewal granted
-											if ($renewal_final_submit_status == 'approved' && $renewal_final_submit_level == 'level_3') {
-												$show_grant_table = 'yes'; 
-											} else { 
-												$show_grant_table = 'no';
+		
+										#To Displaying Message of renewal status
+										if ($is_already_granted == 'yes' && $show_grant_table == 'no' && empty($renewal_final_submit_details)) {
+											echo $this->element('customer_elements/dash_messages/for_renewal_stats');
+										}
+		
+										#To Displaying Message of applied for renewal 
+										if (!empty($renewal_final_submit_details)) {
+											if ($show_renewal_btn == 'yes') { 
+												echo $this->element('customer_elements/dash_messages/if_renewal_applied');
 											}
-											
-										} else { //if new application
-											$show_grant_table = 'yes';
 										}
-	
-										#For Displaying the Grant PDF Table#
-										if ($show_grant_table == 'yes') {
-											echo $this->element('customer_elements/pdf_table_view/grant/gen_grant');
+								
+										if ($show_applied_to_popup == 'yes') {
+											echo $this->element('firm_applying_to_view/applying_to_view');
 										}
-	
-										#For Displaying the Renewal PDF Table#
-										if (!empty($renewal_final_submit_details)) { 
-											echo $this->element('customer_elements/pdf_table_view/grant/renewal');
-										} 
-	
-									}
-	
-									#To Displaying Message of renewal status
-									if ($is_already_granted == 'yes' && $show_grant_table == 'no' && empty($renewal_final_submit_details)) {
-										echo $this->element('customer_elements/dash_messages/for_renewal_stats');
-									}
-	
-									#To Displaying Message of applied for renewal 
-									if (!empty($renewal_final_submit_details)) {
-										if ($show_renewal_btn == 'yes') { 
-											echo $this->element('customer_elements/dash_messages/if_renewal_applied');
-										}
-									}
-							
-									if ($show_applied_to_popup == 'yes') {
-										echo $this->element('firm_applying_to_view/applying_to_view');
 									}
 								}
+
 							?>
 						</div>
 					</div>
@@ -240,7 +249,13 @@
 						</div>
 						<div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
 							<div class="card-body">
-								<?php echo $this->element('customer_elements/pdf_table_view/application/show_cause_notice'); ?>  
+								<?php
+									#For Show Cause Actions - Dashboard Messages 
+									if (!empty($showCauseNotice)) {
+										echo $this->element('customer_elements/dash_messages/show_cause_notice');
+									}
+							 		echo $this->element('customer_elements/pdf_table_view/application/show_cause_notice');
+							 	?>
 							</div>
 						</div>
 					</div>
