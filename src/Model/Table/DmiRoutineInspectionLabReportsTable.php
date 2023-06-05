@@ -6,7 +6,8 @@
 	use App\Controller\AppController;
 	use App\Controller\CustomersController;
 	use Cake\ORM\TableRegistry;
-	
+	use Cake\Datasource\ConnectionManager;  //added by shankhpal shende on 25/05/2023
+
 class DmiRoutineInspectionLabReportsTable extends Table{
 	
 	var $name = "DmiRoutineInspectionLabReports";
@@ -23,37 +24,100 @@ class DmiRoutineInspectionLabReportsTable extends Table{
 				
 	);
 	
-	
-	
+	/*  Comment
+			Reason: as per comments and suggestion for UAT module after test run updated function
+			Name of person : shankhpal shende
+			Date: 25/05/2023
+	*/
 	public function sectionFormDetails($customer_id)
 	{
-		$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+			$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+					
+			if($latest_id != null){
+				$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();		
+				$form_fields_details = $report_fields;
 				
-		if($latest_id != null){
-			$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();		
-			$form_fields_details = $report_fields;
-			
-		}else{
-			$form_fields_details = Array ( 'id' =>"", 'customer_id' =>"", 'io_reply_once_no' =>"", 'user_email_id' =>"", 'user_once_no' =>"", 'referred_back_comment' =>"", 'referred_back_date' =>"", 'io_reply' =>"",'lab_properly_maintain'=>"",'fwd_Concerned_offices'=>"",'last_lot_no'=>"",'dates'=>"",'p_analytical_reg'=>"",'suggestion_during_last'=>'','suggestions'=>"",'signature_name'=>"",'signature'=>"",'short_noticed'=>"",'suggestion_during_last'=>"",'commodity'=>"", 
-			'date_last_inspection'=>"",'date_p_inspection'=>"",'approved_chemist'=>"",'properly_equipped'=>"",'is_equipment'=>"",'eq_working_order'=>"",
-			'io_reply_date' =>"", 'form_status' =>"", 'premises_inspected' =>"", 'premises_inspected_status' =>"", 'premises_inspected_docs' =>"", 'room_site_plan_no' =>"",'room_details_docs' =>"", 'storage_site_plan_no' =>"", 'storage_details_docs' =>"", 'locking_adequate' =>"no", 'locking_details' =>"", 'locking_details_docs' =>"", 'lighted_ventilated' =>"no",
-			'ventilation_details' =>"", 'ventilation_details_docs' =>"", 'conditions_fulfilled' =>"no", 'condition_details' =>"", 'condition_details_docs' =>"", 'approved_date' =>"",'referred_back_by_email' =>"", 'referred_back_by_once' =>"", 'current_level' =>"", 'constituent_oil_mill_docs' =>"", 'separate_pipe_lines' =>"no", 'delete_ro_referred_back' =>""); 
-			
-		}
+			}else{
+				$form_fields_details = Array ( 'id' =>"", 'customer_id' =>"", 'io_reply_once_no' =>"", 'user_email_id' =>"", 'user_once_no' =>"", 'referred_back_comment' =>"", 'referred_back_date' =>"", 'io_reply' =>"",'lab_properly_maintain'=>"",'fwd_Concerned_offices'=>"",'last_lot_no'=>"",'dates'=>"",'p_analytical_reg'=>"",'suggestion_during_last'=>'','suggestions'=>"",'signature_name'=>"",'signature'=>"",'short_noticed'=>"",'suggestion_during_last'=>"",'commodity'=>"", 
+				'date_last_inspection'=>"",'date_p_inspection'=>"",'approved_chemist'=>"",'properly_equipped'=>"",'is_equipment'=>"",'eq_working_order'=>"",
+				'io_reply_date' =>"", 'form_status' =>"", 'premises_inspected' =>"", 'premises_inspected_status' =>"", 'premises_inspected_docs' =>"", 'room_site_plan_no' =>"",'room_details_docs' =>"", 'storage_site_plan_no' =>"", 'storage_details_docs' =>"", 'locking_adequate' =>"no", 'locking_details' =>"", 'locking_details_docs' =>"", 'lighted_ventilated' =>"no",
+				'ventilation_details' =>"", 'ventilation_details_docs' =>"", 'conditions_fulfilled' =>"no", 'condition_details' =>"", 'condition_details_docs' =>"", 'approved_date' =>"",'referred_back_by_email' =>"", 'referred_back_by_once' =>"", 'current_level' =>"", 'constituent_oil_mill_docs' =>"", 'separate_pipe_lines' =>"no", 'delete_ro_referred_back' =>""); 
+				
+			}
 		
-	
-		$user_email_id = $_SESSION['username'];
-		$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
-		$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
-	
-		$added_firms = $DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->toArray();		
-		$added_firm_field = $added_firms[0];			
-    
-		//taking id of multiple sub commodities	to show names in list	
-		$sub_comm_id = explode(',',(string) $added_firm_field['sub_commodity']); #For Deprecations
-		$sub_commodity_value = $MCommodity->find('list',array('valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
 		
-		return array($form_fields_details,$sub_commodity_value);			
+			$user_email_id = $_SESSION['username'];
+			$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+			$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
+	
+			$added_firms = $DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->toArray();		
+			$added_firm_field = $added_firms[0];			
+			
+			//taking id of multiple sub commodities	to show names in list	
+			$sub_comm_id = explode(',',(string) $added_firm_field['sub_commodity']); #For Deprecations
+			$sub_commodity_value = $MCommodity->find('list',array('valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
+			
+			// added for fetching registered chemist incharge
+			$DmiChemistRegistrations = TableRegistry::getTableLocator()->get('DmiChemistRegistrations');
+			
+			$chemist_register = $DmiChemistRegistrations->find('all',array('conditions'=>array('created_by IS'=>$customer_id)))->toArray();
+		
+			$DmiChemistFinalSubmits = TableRegistry::getTableLocator()->get('DmiChemistFinalSubmits');
+
+			# This sql query are use to fetch registered chemist with status is approved
+			# addded by shankhpal on 25/05/2023
+			$conn = ConnectionManager::get('default');
+
+			$approved_chemist = "SELECT  cr.chemist_fname, cr.chemist_lname, cr.chemist_id,cr. created_by
+			FROM dmi_chemist_registrations AS cr
+			INNER JOIN dmi_chemist_final_submits AS cfs ON cfs.customer_id = cr.chemist_id
+			WHERE cr.created_by = '$customer_id' AND status = 'approved' AND current_level = 'level_3'";
+
+			$q = $conn->execute($approved_chemist);
+
+			$all_approved_chemist = $q->fetchAll('assoc');
+			$chemist_full_name = [];
+			
+			if (!empty($all_approved_chemist)) {
+				$chemist_full_name = [];
+				foreach ($all_approved_chemist as $each_chemist) {
+						$full_name = $each_chemist['chemist_fname'] . ' ' . $each_chemist['chemist_lname'];
+						$chemist_full_name[$full_name] = $full_name;
+				}
+			}else{
+					$chemist_full_name = [];
+					// Add other manual options if needed
+				
+			}
+		
+			# We use mapping table to fetch how much ca packer are attached this laboratory 
+			$DmiCaPpLabMapings = TableRegistry::getTableLocator()->get('DmiCaPpLabMapings');
+			$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+
+			# To get table id of lab
+			$firm_data = $DmiFirms->find('all')->select(['id'])->where(['customer_id' => $customer_id])->first();
+			
+			$lab_tabl_id = [];
+			if(!empty($firm_data)){
+					$lab_tabl_id = $firm_data['id'];
+					
+					# To get the list of attached lab with ca packer
+					$attached_lab_with_ca = $DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'customer_id','conditions'=>array('lab_id IS'=>$lab_tabl_id),'order'=>'id asc'))->toList();
+					# To get name of packers
+					$packer_data = $DmiFirms->find('all',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id IN'=>$attached_lab_with_ca),'order'=>'firm_name asc'))->toArray();
+
+					if(!empty($packer_data)){
+						$list_of_packer = [];
+						foreach ($packer_data as $each_data) {
+							$packer_name = $each_data['firm_name'];
+							$list_of_packer[$packer_name] = $packer_name;
+						}
+					}else{
+						$list_of_packer = [];
+					}
+			}
+			
+			return array($form_fields_details,$sub_commodity_value,$chemist_full_name,$list_of_packer);			
 	}
 	
 	

@@ -28,6 +28,16 @@
         var packing_types=$("#packing_types").val();
         var selected_packing_types=$("#selected_packing_types").val();
 		var business_type=$("#business_type").val();
+
+		//new fields added on 17-05-2023 by Amol
+		var commodity_fssai_no=$("#commodity_fssai_no").val();
+		var commodity_fssai_doc=$("#commodity_fssai_doc").val();
+		var premises_fssai_doc=$("#premises_fssai_doc").val();
+		var premises_gst_doc=$("#premises_gst_doc").val();
+		var premises_ownership_doc=$("#premises_ownership_doc").val();
+		var premises_map_doc=$("#premises_map_doc").val();
+		var premises_machineries_doc=$("#premises_machineries_doc").val();
+		var tbl_proforma_a2_doc =$("#tbl_proforma_a2_doc").val();
 		
 		var selectedValues = $("#selectedValues").val();
 		selectedValues = selectedValues.split(",");
@@ -63,6 +73,18 @@
 				value_return = 'false';
 			}*/
 		}
+
+		if(selectedValues.includes("3")==true){
+			//new validation script added for upload fields required for TBL change, 18-05-2023
+			if($("#tbl_proforma_a2_doc_value").text() == ''){	
+				if(check_file_upload_validation(tbl_proforma_a2_doc).result == false){			
+					$("#error_tbl_proforma_a2_doc").show().text("Please select related file");
+					$("#tbl_proforma_a2_doc").addClass("is-invalid");
+					$("#tbl_proforma_a2_doc").click(function(){$("#error_tbl_proforma_a2_doc").hide().text; $("#tbl_proforma_a2_doc").removeClass("is-invalid");});
+					value_return = 'false';
+				}
+			}
+		}
 		
 		if(selectedValues.includes("5")==true){
 			if(street_address==""){				
@@ -89,6 +111,53 @@
 				$("#postal_code").click(function(){$("#error_postal_code").hide().text; $("#postal_code").removeClass("is-invalid");});
 				value_return = 'false';
 			}
+
+			//new validation script added for upload fields required for premises change, 17-05-2023
+			if($("#premises_fssai_doc_value").text() == ''){	
+				if(check_file_upload_validation(premises_fssai_doc).result == false){			
+					$("#error_premises_fssai_doc").show().text("Please select related file");
+					$("#premises_fssai_doc").addClass("is-invalid");
+					$("#premises_fssai_doc").click(function(){$("#error_premises_fssai_doc").hide().text; $("#premises_fssai_doc").removeClass("is-invalid");});
+					value_return = 'false';
+				}
+			}
+
+			if($("#premises_gst_doc_value").text() == ''){	
+				if(check_file_upload_validation(premises_gst_doc).result == false){		
+					$("#error_premises_gst_doc").show().text("Please select related file");
+					$("#premises_gst_doc").addClass("is-invalid");
+					$("#premises_gst_doc").click(function(){$("#error_premises_gst_doc").hide().text; $("#premises_gst_doc").removeClass("is-invalid");});
+					value_return = 'false';
+				}
+			}
+
+			if($("#premises_ownership_doc_value").text() == ''){
+				if(check_file_upload_validation(premises_ownership_doc).result == false){			
+					$("#error_premises_ownership_doc").show().text("Please select related file");
+					$("#premises_ownership_doc").addClass("is-invalid");
+					$("#premises_ownership_doc").click(function(){$("#error_premises_ownership_doc").hide().text; $("#premises_ownership_doc").removeClass("is-invalid");});
+					value_return = 'false';
+				}
+			}
+
+			if($("#premises_map_doc_value").text() == ''){	
+				if(check_file_upload_validation(premises_map_doc).result == false){			
+					$("#error_premises_map_doc").show().text("Please select related file");
+					$("#premises_map_doc").addClass("is-invalid");
+					$("#premises_map_doc").click(function(){$("#error_premises_map_doc").hide().text; $("#premises_map_doc").removeClass("is-invalid");});
+					value_return = 'false';
+				}
+			}
+
+			if($("#premises_machineries_doc_value").text() == ''){	
+				if(check_file_upload_validation(premises_machineries_doc).result == false){			
+					$("#error_premises_machineries_doc").show().text("Please select related file");
+					$("#premises_machineries_doc").addClass("is-invalid");
+					$("#premises_machineries_doc").click(function(){$("#error_premises_machineries_doc").hide().text; $("#premises_machineries_doc").removeClass("is-invalid");});
+					value_return = 'false';
+				}
+			}
+
 		}
 		
 		if(selectedValues.includes("6")==true){
@@ -106,25 +175,34 @@
 			}
 			
 			if($('#lab_type').val() == 1){
-				if($("#chemist_detail_docs_value").text() == ''){		
-					$("#error_chemist_details_docs").show().text("Please select related file");
-					$("#chemist_details_docs").addClass("is-invalid");
-					$("#chemist_details_docs").click(function(){$("#error_chemist_details_docs").hide().text; $("#chemist_details_docs").removeClass("is-invalid");});
-					value_return = 'false';
+				if($("#chemist_detail_docs_value").text() == ''){
+					if(check_file_upload_validation(chemist_details_docs).result == false){			
+						$("#error_chemist_details_docs").show().text("Please select related file");
+						$("#chemist_details_docs").addClass("is-invalid");
+						$("#chemist_details_docs").click(function(){$("#error_chemist_details_docs").hide().text; $("#chemist_details_docs").removeClass("is-invalid");});
+						value_return = 'false';
+					}
 				}
-				if($("#lab_equipped_docs_value").text() == ''){			
-					$("#error_lab_equipped_docs").show().text("Please select related file");
-					$("#lab_equipped_docs").addClass("is-invalid");
-					$("#lab_equipped_docs").click(function(){$("#error_lab_equipped_docs").hide().text; $("#lab_equipped_docs").removeClass("is-invalid");});
-					value_return = 'false';
+
+				if($("#lab_equipped_docs_value").text() == ''){
+					if(check_file_upload_validation(lab_equipped_docs).result == false){			
+						$("#error_lab_equipped_docs").show().text("Please select related file");
+						$("#lab_equipped_docs").addClass("is-invalid");
+						$("#lab_equipped_docs").click(function(){$("#error_lab_equipped_docs").hide().text; $("#lab_equipped_docs").removeClass("is-invalid");});
+						value_return = 'false';
+					}
 				}
+
 			}else{
-				if($("#consent_letter_docs_value").text() == ''){			
-					$("#error_lab_consent_docs").show().text("Please select related file");
-					$("#lab_consent_docs").addClass("is-invalid");
-					$("#lab_consent_docs").click(function(){$("#error_lab_type").hide().text; $("#lab_consent_docs").removeClass("is-invalid");});
-					value_return = 'false';
+				if($("#consent_letter_docs_value").text() == ''){
+					if(check_file_upload_validation(lab_consent_docs).result == false){			
+						$("#error_lab_consent_docs").show().text("Please select related file");
+						$("#lab_consent_docs").addClass("is-invalid");
+						$("#lab_consent_docs").click(function(){$("#error_lab_consent_docs").hide().text; $("#lab_consent_docs").removeClass("is-invalid");});
+						value_return = 'false';
+					}
 				}
+
 			}
 			
 			
@@ -154,6 +232,25 @@
 					$("#selected_commodity").addClass("is-invalid");
 					$("#selected_commodity").click(function(){$("#error_selected_commodity").hide().text; $("#selected_commodity").removeClass("is-invalid");});
 					value_return = 'false';
+				}
+
+				if(commodity_fssai_no==""){	
+					$("#error_commodity_fssai_no").show().text("Please FSSAI No.");
+					$("#commodity_fssai_no").addClass("is-invalid");
+					$("#commodity_fssai_no").click(function(){$("#error_commodity_fssai_no").hide().text; $("#commodity_fssai_no").removeClass("is-invalid");});
+					value_return = 'false';
+				}
+
+				//validation for FSSAI added on 17-05-2023 by Amol
+				if($("#commodity_fssai_doc_value").text() == ''){
+
+					if(check_file_upload_validation(commodity_fssai_doc).result == false){	
+						
+						$("#error_commodity_fssai_doc").show().text(check_file_upload_validation(commodity_fssai_doc).error_message);
+						$("#commodity_fssai_doc").addClass("is-invalid");
+						$("#commodity_fssai_doc").click(function(){$("#error_commodity_fssai_doc").hide().text; $("#commodity_fssai_doc").removeClass("is-invalid");});
+						value_return = 'false';
+					}
 				}
 			}
 			
@@ -193,6 +290,29 @@
 	//added on 03-05-2023 by Amol
 	$("#rel_doc").change(function(){
         file_browse_onclick('rel_doc');
+    });
+
+	//added on 17-05-2023 for new upload fields by Amol
+	$("#commodity_fssai_doc").change(function(){
+        file_browse_onclick('commodity_fssai_doc');
+    });
+	$("#tbl_proforma_a2_doc").change(function(){
+        file_browse_onclick('tbl_proforma_a2_doc');
+    });
+	$("#premises_fssai_doc").change(function(){
+        file_browse_onclick('premises_fssai_doc');
+    });
+	$("#premises_gst_doc").change(function(){
+        file_browse_onclick('premises_gst_doc');
+    });
+	$("#premises_ownership_doc").change(function(){
+        file_browse_onclick('premises_ownership_doc');
+    });
+	$("#premises_map_doc").change(function(){
+        file_browse_onclick('premises_map_doc');
+    });
+	$("#premises_machineries_doc").change(function(){
+        file_browse_onclick('premises_machineries_doc');
     });
 
 

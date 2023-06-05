@@ -26,7 +26,9 @@
 				}
 				$changeField = $this->find('all',array('valueField'=>array('c_filed_id','payment','sectionid'),'conditions'=>array('field_id IS'=>$data, 'form_type IS'=>'common')))->first();
 				if(!empty($changeField)){
-					$explode = explode(',',$changeField['c_filed_id']);							
+					//commented this line as it throw deprecation error for null parameter, on 25-05-2023 by Amol
+					//$explode = explode(',',$changeField['c_filed_id']);	
+					$explode = array();						
 					$changefieldAarray = array_merge($changefieldAarray,$explode);				
 					
 					if($changeField['payment'] == 'paid'){

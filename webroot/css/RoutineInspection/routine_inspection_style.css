@@ -1,0 +1,10 @@
+.hidden{
+  display: none;
+}
+
+.shown {
+  display: visible;
+  transition: all .5s ease-out;
+  opacity: 1;
+  color: red;
+}

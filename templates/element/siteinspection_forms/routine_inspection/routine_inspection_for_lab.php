@@ -1,389 +1,707 @@
-<?php //pr($section_form_details);die; ?>
-<div class="content-wrapper">
-   <div class="content-header">
-      <div class="container-fluid">
-         <div class="row mb-2">
-            <div class="col-sm-6">
-          <label class="badge badge-info">Routine Inspection Report (Approved Laboratory)</label>
+
+<!--    Comment:This file updated as per change and suggestions for UAT module after test run
+	    Reason: updated as per change and suggestions for UAT module after test run
+	    Name of person : shankhpal shende
+	    Date: 24-05-2023
+*/ -->
+<?php 
+echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-data', 'id'=>$section)); ?>
+<section id="form_outer_main" class="content form-middle">
+<div class="container-fluid">
+<h5 class="mt-1 mb-2">Routine Inspection Report (Approved Laboratory)</h5>
+<?php //if($report_status == 'approved'){  ?>
+<!-- <button class="btn btn-primary  mb-2" type="submit" id="wanttoedit">Proceed to Update</button> -->
+<?php //} ?>
+<div id='form_inner_main'>
+<div class="row">
+<div class="col-md-12">
+<div class="card card-success">
+<!-- Initial Details -->
+<div class="card-header sub-card-header-firm"><h3 class="card-title">Initial Details</h3></div>
+<div class="form-horizontal">
+    <div class="card-body border">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm col-form-label">Date of Last Inspection <span class="cRed">*</span></label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <?php echo $this->Form->control('date_last_inspection', array('type'=>'text', 'id'=>'date_last_inspection', 'value'=>$section_form_details[0]['date_last_inspection'], 'class'=>'form-control input-field', 'placeholder'=>'Enter DD/MM/YYYY', 'label'=>false)); ?>
+                <span id="error_date_last_inspection" class="error invalid-feedback"></span>
+            </div>
         </div>
-     <div class="col-sm-6">
-      <ol class="breadcrumb float-sm-right">
-            <li class="breadcrumb-item"><?php echo $this->Html->link('Dashboard', array('controller' => 'customers', 'action'=>'primary_home'));?></li>
-            <li class="breadcrumb-item active">Routine Inspection Report (Approved Laboratory)</li>
-       </ol>
-      </div>
-     </div>
-   </div>
-</div>  
-<?php echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-data', 'id'=>$section)); ?>
+    </div>
+</div>
+<div class="form-horizontal">
+    <div class="card-body ">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm col-form-label">Date & Time of present Inspection <span class="cRed">*</span></label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <?php echo $this->Form->control('date_p_inspection', array('type'=>'text', 'id'=>'date_p_inspection', 'value'=>$section_form_details[0]['date_p_inspection'], 'class'=>'form-control input-field', 'placeholder'=>'Enter DD/MM/YYYY', 'label'=>false)); ?>
+                <span id="error_date_p_inspection" class="error invalid-feedback"></span>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 1. Name and addres of the laboratory Contact details: -->
+<div class="card-header sub-card-header-firm"><h3 class="card-title">1. Name and addres of the laboratory Contact details :</h3></div>
+<div class="form-horizontal">
+    <div class="card-body border">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm col-form-label">Name of the laboratory <span class="cRed">*</span></label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <?php echo $this->Form->control('name_of_lab', array('type'=>'text', 'id'=>'name_of_lab','value'=>$firm_details['firm_name'],'class'=>'form-control','label'=>false,'readonly'=>'readonly')); ?>
+                <span id="error_name_of_lab" class="error invalid-feedback"></span>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm col-form-label">Address of the laboratory <span class="cRed">*</span></label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <?php echo $this->Form->control('street_address', array('type'=>'textarea', 'id'=>'street_address','value'=>$firm_details['street_address'],'readonly'=>true,'placeholder'=>'Enter street address', 'class'=>'form-control input-field', 'label'=>false)); ?>
+                <span id="error_street_address" class="error invalid-feedback"></span>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- address -->
+<div class="form-horizontal">
+    <div class="card-body border">
+        <div class="row">
+            <div class="col-md-2">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm col-form-label">Email Id <span class="cRed">*</span></label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <?php echo $this->Form->control('email', array('type'=>'text', 'placeholder'=>'Enter firm email id','value'=>base64_decode($firm_details['email']),'readonly'=>true, 'id'=>'email', 'class'=>'form-control input-field', 'label'=>false)); ?>
+                <span id="error_email" class="error invalid-feedback"></span>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm col-form-label">Mobile No. <span class="cRed">*</span></label>
+                </div>
+            </div>
+            <div class="col-md-4">
+               <?php echo $this->Form->control('mobile_no', array('type'=>'text', 'placeholder'=>'Enter mobile no. here', 'id'=>'mobile_no','value'=>base64_decode($firm_details['mobile_no']),'readonly'=>true, 'class'=>'form-control input-field', 'label'=>false)); ?>
+                <span id="error_mobile_no" class="error invalid-feedback"></span>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 2. Commodities for which approved -->
+<div class="card-header sub-card-header-firm"><h3 class="card-title">2. Commodities for which approved</h3></div>
+<div class="form-horizontal">
+    <div class="card-body border">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm col-form-label">Commodities <span class="cRed">*</span></label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <?php echo $this->Form->control('sub_commodity', array('type'=>'select', 'options'=>$section_form_details[1], 'multiple'=>'multiple', 'label'=>false, 'disabled'=>'disabled', 'class'=>'form-control')); ?>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 3. Name of the approved chemist Present at the time of inspection -->
+<div class="card-header sub-card-header-firm"><h3 class="card-title">3. Name of the approved chemist</h3></div>
+<div class="form-horizontal">
+    <div class="card-body border">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm col-form-label">Name of the approved Chemist : <span class="cRed">*</span></label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <?php
+                    
+                    $options = $section_form_details[2];
+                    $options = ['' => 'Select Approved Chemist'] + $options;
+                    $selectedValues = $section_form_details[0]['approved_chemist']; // Provide the values you 
+                    echo $this->Form->control('approved_chemist', [
+                        'type' => 'select',
+                        'options' => $options,
+                        'id' => 'approved_chemist',
+                        'class' => 'form-control input-field',
+                        'label' => false,
+                        'value' => $selectedValues,
+                    ]);?>
+                 <?php if (empty($section_form_details[2])) : ?>
+                    <ol class="badge">
+                      <a target="_blank" href="/testdocs/DMI/manuals/applicant/Chemist Registration.pdf">Manual for Chemist Registration</a>
+                    </ol>
+                <?php endif; ?>
+                <span id="error_approved_chemist" class="error invalid-feedback"></span>
+                
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 4.  Present at the time of inspection -->
+<div class="card-header sub-card-header-firm"><h3 class="card-title">4.Whether present at the time of Inspection </h3></div>
+<div class="form-horizontal">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm col-form-label">Present at the time of Inspection<span class="cRed">*</span></label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <?php 
+                        $i=1;
+                        $present_time_of_inspection = isset($section_form_details[0]['present_time_of_inspection'])?$section_form_details[0]['present_time_of_inspection']:"";
+                
+                            if($present_time_of_inspection == 'yes'){
+                                $checked_yes = 'checked';
+                                $checked_no = '';
+                            } else {
 
-    <section id="form_outer_main" class="content form-middle">
-		<div class="container-fluid">
-          <div id='form_inner_main'>
-			<div class="row">
-				<div class="col-md-12">
-			    	<?php echo $this->Form->create(); ?>
-                        <div class="card card-success">
-                                <div class="form-horizontal">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-sm-6">
-                                                <div class="form-group row">
-                                                    <label for="inputEmail3" class="col-sm-3 col-form-label">Date of Last Inspection <span class="cRed">*</span></label>
-                                                    <div class="col-sm-9">
-                                                        <?php echo $this->Form->control('date_last_inspection', array('type'=>'text', 'id'=>'date_last_inspection', 'value'=>$section_form_details[0]['date_last_inspection'], 'class'=>'form-control input-field', 'placeholder'=>'Enter DD/MM/YYYY', 'label'=>false)); ?>
-                                                        <span id="error_date_last_inspection" class="error invalid-feedback"></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="form-group row">
-                                                    <label for="inputEmail3" class="col-sm-3 col-form-label">Date of present Inspection <span class="cRed">*</span></label>
-                                                    <div class="col-sm-9">
-                                                    <?php echo $this->Form->control('date_p_inspection', array('type'=>'text', 'id'=>'date_p_inspection', 'escape'=>false, 'placeholder'=>'Enter DD/MM/YYYY', 'maxlength'=>'10',  'value'=>$section_form_details[0]['date_p_inspection'],'minlength'=>'10', 'class'=>'cvOn cvReq cvDate form-control', 'disabled'=>false, 'label'=>false)); ?>
-                                                    <span id="error_date_p_inspection" class="error invalid-feedback"></span>
-                                                </div>
-                                            </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> 
-                                <div class="card-header sub-card-header-firm"><h3 class="card-title"></h3></div>
-                                    <div class="form-horizontal">
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-sm-6">
-                                                    <div class="form-group row">
-                                                        <label for="inputEmail3" class="col-sm-3 col-form-label">Name of the laboratory<span class="cRed">*</span></label>
-                                                        <div class="col-sm-9">
-                                                        <?php echo $this->Form->control('printing_press', array('type'=>'text', 'id'=>'printing_press','value'=>$firm_details['firm_name'],'readonly'=>true,'label'=>false, 'class'=>'form-control')); ?>
-                                                        <span id="error_printing_press" class="error invalid-feedback"></span>
-                                                    </div>
-                                                 </div>
-                                                <div class="form-group row">
-                                                    <label for="inputEmail3" class="col-sm-3 col-form-label">Email Id <span class="cRed">*</span></label>
-                                                    <div class="col-sm-9">
-                                                        <?php echo $this->Form->control('email', array('type'=>'text', 'placeholder'=>'Enter firm email id','value'=>base64_decode($firm_details['email']),'readonly'=>true, 'id'=>'email', 'class'=>'form-control input-field', 'label'=>false)); ?>
-                                                        <span id="error_email" class="error invalid-feedback"></span>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group row">
-                                                <label for="inputEmail3" class="col-sm-3 col-form-label">Mobile No. <span class="cRed">*</span></label>
-                                                    <div class="col-sm-9">
-                                                        <?php echo $this->Form->control('mobile_no', array('type'=>'text', 'placeholder'=>'Enter mobile no. here', 'id'=>'mobile_no','value'=>base64_decode($firm_details['mobile_no']),'readonly'=>true, 'class'=>'form-control input-field', 'label'=>false)); ?>
-                                                        <span id="error_mobile_no" class="error invalid-feedback"></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="form-group row">
-                                                <label for="inputEmail3" class="col-sm-3 col-form-label">Certificate No <span class="cRed">*</span></label>
-                                                    <div class="col-sm-9">
-                                                        <?php echo $this->Form->control('packaging_material', array('type'=>'text','value'=>$firm_details['customer_id'],'readonly'=>true,  'id'=>'customer_id', 'class'=>'form-control input-field', 'label'=>false)); ?>
-                                                        <span id="error_customer_id" class="error invalid-feedback"></span>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group row">
-                                                <label for="inputEmail3" class="col-sm-3 col-form-label">Address <span class="cRed">*</span></label>
-                                                    <div class="col-sm-9">
-                                                        <?php echo $this->Form->control('street_address', array('type'=>'textarea', 'id'=>'street_address','value'=>$firm_details['street_address'],'readonly'=>true,'placeholder'=>'Enter street address', 'class'=>'form-control input-field', 'label'=>false)); ?>
-                                                        <span id="error_street_address" class="error invalid-feedback"></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                            <div class="form-group row">
-                                                <label for="inputEmail3" class="col-sm-3 col-form-label">Commodities for which approved<span class="cRed">*</span></label>
-                                                    <div class="col-sm-9">
-                                                            <?php echo $this->Form->control('sub_commodity', array('type'=>'select', 'options'=>$section_form_details[1], 'multiple'=>'multiple', 'label'=>false, 'disabled'=>'disabled', 'class'=>'form-control')); ?>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                            <div class="form-group row">
-                                                <label for="inputEmail3" class="col-sm-3 col-form-label">Name of the approved chemist Present at the time of inspection<span class="cRed">*</span></label>
-                                                    <div class="col-sm-9">
-                                                        <?php echo $this->Form->control('approved_chemist', array('type'=>'text', 'placeholder'=>'Enter Name of the approved chemist Present at the time of inspection','value'=>$section_form_details[0]['approved_chemist'],'id'=>'approved_chemist', 'class'=>'form-control input-field', 'label'=>false)); ?>
-                                                        <span id="error_approved_chemist" class="error invalid-feedback"></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card-header sub-card-header-firm"><h3 class="card-title"> </h3></div>
-                                        <div class="form-horizontal">
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="col-sm-6">
-                                                        <div class="form-group row">
-                                                            <label for="inputEmail3" class="col-sm-6 col-form-label">Is the laboratory well lighted Ventilated and hygienic<span class="cRed">*</span></label>
-                                                                <?php
-                                                                $i=1;
-                                                                $properly_equipped = $section_form_details[0]['properly_equipped'];
-                                                                
-                                                                    if($properly_equipped == 'yes'){
-                                                                        $checked_yes = 'checked';
-                                                                        $checked_no = '';
-                                                                    } else {
+                                $checked_yes = '';
+                                $checked_no = 'checked';
+                            }
+                        $i++;
+                    ?>
+                    
+                <div class=" d-inline">
+                    <input type="radio" name="present_time_of_inspection" checked="" id="present_time_of_inspection-yes" value="yes"<?php echo $checked_yes; ?>>
+                    <label for="present_time_of_inspection-yes">Yes
+                    </label>
+                </div>
+                <div class=" d-inline">
+                    <input type="radio" name="present_time_of_inspection" id="present_time_of_inspection-no" value="no" <?php echo $checked_no; ?>>
+                    <label for="present_time_of_inspection-no">No
+                    </label>
+                </div>
+                <span id="error_present_time_of_inspection" class="error invalid-feedback"></span>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 5. Is the laboratory well lighted Ventilated and hygienic -->
+<div class="card-header sub-card-header-firm"><h3 class="card-title">5. Is the laboratory well lighted Ventilated and hygienic</h3></div>
+<div class="form-horizontal">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm col-form-label">Is the laboratory well lighted Ventilated and hygienic<span class="cRed">*</span></label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group row">
+                 <?php
+                        $i=1;
+                        $is_lab_well_lighted = isset($section_form_details[0]['is_lab_well_lighted'])?$section_form_details[0]['is_lab_well_lighted']:"";
+                    
+                        if($is_lab_well_lighted == 'yes'){
+                            $checked_yes = 'checked';
+                            $checked_no = '';
+                        } else {
 
-                                                                        $checked_yes = '';
-                                                                        $checked_no = 'checked';
-                                                                    }
-                                                                    $i++;
-                                                                ?>
-                                                            <div class="col-sm-6">
-                                                                <div class=" d-inline">
-                                                                    <input type="radio" name="properly_equipped" checked="" id="properly_equipped-yes" value="yes" <?php echo $checked_yes; ?>>
-                                                                    <label for="properly_equipped-yes">Yes
-                                                                    </label>
-                                                                </div>
-                                                                <div class=" d-inline">
-                                                                    <input type="radio" name="properly_equipped" id="properly_equipped-no" value="no" <?php echo $checked_no; ?>>
-                                                                    <label for="properly_equipped-no">No
-                                                                    </label>
-                                                                </div>
-                                                                <span id="error_properly_equipped" class="error invalid-feedback"></span>
-                                                                </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-6">
-                                                        <div class="form-group row">
-                                                            <label for="inputEmail3" class="col-sm-3 col-form-label">Is the Laboratory properly equipped for the grading of the commodities<span class="cRed">*</span></label>
-                                                                <?php
-                                                                $i=1;
-                                                                $is_equipment = $section_form_details[0]['is_equipment'];
-                                                                
-                                                                    if($is_equipment == 'yes'){
-                                                                        $checked_yes = 'checked';
-                                                                        $checked_no = '';
-                                                                    } else {
+                            $checked_yes = '';
+                            $checked_no = 'checked';
+                        }
+                        $i++;
+                    ?>
+                <div class="col-sm-6">
+                    <div class=" d-inline">
+                        <input type="radio" name="is_lab_well_lighted" checked="" id="is_lab_well_lighted-yes" value="yes" <?php echo $checked_yes; ?>>
+                        <label for="is_lab_well_lighted-yes">Yes</label>
+                    </div>
+                    <div class=" d-inline">
+                        <input type="radio" name="is_lab_well_lighted" id="is_lab_well_lighted-no" value="no" <?php echo $checked_no; ?>>
+                        <label for="is_lab_well_lighted-no">No</label>
+                    </div>
+                    <span id="error_is_lab_well_lighted" class="error invalid-feedback"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 6. Is the laboratory properly equipped for the granding of the commodities -->
+<div class="card-header sub-card-header-firm"><h3 class="card-title">6. Is the laboratory properly equipped for the granding of the commodities</h3></div>
+<div class="form-horizontal">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm col-form-label">Is the laboratory properly equipped for the granding of the commodities<span class="cRed">*</span></label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <?php
+                        $i=1;
+                        $is_properly_equipped = isset($section_form_details[0]['is_properly_equipped'])?$section_form_details[0]['is_properly_equipped']:"";
+                        if($is_properly_equipped == 'yes'){
+                            $checked_yes = 'checked';
+                            $checked_no = '';
+                        } else {
+                            $checked_yes = '';
+                            $checked_no = 'checked';
+                        }
+                        $i++;
+                    ?>
+                <div class="col-sm-9">
+                    <div class=" d-inline">
+                        <input type="radio" name="is_properly_equipped" checked="" id="is_properly_equipped-yes" value="yes"<?php echo $checked_yes; ?>>
+                        <label for="is_properly_equipped-yes">Yes</label>
+                    </div>
+                    <div class=" d-inline">
+                        <input type="radio" name="is_properly_equipped" id="is_properly_equipped-no" value="no" <?php echo $checked_no; ?>>
+                        <label for="is_properly_equipped-rn">No</label>
+                    </div>
+                    <span id="is_properly_equipped-rn" class="error invalid-feedback"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 7. Is the equipment is in working order -->
+<div class="card-header sub-card-header-firm"><h3 class="card-title">7. Is the equipment is in working order</h3></div>
+<div class="form-horizontal">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm col-form-label">Is the equipment is in working order<span class="cRed">*</span></label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group row">
+                 <?php
+                    $i=1;
+                    $eq_working_order = $section_form_details[0]['eq_working_order'];
+                    if($eq_working_order == 'yes'){
+                        $checked_yes = 'checked';
+                        $checked_no = '';
+                    } else {
+                        $checked_yes = '';
+                        $checked_no = 'checked';
+                    }
+                    $i++;
+                ?>
+                <div class=" d-inline">
+                        <input type="radio" name="eq_working_order" checked="" id="eq_working_order-yes" value="yes"<?php echo $checked_yes; ?>>
+                        <label for="eq_working_order-yes">Yes</label>
+                    </div>
+                    <div class=" d-inline">
+                        <input type="radio" name="eq_working_order" id="eq_working_order-no" value="no" <?php echo $checked_no; ?>>
+                        <label for="eq_working_order-no">No</label>
+                    </div>
+                    <span id="error_eq_working_order" class="error invalid-feedback"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 8. Is the analytical register properly Maintained -->
+<div class="card-header sub-card-header-firm"><h3 class="card-title">8. Is the analytical register properly Maintained</h3></div>
+<div class="form-horizontal">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm col-form-label">Is the analytical register properly Maintained<span class="cRed">*</span></label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <?php
+                        $i=1;
+                        $is_analytical_reg_maintained = isset($section_form_details[0]['is_analytical_reg_maintained'])?$section_form_details[0]['is_analytical_reg_maintained']:"";
+                        if($is_analytical_reg_maintained == 'yes'){
+                            $checked_yes = 'checked';
+                            $checked_no = '';
+                        } else {
+                            $checked_yes = '';
+                            $checked_no = 'checked';
+                        }
+                        $i++;
+                    ?>
+                    <div class=" d-inline">
+                        <input type="radio" name="is_analytical_reg_maintained" checked="" id="is_analytical_reg_maintained-yes" value="yes" <?php echo $checked_yes; ?>>
+                        <label for="is_analytical_reg_maintained-yes">Yes</label>
+                    </div>
+                    <div class=" d-inline">
+                        <input type="radio" name="is_analytical_reg_maintained" id="is_analytical_reg_maintained-no" value="no"<?php echo $checked_no; ?>>
+                        <label for="is_analytical_reg_maintained-no">No</label>
+                    </div>
+                    <span id="error_is_analytical_reg_maintained" class="error invalid-feedback"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 9. Grading records -->
+<div class="card-header sub-card-header-firm"><h3 class="card-title">9. Grading records</h3></div>
+<div class="form-horizontal">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm col-form-label">1) Are the up to date ?<span class="cRed">*</span></label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group row">
+                    <?php
+                        $i=1;
+                        $are_up_to_date = isset($section_form_details[0]['are_up_to_date'])?$section_form_details[0]['are_up_to_date']:"";
+                        if($are_up_to_date == 'yes'){
+                            $checked_yes = 'checked';
+                            $checked_no = '';
+                        } else {
+                            $checked_yes = '';
+                            $checked_no = 'checked';
+                        }
+                        $i++;
+                    ?>
+                    <div class=" d-inline">
+                        <input type="radio" name="are_up_to_date" checked="" id="are_up_to_date-yes" value="yes"<?php echo $checked_yes; ?>>
+                        <label for="are_up_to_date-yes">Yes</label>
+                    </div>
+                    <div class=" d-inline">
+                        <input type="radio" name="are_up_to_date" id="are_up_to_date-no" value="no" <?php echo $checked_no; ?>>
+                        <label for="are_up_to_date-no">No</label>
+                    </div>
+                    <span id="error_are_up_to_date" class="error invalid-feedback"></span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm col-form-label">2) Are they being forwarded to Concerned offices in time<span class="cRed">*</span></label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group row">
+                    <?php
+                        $i=1;
+                        $being_forwarded = isset($section_form_details[0]['being_forwarded'])?$section_form_details[0]['being_forwarded']:"";
+                    
+                        if($being_forwarded == 'yes'){
+                            $checked_yes = 'checked';
+                            $checked_no = '';
+                        } else {
 
-                                                                        $checked_yes = '';
-                                                                        $checked_no = 'checked';
-                                                                    }
-                                                                    $i++;
-                                                                ?>
-                                                            <div class="col-sm-9">
-                                                                <div class=" d-inline">
-                                                                    <input type="radio" name="is_equipment" checked="" id="is_equipment-yes" value="yes"<?php echo $checked_yes; ?>>
-                                                                    <label for="is_equipment-yes">Yes
-                                                                    </label>
-                                                                </div>
-                                                                <div class=" d-inline">
-                                                                    <input type="radio" name="is_equipment" id="is_equipment-no" value="no" <?php echo $checked_no; ?>>
-                                                                    <label for="is_equipment-rn">No
-                                                                    </label>
-                                                                </div>
-                                                                <span id="is_equipment-rn" class="error invalid-feedback"></span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                <div class="card-header sub-card-header-firm"><h3 class="card-title"></h3></div>
-                                    <div class="form-horizontal">
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-sm-6">
-                                                    <div class="form-group row">
-                                                        <label for="inputEmail3" class="col-sm-6 col-form-label">Is the equipment is in working order<span class="cRed">*</span></label>
-                                                            <?php
-                                                            $i=1;
-                                                            $eq_working_order = $section_form_details[0]['eq_working_order'];
-                                                            
-                                                                if($eq_working_order == 'yes'){
-                                                                    $checked_yes = 'checked';
-                                                                    $checked_no = '';
-                                                                } else {
-                                                                    $checked_yes = '';
-                                                                    $checked_no = 'checked';
-                                                                }
-                                                                $i++;
-                                                            ?>
-                                                        <div class=" d-inline">
-                                                                <input type="radio" name="eq_working_order" checked="" id="eq_working_order-yes" value="yes"<?php echo $checked_yes; ?>>
-                                                                <label for="eq_working_order-yes">Yes
-                                                                </label>
-                                                            </div>
-                                                            <div class=" d-inline">
-                                                                <input type="radio" name="eq_working_order" id="eq_working_order-no" value="no" <?php echo $checked_no; ?>>
-                                                                <label for="eq_working_order-no">No
-                                                                </label>
-                                                            </div>
-                                                            <span id="error_eq_working_order" class="error invalid-feedback"></span>
-                                                        </div>
-                                                    </div>
-                                                <div class="col-sm-6">
-                                                <div class="form-group row">
-                                                        <label for="inputEmail3" class="col-sm-6 col-form-label">Is the analytical register properly Maintained<span class="cRed">*</span></label>
-                                                            <?php
-                                                            $i=1;
-                                                            $lab_properly_maintained = $section_form_details[0]['lab_properly_maintain'];
-                                                            
-                                                                if($lab_properly_maintained == 'yes'){
-                                                                    $checked_yes = 'checked';
-                                                                    $checked_no = '';
-                                                                } else {
+                            $checked_yes = '';
+                            $checked_no = 'checked';
+                        }
+                        $i++;
+                    ?>
+                    <div class=" d-inline">
+                        <input type="radio" name="being_forwarded" checked="" id="being_forwarded-yes" value="yes"<?php echo $checked_yes; ?>>
+                        <label for="being_forwarded-yes">Yes</label>
+                    </div>
+                    <div class=" d-inline">
+                        <input type="radio" name="being_forwarded" id="being_forwarded-no" value="no" <?php echo $checked_no; ?>>
+                        <label for="being_forwarded-no">No</label>
+                    </div>
+                    <span id="error_being_forwarded" class="error invalid-feedback"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 10. Last lot analyzed -->
+<div class="card-header sub-card-header-firm"><h3 class="card-title">10. Last lot analyzed</h3></div>
+<div class="form-horizontal">
+    <div class="card-body border">
+        <div class="row">
+            <div class="col-md-2">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm col-form-label">Lot No : <span class="cRed">*</span></label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                 <?php echo $this->Form->control('last_lot_no', array('type'=>'text', 'id'=>'last_lot_no', 'class'=>'form-control input-field','value'=>$section_form_details[0]['last_lot_no'], 'placeholder'=>'Last lot No.', 'label'=>false)); ?>
+                <span id="error_last_lot_no" class="error invalid-feedback error_last_lot_no"></span>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm col-form-label">Last lot date : <span class="cRed">*</span></label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                  <?php echo $this->Form->control('lat_lot_date', array('type'=>'text', 'id'=>'date', 'escape'=>false, 'placeholder'=>'Enter DD/MM/YYYY', 'value'=>$section_form_details[0]['lat_lot_date'],'maxlength'=>'10', 'minlength'=>'10', 'class'=>'cvOn cvReq cvDate form-control', 'disabled'=>false, 'label'=>false)); ?>
+                <span id="error_date" class="error invalid-feedback"></span>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm col-form-label">Commodity : <span class="cRed">*</span></label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                  <?php echo $this->Form->control('commodity', array('type'=>'text', 'id'=>'commodity', 'class'=>'form-control input-field', 'value'=>$section_form_details[0]['commodity'],'placeholder'=>'Enter Commodity', 'label'=>false)); ?>
+                  <span id="error_commodity" class="error invalid-feedback error_commodity"></span>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm col-form-label">Name of the Packers : <span class="cRed">*</span></label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <?php
+                    $options = $section_form_details[3];
+                    $options = ['' => 'Select Packers'] + $options;
+                    $selectedValues = $section_form_details[0]['name_of_packers']; // Provide the values you want to select as an array
+                    echo $this->Form->control('name_of_packers', [
+                        'type' => 'select',
+                        'options' => $options,
+                        'id' => 'name_of_packers',
+                        'class' => 'form-control input-field',
+                        'label' => false,
+                        'value' => $selectedValues // Set the selected values directly in the control options
+                    ]);?>
+                 <?php if (empty($section_form_details[2])) : ?>
+                    <ol class="badge">
+                      <a target="_blank" href="/testdocs/DMI/manuals/applicant/Manual_mapping_lab_pp.pdf">Manual for Mapping of CA With Lab/Printing Press</a>
+                    </ol>
+                <?php endif; ?>
+                <span id="error_name_of_packers" class="error invalid-feedback"></span>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm col-form-label">Analytical results : <span class="cRed">*</span></label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                  <?php echo $this->Form->control('p_analytical_reg', array('type'=>'textarea', 'id'=>'p_analytical_reg','value'=>$section_form_details[0]['p_analytical_reg'], 'class'=>'form-control input-field', 'placeholder'=>'Type here..', 'label'=>false)); ?>
+                <span id="error_p_analytical_reg" class="error invalid-feedback"></span>
+            </div>
+        </div>
+    </div>
+</div>
+  <div class="form-horizontal">
+        <div class="card-body border">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                            <label for="field3" class="col-sm col-form-label"><span><?php if ($current_level == 'level_2' && $application_mode == 'edit' ) { echo 'Analytical Results Doc'; } else { echo 'Analytical Results Doc'; } ?></span></label>
 
-                                                                    $checked_yes = '';
-                                                                    $checked_no = 'checked';
-                                                                }
-                                                                $i++;
-                                                            ?>
-                                                        <div class=" d-inline">
-                                                                <input type="radio" name="lab_properly_maintained" checked="" id="lab_properly_maintained-yes" value="yes" <?php echo $checked_yes; ?>>
-                                                                <label for="lab_properly_maintained-yes">Yes
-                                                                </label>
-                                                            </div>
-                                                            <div class=" d-inline">
-                                                                <input type="radio" name="lab_properly_maintained" id="lab_properly_maintained-no" value="no"<?php echo $checked_no; ?>>
-                                                                <label for="lab_properly_maintained-no">No
-                                                                </label>
-                                                            </div>
-                                                        <span id="error_lab_properly_maintained" class="error invalid-feedback"></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                            <div class="card-header sub-card-header-firm"><h3 class="card-title"></h3></div>
-                                    <div class="form-horizontal">
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-sm-6">
-                                                    
-                                                        <div class="form-group row">
-                                                        <label for="inputEmail3" class="col-sm- col-form-label">Are they being forwarded to Concerned offices in time<span class="cRed">*</span></label>
-                                                        <?php
-                                                            $i=1;
-                                                            $concerned_offices = $section_form_details[0]['fwd_concerned_offices'];
-                                                            
-                                                                if($concerned_offices == 'yes'){
-                                                                    $checked_yes = 'checked';
-                                                                    $checked_no = '';
-                                                                } else {
-
-                                                                    $checked_yes = '';
-                                                                    $checked_no = 'checked';
-                                                                }
-                                                                $i++;
-                                                            ?>
-                                                            <div class=" d-inline">
-                                                                <input type="radio" name="concerned_offices" checked="" id="concerned_offices-yes" value="yes"<?php echo $checked_yes; ?>>
-                                                                <label for="concerned_offices-yes">Yes
-                                                                </label>
-                                                            </div>
-                                                            <div class=" d-inline">
-                                                                <input type="radio" name="concerned_offices" id="concerned_offices-no" value="no" <?php echo $checked_no; ?>>
-                                                                <label for="concerned_offices-no">No
-                                                                </label>
-                                                            </div>
-                                                                <span id="error_concerned_offices" class="error invalid-feedback"></span>
-                                                        </div>
-                                                        <div class="form-group row">
-                                                        <label for="inputLastlotno" class="col-sm-6 col-form-label">Last lot analyzed Lot No: <span class="cRed">*</span></label>
-                                                            <div class="col-sm-9">
-                                                                <?php echo $this->Form->control('last_lot_no', array('type'=>'text', 'id'=>'last_lot_no', 'class'=>'form-control input-field','value'=>$section_form_details[0]['last_lot_no'], 'placeholder'=>'Last lot No. dated And its analytical results', 'label'=>false)); ?>
-                                                                <span id="error_last_lot_no" class="error invalid-feedback error_last_lot_no"></span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group row">
-                                                        <label for="inputLastlotno" class="col-sm-6 col-form-label">Date: <span class="cRed">*</span></label>
-                                                        <div class="col-sm-9">
-                                                            <?php echo $this->Form->control('date', array('type'=>'text', 'id'=>'date', 'escape'=>false, 'placeholder'=>'Enter DD/MM/YYYY', 'value'=>$section_form_details[0]['dates'],'maxlength'=>'10', 'minlength'=>'10', 'class'=>'cvOn cvReq cvDate form-control', 'disabled'=>false, 'label'=>false)); ?>
-                                                            <span id="error_date" class="error invalid-feedback"></span>
-                                                            </div>
-                                                        </div>
-                                                </div>
-                                                <div class="col-sm-6">
-                                                <div class="form-group row">
-                                                    <label for="inputLastlotno" class="col-sm-6 col-form-label">Commodity: <span class="cRed">*</span></label>
-                                                    <div class="col-sm-9">
-                                                        <?php echo $this->Form->control('commodity', array('type'=>'text', 'id'=>'commodity', 'class'=>'form-control input-field', 'value'=>$section_form_details[0]['commodity'],'placeholder'=>'Enter Commodity', 'label'=>false)); ?>
-                                                        <span id="error_commodity" class="error invalid-feedback error_commodity"></span>
-                                                    </div>
-                                                    </div>
-                                                    <div class="form-group row">
-                                                        <label for="inputEmail3" class="col-sm-12 col-form-label">Name of the Packers and it’s Analytical results<span class="cRed">*</span></label>
-                                                        <div class="col-sm-9">
-                                                            <?php echo $this->Form->control('p_analytical_reg', array('type'=>'text', 'id'=>'p_analytical_reg','value'=>$section_form_details[0]['p_analytical_reg'], 'class'=>'form-control input-field', 'placeholder'=>'Enter Name of the Packers and it’s Analytical results', 'label'=>false)); ?>
-                                                            <span id="error_p_analytical_reg" class="error invalid-feedback"></span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group row">
-                                                        <label for="inputEmail3" class="col-sm-12 col-form-label">Suggestions given during last<span class="cRed">*</span></label>
-                                                        <div class="col-sm-9">
-                                                            <?php echo $this->Form->control('suggestion_during_last', array('type'=>'textarea','value'=>$section_form_details[0]['suggestion_during_last'], 'id'=>'suggestion_during_last', 'class'=>'form-control input-field', 'placeholder'=>'Enter Suggestions given during last', 'label'=>false)); ?>
-                                                            <span id="error_suggestion_during_last" class="error invalid-feedback"></span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                            <div class="card-header sub-card-header-firm"><h3 class="card-title"></h3></div>
-                            <div class="form-horizontal">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-sm-6">
-                                            <div class="form-group row">
-                                                <label for="inputEmail3" class="col-sm-12 col-form-label">Shortcomings noticed in present Inspection<span class="cRed">*</span></label>
-                                                <div class="col-sm-9">
-                                                    <?php echo $this->Form->control('short_noticed', array('type'=>'textarea', 'id'=>'short_noticed', 'value'=>$section_form_details[0]['short_noticed'],'class'=>'form-control input-field', 'placeholder'=>'Enter Shortcomings noticed in present Inspection', 'label'=>false)); ?>
-                                                    <span id="error_short_noticed" class="error invalid-feedback"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                        
-                                            <div class="form-group row">
-                                                <label for="inputEmail3" class="col-sm-12 col-form-label">Suggestions<span class="cRed">*</span></label>
-                                                <div class="col-sm-9">
-                                                    <?php echo $this->Form->control('suggestions', array('type'=>'textarea', 'id'=>'suggestions', 'value'=>$section_form_details[0]['suggestions'],'class'=>'form-control input-field', 'placeholder'=>'Enter Suggestions', 'label'=>false)); ?>
-                                                    <span id="error_suggestions" class="error invalid-feedback"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                        <span class="float-left"><?php if ($current_level == 'level_2' && $application_mode == 'edit' && empty($section_form_details[0]['analytical_result_docs'])) { echo 'Attach doc'; }else{ echo 'Attached doc'; } ?> :
+                        <?php if (!empty($section_form_details[0]['analytical_result_docs'])) { ?>
+                            <a id="analytical_result_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['analytical_result_docs']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['analytical_result_docs'])), -1))[0],23);?></a>
+                        <?php }else{ echo "No Document Provided" ;} ?>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <div class="custom-file col-sm">
+                            <input type="file" name="analytical_result_docs" class="form-control" id="analytical_result_docs" multiple='multiple'>
+                            <span id="error_analytical_result_docs" class="error invalid-feedback"></span>
+                            <span id="error_type_analytical_result_docs" class="error invalid-feedback"></span>
+                            <span id="error_size_analytical_result_docs" class="error invalid-feedback"></span>
                             </div>
-                    <div id="total_charge_box">
-                        <div class="card-header sub-card-header-firm"><h3 class="card-title"></h3></div><br>
-                            <div class="form-horizontal">
-                                <div class="card-body">
-                                <div class="row">
-                                        <div class="col-sm-6">
-                                            <div class="form-group row">
-                                                <label for="inputEmail3" class="col-sm-6 col-form-label">Signature and name of the authorized person Officerof the printing press or any representative</label>
-                                                    <?php if($section_form_details[0]['signature'] != null){?>
-                                                <a target="blank" id="signature_docs_value" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['signature']); ?>">Preview</a>
-                                                <?php }?>
-                                <div class="custom-file col-sm-6">
-                                <?php echo $this->Form->control('signature',array('type'=>'file', 'id'=>'signature', 'multiple'=>'multiple', 'label'=>false, 'class'=>'form-control wd100')); ?>
-                                    <span id="error_signature" class="error invalid-feedback"></span>
-                                    <span id="error_size_signature" class="error invalid-feedback"></span>
-                                    <span id="error_type_signature" class="error invalid-feedback"></span>
-                                </div> 
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="form-group row">
-                                                <label for="inputEmail3" class="col-sm-6 col-form-label">Signature of Inspection with official Stamp</label>
-                                                    <?php if($section_form_details[0]['signature_name'] != null){?>
-                                <a target="blank" id="signature_name_docs_value" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['signature_name']); ?>">Preview</a>
-                                <?php } ?>
-                                                <div class="custom-file col-sm-6">
-                                    <?php echo $this->Form->control('signature_name',array('type'=>'file', 'id'=>'signature_name', 'multiple'=>'multiple', 'label'=>false, 'class'=>'form-control wd100')); ?>
-                                    <span id="error_signature_name" class="error invalid-feedback"></span>
-                                    <span id="error_size_signature_name" class="error invalid-feedback"></span>
-                                    <span id="error_type_signature_name" class="error invalid-feedback"></span>
+                    </div> 
+                    <p class="lab_form_note float-right mt-3"><i class="fa fa-info-circle"></i> File type: PDF, jpg &amp; max size upto 2 MB</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 11. Suggestions given during last -->
+<div class="card-header sub-card-header-firm"><h3 class="card-title">11. Suggestions given during last</h3></div>
+<div class="form-horizontal">
+    <div class="card-body border">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm col-form-label">Suggestions given during last <span class="cRed">*</span></label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group row">
+                <?php
+                $i=1;
+                $e_briefly_suggestions_radio = isset($section_form_details[0]['e_briefly_suggestions_radio'])?$section_form_details[0]['e_briefly_suggestions_radio']:"";
+                
+                    if($e_briefly_suggestions_radio == 'yes'){
+                        $checked_yes = 'checked';
+                        $checked_no = '';
+                    } else {
 
-                                    </div>
-                                </div>
+                        $checked_yes = '';
+                        $checked_no = 'checked';
+                    }
+                    $i++;
+                ?>
+                <div class="d-inline">
+                    <input type="radio" name="e_briefly_suggestions_radio" checked="" id="e_briefly_suggestions_radio-yes" value="yes" <?php echo $checked_yes; ?>>
+                    <label for="e_briefly_suggestions_radio-yes">Yes
+                    </label>
+                </div>
+                <div class=" d-inline">
+                    <input type="radio" name="e_briefly_suggestions_radio" id="e_briefly_suggestions_radio-no" value="no" <?php echo $checked_no; ?>>
+                    <label for="e_briefly_suggestions_radio-no">No</label>
+                </div>    
+                <div class="col-sm-9">
+                <?php 
+                    echo $this->Form->control('enumerate_briefly_suggestions', array('type'=>'textarea', 'id'=>'enumerate_briefly_suggestions', 'escape'=>false,'value'=>isset($section_form_details[0]['enumerate_briefly_suggestions'])?$section_form_details[0]['enumerate_briefly_suggestions']:"", 'class'=>'form-control input-field', 'label'=>false, 'placeholder'=>'Enter discrepancies here...')); ?>
+                <span id="error_enumerate_briefly_suggestions" class="error invalid-feedback"></span>
+            </div>    
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 12. Shortcomings noticed in present Inspection -->
+<div class="card-header sub-card-header-firm"><h3 class="card-title">12. Shortcomings noticed in present Inspection</h3></div>
+<div class="form-horizontal">
+    <div class="card-body border">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm col-form-label">Shortcomings noticed in present Inspection <span class="cRed">*</span></label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <?php echo $this->Form->control('shortcomings_noticed', array('type'=>'textarea', 'id'=>'shortcomings_noticed', 'value'=>$section_form_details[0]['shortcomings_noticed'],'class'=>'form-control input-field', 'placeholder'=>'Type here..', 'label'=>false)); ?>
+                <span id="error_shortcomings_noticed" class="error invalid-feedback"></span>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 13. Suggestions -->
+<div class="card-header sub-card-header-firm"><h3 class="card-title">13. Suggestions</h3></div>
+<div class="form-horizontal">
+    <div class="card-body border">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm col-form-label">Suggestions <span class="cRed">*</span></label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                 <?php echo $this->Form->control('suggestions', array('type'=>'textarea', 'id'=>'suggestions', 'value'=>$section_form_details[0]['suggestions'],'class'=>'form-control input-field', 'placeholder'=>'Type here..', 'label'=>false)); ?>
+                <span id="error_suggestions" class="error invalid-feedback"></span>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Signnature and Name of the Office Authorized person of the laboratory-->          
+<div class="card-header sub-card-header-firm"><h3 class="card-title">Signnature and Name of the Office Authorized person of the laboratory</h3></div>
+<div class="form-horizontal">
+    <div class="card-body border">
+        <div class="row">
+        <div class="col-md-6">
+            <div class="form-group row">
+                <label for="inputEmail3" class="col-sm col-form-label">Name of the Office Authorized person<span class="cRed">*</span></label>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group row">
+                <div class="col-sm">
+                        <?php echo $this->Form->control('authorized_persion_name', array('type'=>'text', 'id'=>'authorized_persion_name','value'=>isset($section_form_details[0]['authorized_persion_name'])?$section_form_details[0]['authorized_persion_name']:"", 'placeholder'=>'Enter name', 'class'=>'form-control', 'label'=>false)); ?>
+                    <span id="error_authorized_persion_name" class="error invalid-feedback"></span>
+                </div> 
+            </div>
+        </div>
+    </div>
+</div>
+<div class="form-horizontal">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                            <label for="field3" class="col-sm col-form-label"><span><?php if ($current_level == 'level_2' && $application_mode == 'edit' ) { echo 'Signature'; } else { echo 'Signature'; } ?></span></label>
+
+                        <span class="float-left"><?php if ($current_level == 'level_2' && $application_mode == 'edit' && empty($section_form_details[0]['authorized_signature_docs'])) { echo 'Attach doc'; }else{ echo 'Attached doc'; } ?> :
+                        <?php if (!empty($section_form_details[0]['authorized_signature_docs'])) { ?>
+                            <a id="authorized_signature_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['authorized_signature_docs']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['authorized_signature_docs'])), -1))[0],23);?></a>
+                        <?php }else{ echo "No Document Provided" ;} ?>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <div class="custom-file col-sm">
+                                <input type="file" name="authorized_signature_docs" class="form-control" id="authorized_signature_docs" multiple='multiple'>
+                            <span id="error_authorized_signature_docs" class="error invalid-feedback"></span>
+                            <span id="error_type_authorized_signature_docs" class="error invalid-feedback"></span>
+                            <span id="error_size_authorized_signature_docs" class="error invalid-feedback"></span>
+                            </div>
+                    </div> 
+                    <p class="lab_form_note float-right mt-3"><i class="fa fa-info-circle"></i> File type: PDF, jpg &amp; max size upto 2 MB</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Signnature and Name of the Inspecting Designation -->     
+<div class="card-header sub-card-header-firm"><h3 class="card-title">Signnature and Name of the Inspecting Officer</h3></div>
+    <div class="form-horizontal">
+        <div class="form-horizontal">
+            <div class="card-body border">
+                <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="inputEmail3" class="col-sm col-form-label">Name of the Inspecting Officer<span class="cRed"> * </span></label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <div class="col-sm">
+                            <?php echo $this->Form->control('name_of_inspecting_officer', array('type'=>'text', 'id'=>'name_of_inspecting_officer','placeholder'=>'Enter Name of the Inspecting Officer', 'class'=>'form-control', 'label'=>false,'value'=>isset($section_form_details[0]['name_of_inspecting_officer'])?$section_form_details[0]['name_of_inspecting_officer']:"")); ?>
+                                <span id="error_name_of_inspecting_officer" class="error invalid-feedback"></span>
+                        </div> 
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-horizontal">
+        <div class="form-horizontal">
+            <div class="card-body border">
+                <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="inputEmail3" class="col-sm col-form-label">Designation<span class="cRed"> * </span></label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <div class="col-sm">
+                            <?php echo $this->Form->control('designation_inspecting_officer', array('type'=>'text', 'id'=>'designation_inspecting_officer', 'class'=>'form-control','value '=>isset($section_form_details[0]['designation_inspecting_officer'])?$section_form_details[0]['designation_inspecting_officer']:"", 'placeholder'=>'Please Enter Designation', 'label'=>false)); ?>
+                            <span id="error_designation_inspecting_officer" class="error invalid-feedback"></span>
+                        </div> 
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-horizontal">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label for="field3" class="col-sm col-form-label"><span><?php if ($current_level == 'level_2' && $application_mode == 'edit' ) { echo 'Signature'; } else { echo 'Signature'; } ?></span></label>
+
+                                <span class="float-left"><?php if ($current_level == 'level_2' && $application_mode == 'edit' && empty($section_form_details[0]['signnature_of_inspecting_officer_docs'])) { echo 'Attach docs'; }else{ echo 'Attached docs'; } ?> :
+                                <?php if (!empty($section_form_details[0]['signnature_of_inspecting_officer_docs'])) { ?>
+                                    <a id="signnature_of_inspecting_officer_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['signnature_of_inspecting_officer_docs']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['signnature_of_inspecting_officer_docs'])), -1))[0],23);?></a>
+                                <?php }else{ echo "No Document Provided" ;} ?>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <div class="custom-file col-sm">
+                                        <input type="file" name="signnature_of_inspecting_officer_docs" class="form-control" id="signnature_of_inspecting_officer_docs" multiple='multiple'>
+                                    <span id="error_signnature_of_inspecting_officer_docs" class="error invalid-feedback"></span>
+                                    <span id="error_type_signnature_of_inspecting_officer_docs" class="error invalid-feedback"></span>
+                                    <span id="error_size_signnature_of_inspecting_officer_docs" class="error invalid-feedback"></span>
+                                    </div>
+                            </div> 
+                            <p class="lab_form_note float-right mt-3"><i class="fa fa-info-circle"></i> File type: PDF, jpg &amp; max size upto 2 MB</p>
                     </div>
                 </div>
             </div>
@@ -391,9 +709,15 @@
     </div>
 </div>
 </section>
-</div>
 <input type="hidden" id="final_submit_status_id" value="<?php echo $final_submit_status; ?>">
 <input type="hidden" id="application_mode" value="<?php echo $_SESSION['application_mode']; ?>">
 <input type="hidden" id="application_type_id" value="<?php echo $_SESSION['application_type']; ?>">                                             
+<input type="hidden" id="firm_type" value="<?php echo $firm_type; ?>">
+<!-- added for if session value is set -->
+<?php if(!empty($_SESSION['rtiupdatemode'])) { ?>
+    <input type="hidden" id="checkeditsession" value="<?php echo $_SESSION['rtiupdatemode']; ?>">
+<?php } ?>
+<!-- //firm type is use to validate form fields added by shankhpal on 25/05/023 -->
 <?php echo $this->Html->script('routininspection/routin_inspection'); ?>
+<?php echo $this->Html->script('routininspection/want_to_edit_rti'); ?>
 

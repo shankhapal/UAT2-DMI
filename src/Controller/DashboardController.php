@@ -255,7 +255,7 @@ class DashboardController extends AppController{
 
 			$current_level = $this->Session->read('current_level');
 			$show_list_for = $this->Session->read('show_list_for');
-
+			
 			if($current_level == 'level_3' && $show_list_for != 'rejected'){
 				$this->render('/element/common_counts_and_list_elements/ro_so_common_elements/ro_so_common_dashboard_tabs');
 			}elseif($current_level == 'level_4'){
@@ -669,12 +669,24 @@ class DashboardController extends AppController{
 
 			$find_ro_id = $this->DmiRoOffices->find('list',array('valueField'=>'id','conditions'=>array('ro_email_id IS'=>$username)))->toList();
 
+			//below updates are applied on 19-05-2023 as suggested by DMi through email.
+			//Because RO incharge wants the list of IO users from SO jurisdiction under it. as per application.
+			//get application jurisdiction
+			$this->loadModel('DmiApplWithRoMappings');
+			$appl_office_id = $this->DmiApplWithRoMappings->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+			//check first the application jurisdiction not same with current login user, else show as it is
+			//else show users from both jurisdictions
+			if(!in_array($appl_office_id['office_id'],$find_ro_id)){
+				$conditionCheck = array('OR'=>array('posted_ro_office IN'=>$find_ro_id,'posted_ro_office IS'=>$appl_office_id['office_id']),'status'=>'active');
+			}else{
+				$conditionCheck = array('posted_ro_office IN'=>$find_ro_id,'status'=>'active');
+			}
+
 			$io_users_list = array();
 			if(!empty($find_ro_id))
 			{
-				$ro_id = $find_ro_id;
-
-				$find_user_belongs = $this->DmiUsers->find('list',array('keyField'=>'id', 'valueField'=>'email','conditions'=>array('posted_ro_office IN'=>$ro_id,'status'=>'active')))->toList();
+				//condition variable "$conditionCheck" is applied in 19-05-2023 as per above updates
+				$find_user_belongs = $this->DmiUsers->find('list',array('keyField'=>'id', 'valueField'=>'email','conditions'=>$conditionCheck))->toList();
 
 				$io_users_list = $this->DmiUserRoles->find('list',array('keyField'=>'user_email_id','valueField'=>'user_email_id','conditions'=>array('user_email_id IN'=>$find_user_belongs,'io_inspection'=>'yes')))->toArray();
 
@@ -1023,9 +1035,10 @@ class DashboardController extends AppController{
 							$i=$i+1;
 							}
 
-						} //For Routine Inpection (RTI) added by shankhpal shende on 06/12/2022
+						} 
+						//added by shankhpal shende on 06/12/2022
 						elseif($sub_tab=='routine_inspection_allocation_tab'){
-						
+
 							if($each_flow['application_type']=='10'){
 								
 								$this->loadModel('DmiGrantCertificatesPdfs');
@@ -1037,8 +1050,10 @@ class DashboardController extends AppController{
 								$username = $this->Session->read('username');
 								
 								//get RO/SO Incharge details
+								
 								$get_short_codes = $this->DmiRoOffices->find('list',array('valueField'=>'short_code','conditions'=>array('ro_email_id IS'=>$username)))->toArray();
-					
+						   
+							  
 								//$conditionsArr = null;
 								$condition = '';
 								$n = 1;
@@ -1113,7 +1128,7 @@ class DashboardController extends AppController{
 											$years = floor($diff / (365*12*60*60*24)); // retrun years
 											
 											$months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24)); // return month
-											
+										
 											//check conditionally if month greter to period then do inspection yes
 											if($months > $period){
 												$inspection = 'yes';
@@ -1182,11 +1197,9 @@ class DashboardController extends AppController{
 								}
 							
 							}
-						
+             
 						}
-				
 					}
-
 					//for HO level scrutiny allocations
 					elseif($for_level=='level_4'){
 
@@ -1597,12 +1610,17 @@ class DashboardController extends AppController{
 	//Author :  -> Shankhpal Shende 
 	//Date : 09/12/2022
 	//For Routine Inspection (RTI)
+
+	//Description : For Allocation Tab updated function for logical change
+	//Author :  -> Shankhpal Shende 
+	//Date :18/05/2023
+	//For Routine Inspection (RTI)
 	
 	public function allocateApplForRoutineInspection(){
      
 		$this->autoRender= false;
 		$get_customer_id = explode('-',htmlentities($_POST['customer_id'], ENT_QUOTES));
-		
+	
 		$customer_id = $get_customer_id[0];
 	
 		$appl_type = htmlentities($_POST['appl_type'], ENT_QUOTES);
@@ -1619,6 +1637,7 @@ class DashboardController extends AppController{
 		$this->loadModel('DmiRoOffices');
 		$this->loadModel('DmiIoAllocationLogs');
 		$this->loadComponent('Customfunctions');
+		$this->loadModel('DmiRtiAllocationsLog'); // log model dedded by shankhpal on 17/05/2023
 
 		$ro_scheduled_date = $this->Customfunctions->dateFormatCheck($ro_scheduled_date);
 
@@ -1672,23 +1691,6 @@ class DashboardController extends AppController{
 			}
 		}
 			
-		// this condition used for when first time in allocation tabale have not any entry 
-		//  so we need to add entry first in allocation table 
-		  if(!empty($get_latest_id)){
-
-
-				$this->$allocation_table->updateAll(
-
-					array($mo_column_name=>"$io_user_id",
-					  'current_level'=>"$io_user_id",
-						'modified'=>"$current_date",
-						'ro_scheduled_date'=>"$ro_scheduled_date",
-						'io_scheduled_date'=>"$ro_scheduled_date"),
-					array('id'=>$get_latest_id['id']));
-
-			}
-			else{
-				
 				  $next_level = 'level_2';
 				  $mo_column_name = 'level_2';
 				//Insert entry in current position table
@@ -1706,14 +1708,29 @@ class DashboardController extends AppController{
 						'io_scheduled_date'=>$ro_scheduled_date));
           
 					if($this->$allocation_table->save($allocation_entry)){
+
+						// Save the log of allocated application (Done by shankhpal shende on 17/05/2023)
+						$DmiRtiAllocationsLogEntity = $this->DmiRtiAllocationsLog->newEntity(array(
+							
+							$mo_column_name=>$io_user_id,
+							'customer_id'=>$customer_id,
+							'level_3' => $username, 
+							'current_level'=>$io_user_id,
+							'created'=>date('Y-m-d H:i:s'),
+							'modified'=>date('Y-m-d H:i:s'),
+							'ro_scheduled_date'=>$ro_scheduled_date,
+							'io_scheduled_date'=>$ro_scheduled_date
+
+						));
+						$this->DmiRtiAllocationsLog->save($DmiRtiAllocationsLogEntity);
 					
 					#SMS: Rutin Inspection   // commented by shankhpal shende on 09/12/2022
 					//$this->DmiSmsEmailTemplates->sendMessage($msg_id,$customer_id);
-				}
+					// }
 
 
 
-			}
+					}
 			
 				//update current position table
 				$this->$current_position_table->currentUserUpdate($customer_id,$io_user_id,$next_level);
@@ -1742,6 +1759,8 @@ class DashboardController extends AppController{
 			exit;
 
 	}
+
+
 
 		// Function to combine user name and user email id and create user name(ID) value
 		public function userNameList($user_email_list){
@@ -2991,6 +3010,160 @@ class DashboardController extends AppController{
 
 //phase 2 new code till above
 
+
+	//Description : when click on re_allocation button call function
+	//Author :  -> Shankhpal Shende 
+	//Date :18/05/2023
+	//For Routine Inspection (RTI)
+	
+	public function reAllocateApplForRoutineInspection(){
+     
+		$this->autoRender= false;
+		$get_customer_id = explode('-',htmlentities($_POST['customer_id'], ENT_QUOTES));
+	
+		$customer_id = $get_customer_id[0];
+	
+		$appl_type = htmlentities($_POST['appl_type'], ENT_QUOTES);
+
+		$io_user_id = htmlentities($_POST['io_user_id'], ENT_QUOTES);
+			
+		$current_date = date('d-m-Y H:i:s');
+		$ro_scheduled_date = htmlentities($_POST['ro_scheduled_date'], ENT_QUOTES);
+
+		//get allocation table name from flow wise tables
+		$this->loadModel('DmiFlowWiseTablesLists');
+		$this->loadModel('DmiApplicationTypes');
+		$this->loadModel('DmiUsers');
+		$this->loadModel('DmiRoOffices');
+		$this->loadModel('DmiIoAllocationLogs');
+		$this->loadComponent('Customfunctions');
+		$this->loadModel('DmiRtiAllocationsLog'); // log model dedded by shankhpal on 17/05/2023
+
+		$ro_scheduled_date = $this->Customfunctions->dateFormatCheck($ro_scheduled_date);
+
+		$current_level = $this->Session->read('current_level');
+		$username = $this->Session->read('username');
+
+		//get allocating officer user details
+		$get_user_id = $this->DmiUsers->find('all',array('fields'=>'id','conditions'=>array('email IS'=>$username)))->first();
+		
+		$user_id = $get_user_id['id'];
+
+		$appl_type_id = $this->DmiApplicationTypes->find('all',array('conditions'=>array('LOWER(application_type) IS'=>strtolower($appl_type))))->first();
+
+		//this temporary session varible is set for the SMS and Email - Akash [10-10-2022]
+		$_SESSION['application_type_temp'] = $appl_type_id['id'];
+
+		$flow_wise_tables = $this->DmiFlowWiseTablesLists->find('all',array('conditions'=>array('application_type IS'=>$appl_type_id['id'])))->first();
+	
+		$allocation_table = $flow_wise_tables['allocation'];
+		
+		$current_position_table = $flow_wise_tables['appl_current_pos'];
+
+		$this->loadModel($allocation_table);
+		$this->loadModel($current_position_table);
+
+		//get IO user details
+		$user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$io_user_id)))->first();
+		$io_posted_id = $user_details['posted_ro_office'];
+
+		//get IO posted office
+		$io_office = $this->DmiRoOffices->find('all',array('conditions'=>array('id IS'=>$io_posted_id)))->first();
+		$io_office = $io_office['ro_office'];
+	
+
+
+		if($current_level=='level_3'){//by RO/SO as nodal office
+	
+			$allocation_type = '0';// 0 & 1 for first Inspection allocation/reallocation
+			$msg_id = 14;
+	
+			//get latest record for allocation
+			$get_latest_id = $this->$allocation_table->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
+
+			if(!empty($get_latest_id)){
+		
+				if($get_latest_id['level_2'] != null){$allocation_type = '1'; $msg_id = 15;}//to check allocation or reallocation
+
+				$next_level = 'level_2';
+				$mo_column_name = 'level_2';
+			
+			}
+		}
+			
+
+			// this condition used for when first time in allocation tabale have not any entry 
+			//  so we need to add entry first in allocation table 
+				// if(!empty($get_latest_id)){
+
+
+				$this->$allocation_table->updateAll(
+
+					array($mo_column_name=>"$io_user_id",
+					  'current_level'=>"$io_user_id",
+						'modified'=>"$current_date",
+						'ro_scheduled_date'=>"$ro_scheduled_date",
+						'io_scheduled_date'=>"$ro_scheduled_date"),
+					array('id'=>$get_latest_id['id'])
+				);
+
+			
+				
+				  $next_level = 'level_2';
+				  $mo_column_name = 'level_2';
+					//Insert entry in current position table
+				  $this->$current_position_table->currentUserEntry($customer_id,$io_user_id,$next_level);
+
+					// Save the log of allocated application (Done by shankhpal shende on 17/05/2023)
+					$DmiRtiAllocationsLogEntity = $this->DmiRtiAllocationsLog->newEntity(array(
+						
+						$mo_column_name=>$io_user_id,
+						'customer_id'=>$customer_id,
+						'level_3' => $username, 
+						'current_level'=>$io_user_id,
+						'created'=>date('Y-m-d H:i:s'),
+						'modified'=>date('Y-m-d H:i:s'),
+						'ro_scheduled_date'=>$ro_scheduled_date,
+						'io_scheduled_date'=>$ro_scheduled_date
+
+					));
+					$this->DmiRtiAllocationsLog->save($DmiRtiAllocationsLogEntity);
+				
+				#SMS: Rutin Inspection   // commented by shankhpal shende on 09/12/2022
+				//$this->DmiSmsEmailTemplates->sendMessage($msg_id,$customer_id);
+				// }
+
+
+
+					
+			
+				//update current position table
+				$this->$current_position_table->currentUserUpdate($customer_id,$io_user_id,$next_level);
+
+				// Common IO allocation logs, dirrentiate with allocation type nos
+				$allocation_logs_entity = $this->DmiIoAllocationLogs->newEntity(array(
+
+					'customer_id'=>$customer_id,
+					'application_type'=>$appl_type_id['id'],
+					'created'=>$current_date,
+					'user_id'=>$user_id,
+					'io_office'=>$io_office,
+					'io_email_id'=>$io_user_id,
+					'allocation_type'=>$allocation_type
+
+				));
+
+				if($this->DmiIoAllocationLogs->save($allocation_logs_entity)){
+					
+					#SMS: Rutin Inspection   // commented by shankhpal shende on 09/12/2022
+					//$this->DmiSmsEmailTemplates->sendMessage($msg_id,$customer_id); 
+				}
+
+			
+
+			exit;
+
+	}
 
 }
 

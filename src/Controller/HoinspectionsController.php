@@ -142,6 +142,12 @@ use App\Network\Response\Response;
 			$firm_details = $this->DmiFirms->firmDetails($customer_id);
 			$this->set('firm_name',$firm_details['firm_name']);
 
+			//check current postion also, if any case where already allocated and Dy.ama again send HO MO by allocation, then no comment will found from Dyama to HoMO
+			//on 15-05-2023 to resolved such issues, where application get stucked.
+			$checkCurrentPos = $this->$appl_current_pos_table->find('all',array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc'))->first();
+			$curPosUser = $checkCurrentPos['current_user_email_id'];
+			$this->set('curPosUser',$curPosUser);
+
 			// fetch comments history
 			$ho_comment_details = $this->$ho_comments_table->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'OR'=>array('comment_by IS'=>$username,'comment_to'=>$username),$grantDateCondition),'order'=>'id'))->toArray();
 			$this->set('ho_comment_details',$ho_comment_details);
@@ -563,9 +569,11 @@ use App\Network\Response\Response;
 
 		
 	//to redirect on granted applications window	
-		public function redirectGrantedApplications($appl_type_id){
+	//added new parameter "$is_old=null" and set session to manage old applications list, on 29-05-2023 by Amol
+		public function redirectGrantedApplications($appl_type_id,$is_old=null){
 			
 			$this->Session->write('ap_id',$appl_type_id);
+			$this->Session->write('is_old',$is_old);
 			$this->redirect(array('controller'=>'hoinspections', 'action'=>'grantCertificatesList'));
 		}
 
@@ -622,7 +630,15 @@ use App\Network\Response\Response;
 			
 			
 			//set common values conditionally
-			if($appl_type_id == '1'){//for new
+			//added code to get old appl flag from session, and show old verified appl. listing, on 29-05-2023 by Amol
+			$is_old = $this->Session->read('is_old');
+			if($appl_type_id == '1' && !empty($is_old)){//for new
+				
+				$condition = array('pdf_version'=>'1','user_email_id IS'=>'old_application','date(created) >=' => $from_dt, 'date(created) <=' => $to_dt);
+				$report_pdf_field = 'pdf_file';
+			
+			}
+			elseif($appl_type_id == '1'){//for new
 				
 				$condition = array('pdf_version'=>'1','user_email_id !='=>'old_application','date(created) >=' => $from_dt, 'date(created) <=' => $to_dt);
 				$report_pdf_field = 'pdf_file';
@@ -637,6 +653,7 @@ use App\Network\Response\Response;
 				$condition = array('user_email_id !='=>'old_application','date(created) >=' => $from_dt, 'date(created) <=' => $to_dt);
 				$report_pdf_field = 'pdf_file';
 			}
+			
 			
 			//get user roles
 			$this->loadModel('DmiUserRoles');

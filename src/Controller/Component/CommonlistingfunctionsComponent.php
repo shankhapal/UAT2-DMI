@@ -151,7 +151,8 @@
 		
 		
 		//Get MO With HO Create Array Status Method
-		public function getMOWithHOCreateArrayStatus($for_status,$customer_id,$final_submit_table,$ho_comments_table,$each_alloc) {
+		//added new parameter "$appl_current_pos_table" on 15-05-2023 as required, and also added where function is called
+		public function getMOWithHOCreateArrayStatus($for_status,$customer_id,$final_submit_table,$ho_comments_table,$each_alloc,$appl_current_pos_table) {
 			
 			$final_submit_table = TableRegistry::getTableLocator()->get($final_submit_table);
 			$ho_comments_table = TableRegistry::getTableLocator()->get($ho_comments_table);
@@ -201,11 +202,18 @@
 
 						$check_comment_to_status = 	$ho_comments_table->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'to_user'=>$current_user),'order'=>'id DESC'))->first();
 						
+						//check current postion also, if any case where already allocated and Dy.ama again send HO MO by allocation, then no comment will found from Dyama to HoMO
+						//on 15-05-2023 to resolved such issues, where application get stucked.
+						$appl_current_pos_table = TableRegistry::getTableLocator()->get($appl_current_pos_table);
+						$checkCurrentPos = $appl_current_pos_table->find('all',array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc'))->first();
+						
 						if (!empty($check_comment_to_status)) {
 							
 							if($check_if_commented['id'] < $check_comment_to_status['id']) {
 								$creat_array = $check_comment_to_status['modified'];
 							}
+						}else if ($checkCurrentPos['current_user_email_id']==$username) {
+							$creat_array = $checkCurrentPos['modified'];
 						}
 					}
 				}
@@ -243,7 +251,8 @@
 				if($for_status == 'pending') { 
 					$check_final_reported = $final_submit_table->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved','OR'=>array('current_level IN'=>array('level_2','level_3')),$grantDateCondition)))->first();		
 					
-					if (empty($check_final_reported)) {
+					//added $appl_type_id = 10 for routine inspection list by shankhpal shende on 18/05/2023
+					if (empty($check_final_reported) || $appl_type_id == '10') {
 						$creat_array = $each_alloc['modified'];
 					}
 				}
@@ -756,13 +765,25 @@
 			//added condition for lab export, as there will be no siteinspection, so default set to true
 			//29-09-2021 by Amol
 			
+			$flagToShowApplWOReport = null;//new common flag to use in below conditions 
 			if($split_customer_id[1]==3 && ($export_unit_status == 'yes' || $NablDate != null)){//updated on 30-09-2021
 
 				$all_report_status = 'true';
+				$flagToShowApplWOReport = 'yes';
 			
 			//The Below code is added for appl 9 : Surrender Flow to avoid the site inspection- Akash[02-12-2022]
 			}elseif($appl_type_id == 9){ 
 				$all_report_status = 'true';
+				$flagToShowApplWOReport = 'yes';
+			
+			//added condition on 24-05-2023 by Amol for change flow
+			}elseif($appl_type_id == 3){ 
+				$changeInspection = $this->Controller->Customfunctions->inspRequiredForChangeApp($customer_id,$appl_type_id);
+				if($changeInspection=='no'){
+					$all_report_status = 'true';
+					$flagToShowApplWOReport = 'yes';
+				}
+				
 			}
 
 			if($this->Session->read('username') == $office_email_id)
@@ -777,8 +798,10 @@
 						
 						$this->Session->write('ho_comments_readonly','yes');
 						
-						//to get list of lab export appln allocated to HO without Report.					
-						if($split_customer_id[1]==3 && empty($find_id_list) && ($export_unit_status == 'yes' || $NablDate != null))
+						//to get list of lab export appln allocated to HO without Report.
+						//commented condition and used common flag as set from above, on 24-05-2023 by Amol					
+						if(/*$split_customer_id[1]==3 && empty($find_id_list) && ($export_unit_status == 'yes' || $NablDate != null)*/
+							$flagToShowApplWOReport == 'yes')
 						{											
 							$check_if_commented = $ho_comments_table->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'to_user'=>'ro')))->first();
 
@@ -809,8 +832,10 @@
 				elseif($for_status == 'ref_back'){
 					
 					$this->Session->write('ho_comments_readonly','yes');
-					//to get list of lab export appln allocated to HO without Report.					
-					if($split_customer_id[1]==3 && empty($find_id_list) && ($export_unit_status == 'yes' || $NablDate != null))
+					//to get list of lab export appln allocated to HO without Report.
+					//commented condition and used common flag as set from above, on 24-05-2023 by Amol					
+					if(/*$split_customer_id[1]==3 && empty($find_id_list) && ($export_unit_status == 'yes' || $NablDate != null)*/
+						$flagToShowApplWOReport == 'yes')
 					{
 						$check_if_commented = $ho_comments_table->find('list',array('conditions'=>array('customer_id IS'=>$customer_id,'to_user'=>'ro')))->toList();
 						
@@ -868,7 +893,9 @@
 					if(!empty($app_current_pending) && $all_report_status=='true'){
 						
 						//to get list of lab export appln allocated to HO without Report.
-						if($split_customer_id[1]==3 && empty($find_id_list) && ($export_unit_status == 'yes' || $NablDate != null))
+						//commented condition and used common flag as set from above, on 24-05-2023 by Amol	
+						if(/*$split_customer_id[1]==3 && empty($find_id_list) && ($export_unit_status == 'yes' || $NablDate != null)*/
+							$flagToShowApplWOReport == 'yes')
 						{
 							$check_if_commented = $ho_comments_table->find('list',array('conditions'=>array('customer_id IS'=>$customer_id,'to_user'=>'ro')))->toList();
 							
@@ -1107,7 +1134,8 @@
 						$appl_edit_link = '../rosocomments/fetch_record_id/'.$firm_table_id.'/edit/'.$appl_type_id;
 					}
 					elseif($sub_tab=='scrutiny_with_ho_office'){
-						$creat_array = $this->getMOWithHOCreateArrayStatus($for_status,$customer_id,$final_submit_table,$ho_comments_table,$each_alloc);
+						//added new parameter "$appl_current_pos_table" on 15-05-2023 as required, and also added where function is defined
+						$creat_array = $this->getMOWithHOCreateArrayStatus($for_status,$customer_id,$final_submit_table,$ho_comments_table,$each_alloc,$appl_current_pos_table);
 						$comm_with_email = $each_alloc['dy_ama'];
 						$appl_view_link = '../hoinspections/fetch_record_id/'.$firm_table_id.'/view/'.$appl_type_id;
 						$appl_edit_link = '../hoinspections/fetch_record_id/'.$firm_table_id.'/edit/'.$appl_type_id;

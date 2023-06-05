@@ -6,6 +6,7 @@ use App\Network\Email\Email;
 use App\Network\Request\Request;
 use App\Network\Response\Response;
 use Cake\ORM\TableRegistry;
+use Cake\Collection\Collection;
 
 class ApplicationController extends AppController{
 
@@ -97,6 +98,9 @@ class ApplicationController extends AppController{
 		$this->loadModel('DmiChangeSelectedFields');
 		$this->loadModel('DmiChangeFieldLists');
 
+		$this->loadComponent('Beforepageload');
+		$this->Beforepageload->showButtonOnSecondaryHome();
+
 		$customer_id = $this->Customfunctions->sessionCustomerID();
 		$form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
 		$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id);
@@ -106,7 +110,20 @@ class ApplicationController extends AppController{
 		$final_submit_details = $this->DmiChangeFinalSubmits->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'pending',$grantDateCondition),'order'=>'id DESC'))->first();
 		$this->set('final_submit_details',$final_submit_details);
 
-		$changeFieldsList = $this->DmiChangeFieldLists->find('list',array('keyField'=>'field_id','valueField'=>'change_field','conditions'=>array('form_type IS'=>'common'),'order'=>'field_id'))->toArray();
+		$firm_type = $this->Customfunctions->firmType($customer_id);
+		//commented the query on 15-05-2023, and added below code to restrict change fields options as per the CA,PP and Lab
+		//$changeFieldsList = $this->DmiChangeFieldLists->find('list',array('keyField'=>'field_id','valueField'=>'change_field','conditions'=>array('form_type IS'=>'common','firm_type IN'=>array('common',$firm_type),'OR'=>array('firm_type LIKE'=>'%'.$firm_type,'firm_type LIKE'=>$firm_type.'%')),'order'=>'field_id'))->toArray();
+	
+		//added new query on 15-05-2023 to get specific fields only as per the applicant CA,PP and Lab
+		$query = "SELECT field_id, change_field FROM dmi_change_field_lists WHERE form_type = 'common'
+        	AND (firm_type = 'common' OR firm_type = :firmType OR firm_type ILIKE '%' || :firmType || '%' OR firm_type ILIKE :firmType || '%')
+    		ORDER BY field_id";
+
+		$connection = $this->DmiChangeFieldLists->getConnection();
+		$results = $connection->execute($query, ['firmType' => $firm_type])->fetchAll('assoc');
+
+		$changeFieldsList = (new Collection($results))->combine('field_id', 'change_field')->toArray();
+	
 		$this->set('changeFieldsList',$changeFieldsList);
 
 		$selectedValues = $this->DmiChangeSelectedFields->selectedChangeFields();

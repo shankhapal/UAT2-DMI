@@ -1562,10 +1562,14 @@ class OthermodulesController extends AppController{
 
 		$customer_id = $this->Session->read('customer_id');
 		
-		$get_period = $conn->execute("SELECT pp.* FROM dmi_routine_inspection_period AS pp")->fetchAll('assoc');
+			$get_period = $conn->execute("SELECT pp.*
+											   FROM dmi_routine_inspection_period AS pp
+												")->fetchAll('assoc');
 
 		$period_ca = $get_period[0]['period'];
+			
 		$period_lab = $get_period[1]['period'];
+			
 		$period_pp = $get_period[2]['period'];
 
 		//dates between to fetch records
@@ -1585,26 +1589,23 @@ class OthermodulesController extends AppController{
 	
 		// to get array list for allocated lab application 
 		$list_array_lab = $this->DmiRtiAllocations->find('list',array('keyField'=>'id','valueField'=>'customer_id','conditions'=>array('customer_id like'=>'%'.'/3/'.'%',array('date(created) >=' => $from_date_lab, 'date(created) <=' =>$to_date)),'order'=>'id desc'))->toArray();
-		
+		//added by shankhpal for approved list of ca 16/05/2023
+		$get_rti_approved_list_for_ca = [];
 		if(!empty($list_array_ca)){
-			$get_rti_approved_list_for_ca = $this->DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IN'=>$list_array_ca,'status IN'=>'approved','current_level'=>'level_3')))->toArray();
-		}else{
-			$get_rti_approved_list_for_ca = array();
+					$get_rti_approved_list_for_ca = $this->DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IN'=>$list_array_ca,'status IN'=>'approved','current_level'=>'level_3'),'order'=>'id desc'))->toArray();
 		}
-		
+		//added by shankhpal for approved list of pp 16/05/2023
+		$get_rti_approved_list_for_pp = [];
 		if(!empty($list_array_pp)){
 			$get_rti_approved_list_for_pp = $this->DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IN'=>$list_array_pp,'status IN'=>'approved','current_level'=>'level_3'),'order'=>'id desc'))->toArray();
-		}else{
-			$get_rti_approved_list_for_pp = array();
 		}
+//added by shankhpal for approved list of lab 16/05/2023
+		$get_rti_approved_list_for_lab = [];
 		if(!empty($list_array_lab)){
 			$get_rti_approved_list_for_lab = $this->DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IN'=>$list_array_lab,'status IN'=>'approved','current_level'=>'level_3'),'order'=>'id desc'))->toArray();
-		}else{
-			$get_rti_approved_list_for_lab = array();
 		}
 
-
-		$flow_wise_table = $this->DmiFlowWiseTablesLists->find('all',array('conditions'=>array('application_type IS'=>$application_type),'order'=>'id desc'))->first();
+			$flow_wise_table = $this->DmiFlowWiseTablesLists->find('all',array('conditions'=>array('application_type IS'=>$application_type)))->first();
 
 		$report_pdf_table = $flow_wise_table['DmiRtiReportPdfRecords'];
 		$this->loadModel('DmiRtiReportPdfRecords');
@@ -1621,8 +1622,12 @@ class OthermodulesController extends AppController{
 				$report_pdf_field = 'pdf_file';
 				$get_report_pdf = $this->DmiRtiReportPdfRecords->find('all',array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc'))->first();
 				
+					
+					$report_pdf = '';
+					$pdf_version_ca = '';
 				if(!empty($get_report_pdf)){
 					$report_pdf = $get_report_pdf[$report_pdf_field];
+					$pdf_version_ca = $get_report_pdf['pdf_version'];
 				}
 
 				
@@ -1639,6 +1644,7 @@ class OthermodulesController extends AppController{
 				$appl_array_ca[$i]['on_date'] = $each['created'];
 				$appl_array_ca[$i]['report_pdf'] = $report_pdf;
 				$appl_array_ca[$i]['report_link'] = $report_link;
+				$appl_array_ca[$i]['pdf_version'] = $pdf_version_ca;
 				
 				$i=$i+1;
 			//}
@@ -1646,6 +1652,7 @@ class OthermodulesController extends AppController{
 
 		$appl_array_pp = array();
 		$i=0;
+			
 		foreach($get_rti_approved_list_for_pp as $each){	
 			
 			$customer_id = $each['customer_id'];
@@ -1655,8 +1662,12 @@ class OthermodulesController extends AppController{
 				$report_pdf_field = 'pdf_file';
 				$get_report_pdf = $this->DmiRtiReportPdfRecords->find('all',array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc'))->first();
 				
+				$pdf_version_pp = '';
+				$report_pdf = '';
 				if(!empty($get_report_pdf)){
 					$report_pdf = $get_report_pdf[$report_pdf_field];
+						$pdf_version_pp = $get_report_pdf['pdf_version'];
+						
 				}
 
 				//get firm details
@@ -1671,6 +1682,7 @@ class OthermodulesController extends AppController{
 				$appl_array_pp[$i]['on_date'] = $each['created'];
 				$appl_array_pp[$i]['report_pdf'] = $report_pdf;
 				$appl_array_pp[$i]['report_link'] = $report_link;
+				$appl_array_pp[$i]['pdf_version'] = $pdf_version_pp;
 				
 				$i=$i+1;
 			//}
@@ -1687,8 +1699,11 @@ class OthermodulesController extends AppController{
 				$report_pdf_field = 'pdf_file';
 				$get_report_pdf = $this->DmiRtiReportPdfRecords->find('all',array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc'))->first();
 				
+				$report_pdf = '';
+				$pdf_version_lab = '';
 				if(!empty($get_report_pdf)){
 					$report_pdf = $get_report_pdf[$report_pdf_field];
+					$pdf_version_lab= $get_report_pdf['pdf_version'];
 				}
 			
 				//get firm details
@@ -1704,6 +1719,7 @@ class OthermodulesController extends AppController{
 				$appl_array_lab[$i]['on_date'] = $each['created'];
 				$appl_array_lab[$i]['report_pdf'] = $report_pdf;
 				$appl_array_lab[$i]['report_link'] = $report_link;
+				$appl_array_lab[$i]['pdf_version'] = $pdf_version_lab;
 				
 				$i=$i+1;
 			//}

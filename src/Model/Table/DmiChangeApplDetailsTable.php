@@ -36,7 +36,8 @@
 											   'reffered_back_date' => "", 'form_status' =>"", 'customer_reply' =>"", 'customer_reply_date' =>"", 'approved_date' => "",
 											   'user_email_id' => "", 'current_level' => "",'mo_comment' =>"", 'mo_comment_date' => "", 'ro_reply_comment' =>"", 'ro_reply_comment_date' =>"", 'delete_mo_comment' =>"", 'delete_ro_reply' => "",
 											   'delete_ro_referred_back' => "", 'delete_customer_reply' => "", 'ro_current_comment_to' => "",
-											   'rb_comment_ul'=>"",'mo_comment_ul'=>"",'rr_comment_ul'=>"",'cr_comment_ul'=>"",'dist_list'=>"",'business_type'=>"",'rel_doc'=>""); 
+											   'rb_comment_ul'=>"",'mo_comment_ul'=>"",'rr_comment_ul'=>"",'cr_comment_ul'=>"",'dist_list'=>"",'business_type'=>"",'rel_doc'=>"",'commodity_fssai_no'=>"",'commodity_fssai_doc'=>"",'premises_fssai_doc'=>"",
+											   'premises_gst_doc'=>"",'premises_ownership_doc'=>"",'premises_map_doc'=>"",'premises_machineries_doc'=>"",'tbl_proforma_a2_doc'=>""); 
 				
 			}
 
@@ -262,12 +263,73 @@
 					}
 					
 				}
+				//added on 18-05-2023 for upload, required in TBL change
+				if(in_array(3,$selectedValues)){
+					if(!empty($forms_data['tbl_proforma_a2_doc']->getClientFilename())){
+						$file_name = $forms_data['tbl_proforma_a2_doc']->getClientFilename();
+						$file_size = $forms_data['tbl_proforma_a2_doc']->getSize();
+						$file_type = $forms_data['tbl_proforma_a2_doc']->getClientMediaType();
+						$file_local_path = $forms_data['tbl_proforma_a2_doc']->getStream()->getMetadata('uri');												
+						$tbl_proforma_a2_doc = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function					
+					}else{ $tbl_proforma_a2_doc = $section_form_details[0]['tbl_proforma_a2_doc']; }
+
+					$dataArray = array_merge($dataArray,array(
+						'tbl_proforma_a2_doc'=>$tbl_proforma_a2_doc,
+					));
+				}
 				if(in_array(5,$selectedValues)){
+
+					//added new fields for uploads required for premises change, on 17-05-2023
+					if(!empty($forms_data['premises_fssai_doc']->getClientFilename())){
+						$file_name = $forms_data['premises_fssai_doc']->getClientFilename();
+						$file_size = $forms_data['premises_fssai_doc']->getSize();
+						$file_type = $forms_data['premises_fssai_doc']->getClientMediaType();
+						$file_local_path = $forms_data['premises_fssai_doc']->getStream()->getMetadata('uri');												
+						$premises_fssai_doc = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function					
+					}else{ $premises_fssai_doc = $section_form_details[0]['premises_fssai_doc']; }
+
+					if(!empty($forms_data['premises_gst_doc']->getClientFilename())){
+						$file_name = $forms_data['premises_gst_doc']->getClientFilename();
+						$file_size = $forms_data['premises_gst_doc']->getSize();
+						$file_type = $forms_data['premises_gst_doc']->getClientMediaType();
+						$file_local_path = $forms_data['premises_gst_doc']->getStream()->getMetadata('uri');												
+						$premises_gst_doc = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function					
+					}else{ $premises_gst_doc = $section_form_details[0]['premises_gst_doc']; }
+
+					if(!empty($forms_data['premises_ownership_doc']->getClientFilename())){
+						$file_name = $forms_data['premises_ownership_doc']->getClientFilename();
+						$file_size = $forms_data['premises_ownership_doc']->getSize();
+						$file_type = $forms_data['premises_ownership_doc']->getClientMediaType();
+						$file_local_path = $forms_data['premises_ownership_doc']->getStream()->getMetadata('uri');												
+						$premises_ownership_doc = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function					
+					}else{ $premises_ownership_doc = $section_form_details[0]['premises_ownership_doc']; }
+
+					if(!empty($forms_data['premises_map_doc']->getClientFilename())){
+						$file_name = $forms_data['premises_map_doc']->getClientFilename();
+						$file_size = $forms_data['premises_map_doc']->getSize();
+						$file_type = $forms_data['premises_map_doc']->getClientMediaType();
+						$file_local_path = $forms_data['premises_map_doc']->getStream()->getMetadata('uri');												
+						$premises_map_doc = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function					
+					}else{ $premises_map_doc = $section_form_details[0]['premises_map_doc']; }
+
+					if(!empty($forms_data['premises_machineries_doc']->getClientFilename())){
+						$file_name = $forms_data['premises_machineries_doc']->getClientFilename();
+						$file_size = $forms_data['premises_machineries_doc']->getSize();
+						$file_type = $forms_data['premises_machineries_doc']->getClientMediaType();
+						$file_local_path = $forms_data['premises_machineries_doc']->getStream()->getMetadata('uri');												
+						$premises_machineries_doc = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function					
+					}else{ $premises_machineries_doc = $section_form_details[0]['premises_machineries_doc']; }
+
 					$dataArray = array_merge($dataArray,array(
 						'premise_street'=>htmlentities($forms_data['premise_street'], ENT_QUOTES),
 						'premise_state'=>htmlentities($forms_data['premise_state'], ENT_QUOTES),
 						'premise_city'=>htmlentities($forms_data['premise_city'], ENT_QUOTES),
 						'premise_pin'=>htmlentities($forms_data['premise_pin'], ENT_QUOTES),
+						'premises_fssai_doc'=>$premises_fssai_doc,
+						'premises_gst_doc'=>$premises_gst_doc,
+						'premises_ownership_doc'=>$premises_ownership_doc,
+						'premises_map_doc'=>$premises_map_doc,
+						'premises_machineries_doc'=>$premises_machineries_doc,
 					));
 				}
 				if(in_array(6,$selectedValues)){
@@ -318,10 +380,23 @@
 					if ($firm_type==1 || $firm_type==3) {
 						
 						$selected_commodity = implode(',',$forms_data['selected_commodity']);
+
+						//added FFSAI fields on 17-05-2023
+						if(!empty($forms_data['commodity_fssai_doc']->getClientFilename())){
+							$file_name = $forms_data['commodity_fssai_doc']->getClientFilename();
+							$file_size = $forms_data['commodity_fssai_doc']->getSize();
+							$file_type = $forms_data['commodity_fssai_doc']->getClientMediaType();
+							$file_local_path = $forms_data['commodity_fssai_doc']->getStream()->getMetadata('uri');												
+							$commodity_fssai_doc = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function					
+						}else{ $commodity_fssai_doc = $section_form_details[0]['commodity_fssai_doc']; }
+						
 						$dataArray = array_merge($dataArray,array(
 							'comm_category'=>htmlentities($forms_data['comm_category'], ENT_QUOTES),
 							'commodity'=>htmlentities($selected_commodity, ENT_QUOTES),
+							'commodity_fssai_no'=>htmlentities($forms_data['commodity_fssai_no'], ENT_QUOTES),
+							'commodity_fssai_doc'=>$commodity_fssai_doc,
 						));
+
 						
 					} elseif ($firm_type==2) {
 						
@@ -454,12 +529,24 @@
 					'phone_no'=>htmlentities($forms_data['phone_no'], ENT_QUOTES),
 				));
 			}
+			//added on 18-05-2023 for upload, required in TBL change
+			if(in_array(3,$selectedValues)){
+				$dataArray = array_merge($dataArray,array(
+					'tbl_proforma_a2_doc'=>$forms_data['tbl_proforma_a2_doc'],
+				));
+			}
 			if(in_array(5,$selectedValues)){
 				$dataArray = array_merge($dataArray,array(
 					'premise_street'=>htmlentities($forms_data['premise_street'], ENT_QUOTES),
 					'premise_state'=>htmlentities($forms_data['premise_state'], ENT_QUOTES),
 					'premise_city'=>htmlentities($forms_data['premise_city'], ENT_QUOTES),
 					'premise_pin'=>htmlentities($forms_data['premise_pin'], ENT_QUOTES),
+					//new fields for uploads added on 17-05-2023 for premises change
+					'premises_fssai_doc'=>$forms_data['premises_fssai_doc'],
+					'premises_gst_doc'=>$forms_data['premises_gst_doc'],
+					'premises_ownership_doc'=>$forms_data['premises_ownership_doc'],
+					'premises_map_doc'=>$forms_data['premises_map_doc'],
+					'premises_machineries_doc'=>$forms_data['premises_machineries_doc'],
 				));
 			}
 			if(in_array(6,$selectedValues)){
@@ -524,6 +611,8 @@
 					$dataArray = array_merge($dataArray,array(
 						'comm_category'=>htmlentities($forms_data['comm_category'], ENT_QUOTES),
 						'commodity'=>htmlentities($forms_data['selected_comm'], ENT_QUOTES),
+						'commodity_fssai_no'=>htmlentities($forms_data['commodity_fssai_no'], ENT_QUOTES),
+						'commodity_fssai_doc'=>$forms_data['commodity_fssai_doc'],
 					));
 					
 				} elseif ($firm_type==2) {
@@ -727,8 +816,210 @@
 			
 			return array($category_list,$selected_commodities,$selected_packing_types,$selected_category_commodities);
 		}
+
+
+		//to update all changed details to original tables after grant.
+		//to reflect the change in overall application once grant.
+		//this method is called after grant esigned while creating grant pdf, but before entry in grant table
+		//on 20-04-2023
+		public function updateChangeDetailsAftergrant($customer_id){
+			
+			$DmiChangeSelectedFields = TableRegistry::getTableLocator()->get('DmiChangeSelectedFields');
+			$selectedfields = $DmiChangeSelectedFields->selectedChangeFields();
+			$selectedValues = $selectedfields[0];
+			
+			$DmiChangeApplDetails = TableRegistry::getTableLocator()->get('DmiChangeApplDetails');
+			$DmiChangeGrantedLogs = TableRegistry::getTableLocator()->get('DmiChangeGrantedLogs');
+			
+			$getChangeApplDetails = $DmiChangeApplDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+			$getChangeGrantedLogs = $DmiChangeGrantedLogs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+			$version = 1;
+			if(!empty($getChangeGrantedLogs)){
+				$version = $getChangeGrantedLogs['version']+1;
+			}
+			
+			if(in_array(1,$selectedValues)){
+				//get last firm name from table to store in log table
+				$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+				$getFirmName = $DmiFirms->find('all',array('fields'=>'firm_name','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+				
+				//save details in logs table first				
+				$result = $this->saveRecordGrantLogs($customer_id,'Firm Name',$getFirmName['firm_name'],$getChangeApplDetails['firm_name'],$version);
+				//to update details in firm table
+				if($result==true){					
+					$DmiFirms->updateAll(array('firm_name'=>$getChangeApplDetails['firm_name'],'modified'=>date('Y-m-d H:i:s')),array('customer_id'=>$customer_id));
+				}
+				
+			}
+			if(in_array(2,$selectedValues)){
+				
+				//get last firm name from table to store in log table
+				$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+				$getFirmdetails = $DmiFirms->find('all',array('fields'=>array('email','mobile_no','fax_no'),'conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+				//save details in logs table first
+				$changedFields = 'Firm Contact (Mobile, Email, Phone)';
+				$prevValue = $getFirmdetails['email'].', '.$getFirmdetails['mobile_no'].', '.$getFirmdetails['fax_no'];
+				$newValue = $getChangeApplDetails['email_id'].', '.$getChangeApplDetails['mobile_no'].', '.$getChangeApplDetails['phone_no'];
+				//to update details in firm table
+				$result = $this->saveRecordGrantLogs($customer_id,$changedFields,$prevValue,$newValue,$version);
+				if($result==true){					
+					$DmiFirms->updateAll(array('email'=>$getChangeApplDetails['email_id'],'mobile_no'=>$getChangeApplDetails['mobile_no'],
+											'fax_no'=>$getChangeApplDetails['phone_no'],'modified'=>date('Y-m-d H:i:s')),
+										array('customer_id'=>$customer_id));
+				}
+			}
+			if(in_array(5,$selectedValues)){
+				
+				//get last firm name from table to store in log table
+				//to update premises details in firm table
+				$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+				$getFirmdetails = $DmiFirms->find('all',array('fields'=>array('street_address','state','district','postal_code'),'conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();				
+				//save details in logs table first
+				$changedFields = 'Premise/Location in firm table';
+				$prevValue = $getFirmdetails['street_address'].', '.$getFirmdetails['state'].', '.$getFirmdetails['district'].', '.$getFirmdetails['postal_code'];
+				$newValue = $getChangeApplDetails['premise_street'].', '.$getChangeApplDetails['premise_state'].', '.$getChangeApplDetails['premise_city'].', '.$getChangeApplDetails['premise_pin'];
+				
+				$result = $this->saveRecordGrantLogs($customer_id,$changedFields,$prevValue,$newValue,$version);	
+				if($result==true){
+					
+					$DmiFirms->updateAll(array('street_address'=>$getChangeApplDetails['premise_street'],'state'=>$getChangeApplDetails['premise_state'],
+												'district'=>$getChangeApplDetails['premise_city'],'postal_code'=>$getChangeApplDetails['premise_pin'],
+												'modified'=>date('Y-m-d H:i:s')),
+										array('customer_id'=>$customer_id));
+				}
+				
+				//to update in premises profile table for CA and PP
+				$CustomersController = new CustomersController;
+				$firm_type = $CustomersController->Customfunctions->firmType($customer_id);
+				if($firm_type==1){
+					$PremisesProfilesTable = TableRegistry::getTableLocator()->get('DmiCustomerPremisesProfiles');
+				}else{
+					$PremisesProfilesTable = TableRegistry::getTableLocator()->get('DmiPrintingPremisesProfiles');
+				}
+				
+				if($firm_type==1 || $firm_type==2){
+					$getPremisesetails = $PremisesProfilesTable->find('all',array('fields'=>array('id','street_address','state','district','postal_code'),'conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+					//save details in logs table first
+					$changedFields = 'Premise/Location in premises profile table';
+					$prevValue = $getPremisesetails['street_address'].', '.$getPremisesetails['state'].', '.$getPremisesetails['district'].', '.$getPremisesetails['postal_code'];
+					//save details in logs table first
+					$result2 = $this->saveRecordGrantLogs($customer_id,$changedFields,$prevValue,$newValue,$version);	
+					if($result2==true){
+						
+						$PremisesProfilesTable->updateAll(array('street_address'=>$getChangeApplDetails['premise_street'],'state'=>$getChangeApplDetails['premise_state'],
+													'district'=>$getChangeApplDetails['premise_city'],'postal_code'=>$getChangeApplDetails['premise_pin'],
+													'modified'=>date('Y-m-d H:i:s')),
+											array('id'=>$getPremisesetails['id'],'customer_id'=>$customer_id));
+											
+					}
+				}
+				
+
+			}
+			if(in_array(6,$selectedValues)){
+				
+				$DmiCustomerLaboratoryDetails = TableRegistry::getTableLocator()->get('DmiCustomerLaboratoryDetails');
+				$getLabDetails = $DmiCustomerLaboratoryDetails->find('all',array('fields'=>array('id','laboratory_type','laboratory_name','consent_letter_docs','lab_equipped_docs','chemist_detail_docs'),'conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+				//save details in logs table first
+				$changedFields = 'Laboratory Details';
+				$prevValue = $getLabDetails['laboratory_type'].', '.$getLabDetails['laboratory_name'].', '.$getLabDetails['consent_letter_docs'].', '.$getLabDetails['lab_equipped_docs'].', '.$getLabDetails['chemist_detail_docs'];
+				$newValue = $getChangeApplDetails['lab_type'].', '.$getChangeApplDetails['lab_name'].', '.$getChangeApplDetails['lab_consent_docs'].', '.$getChangeApplDetails['lab_equipped_docs'].', '.$getChangeApplDetails['chemist_details_docs'];
+				//to update details Ca lab details table
+				$result = $this->saveRecordGrantLogs($customer_id,$changedFields,$prevValue,$newValue,$version);	
+				if($result==true){
+					
+					$DmiCustomerLaboratoryDetails->updateAll(array('laboratory_type'=>$getChangeApplDetails['lab_type'],'laboratory_name'=>$getChangeApplDetails['lab_name'],
+												'consent_letter_docs'=>$getChangeApplDetails['lab_consent_docs'],'lab_equipped_docs'=>$getChangeApplDetails['lab_equipped_docs'],
+												'chemist_detail_docs'=>$getChangeApplDetails['chemist_details_docs'],'modified'=>date('Y-m-d H:i:s')),
+										array('id'=>$getLabDetails['id'],'customer_id'=>$customer_id));
+										
+				}
+			}
+			if(in_array(7,$selectedValues)){
+
+				//get last category and commodities from table to store in log table
+				$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+				$getFirmDetails = $DmiFirms->find('all',array('fields'=>array('commodity','sub_commodity','packaging_materials'),'conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+				
+				$CustomersController = new CustomersController;
+				$firm_type = $CustomersController->Customfunctions->firmType($customer_id);
+				if ($firm_type==1 || $firm_type==3) {
+					
+					$prevValue = 'category:'.$getFirmDetails['commodity'].' commodities:'.$getFirmDetails['sub_commodity'];
+					$newValue = 'category:'.$getChangeApplDetails['comm_category'].' commodities:'.$getChangeApplDetails['commodity'];
+					//save details in logs table first				
+					$result = $this->saveRecordGrantLogs($customer_id,'Category/Commodity',$prevValue,$newValue,$version);
+					//to update details in firm table				
+					if($result==true){					
+						$DmiFirms->updateAll(array('commodity'=>$getChangeApplDetails['comm_category'],'sub_commodity'=>$getChangeApplDetails['commodity'],'modified'=>date('Y-m-d H:i:s')),array('customer_id'=>$customer_id));
+					}
+
+					
+				} elseif ($firm_type==2) {
+
+					$prevValue = $getFirmDetails['packaging_materials'];
+					$newValue = $getChangeApplDetails['packing_types'];
+					//save details in logs table first				
+					$result = $this->saveRecordGrantLogs($customer_id,'Packing type',$prevValue,$newValue,$version);
+					//to update details in firm table				
+					if($result==true){					
+						$DmiFirms->updateAll(array('packaging_materials'=>$getChangeApplDetails['packing_types'],'modified'=>date('Y-m-d H:i:s')),array('customer_id'=>$customer_id));
+					}
+				}
+			}
+			if(in_array(9,$selectedValues)){
+				
+				$CustomersController = new CustomersController;
+				$firm_type = $CustomersController->Customfunctions->firmType($customer_id);
+				
+				if($firm_type==1){
+					$firmProfilesTable = TableRegistry::getTableLocator()->get('DmiCustomerFirmProfiles');
+				}elseif($firm_type==2){
+					$firmProfilesTable = TableRegistry::getTableLocator()->get('DmiPrintingFirmProfiles');
+				}else{
+					$firmProfilesTable = TableRegistry::getTableLocator()->get('DmiLaboratoryFirmDetails');
+				}
+				
+				$getBusinessType = $firmProfilesTable->find('all',array('fields'=>array('id','business_type'),'conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+				$prevValue = $getBusinessType['business_type'];
+				$newValue = $getChangeApplDetails['business_type'];
+				
+				//save details in logs table first				
+				$result = $this->saveRecordGrantLogs($customer_id,'Business type',$prevValue,$newValue,$version);
+				//to update details in profile table table				
+				if($result==true){					
+					$firmProfilesTable->updateAll(array('business_type'=>$getChangeApplDetails['business_type'],'modified'=>date('Y-m-d H:i:s')),array('id'=>$getBusinessType['id'],'customer_id'=>$customer_id));
+				}
+				
+			}
+			
+			
+			
+		}
 		
 		
+		//to save record in cafter grant log table
+		//on 25-04-2023
+		public function saveRecordGrantLogs($customer_id,$changed_field,$prev_value,$new_value,$version){
+			
+			$DmiChangeGrantedLogs = TableRegistry::getTableLocator()->get('DmiChangeGrantedLogs');
+			
+			$dataArray = array(			
+				'customer_id'=>$customer_id,
+				'grant_by'=>$_SESSION['username'],
+				'changed_field'=>$changed_field,
+				'prev_value'=>$prev_value,
+				'new_value'=>$new_value,
+				'created'=>date('Y-m-d H:i:s'),
+				'version'=>$version		
+			);
+			
+			$grantedLogsEntity = $DmiChangeGrantedLogs->newEntity($dataArray);
+			if($DmiChangeGrantedLogs->save($grantedLogsEntity)){	
+				return true; 
+			}
+			return false;
+		}
 		
 
 } ?>

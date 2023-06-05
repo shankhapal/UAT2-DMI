@@ -86,12 +86,13 @@
                             $tbl_registration_docs = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function
 
                     }else{ $tbl_registration_docs = $edit_tbl_row_data['tbl_registration_docs']; }
-
+				
                     $newEntity = $this->newEntity(array(
                             'id'=>$hide_edit_id,
                             'customer_id'=>$customer_id,
                             'customer_once_no'=>$customer_once_no,
                             'tbl_name'=>$tbl_name,
+							'tbl_comm'=>$forms_data['tbl_comm'],
                             'tbl_registered'=>$tbl_registered,
                             'tbl_registered_no'=>$tbl_registered_no,
                             'tbl_registration_docs'=>$tbl_registration_docs,
@@ -106,11 +107,12 @@
             }		
 		
 		
-		public function editTblDetails($record_id,$tbl_name,$tbl_registered,$tbl_registered_no,$tbl_registration_docs){
+		public function editTblDetails($record_id,$tbl_name,$tbl_registered,$tbl_registered_no,$tbl_registration_docs,$tbl_comm=null){
 			
 			$newEntity = $this->newEntity(array(
 				'id'=>$record_id,
 				'tbl_name'=>$tbl_name,
+				'tbl_comm'=>$tbl_comm,
 				'tbl_registered'=>$tbl_registered,
 				'tbl_registered_no'=>$tbl_registered_no,
 				'tbl_registration_docs'=>$tbl_registration_docs,

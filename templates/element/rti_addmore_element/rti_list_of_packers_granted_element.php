@@ -15,8 +15,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php //pr($section_form_details);die;
-                    //if(!empty($replica_appl_list)){
+                    <?php 
                         $i=0;
                         $sr_no = 1;
                         foreach($section_form_details[3] as $each_details){ ?>
@@ -25,8 +24,9 @@
                                 <td><?php echo $each_details['firm_name'];?></td>
                                 <td><?php echo $each_details['customer_id'];?></td>
                                 <td><?php echo $each_details['validupto'];?></td>
-                                <td><?php echo $this->Form->Control('commList', array('type'=>'select','options'=>$each_details['sub_commodity'],'name'=>'commList', 'id'=>'commList', 'label'=>false));?></td>
-                                <td><?php echo $this->Form->Control('tblList', array('type'=>'select','options'=>$each_details['tbl_name'],'name'=>'tblList', 'id'=>'tblList', 'label'=>false));?></td>
+                                <td><?php echo $this->Form->control('commList', array('type'=>'select', 'options'=>$each_details['sub_commodity'], 'multiple'=>'multiple', 'label'=>false, 'disabled'=>'disabled', 'class'=>'form-control')); ?>
+                                </td><td><?php echo $this->Form->control('tblList', array('type'=>'select', 'options'=>$each_details['tbl_name'], 'multiple'=>'multiple', 'label'=>false, 'disabled'=>'disabled', 'class'=>'form-control')); ?>
+                                </td>
                                 
                             </tr>                                        
 

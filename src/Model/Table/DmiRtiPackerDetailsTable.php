@@ -13,36 +13,36 @@
 			   
 	
 		public function savePackageingDetails($packer_id,$indent,$supplied,$balance,$tbl_name){
-								
-								if(strpos(base64_decode($_SESSION['username']), '@') !== false){//for email encoding
-									$customer_id = $_SESSION['customer_id'];
-								}else{
-									$customer_id = $_SESSION['username'];
-								}
-																	
-								$customer_once_no = $_SESSION['once_card_no'];
-								
-								$newEntity = $this->newEntity(array(
+			
+			if(strpos(base64_decode($_SESSION['username']), '@') !== false){//for email encoding
+				$customer_id = $_SESSION['customer_id'];
+			}else{
+				$customer_id = $_SESSION['username'];
+			}
+												
+			$customer_once_no = $_SESSION['once_card_no'];
+			
+			$newEntity = $this->newEntity(array(
 
-								  'customer_id'=>$customer_id,
-									'packer_id'=>$packer_id,
-									'indent'=>$indent,
-									'supplied'=>$supplied,
-									'balance'=>$balance,
-									'tbl'=>$tbl_name,
-									'created'=>date('Y-m-d H:i:s'),
-									'modified'=>date('Y-m-d H:i:s')
-								
-								)); 
-								
-								if($this->save($newEntity)){
-									
-									return true;
-									
-								}
-								
-								
-							}
+				'customer_id'=>$customer_id,
+				'packer_id'=>$packer_id,
+				'indent'=>$indent,
+				'supplied'=>$supplied,
+				'balance'=>$balance,
+				'tbl'=>$tbl_name,
+				'created'=>date('Y-m-d H:i:s'),
+				'modified'=>date('Y-m-d H:i:s')
+			
+			)); 
+			
+			if($this->save($newEntity)){
+				
+				return true;
+				
+			}
+			
+			
+		}
 
 	public function packagingDetails(){
 		
