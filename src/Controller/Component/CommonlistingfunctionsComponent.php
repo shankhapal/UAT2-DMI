@@ -652,9 +652,12 @@
 							  rsct.to_user ='ro' and fsr.current_level !='level_3'";	
 				$tradate = "rsct.modified as tradate";				
 			}
-			elseif($for_status == 'replied'){						
+			elseif($for_status == 'replied'){
+				
+				//updated condition with "fsr.current_level !='level_3'" new cond. to hide records after grant from "with reg. office" tab
+				//on 06-05-2023 by Amol
 				$conditions = "al.level_3 = '$username' and cp.current_user_email_id = '$username' and al.level_4_ro IS NOT NULL AND rsct.from_user ='ro' and 
-							  rsct.to_user ='so' and fsr.status ='approved' and cp.current_level ='level_3'";
+							  rsct.to_user ='so' and fsr.status ='approved' and fsr.current_level !='level_3' and cp.current_level ='level_3'";
 				$tradate = "rsct.modified as tradate";
 				
 			}elseif($for_status == 'approved'){
