@@ -597,5 +597,6 @@
 	echo $this->Html->script('multiselect/jquery.multiselect');
 	echo $this->Html->script('routininspection/routin_inspection');
     echo $this->Html->script('routininspection/routine_inspection_add_more_pp');
+    echo $this->Html->script('routininspection/rti_file_uploads_validation');
 ?>
 

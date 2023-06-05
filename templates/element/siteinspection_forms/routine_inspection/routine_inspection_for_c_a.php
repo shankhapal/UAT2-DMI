@@ -69,7 +69,7 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group row">
-                                                     <label for="inputEmail3" class="col-sm col-form-label">Address <span class="cRed">*</span></label>
+                                                     <label for="inputEmail3" class="col-sm col-form-label">Address </label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -118,7 +118,7 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group row">
-                                                     <label for="inputEmail3" class="col-sm col-form-label">Certificate No.<span class="cRed">*</span></label>
+                                                     <label for="inputEmail3" class="col-sm col-form-label">Certificate No.</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -133,7 +133,7 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group row">
-                                                     <label for="inputEmail3" class="col-sm col-form-label">Valid Upto.<span class="cRed">*</span></label>
+                                                     <label for="inputEmail3" class="col-sm col-form-label">Valid Upto.</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -153,7 +153,7 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group row">
-                                                     <label for="inputEmail3" class="col-sm col-form-label">Commodities<span class="cRed">*</span></label>
+                                                     <label for="inputEmail3" class="col-sm col-form-label">Commodities</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -170,7 +170,7 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group row">
-                                                     <label for="inputEmail3" class="col-sm col-form-label">Grading laboratory<span class="cRed">*</span></label>
+                                                     <label for="inputEmail3" class="col-sm col-form-label">Grading laboratory</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -210,7 +210,7 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group row">
-                                                     <label for="inputEmail3" class="col-sm col-form-label">Approved Printing press <span class="cRed">*</span></label>
+                                                     <label for="inputEmail3" class="col-sm col-form-label">Approved Printing press</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -292,7 +292,7 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group row">
-                                                       <label for="inputEmail3" class="col-sm col-form-label">Chemist Incharge<span class="cRed">*</span></label>
+                                                       <label for="inputEmail3" class="col-sm col-form-label">Chemist Incharge</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -821,7 +821,7 @@
                                                          <input type="file" name="shortcomings_noticed_docs" class="form-control" id="shortcomings_noticed_docs" multiple='multiple'>
                                                          <span id="error_shortcomings_noticed_docs" class="error invalid-feedback"></span>
                                                          <span id="error_type_shortcomings_noticed_docs" class="error invalid-feedback"></span>
-                                                         <span id="error_size_shortcomings_noticed_docs" class="error invalid-feedback"></span>
+                                                         <span id="error_size_shortcomings_noticed_docs" class="error warning"></span>
                                                      </div>
                                                 </div> 
                                                  <p class="lab_form_note float-right mt-3"><i class="fa fa-info-circle"></i> File type: PDF, jpg &amp; max size upto 2 MB</p>
@@ -983,6 +983,10 @@
 <!-- //firm type is use to validate form fields added by shankhpal on 25/05/023 -->
 <?php 
 echo $this->Html->css('RoutineInspection/routine_inspection_style');
-echo $this->Html->script('routininspection/routin_inspection');?>
+echo $this->Html->script('routininspection/routin_inspection');
+echo $this->Html->script('routininspection/rti_file_uploads_validation');
+
+?>
+
 
 

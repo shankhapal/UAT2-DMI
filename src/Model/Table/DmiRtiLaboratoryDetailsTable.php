@@ -31,61 +31,78 @@ class DmiRtiLaboratoryDetailsTable extends Table{
 	*/
 	public function sectionFormDetails($customer_id)
 	{
-			$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
-					
-			if($latest_id != null){
-				$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();		
-				$form_fields_details = $report_fields;
+			
+        // select record for customer has approved or not
+				$DmiRtiFinalReports = TableRegistry::getTableLocator()->get('DmiRtiFinalReports');
+				$DmiRtiAllocations = TableRegistry::getTableLocator()->get('DmiRtiAllocations');
+				$CustomersController = new CustomersController;
+    
+        // fetch packer approve data
+				$approved_record = $DmiRtiFinalReports->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id desc'))->first();
+
+        $allocated_record = '';
 				
-			}else{
-				$form_fields_details = Array ( 
-          'id' =>"", 
-          'customer_id' =>"", 
-          'date_last_inspection' => '',
-          'date_p_inspection' => '',
-          'name_of_lab' => '',
-          'street_address' => '',
-          'email' => '',
-          'mobile_no' => '',
-          'sub_commodity' => '',
-          'approved_chemist' => '',
-          'present_time_of_inspection' => '',
-          'is_lab_well_lighted' => '',
-          'is_properly_equipped' => '',
-          'eq_working_order' => '',
-          'is_analytical_reg_maintained' => '',
-          'are_up_to_date' => '',
-          'being_forwarded' => '',
-          'last_lot_no' => '',
-          'lat_lot_date' => '',
-          'commodity' => '',
-          'name_of_packers' => '',
-          'p_analytical_reg' => '',
-          'e_briefly_suggestions_radio' => '',
-          'enumerate_briefly_suggestions' => '',
-          'shortcomings_noticed' => '',
-          'suggestions' => '',
-          'authorized_persion_name' => '',
-          'name_of_inspecting_officer' => '',
-          'designation_inspecting_officer' => '',
-          'authorized_signature_docs' => '',
-          'signnature_of_inspecting_officer_docs' => '',
-          'io_reply_once_no' =>"", 
-          'user_email_id' =>"", 
-          'user_once_no' =>"", 
-          'referred_back_comment' =>"", 
-          'referred_back_date' =>"", 
-          'io_reply' =>"",
-				  'io_reply_date' =>"", 
-          'form_status' =>"",  
-				  'referred_back_by_email' =>"", 
-          'referred_back_by_once' =>"", 
-          'current_level' =>"",   
-          'delete_ro_referred_back' =>""); 
+				if(!empty($approved_record)){
+						// if packer is approved then compair approve date to allocation date
+						$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'date(created) > '=>$approved_record['created']),'order'=>'id desc'))->first();
+				}
+        if(empty($allocated_record)){
+
+						$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
+						
+						$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();
+
+						if(empty($allocated_record)){
+							$current_version = $current_version - 1;
+							$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();
+						}
+				}
+
+        $current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
+				$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();	
 				
-			}
-		
-		
+				$last_approved_record = $DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),array('order'=>'id desc')))->first();
+
+				$current_allocated_record = '';
+
+        if(!empty($last_approved_record)){
+
+						$current_allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'date(created) > '=>$last_approved_record['created']),'order'=>'id desc'))->first();
+
+						$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
+						$current_version = $current_version - 1;
+						$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();	
+				
+				}
+        if($last_report_details != null && $last_approved_record != null){
+				
+						$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+						$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();		
+						$form_fields_details = $report_fields;
+			
+				}elseif($last_report_details != null && $last_approved_record == null){
+						
+						$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+						$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();		
+						$form_fields_details = $report_fields;
+
+				}else{
+            if(!empty($last_report_details)){
+					  	$enumerate_briefly_suggestions = $last_report_details['enumerate_briefly_suggestions'];
+					  }
+
+            $form_fields_details = Array ( 
+            'id' =>"",'customer_id' =>"",'date_last_inspection' => "",'date_p_inspection' => "",'name_of_lab' =>"",'street_address' => "",'email' => "",
+            'mobile_no' => "",'sub_commodity' => "",'approved_chemist' => "",'present_time_of_inspection' => "",'is_lab_well_lighted' => "",
+            'is_properly_equipped' => "",'eq_working_order' => "",'is_analytical_reg_maintained' => "",'are_up_to_date' => "",'being_forwarded' => "",
+            'last_lot_no' => "",'lat_lot_date' => "",'commodity' => "",'name_of_packers' => "",'p_analytical_reg' => "",'e_briefly_suggestions_radio' => "",
+            'enumerate_briefly_suggestions' => isset($enumerate_briefly_suggestions)?$enumerate_briefly_suggestions:"",'shortcomings_noticed' => "",
+            'suggestions' => "",'authorized_persion_name' => "",'name_of_inspecting_officer' => "",'designation_inspecting_officer' => "",
+            'authorized_signature_docs' => "",'signnature_of_inspecting_officer_docs' => "",'io_reply_once_no' =>"", 'user_email_id' =>"", 'user_once_no'=>"",'referred_back_comment' =>"",'referred_back_date' =>"",'io_reply' =>"",'io_reply_date' =>"",'form_status' =>"",  
+            'referred_back_by_email' =>"",'referred_back_by_once' =>"",'current_level' =>"",   'delete_ro_referred_back' =>""); 
+
+        }
+
 			$user_email_id = $_SESSION['username'];
 			$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
 			$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
@@ -338,7 +355,10 @@ class DmiRtiLaboratoryDetailsTable extends Table{
           
           $this->save($ioReplyEntity);
         }
-      }						
+      }				
+      
+      $CustomersController = new CustomersController;
+		  $current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
       
       $formSavedEntity = $this->newEntity(array(	
         'id'=>$section_form_details[0]['id'],
@@ -375,6 +395,7 @@ class DmiRtiLaboratoryDetailsTable extends Table{
         'analytical_result_docs' => $analytical_result_docs,
         'user_email_id'=>$_SESSION['username'],
         'user_once_no'=>$_SESSION['once_card_no'],
+        'version'=>$current_version,
         'form_status'=>'saved',
         'created'=>date('Y-m-d H:i:s'),
         'modified'=>date('Y-m-d H:i:s')
@@ -388,6 +409,9 @@ class DmiRtiLaboratoryDetailsTable extends Table{
 
 	public function saveReferredBackComment($customer_id,$report_details,$reffered_back_comment,$rb_comment_ul){
 	
+    $CustomersController = new CustomersController;
+		$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
+
 		$formSavedEntity = $this->newEntity(array(			
 			'customer_id'=>$customer_id,
 			'user_email_id'=>$report_details['user_email_id'],
@@ -428,6 +452,7 @@ class DmiRtiLaboratoryDetailsTable extends Table{
 			'referred_back_by_email'=>$_SESSION['username'],
 			'referred_back_by_once'=>$_SESSION['once_card_no'],
 			'form_status'=>'referred_back',
+      'version'=>$current_version,
 			'current_level'=>$_SESSION['current_level'],
 			'created'=>date('Y-m-d H:i:s'),
 			'modified'=>date('Y-m-d H:i:s')				

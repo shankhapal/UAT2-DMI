@@ -44,73 +44,82 @@ class DmiRtiCaPackerDetailsTable extends Table{
 			if(!empty($approved_record)){
 				// if packer is approved then compair approve date to allocation date
 				$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'date(created) > '=>$approved_record['created']),'order'=>'id desc'))->first();
+				
 			}
 			if(empty($allocated_record)){
 				
-				$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
-				$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();
-				// if($current_version == 1){
-				// 	$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();	
-				// }else{
-				// 	$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$last_version)))->first();
-				// 	$last_version = $current_version - 1;
-				// }
+					$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
+					
+					$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();
+
+					if(empty($allocated_record)){
+						$current_version = $current_version - 1;
+					
+						$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();
+					}
+				
 			}
-			if(!empty($allocated_record)){
-				$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
-				$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();	
+			
+			$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
+			
+			$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();	
+			
+			$last_approved_record = $DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),array('order'=>'id desc')))->first();
+			
+			$current_allocated_record = '';
+			if(!empty($last_approved_record)){
+				
+				$current_allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'date(created) > '=>$last_approved_record['created']),'order'=>'id desc'))->first();
+				
+				if(!empty($current_allocated_record)){
+					
+					$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
+					
+					$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();	
+					
+				}else{
+					$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
+					$current_version = $current_version - 1;
+			  	$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();	
+				}
+				
+				
 			}
-			if($last_report_details != null){
+			if($last_report_details != null && $last_approved_record != null && $allocated_record == null){
+				echo "1";die;
+				$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+				$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();		
+				$form_fields_details = $report_fields;
+			
+			}
+			if($last_report_details != null && $last_approved_record == null){
 				
 				$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
 				$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();		
 				$form_fields_details = $report_fields;
 			}
+			if($last_approved_record != null){
+					$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+					$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();		
+					$form_fields_details = $report_fields;
+			}
 			else{
-				
+					
+					if(!empty($last_report_details)){
+						$enumerate_briefly_suggestions = $last_report_details['enumerate_briefly_suggestions'];
+					}
+
 					$form_fields_details = Array (
-						'id' =>"", 
-						'customer_id' =>"", 
-						'io_reply_once_no' =>"",  
-						'referred_back_comment' =>"", 
-						'referred_back_date' =>"",
-						'date_last_inspection' =>"",
-						'date_p_inspection' =>"",
-						'name_authorized_packer' =>"",
-						'street_address' =>"",
-						'email' =>"",
-						'mobile_no' =>"",
-						'certificate_no' =>"",
-						'valid_upto' =>"",
-						'commodity' =>"",
-						'grading_lab' =>"",
-						'printing_press' =>"",
-						'record_of_invice' =>"",
-						'chemist_incharge' =>"",
-						'present_time_of_inspection' =>"",
-						'premises_adequately' =>"",
-						'lab_properly_equipped' =>"",
-						'are_you_upto_date' =>"",
-						'concerned_offices' =>"",
-						'last_lot_no' =>"",
-						'last_lot_date' =>"",
-						'analytical_results' =>"",
-						'month_upto' =>"",
-						'enumerate_briefly_suggestions'=>"",
-						'replica_account_correct' =>"",
-						'discrepancies_replica_aco' =>"",
-						'fssai_approved ' =>"",
-						'io_reply' =>"", 
-						'io_reply_date' =>"", 
-						'form_status' =>"",
-						'referred_back_by_email' =>"", 
-						'referred_back_by_once' =>"", 
-						'current_level' =>"", 
-						'delete_ro_referred_back' =>"",
-						'analytical_result_docs'=>""
+						'id' =>"",'customer_id' =>"",'io_reply_once_no' =>"",  'referred_back_comment' =>"",'referred_back_date' =>"",'date_last_inspection' =>"",
+						'date_p_inspection' =>"",'name_authorized_packer' =>"",'street_address' =>"",'email' =>"",'mobile_no' =>"",'certificate_no' =>"",
+						'valid_upto' =>"",'commodity' =>"",'grading_lab' =>"",'printing_press' =>"",'record_of_invice' =>"",'chemist_incharge' =>"",
+						'present_time_of_inspection' =>"",'premises_adequately' =>"",'lab_properly_equipped' =>"",'are_you_upto_date' =>"",'concerned_offices' =>"",
+						'last_lot_no' =>"",'last_lot_date' =>"",'analytical_results' =>"",'month_upto' =>"",'enumerate_briefly_suggestions'=>isset($enumerate_briefly_suggestions)?$enumerate_briefly_suggestions:"",'replica_account_correct' =>"",'discrepancies_replica_aco' =>"",
+						'fssai_approved ' =>"",'io_reply' =>"", 'io_reply_date' =>"", 'form_status' =>"",'referred_back_by_email' =>"", 'referred_back_by_once' =>"", 
+						'current_level' =>"", 'delete_ro_referred_back' =>"",'analytical_result_docs'=>""
 					); 
 					
-				}
+			}
 		
 			$Dmi_grant_certificates_pdfs = TableRegistry::getTableLocator()->get('DmiGrantCertificatesPdfs');
 			

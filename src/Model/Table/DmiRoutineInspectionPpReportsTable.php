@@ -31,139 +31,77 @@ class DmiRoutineInspectionPpReportsTable extends Table{
 				// select record for customer has approved or not
 				$DmiRtiFinalReports = TableRegistry::getTableLocator()->get('DmiRtiFinalReports');
 				$DmiRtiAllocations = TableRegistry::getTableLocator()->get('DmiRtiAllocations');
-
+				$CustomersController = new CustomersController;
+				
 				// fetch packer approve data
 				$approved_record = $DmiRtiFinalReports->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id desc'))->first();
 			
 				
 			
 				$allocated_record = '';
+				
 				if(!empty($approved_record)){
-				
-					// if packer is approved then compair approve date to allocation date
-					
-					$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'date(created) > '=>$approved_record['created']),'order'=>'id desc'))->first();
-					
-				
-
-					if(!empty($allocated_record)){
-
-						$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
-						
-						if(!empty($latest_id)){
-							
-							$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();
-									
-							$form_fields_details = $report_fields;
-							$last_inspection_sugg = $form_fields_details['last_insp_suggestion'];
-						}else{
-						
-								$form_fields_details = Array (  
-								'id' =>"", 
-								'customer_id' =>"",
-								'date_last_inspection'=>"",
-								'date_p_inspection'=>"",
-								'email'=>"",
-								'mobile_no'=>"",
-								'packaging_material'=>"",
-								'valid_upto'=>"",
-								'street_address'=>"",
-								'registered_office'=>"",
-								'press_premises'=>"",
-								'physical_check'=>"",
-								'is_printing'=>"",
-								'storage_facilities'=>"",
-								'lab_properly_equipped'=>"",
-								'maintains_proper'=>"",
-								'right_quality_of_printing'=>"",
-								'press_is_marking_logo'=>"",
-								'last_insp_suggestion'=>isset($last_inspection_sugg)?$last_inspection_sugg:"",
-								'short_obserd'=>"",
-								'if_any_sugg'=>"",
-								'signature'=>"",
-								'signature_name'=>"",
-								'io_reply_once_no' =>"", 
-								'user_email_id' =>"",
-								'user_once_no' =>"", 
-								'referred_back_comment' =>"", 
-								'referred_back_date' =>"", 
-								'io_reply' =>"", 
-								'io_reply_date' =>"", 
-								'form_status' =>"",
-								'approved_date' =>"",
-								'referred_back_by_email' =>"", 
-								'referred_back_by_once' =>"", 
-								'current_level' =>"", 
-								'constituent_oil_mill_docs' =>"", 
-								'separate_pipe_lines' =>"no", 
-								'delete_ro_referred_back' =>"");
-						}
-
-					}else{
-							$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
-						
-							if(!empty($latest_id)){
-								
-								$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();
-										
-								$form_fields_details = $report_fields;
-								
-							}
-					}
-				}else{
-
-					$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
-						
-					if(!empty($latest_id)){
-						
-						$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();
-								
-						$form_fields_details = $report_fields;
-						$last_inspection_sugg = $form_fields_details['last_insp_suggestion'];
-					}else{
-						$form_fields_details = Array (  
-						'id' =>"", 
-						'customer_id' =>"",
-						'date_last_inspection'=>"",
-						'date_p_inspection'=>"",
-						'email'=>"",
-						'mobile_no'=>"",
-						'packaging_material'=>"",
-						'valid_upto'=>"",
-						'street_address'=>"",
-						'registered_office'=>"",
-						'press_premises'=>"",
-						'physical_check'=>"",
-						'is_printing'=>"",
-						'storage_facilities'=>"",
-						'lab_properly_equipped'=>"",
-						'maintains_proper'=>"",
-						'right_quality_of_printing'=>"",
-						'press_is_marking_logo'=>"",
-						'last_insp_suggestion'=>"",
-						'short_obserd'=>"",
-						'if_any_sugg'=>"",
-						'signature'=>"",
-						'signature_name'=>"",
-						'io_reply_once_no' =>"", 
-						'user_email_id' =>"",
-						'user_once_no' =>"", 
-						'referred_back_comment' =>"", 
-						'referred_back_date' =>"", 
-						'io_reply' =>"", 
-						'io_reply_date' =>"", 
-						'form_status' =>"",
-						'approved_date' =>"",
-						'referred_back_by_email' =>"", 
-						'referred_back_by_once' =>"", 
-						'current_level' =>"", 
-						'constituent_oil_mill_docs' =>"", 
-						'separate_pipe_lines' =>"no", 
-						'delete_ro_referred_back' =>"");
-					}
-
-					
+						// if packer is approved then compair approve date to allocation date
+						$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'date(created) > '=>$approved_record['created']),'order'=>'id desc'))->first();
 				}
+				if(empty($allocated_record)){
+
+						$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
+						
+						$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();
+
+						if(empty($allocated_record)){
+							$current_version = $current_version - 1;
+							$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();
+						}
+				}
+
+				$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
+				$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();	
+				
+				$last_approved_record = $DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),array('order'=>'id desc')))->first();
+
+				$current_allocated_record = '';
+
+				if(!empty($last_approved_record)){
+
+						$current_allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'date(created) > '=>$last_approved_record['created']),'order'=>'id desc'))->first();
+
+						$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
+						$current_version = $current_version - 1;
+						$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();	
+				
+				}
+				if($last_report_details != null && $last_approved_record != null){
+				
+						$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+						$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();		
+						$form_fields_details = $report_fields;
+			
+				}elseif($last_report_details != null && $last_approved_record == null){
+						
+						$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+						$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();		
+						$form_fields_details = $report_fields;
+
+				}else{
+					
+					if(!empty($last_report_details)){
+						$last_insp_suggestion = $last_report_details['last_insp_suggestion'];
+					}
+
+					$form_fields_details = Array ('id' =>"",'customer_id' =>"",'date_last_inspection'=>"",'date_p_inspection'=>"",'email'=>"",'mobile_no'=>"",'packaging_material'=>"",
+					'valid_upto'=>"",'street_address'=>"",'registered_office'=>"",'press_premises'=>"",'physical_check'=>"",'is_printing'=>"",
+					'storage_facilities'=>"",'lab_properly_equipped'=>"",'maintains_proper'=>"",'right_quality_of_printing'=>"",'press_is_marking_logo'=>"",
+					'last_insp_suggestion'=>isset($last_insp_suggestion)?$last_insp_suggestion:"",'short_obserd'=>"",'if_any_sugg'=>"",'signature'=>"",
+					'signature_name'=>"",'io_reply_once_no' =>"", 'user_email_id' =>"",'user_once_no' =>"", 'referred_back_comment' =>"", 'referred_back_date' =>"", 
+					'io_reply' =>"", 'io_reply_date' =>"", 'form_status' =>"",'approved_date' =>"",'referred_back_by_email' =>"", 'referred_back_by_once' =>"", 
+					'current_level' =>"", 'constituent_oil_mill_docs' =>"",'separate_pipe_lines' =>"no", 'delete_ro_referred_back' =>"");
+
+				}
+
+					
+	
 
 				
 				$user_email_id = $_SESSION['username'];
@@ -399,6 +337,9 @@ class DmiRoutineInspectionPpReportsTable extends Table{
 			}
 		}
 
+		$CustomersController = new CustomersController;
+		$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
+
 		$formSavedEntity = $this->newEntity(array(
 			'id'=>$section_form_details[0]['id'],
 			'customer_id'=>$customer_id,
@@ -424,6 +365,7 @@ class DmiRoutineInspectionPpReportsTable extends Table{
 			'shortcomings_noticed_docs'=>$shortcomings_noticed_docs,
 			'name_of_inspecting_officer'=> $htmlencoded_name_of_inspecting_officer,
 			'signnature_io_docs'=>$signnature_io_docs,
+			'version'=>$current_version,
 			'form_status'=>'saved',
 			'created'=>date('Y-m-d H:i:s'),
 			'modified'=>date('Y-m-d H:i:s')
@@ -438,6 +380,9 @@ class DmiRoutineInspectionPpReportsTable extends Table{
 */
 	public function saveReferredBackComment($customer_id,$report_details,$reffered_back_comment,$rb_comment_ul){
 			
+		$CustomersController = new CustomersController;
+		$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
+
 		$formSavedEntity = $this->newEntity(array(
 			'customer_id'=>$customer_id,
 			'user_email_id'=>$report_details['user_email_id'],
@@ -467,6 +412,7 @@ class DmiRoutineInspectionPpReportsTable extends Table{
 			'referred_back_date'=>date('Y-m-d H:i:s'),
 			'referred_back_by_email'=>$_SESSION['username'],
 			'referred_back_by_once'=>$_SESSION['once_card_no'],
+			'version'=>$current_version,
 			'form_status'=>'referred_back',
 			'current_level'=>$_SESSION['current_level'],
 			'created'=>date('Y-m-d H:i:s'),

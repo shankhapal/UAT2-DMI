@@ -53,7 +53,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
         <div class="row">
             <div class="col-md-3">
                 <div class="form-group row">
-                    <label for="inputEmail3" class="col-sm col-form-label">Name of the laboratory <span class="cRed">*</span></label>
+                    <label for="inputEmail3" class="col-sm col-form-label">Name of the laboratory</label>
                 </div>
             </div>
             <div class="col-md-3">
@@ -62,7 +62,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
             </div>
             <div class="col-md-3">
                 <div class="form-group row">
-                    <label for="inputEmail3" class="col-sm col-form-label">Address of the laboratory <span class="cRed">*</span></label>
+                    <label for="inputEmail3" class="col-sm col-form-label">Address of the laboratory </label>
                 </div>
             </div>
             <div class="col-md-3">
@@ -78,7 +78,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
         <div class="row">
             <div class="col-md-2">
                 <div class="form-group row">
-                    <label for="inputEmail3" class="col-sm col-form-label">Email Id <span class="cRed">*</span></label>
+                    <label for="inputEmail3" class="col-sm col-form-label">Email Id </label>
                 </div>
             </div>
             <div class="col-md-4">
@@ -87,7 +87,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
             </div>
             <div class="col-md-2">
                 <div class="form-group row">
-                    <label for="inputEmail3" class="col-sm col-form-label">Mobile No. <span class="cRed">*</span></label>
+                    <label for="inputEmail3" class="col-sm col-form-label">Mobile No.</label>
                 </div>
             </div>
             <div class="col-md-4">
@@ -104,7 +104,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group row">
-                    <label for="inputEmail3" class="col-sm col-form-label">Commodities <span class="cRed">*</span></label>
+                    <label for="inputEmail3" class="col-sm col-form-label">Commodities </label>
                 </div>
             </div>
             <div class="col-md-6">
@@ -716,6 +716,8 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
     <input type="hidden" id="checkeditsession" value="<?php echo $_SESSION['rtiupdatemode']; ?>">
 <?php } ?>
 <!-- //firm type is use to validate form fields added by shankhpal on 25/05/023 -->
-<?php echo $this->Html->script('routininspection/routin_inspection'); ?>
-<?php echo $this->Html->script('routininspection/want_to_edit_rti'); ?>
+<?php echo $this->Html->script('routininspection/routin_inspection'); 
+      echo $this->Html->script('routininspection/want_to_edit_rti'); 
+      echo $this->Html->script('routininspection/rti_file_uploads_validation');
+?>
 

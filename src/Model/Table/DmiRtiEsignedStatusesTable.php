@@ -27,9 +27,10 @@
 		
 		$inspection_report_table = $Dmi_flow_wise_tables_list->getFlowWiseTableDetails($_SESSION['application_type'],'inspection_report');
 		$Dmi_siteinspection_final_report = TableRegistry::getTableLocator()->get($inspection_report_table);
-				
+			
 		//check application type new/old 
 		$get_type = $Dmi_firm->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+			
 		if($get_type['is_already_granted']=='yes'){			
 			$type = 'old';
 		}else{
