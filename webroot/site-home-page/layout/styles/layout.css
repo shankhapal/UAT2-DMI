@@ -616,13 +616,13 @@ table a, #comments a{background-color:inherit;}
 		height: 430px;
 	}
 	#main1{
-		background-image: url('https://10.158.81.78/DMI/img/home-slider/banner2.jpg');
+		background-image: url('https://localhost/UAT-DMI/img/home-slider/banner2.jpg');
 	
 	}
 	#main2 {
-			background-image: url('https://10.158.81.78/DMI/img/home-slider/banner4.jpg');
+			background-image: url('https://localhost/UAT-DMI/img/home-slider/banner4.jpg');
 		}
 	#main3 {
-					background-image: url('https://10.158.81.78/DMI/img/home-slider/banner5.jpg');
+					background-image: url('https://localhost/UAT-DMI/img/home-slider/banner5.jpg');
 	}
 /* till here */

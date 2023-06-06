@@ -29,15 +29,13 @@
 										<input class="custom-control-input" type="radio" id="scrutinized_report" name="report_type">
 										<label class="custom-control-label" for="scrutinized_report">Scrutinized Report</label>
 									</div>
-									<!--<div class="custom-control custom-radio ml-2">
-										<input class="custom-control-input" type="radio" id="allocate_report" name="report_type">
-										<label class="custom-control-label" for="allocate_report">Allocate Report</label>
-									</div>-->
 								</div>
 							</div>
 							<div class="card-body">
 								<div id="pending_report_table">
-									<div class="card-header"><h3 class="card-title-new">Pending Reports</h3></div>
+
+									<p class="alert">NOTE :: This is a list of the finalized reports from LIMS that are currently awaiting further processing, including attachment of packer, optional allocation, scrutiny, or action-taking. </p>
+									<h3 class="card-title-new text-bold">Pending Reports</h3>
 									<table class="table table-striped table-sm table-hover table-bordered">
 									<caption>Pending Reports</caption>
 										<thead class="tableHead">
@@ -102,7 +100,8 @@
 								</div>
 
 								<div id="scrutinized_report_table">
-									<div class="card-header"><h3 class="card-title-new">Scrutinized Reports</h3></div>
+									<p class="alert">NOTE :: This is a list of reports that have been scrutinized by the office in-charge and found to have no issues. </p>
+									<h3 class="card-title-new text-bold">Scrutinized Reports</h3>
 									<table class="table table-striped table-hover table-sm table-bordered">
 									<caption>Scrutinized Reports</caption>
 										<thead class="tableHead">
@@ -138,47 +137,6 @@
 										</tbody>
 									</table>
 								</div>
-
-								<!--
-								<div id="allocated_report_table">
-									<div class="card-header"><h3 class="card-title-new">Allocated Reports</h3></div>
-									<table class="table table-striped table-hover table-sm table-bordered">
-									<caption>Allocated Reports</caption>
-										<thead class="tableHead">
-											<tr>
-												<th>Sr No</th>
-												<th>Sample Code</th>
-												<th>Packer ID</th>
-												<th>Action</th>
-											</tr>
-										</thead>
-										<tbody class="tableBody">
-											<?php /*
-
-											if (isset($get_allocations)) {
-												$i = 0;
-												foreach ($get_allocations as $each) :
-													$i++; 	
-																
-													?>
-													<tr>
-														<td><?php echo $i; ?></td>
-														<td><?php echo $each['sample_code']; ?></td>
-														<td><?php echo $each['customer_id'] ?></td>
-														<td>
-															<?php echo $this->Html->link(
-																'',
-																['controller' => 'misgrading', 'action' => 'redirectToAllocate', $each['sample_code'], 'level_1','edit'],
-																['class' => 'fas fa-long-arrow-alt-right', 'title' => 'Edit']
-															); ?> 
-														</td>
-													</tr>
-											<?php endforeach; } */ ?>
-										</tbody>
-									</table>
-								</div>
-								-->
-
 							</div>
 						</div>
 					</div>

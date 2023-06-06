@@ -3,9 +3,9 @@ if (isset($_REQUEST['to']))
 {
 $to = $_REQUEST['to'];
 $to = htmlspecialchars($to);
-$host='10.158.81.78';
+$host='localhost';
 $ip=$_SERVER['SERVER_ADDR'];
-$from="no-reply@10.158.81.78";
+$from="no-reply@localhost";
 $subject="This is a configuration test mail for email relay";
 $message="This is a test message sent from $host. It originated from the IP address $ip. If you received this email, that means that the PHP mail function is working on this server.";
 $headers="From: $from" . "\r\n" . "X-Mailer: PHP/" . phpversion();

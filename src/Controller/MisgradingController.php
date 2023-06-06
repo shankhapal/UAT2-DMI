@@ -57,61 +57,42 @@ class MisgradingController extends AppController{
 		// Get the posted office ID for the current user
 		$loc_id = $this->DmiUsers->getPostedOffId($_SESSION['username']);
 
-		// Fetch the org_sample_codes from the workflow table
-		$query = "SELECT org_sample_code 
-				FROM workflow 
-				WHERE src_loc_id = '$loc_id' 
-				GROUP BY org_sample_code";
-		$orgSampleCodes = $con->execute($query)->fetchAll('assoc');
+		// Fetch the final grading reports
+		$query = "SELECT w.org_sample_code,	w.tran_date, mcc.category_name, 
+						mc.commodity_name, mst.sample_type_desc, 
+						mc.commodity_code, si.report_pdf, 
+						si.packer_attached,	si.packer_id,	
+						si.scrutiny_status,si.action_final_submit,
+						si.allocated
+				FROM workflow w
+				INNER JOIN sample_inward si ON si.org_sample_code = w.org_sample_code
+				INNER JOIN m_commodity_category mcc ON mcc.category_code = si.category_code
+				INNER JOIN m_commodity mc ON mc.commodity_code = si.commodity_code
+				INNER JOIN m_sample_type mst ON mst.sample_type_code = si.sample_type_code
+				WHERE si.status_flag != 'junked' 
+					AND w.stage_smpl_flag = 'FG' 
+					AND w.org_sample_code IN (
+						SELECT org_sample_code 
+						FROM workflow 
+						WHERE src_loc_id = :loc_id 
+						GROUP BY org_sample_code
+					)
+				ORDER BY w.tran_date DESC";
 
+		$finalGrading = $con->execute($query, ['loc_id' => $loc_id])->fetchAll('assoc');
+		
+	
 		$finalReports = [];
+		foreach ($finalGrading as $row) {
 
-		if (!empty($orgSampleCodes)) {
-			foreach ($orgSampleCodes as $orgSampleCode) {
-
-				$sampleCode = $orgSampleCode['org_sample_code'];
-				
-				$query = "SELECT w.stage_smpl_cd, w.tran_date, mcc.category_name, 
-								mc.commodity_name, mst.sample_type_desc, 
-								mc.commodity_code, si.report_pdf, w.org_sample_code,
-								si.packer_attached,si.action_final_submit,si.scrutiny_status,si.packer_id
-			
-						FROM workflow w
-						INNER JOIN sample_inward si ON si.org_sample_code = w.org_sample_code
-						INNER JOIN m_commodity_category mcc ON mcc.category_code = si.category_code
-						INNER JOIN m_commodity mc ON mc.commodity_code = si.commodity_code
-						INNER JOIN m_sample_type mst ON mst.sample_type_code = si.sample_type_code
-						WHERE si.status_flag != 'junked' 
-						AND w.stage_smpl_flag = 'FG' 
-						AND w.org_sample_code = '$sampleCode' 
-						AND si.action_final_submit != 'scrutinized'
-						ORDER BY w.tran_date DESC";
-				$finalGrading = $con->execute($query)->fetchAll('assoc');
-		
-				if (!empty($finalGrading)) {
-					$finalReports = array_merge($finalReports, $finalGrading);
-				}
+			// Check if either 'scrutiny_status' or 'action_final_submit' contains 'Yes'
+			if ($row['scrutiny_status'] === 'Yes' || $row['action_final_submit'] === 'Yes') {
+				continue; // Skip the iteration
 			}
+
+			$finalReports[] = $row;
 		}
 
-		pr($finalReports); exit;
-		
-		
-
-
-
-		//To get the allocated Report to the current user
-		$this->loadModel('DmiMmrAllocations');
-		$resultIds = $this->DmiMmrAllocations->find('list',array('fields'=>array('customer_id','id'=>'max(id)'),'order'=>array('id DESC'),'group'=>'customer_id'))->toArray();	
-		if(!empty($resultIds)){
-			$get_allocations = $this->DmiMmrAllocations->find('all',array('conditions' => array('id IN'=>$resultIds, 'level_1 = current_level','level_1 IS'=>$_SESSION['username'])))->toArray();
-		}else{ 
-			$get_allocations = array(); 
-		}
-		
-
-		//to get the scrutinized report for the current user
-		$this->loadModel('DmiMmrFinalSubmits');
 
 		$scrutinizedReports = $this->DmiMmrFinalSubmits->find('all');
 	
@@ -136,7 +117,6 @@ class MisgradingController extends AppController{
 		}
 
 		$this->set('scrutinyDone',$scrutinyDone);
-		$this->set('get_allocations',$get_allocations);
 		$this->set('final_reports', $finalReports);
 
 		
@@ -296,7 +276,15 @@ class MisgradingController extends AppController{
 			if($this->DmiMmrFinalSubmits->saveData($this->request->getData())){
 
 				$message_theme = 'success';
-				$message = 'The details for this report have been saved. You can now allocate this report to a scrutinizer or you can scrutinize the report.';
+				$message = 
+				'	
+					The Details for the Sample Code and the Packer are Saved Successfully.
+					Now, You can choose any of these options based on the requirements and circumstances surrounding the report.: <br>
+					1.Allocate the report: Assign the report to a scrutinizer who will review and analyze it further.<br>
+					2.Scrutinize the report: Personally review and examine the report for any discrepancies or issues.<br>
+					3.Take action against the packer: If necessary, initiate appropriate actions or follow-up steps in response to the report findings.
+					
+				';
 				$redirect_to = 'allocate_report';
 			}
 
