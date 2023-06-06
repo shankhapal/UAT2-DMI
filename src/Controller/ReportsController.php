@@ -24,6 +24,8 @@ class ReportsController extends AppController {
 	var $name = 'Reports';
 
 	public function initialize(): void {
+		ini_set('memory_limit', '1024M');
+
 
 		parent::initialize();
 		$this->loadComponent('Customfunctions');
@@ -31,6 +33,7 @@ class ReportsController extends AppController {
 		$this->loadComponent('Progressbar');
 		$this->loadComponent('Createcaptcha');
 		$this->loadComponent('Reportstatistics');
+		$this->loadComponent('Reportsfunctions');
 		$this->viewBuilder()->setLayout('admin_dashboard');
 		$this->viewBuilder()->setHelpers(['Form','Html','Csv']);
 
@@ -75,7 +78,6 @@ class ReportsController extends AppController {
 		if ($this->Session->read('username') == null) {
 
 			$this->customAlertPage("Sorry You are not authorized to view this page..");
-			exit();
 		}
 
 		$user_role = $this->DmiUserRoles->find('all')->select(['view_reports'])->where(['user_email_id IS' => $this->Session->read('username')])->first(); 
@@ -83,27 +85,35 @@ class ReportsController extends AppController {
 		if ($this->Session->read('username') == null && $user_role['view_reports'] == 'yes') {
 
 			$this->customAlertPage("Sorry You are not authorized to view this page..");
-			exit();
 		}
 
 		/* set last action url for back button on reports, Done By Pravin Bhakare 06-03-2018  */
 		$currentAction = $this->request->getParam('action');
 
 		if ($this->Session->read('backAction') == null && $currentAction == "reportTypes") {
-
+			
 			$this->Session->write('backAction',$currentAction);
+			$this->Session->write('back',$currentAction );//added by laxmi for back button on 9-03-23
 
 		} elseif ($this->Session->read('backAction') != null && $currentAction == "aqcmsStatistics") {
-
+		
 			$this->Session->write('backAction',$currentAction);
-
+		
 		} elseif ($this->Session->read('backAction') != null && $currentAction == "reportTypes") {
 
 			$this->Session->write('backAction',$currentAction);
+		//added elseif by laxmi on 09-03-2023	
+		}elseif($this->Session->read('backAction') == 'aqcmsStatistics' && $currentAction != 'aqcmsStatistics'){
+
+			$this->Session->write('backAction',$this->Session->read('backAction'));
 		}
 
-		$this->set('backAction',$this->Session->read('backAction'));
-
+		//added if else by laxmi for back button on 9-03-23
+		if($currentAction == 'aqcmsStatistics'){
+			$this->set('backAction',$this->Session->read('back'));
+		}else{
+			$this->set('backAction',$this->Session->read('backAction'));
+		}
 	}
 
 
@@ -150,6 +160,7 @@ class ReportsController extends AppController {
 
 	public function aqcmsStatistics() {
 
+		
 		$report_name = 'AQCMS Statistics';
 		$this->set('report_name',$report_name);
 
@@ -185,7 +196,7 @@ class ReportsController extends AppController {
 		$current_ro_id = '';
 
 		foreach ($rolist as $each_user) {
-
+			
 			if (!empty($user_role)) {
 
 				$current_ro_id = $each_user['id'];
@@ -193,22 +204,23 @@ class ReportsController extends AppController {
 
 			$ro_name_list[$each_user['id']] = $each_user['f_name']." ".$each_user['l_name']."  (".base64_decode($each_user['email']).") - (".$ro_office_list[$each_user['posted_ro_office']].")"; //for email encoding
 		}
-
+		
 		asort($ro_name_list);
 		$this->set('ro_name_list',$ro_name_list);
+		
 
 		$aqcms_statistics_report = null;
 
 		 //delete previus session by laxmi b on 21-02-2023 
-        if(!empty($this->Session->read('search_from_date')) && !empty($this->Session->read('search_to_date')) || !empty($this->Session->read('search_user_role')) || !empty($this->Session->read('application_approved_office'))) {
-            $this->Session->delete('search_from_date');
+		if(!empty($this->Session->read('search_from_date')) && !empty($this->Session->read('search_to_date')) || !empty($this->Session->read('search_user_role')) || !empty($this->Session->read('application_approved_office'))) {
+			$this->Session->delete('search_from_date');
 			$this->Session->delete('search_to_date');
 			$this->Session->delete('search_user_role');
 			$this->Session->delete('application_approved_office');
-        }
+		}
 
 		if (null !== ($this->request->getData('search'))) {
-
+			
 			$aqcms_statistics_report = 1;
 
 			$this->Session->delete('ro_id');
@@ -217,11 +229,12 @@ class ReportsController extends AppController {
 			$to_date = $this->request->getData('to_date');
 			$this->Session->write('ro_id',$ro_id);
 			//delete session variable by laxmi on 15-02-2023
-            $this->Session->delete('roOfficeShortCode');
+			$this->Session->delete('roOfficeShortCode');
 			$this->Session->delete('ro_office_id');
 			$this->Session->delete('from_date');
 			$this->Session->delete('to_date');
-            $this->Session->delete('roId');	   
+			$this->Session->delete('roId');	   
+			
 			if (!empty($ro_id)) {
 
 				
@@ -243,16 +256,16 @@ class ReportsController extends AppController {
 				}
 				
 				//code added for disrtict problem for brijesh tiwari added by laxmi B on 17-02-2023
-              if(empty($district_list)){  
-                 $from_date= '';
-                 $to_date = '';
-                 $ro_id = '';
-              }
+				if(empty($district_list)){  
+					$from_date= '';
+					$to_date = '';
+					$ro_id = '';
+				}
 			}
 			//set ro_office short code ro_office id from_date and to_date in session by laxmi B. on 15-02-2023
 			$this->Session->write('from_date',$from_date);
 			$this->Session->write('to_date',$to_date);
-
+			
 			
 			//Check Between Dates
 			if (!empty($from_date) && !empty($to_date) && !empty($ro_id)) {
@@ -280,11 +293,11 @@ class ReportsController extends AppController {
 				$query_tfr = $this->DmiFirms->find('all');
 
 				$total_firm_register = $query_tfr->select(['certification_type', 'count' => $query_tfr->func()->count('certification_type')])
-																					->where($searchConditions)
-																					->bind(':start', $from_date, 'date')->bind(':end', $to_date, 'date')
-																					->group(['certification_type'])
-																					->order(['certification_type' => 'ASC'])
-																					->toArray(); 
+												->where($searchConditions)
+												->bind(':start', $from_date, 'date')->bind(':end', $to_date, 'date')
+												->group(['certification_type'])
+												->order(['certification_type' => 'ASC'])
+												->toArray(); 
 
 				$total_delete_firms = $this->DmiFirms->find('all')->where($searchConditions)->where(['delete_status IS NOT' => NULL])
 																	->bind(':start', $from_date, 'date')->bind(':end', $to_date, 'date')
@@ -337,9 +350,9 @@ class ReportsController extends AppController {
 
 			//$applications_current_positions_tables =  ['DmiFinalSubmits' => 'DmiAllApplicationsCurrentPositions', 'DmiRenewalFinalSubmits' => 'DmiRenewalAllCurrentPositions'];
 			//comment above & fetch all array of table from flowise table added by laxmi B. on 09-02-2023
-			 $applTypeArray = $this->Session->read('applTypeArray');
-			 $this->loadModel('DmiFlowWiseTablesLists');
-            $applications_current_positions_tables = $this->DmiFlowWiseTablesLists->find('all')->select(['application_form','appl_current_pos'])->where(array('application_type IN'=>$applTypeArray))->order(['id'])->combine('application_form','appl_current_pos')->toArray();
+			$applTypeArray = $this->Session->read('applTypeArray');
+			$this->loadModel('DmiFlowWiseTablesLists');
+			$applications_current_positions_tables = $this->DmiFlowWiseTablesLists->find('all')->select(['application_form','appl_current_pos'])->where(array('application_type IN'=>$applTypeArray))->order(['id'])->combine('application_form','appl_current_pos')->toArray();
 
 
 			$pendingCountForMo = 0;
@@ -350,12 +363,12 @@ class ReportsController extends AppController {
 			if (!empty($from_date) && !empty($to_date) && !empty($ro_id)) {
 
 				$searchPendingConditions = ['AND' => [$OfficeShortCode, 'date(modified) BETWEEN :start AND :end']];// added array for Key AND by laxmi on 14-02-2023
-                   $from_date =$from_date;
-				   $to_date = $to_date;	   
+				$from_date =$from_date;
+				$to_date = $to_date;
 			} elseif (empty($from_date) && empty($to_date) && !empty($ro_id)) {
 
 				$searchPendingConditions = ['OR'=>$OfficeShortCode];
-                $from_date ='';
+				$from_date ='';
 				$to_date = '';
 			} elseif (!empty($from_date) && !empty($to_date) && empty($ro_id)) {
 
@@ -373,37 +386,47 @@ class ReportsController extends AppController {
 
 
 			$application_processed_type = ['new_app_processed','renewal_app_processed','backlog_app_processed'];
-
+			
 
 			foreach ($application_processed_type as $each) {
 
 				$application_processed[] = $this->Reportstatistics->$each($searchPendingConditions, $from_date, $to_date);//from_date to_date added by laxmi on 13-20-2023
 				
 			}
-
+		
 
 			if (!empty($from_date) && !empty($to_date)) {
 
 				foreach ($applications_current_positions_tables as $each_table) {
 
 					$key = array_search ($each_table, $applications_current_positions_tables);
-
 					//load list of table added by laxmi on 09-02-2023
 					$this->loadModel($each_table); 
 					$this->loadModel($key);
 
+					//below query commented by shreeya bcoz of added new query Date [ 01-06-23]
+					//For Progress with MO
+					// $inprogress_with_mo = $this->$each_table->find('all')->select(['id', 'customer_id'])
+					// 										->where($searchPendingConditions)->where(['current_level' => 'level_1'])
+					// 										->bind(':start', $from_date, 'date')->bind(':end', $to_date, 'date')
+					// 										->combine('id', 'customer_id')->toArray(); 
+					// $pendingCountForMo = $pendingCountForMo + count($inprogress_with_mo);
+
+					//added new query if customer_is is null could not show null entry in cout
+					//by shreeya on date [ 01-06-2023]
 					//For Progress with MO
 					$inprogress_with_mo = $this->$each_table->find('all')->select(['id', 'customer_id'])
-															->where($searchPendingConditions)->where(['current_level' => 'level_1'])
-															->bind(':start', $from_date, 'date')->bind(':end', $to_date, 'date')
-															->combine('id', 'customer_id')->toArray(); 
+												->where($searchPendingConditions)->where(['current_level' => 'level_1'])->
+												bind(':start', $from_date, 'date')->bind(':end', $to_date, 'date')
+												->where(function ($exp, $q) {return $exp->notEq('customer_id', '');
+												})->combine('id', 'customer_id')->toArray();
 					$pendingCountForMo = $pendingCountForMo + count($inprogress_with_mo);
 
 					//For Progress with IO
 					$inprogress_with_io = $this->$each_table->find('all')->select(['id', 'customer_id'])
 															->where($searchPendingConditions)->where(['current_level' => 'level_2'])
 															->bind(':start', $from_date, 'date')->bind(':end', $to_date, 'date')
-															->combine('id', 'customer_id')->toArray(); 
+															->combine('id', 'customer_id')->toArray();
 					$pendingCountForIo = $pendingCountForIo + count($inprogress_with_io);
 
 
@@ -421,21 +444,29 @@ class ReportsController extends AppController {
 															->bind(':start', $from_date, 'date')->bind(':end', $to_date, 'date')
 															->combine('id', 'customer_id')->toArray(); 
 
-					foreach ($inprogress_with_ro as $each_record ) {
-
-						$result_status = $this->$key->find('all')->where(['customer_id' => $each_record, 'status' => 'approved', 'current_level' => 'level_3'])->toArray(); 
-
-
-						if (empty($result_status)) {
-
-							$inprogress_app_with_ro[] = $each_record;
-						}
-					}
+															foreach($inprogress_with_ro as $each_record ){
+				
+																$result_status = $this->$key->find('all')->where(['customer_id' => $each_record, 'status' => 'approved', 'current_level' => 'level_3'])->toArray();
+																
+																//below condition commented by Shreeya 
+																/*if(empty($result_status)){
+																	$inprogress_app_with_ro[] = $each_record;
+																}*/
+																
+																if(empty($result_status)){
+																	//$each_record is not already in the array, it will be added to the $inprogress_app_with_ro array using the [] notation.By Shreeya on Date [02-06-2023]
+																	if(!in_array($each_record,$inprogress_app_with_ro)){
+																		$inprogress_app_with_ro[] = $each_record;
+																	}
+																}
+															}
+															
+															$inprogress_app_with_ro = array_unique($inprogress_app_with_ro);
 				}
 
 
 				$applicationEsigned = $this->DmiApplicationEsignedStatuses->find('all')->where($searchPendingConditions)->where(['application_esigned' => 'yes'])
-					->bind(':start', $from_date, 'date')->bind(':end', $to_date, 'date')->toArray(); 
+					->bind(':start', $from_date, 'date')->bind(':end', $to_date, 'date')->toArray();
 
 				$inspectionReportEsigned = $this->DmiApplicationEsignedStatuses->find('all')->where($searchPendingConditions)->where(['report_esigned' => 'yes'])
 					->bind(':start', $from_date, 'date')->bind(':end', $to_date, 'date')->toArray(); 
@@ -465,7 +496,8 @@ class ReportsController extends AppController {
 				foreach ($applications_current_positions_tables as $each_table) {
 
 					$key = array_search ($each_table, $applications_current_positions_tables);
-					     //load all flowlist table by laxmi on 10-09-2023
+					
+					//load all flowlist table by laxmi on 10-09-2023
 					$this->loadModel($each_table);
 					$this->loadModel($key);	
 
@@ -492,7 +524,7 @@ class ReportsController extends AppController {
 						}
 					}
 				}
-
+				
 				$applicationEsigned = $this->DmiApplicationEsignedStatuses->find('all')->where($searchPendingConditions)->where(['application_esigned' => 'yes'])->toArray(); 
 
 				$inspectionReportEsigned = $this->DmiApplicationEsignedStatuses->find('all')->where($searchPendingConditions)->where(['report_esigned' => 'yes'])->toArray(); 
@@ -503,7 +535,12 @@ class ReportsController extends AppController {
 
 				$renewalInspectionReportEsigned = $this->DmiRenewalEsignedStatuses->find('all')->where($searchPendingConditions)->where(['report_esigned' => 'yes'])->toArray(); 
 
-				$renewalCertificateEsigned = $this->DmiRenewalEsignedStatuses->find('all')->where($searchPendingConditions)->where(['certificate_esigned' => 'yes'])->toArray(); 
+				// below query is commented by shreeya adde new query on date [05-06-2023]
+				//$renewalCertificateEsigned = $this->DmiRenewalEsignedStatuses->find('all')->where($searchPendingConditions)->where(['certificate_esigned' => 'yes'])->toArray(); 
+				// adde for if customer id is null could not show null records count
+				// added by shreeya on date [05-06-2023]
+				$renewalCertificateEsigned = $this->DmiRenewalEsignedStatuses->find('all')->where($searchPendingConditions)->where(['certificate_esigned' => 'yes'])
+				->where(function ($exp, $q) {return $exp->notEq('customer_id', '');})->toArray();
 
 				$newApplicationrevenue_Query = $this->DmiApplicantPaymentDetails->find('all')->where($searchPendingConditions)
 					->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); $newApplicationrevenue = ['sum' => $newApplicationrevenue_Query]; 
@@ -567,6 +604,7 @@ class ReportsController extends AppController {
 
 		} else {
 
+			
 			if (!empty($user_role)) {
 				$ro_id = $current_ro_id;
 				$this->Session->write('ro_id', $ro_id);
@@ -584,7 +622,7 @@ class ReportsController extends AppController {
 		$this->set('to_date',$to_date);
 
 		if (null !== $this->request->getData('download_report')) {
-
+		
 			$this->viewBuilder()->setLayout('pdf_layout');
 
 			$this->set('total_primary_user',$this->Session->read('total_primary_user'));
@@ -619,20 +657,9 @@ class ReportsController extends AppController {
 			}
 
 			$pdf = new ApplicationformspdfsController();
-			// $pdfName = 'aqcms_statistics.pdf'; //name of the pdf file
-			// $this->Mpdf->init();
-
-			// $stylesheet = file_get_contents('css/forms-style.css');
-			// $this->Mpdf->ob_clean();
-
-			// $this->Mpdf->SetDisplayMode('fullpage');
-			// $this->Mpdf->watermark_font = 'DejaVuSansCondensed';
 			$pdf->callTcpdf($pdfHtml, 'D', '', '');
-			// $pdf->WriteHTML($pdfHtml);
-
-			// $pdf->Output($pdfName, 'D');
 		}
-
+	
 		if (!empty($user_role)) {
 			$this->view = 'ro_aqcms_statistics';
 		} else {
@@ -853,7 +880,8 @@ class ReportsController extends AppController {
 					
 			} else {
 				// limit set to 100 will show only latest 100 results
-				$user_role_logs_history_details = $this->DmiUserRolesManagmentLogs->find('all')->order(['id' => 'DESC'])->limit(['100'])->toArray(); 
+				//$user_role_logs_history_details = $this->DmiUserRolesManagmentLogs->find('all')->order(['id' => 'DESC'])->limit(['100'])->toArray(); 
+				$user_role_logs_history_details = $this->DmiUserRolesManagmentLogs->find('all')->order(['id' => 'DESC'])->toArray(); 
 			}
 
 			$user_role_logs_details = $this->userLogsSearchCondition($user_role_logs_history_details,$search_office,$search_user_role,$search_user_id,$search_from_date,$search_to_date);
@@ -908,18 +936,17 @@ class ReportsController extends AppController {
 
 				if (!empty($user_office_details)) {
 					$user_office[$i] = $user_office_details['ro_office']; 
-				}
-				else {
+				} else {
 					$user_office[$i] = '---';
 				}
 
 				if (!empty($user_details)) {
 					$user_full_name = $user_details['f_name'].' '.$user_details['l_name'];
 					$user_name_detail[$i] = $user_full_name.' ('.base64_decode($user_details['email']).')';//for email encoding
-				}
-				else {
+				} else {
 					$user_name_detail[$i] = '---';
 				}
+
 				$i = $i+1;
 			}
 
@@ -939,9 +966,11 @@ class ReportsController extends AppController {
 			$this->set('add_user_roles_name_view_list',$add_user_roles_name_view_list); // added by Ankur
 			$this->set('user_office',$user_office);
 			$this->set('user_name_detail',$user_name_detail);
+
 		} else {
 			$user_role_logs_history_details = array();
 		}
+
 		$this->set('user_role_logs_history_details',$user_role_logs_history_details);
 	}
 
@@ -960,6 +989,7 @@ class ReportsController extends AppController {
 
 		$i=0;
 		foreach ($user_role_logs_history_details as $user_name) {
+
 			$user_email_id = $user_name['to_user']; 
 			$user_details = $this->DmiUsers->find('all')->where(['email'=>$user_email_id])->first(); 
 
@@ -969,18 +999,17 @@ class ReportsController extends AppController {
 
 			if (!empty($user_office_details)) {
 				$user_office[$i] = $user_office_details['ro_office']; 
-			}
-			else {
+			} else {
 				$user_office[$i] = '---';
 			}
 
 			if (!empty($user_details)) {
 				$user_full_name = $user_details['f_name'].' '.$user_details['l_name'];
 				$user_name_detail[$i] = $user_full_name.' ('.base64_decode($user_details['email']).')';//for email encoding
-			}
-			else {
+			} else {
 				$user_name_detail[$i] = '---';
 			}
+
 			$i = $i+1;
 		}
 
@@ -1355,7 +1384,8 @@ class ReportsController extends AppController {
 			if (null != ($this->request->getData('search_logs')) || null != ($this->request->getData('download_report'))) {
 				$allocation_logs_details = $this->$table->find('all')->order(['id' => 'DESC'])->toArray(); 
 			} else { // default query without search with limit top 100
-				$allocation_logs_details = $this->$table->find('all')->order(['id' => 'DESC'])->limit(['100'])->toArray(); 
+				//$allocation_logs_details = $this->$table->find('all')->order(['id' => 'DESC'])->limit(['100'])->toArray(); 
+				$allocation_logs_details = $this->$table->find('all')->order(['id' => 'DESC'])->toArray();
 			}
 			//Fetch the all data that required for creating the downloading report as execel (Done by pravin 13-03-2018)
 			if ($download_report == 'yes') {
@@ -1443,7 +1473,7 @@ class ReportsController extends AppController {
 				else {
 					$user_name_detail[$i] = '---';
 				}
-			$i = $i+1;
+				$i = $i+1;
 			}
 			$this->set('user_name_detail', $user_name_detail);
 			$this->set('orders', $download_allocation_logs_details);
@@ -1482,8 +1512,6 @@ class ReportsController extends AppController {
 
 
 
-
-
 	// Pending New Applications Report
 	// Description : ----
 	// @Author : Pravin Bhakare
@@ -1491,11 +1519,6 @@ class ReportsController extends AppController {
 	// Date : ----
 
 	public function pendingNewApplicationsReport() {
-		 //variable set for session from in process  laxmi b on 16-02-2023
-		$static_pending_from_date = '';
-		$static_pending_to_date = '';
-		$static_pending_roOfficeShortCode ='';
-		$static_pending_ro_office_id ='';				   
 
 		$application_pending_days = $this->Session->read('pending_days');
 
@@ -1555,20 +1578,8 @@ class ReportsController extends AppController {
 		// Set default value for download report click event (Done by pravin 14-03-2018)
 		$download_report = 'no';
 
-		 //set session variable and delete it by laxmi Bhadade on 16-02-2023 
-        $static_pending_from_date = $this->Session->read('from_date');
-        $static_pending_to_date = $this->Session->read('to_date');
-        $static_pending_roOfficeShortCode = $this->Session->read('roOfficeShortCode');
-        $static_pending_ro_office_id = $this->Session->read('ro_office_id');
-       
-         //delete session
-        $this->Session->delete('ro_office_id');
-        $this->Session->delete('roOfficeShortCode');
-        $this->Session->delete('to_date');
-        $this->Session->delete('from_date');
-
 		//Check and Pass the entry for "Search" or "Download Report as Excel" button click event (Done by pravin 14-03-2018)
-		if (((!empty($static_pending_from_date) && !empty($static_pending_to_date)) || !empty($static_pending_roOfficeShortCode)) || (null != ($this->request->getData('search_logs')) || null != ($this->request->getData('download_report')))) {
+		if (null != ($this->request->getData('search_logs')) || null != ($this->request->getData('download_report'))) {
 			//Check not empty "Download Report as Excel" button Request, if condition TRUE then set value "yes" for "Download Report as Excel" click event
 			//and pass this value to "mo_io_ro_allocation_serach_conditions" function (Done by pravin 14-03-2018)
 			if (!empty($this->request->getData('download_report'))) {
@@ -1611,34 +1622,6 @@ class ReportsController extends AppController {
 			$this->Session->delete('search_from_date');
 			$this->Session->delete('search_to_date');
 			$this->Session->delete('search_user_email_id');
-
-			  //set from_date and to_date and office name from session of statstics report added by laxmi B. on 15-02-2023
-        if(!empty($static_pending_from_date) && !empty($static_pending_to_date && empty($static_pending_roOfficeShortCode) )){
-              $search_from_date = $static_pending_from_date;
-              $search_to_date = $static_pending_to_date;
-              $search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
-              $search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
-			  $this->date_comparison($search_from_date, $search_to_date);
-
-         }elseif(!empty($static_pending_from_date) && !empty($static_pending_to_date && !empty($static_pending_roOfficeShortCode))){
-         
-
-             $search_from_date = $static_pending_from_date;
-              $search_to_date = $static_pending_to_date;
-              $search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
-              $search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
-			  $this->date_comparison($search_from_date, $search_to_date);
-               
-             $ro_office = $this->DmiRoOffices->find('all')->select(['id'])->where(['id IN' => $static_pending_ro_office_id])->where(['short_code IN'=>$static_pending_roOfficeShortCode])->first(); 
-             $ro_office_id = [$ro_office['id']];
-             $search_user_role = 'RO/SO';
-              
-
-             }elseif(!empty($static_pending_roOfficeShortCode)){
-             $ro_office = $this->DmiRoOffices->find('all')->select(['id'])->where(['id IN' => $static_pending_ro_office_id])->where(['short_code IN'=>$static_pending_roOfficeShortCode])->first(); 
-             $ro_office_id = [$ro_office['id']];
-             $search_user_role = 'RO/SO';
-         }//end laxmi
 
 			$this->Session->write('search_application_type_id',$search_application_type_id);
 			$this->Session->write('search_user_role',$search_user_role);
@@ -1712,44 +1695,190 @@ class ReportsController extends AppController {
 
 
 
-	// Pending Renewal Applications Report
-	// Description : Start to create Pending renewal application report 
-	// @Author : Pravin Bhakare
-	// #Contributer : Ankur Jangid (Migration)
-	// Date : 20-09-2017
 
-	public function pendingRenewalApplicationsReport() {
+
+	// Pending New Applications Report For Stats
+	// Description : ----
+	// @Author : Pravin Bhakare
+	// #Contributer : Yash & Shreeya 
+	// Date : 24-05-2023
+	
+	/*=================== This Function Used for In_process New Application KPI's===========*/
+	public function pendingNewApplicationsReportForStats($cert_type,$appl_type) {	//newapp_id replace ->cert_type By Shreeya
+
+		/*===================Added New Code  for show the list of count (Start) Date [24-05-2023 By Shreeya] ===========*/
+		//pass the parameter of cert_type,appl_type
+		$appl_type=base64_decode($appl_type);
+		$cert_type=base64_decode($cert_type);
+		$data_id =array($cert_type);
+	
+		
+		if ($cert_type== 'CA') 
+		{
+			$cert_type = 1;
+		} 
+		elseif ($cert_type== 'PP') 
+		{
+			$cert_type = 2;
+		} 
+		elseif ($cert_type== 'LAB') 
+		{
+			$cert_type = 3;
+		} 
+
+
+
+		//check the which application type is present
+		if($appl_type=='new'){
+			$processFunction = 'new_app_processed';
+		}elseif($appl_type=='renewal'){
+			$processFunction = 'renewal_app_processed';
+		}elseif($appl_type=='backlog'){
+			$processFunction = 'backlog_app_processed';
+		}
+
+		
+		//show the count according to application type 
+		$searchConditions = array();
+		$application_processed[] = $this->Reportstatistics->$processFunction($searchConditions,null,null,$cert_type,$appl_type);
+		$applListToShow = $application_processed[0][2];
+		
+		
+		$application_id = null;
+		$application_type = null;
+		$user_roles = null;
+		$user_office = null;
+		$user_email_id =null;
+		$date = []; // Rename the variable to avoid overwriting the previous $date variable
+		
+		$i = 0;
+		foreach ($applListToShow as $each_customer_id) {
+
+			$application_id[$i] = $each_customer_id;
+		
+
+			$table = 'DmiAllApplicationsCurrentPositions';
+			$current_users_details = $this->$table->find('all')->where(['customer_id IN' => $each_customer_id])->order(['id' => 'DESC'])->first(); 
+		
+			
+			$application_form_type = $this->Customfunctions->checkApplicantFormType($each_customer_id);
+			
+				if ($application_form_type == 'A') {
+					$application_type[$i]='CA (Form-A)';
+				} elseif ($application_form_type == 'B') {
+					$application_type[$i]='Printing Press (Form-B)';
+				} elseif ($application_form_type == 'C') {
+					$application_type[$i]='Laboratory (Form-C)';
+				} elseif ($application_form_type == 'D') {
+					$application_type[$i]='Laboratory (Form-D)';
+				} elseif ($application_form_type == 'E') {
+					$application_type[$i]='CA (Form-E)';
+				} elseif ($application_form_type == 'F') {
+					$application_type[$i]='CA (Form-F)';
+				}
+
+			$date[$i] = $current_users_details['modified']; // Store the value in a new array
+			$user_email_id[$i] = $current_users_details['current_user_email_id'];
+			$current_level[$i] = $current_users_details['current_level'];
+
+
+				$user_posted_office_id=array();
+				if (!empty($user_email_id[$i])) {
+					$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IN' => $user_email_id[$i]])->first(); 
+					
+				}
+				if (!empty($user_posted_office_id)) {
+					$user_office[$i] = $this->DmiRoOffices->find('all')->select(['ro_office'])->where(['id' => $user_posted_office_id['posted_ro_office']])->first(); 
+					
+				}
+
+				if (!empty($user_office[$i])) {
+					$user_office[$i] = $user_office[$i]['ro_office'];
+				} else {
+					$user_office[$i] = '--';
+				}
+
+				$check_roles=array();
+				if (!empty($user_email_id[$i])) {
+					$check_roles = $this->DmiUserRoles->find('all')->where(['user_email_id IN' => $user_email_id[$i]])->first(); 
+				}
+
+				if (!empty($check_roles)) {
+					$user_list[$i] = $check_roles;
+				} else {
+					$user_list[$i] = '---';
+				}
+
+				$user_roles[$i] = $this->checkUserRoleFromCurrentLevel($current_users_details['current_level'],$current_users_details['current_user_email_id']);
+
+
+
+			$i = $i + 1;
+		
+			$this->set('date',$date);
+			$this->set('user_list',$user_list);
+			$this->set('application_type',$application_type);
+			$this->set('user_roles',$user_roles);
+			$this->set('user_office',$user_office);
+			$this->set('user_email_id',$user_email_id);
+			$this->set('application_id',$application_id);
+		}
+
+		### -End- ###
+
+		//variable set for session from in process  laxmi b on 16-02-2023
+		$static_pending_from_date = '';
+		$static_pending_to_date = '';
+		$static_pending_roOfficeShortCode ='';
+		$static_pending_ro_office_id ='';
 
 		$application_pending_days = $this->Session->read('pending_days');
-
+		
 		if (!empty($application_pending_days)) {
-			$report_name = 'Pending Renewal Applications Report (More than 15 Days)';
+			$report_name = 'Pending New Applications Report ( More than 15 Days)';
 		} else {
-			$report_name ='Pending Renewal Applications Report';
+			$report_name ='Pending New Applications Report';
 		}
 
 		$this->set('report_name',$report_name);
 
-		$table = 'DmiRenewalAllCurrentPositions';
-		$pending_application_type = 'renewal';
+		//$table = 'DmiAllApplicationsCurrentPositions';
 
-		$application_type_xy = array('A'=>'CA (Form-A)','C'=>'Laboratory (Form-C)','E'=>'CA (Form-E)','B'=>'Printing Press (Form-B)','D'=>'Laboratory (Form-D)','F'=>'CA (Form-F)');
+		$pending_application_type = 'new';
+		
+		$application_type_xy = array('A'=>'CA (Form-A)', 'C'=>'Laboratory (Form-C)', 'E'=>'CA (Form-E)', 'B'=>'Printing Press (Form-B)', 'D'=>'Laboratory (Form-D)', 'F'=>'CA (Form-F)');
+		//newapp_id replace ->cert_type By Shreeya
+		if($cert_type=='CA')
+		{
+			$application_type_xy = array('A'=>'CA (Form-A)','E'=>'CA (Form-E)','F'=>'CA (Form-F)');
+		}
+		elseif($cert_type=='PP') 
+		{
+			$application_type_xy = array('B'=>'Printing Press (Form-B)');
+		}
+		elseif ($cert_type=='LAB') {
+			$application_type_xy = array('C'=>'Laboratory (Form-C)','D'=>'Laboratory (Form-D)');
+		}
+
 
 		//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
 		asort($application_type_xy);
 		$this->set('application_type_xy',$application_type_xy);
-
-		$user_roles_xy = array('RO/SO'=>'RO/SO','MO/SMO'=>'MO/SMO','IO'=>'IO');
+		//newapp_id replace ->cert_type By Shreeya
+		$this->set('cert_type',$cert_type);
+		
+		$user_roles_xy = array('RO/SO'=>'RO/SO','MO/SMO'=>'MO/SMO','IO'=>'IO','HO MO/SMO'=>'HO MO/SMO','DY.AMA'=>'DY.AMA','JT.AMA'=>'JT.AMA','AMA'=>'AMA');
+		
 		//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
 		asort($user_roles_xy);
 		$this->set('user_roles_xy',$user_roles_xy);
-
-		$ro_office = $this->DmiRoOffices->find('all')->select(['id', 'ro_office'])->where(['office_type' => 'RO','delete_status IS NULL'])->order(['ro_office' => 'ASC'])
-			->combine('id', 'ro_office')->toArray(); 
+		
+		$ro_office = $this->DmiRoOffices->find('all')->where(['office_type' => 'RO','delete_status IS NULL'])->order(['ro_office' => 'ASC'])->combine('id', 'ro_office')->toArray(); 
 		$this->set('ro_office',$ro_office);
 
-		$search_application_type_id = $this->Session->read('search_application_type_id');
+		
 
+		$search_application_type_id = $this->Session->read('search_application_type_id');
 		$search_user_role = $this->Session->read('search_user_role');
 		$ro_office_id = $this->Session->read('ro_office_id');
 		$mo_office_id = $this->Session->read('mo_office_id');
@@ -1778,16 +1907,26 @@ class ReportsController extends AppController {
 
 		// Set default value for download report click event (Done by pravin 14-03-2018)
 		$download_report = 'no';
+		 //set session variable and delete it by laxmi Bhadade on 16-02-2023 
+		$static_pending_from_date = $this->Session->read('from_date');
+		$static_pending_to_date = $this->Session->read('to_date');
+		$static_pending_roOfficeShortCode = $this->Session->read('roOfficeShortCode');
+		$static_pending_ro_office_id = $this->Session->read('ro_office_id');
+		
+		//delete session
+		$this->Session->delete('ro_office_id');
+		$this->Session->delete('roOfficeShortCode');
+		$this->Session->delete('to_date');
+		$this->Session->delete('from_date');
 
 		//Check and Pass the entry for "Search" or "Download Report as Excel" button click event (Done by pravin 14-03-2018)
-		if (null != ($this->request->getData('search_logs')) || null != ($this->request->getData('download_report'))) {
-
+		if (((!empty($static_pending_from_date) && !empty($static_pending_to_date)) || !empty($static_pending_roOfficeShortCode)) || (null != ($this->request->getData('search_logs')) || null != ($this->request->getData('download_report')))) {
 			//Check not empty "Download Report as Excel" button Request, if condition TRUE then set value "yes" for "Download Report as Excel" click event
 			//and pass this value to "mo_io_ro_allocation_serach_conditions" function (Done by pravin 14-03-2018)
 			if (!empty($this->request->getData('download_report'))) {
 				$download_report = 'yes';
 			}
-
+			
 			$search_application_type_id = $this->request->getData('application_type');
 			$search_user_role =  $this->request->getData('user_role');
 			$ro_office_id =  $this->request->getData('ro_office');
@@ -1804,6 +1943,7 @@ class ReportsController extends AppController {
 			// Change on 2/11/2018 - For download excel report, Take search filter field value from session variables instend of POST variable - By Pravin
 			if ($download_report == 'yes') {
 
+				$search_application_type_id = $this->Session->read('search_application_type_id');
 				$search_user_role = $this->Session->read('search_user_role');
 				$ro_office_id = $this->Session->read('ro_office_id');
 				$mo_office_id = $this->Session->read('mo_office_id');
@@ -1813,7 +1953,7 @@ class ReportsController extends AppController {
 				$search_user_email_id = $this->Session->read('search_user_email_id');
 			}
 
-			$download_application_customer_id_list = $this->pendingApplicationSearchConditions($download_search_application_type_id,$download_search_user_role,$download_ro_office_id,$download_mo_office_id,$download_io_office_id,$download_search_from_date,$download_search_to_date,$download_search_user_email_id,$table,$pending_application_type,$application_pending_days);
+			$download_application_customer_id_list = $this->pendingApplicationSearchConditions($download_search_application_type_id,$download_search_user_role,$download_ro_office_id,$download_mo_office_id,$download_io_office_id,$download_search_from_date,$download_search_to_date,$download_search_user_email_id,$table,$pending_application_type,$application_pending_days,$data_id);
 
 			$this->Session->delete('search_application_type_id');
 			$this->Session->delete('search_user_role');
@@ -1823,6 +1963,31 @@ class ReportsController extends AppController {
 			$this->Session->delete('search_from_date');
 			$this->Session->delete('search_to_date');
 			$this->Session->delete('search_user_email_id');
+
+			//set from_date and to_date and office name from session of statstics report added by laxmi B. on 15-02-2023
+			if(!empty($static_pending_from_date) && !empty($static_pending_to_date && empty($static_pending_roOfficeShortCode) )){
+				$search_from_date = $static_pending_from_date;
+				$search_to_date = $static_pending_to_date;
+				$search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
+				$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
+				$this->date_comparison($search_from_date, $search_to_date);
+
+			} elseif(!empty($static_pending_from_date) && !empty($static_pending_to_date && !empty($static_pending_roOfficeShortCode))) {
+				$search_from_date = $static_pending_from_date;
+				$search_to_date = $static_pending_to_date;
+				$search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
+				$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
+				$this->date_comparison($search_from_date, $search_to_date);
+					
+				$ro_office = $this->DmiRoOffices->find('all')->select(['id'])->where(['id IN' => $static_pending_ro_office_id])->where(['short_code IN'=>$static_pending_roOfficeShortCode])->first(); 
+				$ro_office_id = [$ro_office['id']];
+				$search_user_role = 'RO/SO';
+			} elseif(!empty($static_pending_roOfficeShortCode)) {
+				$ro_office = $this->DmiRoOffices->find('all')->select(['id'])->where(['id IN' => $static_pending_ro_office_id])->where(['short_code IN'=>$static_pending_roOfficeShortCode])->first(); 
+				$ro_office_id = [$ro_office['id']];
+				$search_user_role = 'RO/SO';
+			}
+			//end laxmi
 
 			$this->Session->write('search_application_type_id',$search_application_type_id);
 			$this->Session->write('search_user_role',$search_user_role);
@@ -1842,44 +2007,55 @@ class ReportsController extends AppController {
 			$this->set('search_to_date',$search_to_date);
 			$this->set('search_user_email_id',$search_user_email_id);
 
-			$application_customer_id_list = $this->pendingApplicationSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days);
 
+			$application_customer_id_list = $this->pendingApplicationSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days,$data_id );
+			
 			if (!empty($application_customer_id_list)) {
 
 				$current_users_details = $this->$table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->order(['id' => 'DESC'])->toArray(); 
-
+				
 				//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
 				if ($download_report == 'yes') {
-					$download_pending_application = $this->$table->find('all')->where(['customer_id IN' => $download_application_customer_id_list])->order(['id' => 'DESC'])->toArray(); 
+
+					if (!empty($download_application_customer_id_list)) {
+						$download_condition = ['customer_id IN' => $download_application_customer_id_list];
+					} else {
+						$download_condition = ['customer_id IS' => ''];
+					}
+
+					$download_pending_application = $this->$table->find('all')->where($download_condition)->order(['id' => 'DESC'])->toArray(); 
 					$this->downloadPendingApplicationReport($download_pending_application,$pending_application_type,$table);
 				}
-
+				
 			} else {
 				$current_users_details = null;
 			}
 
-			$this->pendingApplicationReportResults($current_users_details,$pending_application_type,$table);
-		
+			//below query commented by shreeya for display list of new application
+			//$this->pendingApplicationReportResults($current_users_details,$pending_application_type,$table,$data_id);
+
 		} else {
-
-			$application_customer_id_list = $this->pendingApplicationSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days);
-
+			
+		
+			$application_customer_id_list = $this->pendingApplicationSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days,$data_id);
+			
 			if (!empty($application_customer_id_list)) {
-
-				$current_users_details = $this->$table->find('all')->where(['customer_id IN' => $application_customer_id_list])->order(['id' => 'DESC'])->toArray(); 
-
+			
+				$current_users_details = $this->$table->find('all')->where(['customer_id IN' => $application_customer_id_list])->order(['id' => 'DESC'])->toArray(); /*->limit(['100'])*/
+				
+				$this->set('current_users_details',$current_users_details);
+				
 				//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
 				if ($download_report == 'yes') {
-					$download_pending_application = $this->$table->find('all')->where(['customer_id IN' => $application_customer_id_list])
-						->order(['id' => 'DESC'])->toArray(); 
+					$download_pending_application = $this->$table->find('all')->where(['customer_id' => $application_customer_id_list])->order(['id' => 'DESC'])->toArray(); 
 					$this->downloadPendingApplicationReport($download_pending_application,$pending_application_type,$table);
 				}
-
+				
 			} else {
 				$current_users_details = null;
 			}
-
-			$this->pendingApplicationReportResults($current_users_details,$pending_application_type,$table);
+			//Below query commented by shreya for display list of new application
+			//$this->pendingApplicationReportResults($current_users_details,$pending_application_type,$table,$data_id);
 		}
 	
 	}
@@ -1893,29 +2069,30 @@ class ReportsController extends AppController {
 	// #Contributer : Ankur Jangid (Migration)
 	// Date : 18-09-2017
 
-	public function pendingApplicationSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days)
+	public function pendingApplicationSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days,$data_id=null)
 	{
 		$current_date = new \DateTime(date("d-m-Y")); // Ankur updated new DateTime to new \DateTime as Class "App\Controller\DateTime" not found
 		$modify_date_obj = $current_date->modify('-15 day');
 		$modify_date = $modify_date_obj->format('d-m-Y H:i:s');
 
+		
 		if (!empty($application_pending_days)) {
-
+		 
 			$conditions = ['DATE(modified) <' => $modify_date]; 
-			// $date_conditions = array('conditions'=>array('date(modified) BETWEEN ? AND ?' => array($search_from_date,$search_to_date),'DATE(created) <'=>$modify_date));
+			
 			$date_conditions = ['date(modified) BETWEEN :start AND :end', 'DATE(created) <' => $modify_date]; 
-			// $date_conditions_1 = array('fields'=>'customer_id','conditions'=>array('date(modified) BETWEEN ? AND ?' => array($search_from_date,$search_to_date),'DATE(created) <'=>$modify_date));
+			
 			$date_conditions_1 = ['date(modified) BETWEEN :start AND :end', 'DATE(created) <' => $modify_date]; 
 		
 		} else {
-
+			
 			$conditions = [];
-			// $date_conditions = array('conditions'=>array('date(modified) BETWEEN ? AND ?' => array($search_from_date,$search_to_date)));
+			
 			$date_conditions = ['date(modified) BETWEEN :start AND :end']; 
-			// $date_conditions_1 = array('fields'=>'customer_id','conditions'=>array('date(modified) BETWEEN ? AND ?' => array($search_from_date,$search_to_date),'DATE(created) <'=>$modify_date));
+			
 			$date_conditions_1 = ['date(modified) BETWEEN :start AND :end', 'DATE(created) <' => $modify_date];  
 		}
-
+	
 		$final_customer_id_list = null;
 
 		if ($ro_office_id != '' && $search_user_role == 'RO/SO') {
@@ -1932,7 +2109,7 @@ class ReportsController extends AppController {
 		if ($search_application_type_id != '' && $search_user_role == '' && $search_from_date == '' && $search_to_date == '') {
 
 			$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
-
+			
 			$i=0;
 			foreach ($application_customer_id as $each_customer_id) {
 
@@ -1946,27 +2123,30 @@ class ReportsController extends AppController {
 				}
 			}
 
-		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $level_1_2_3_office == '' && $search_from_date == '' && $search_to_date == '') {
-
-			if ($search_application_type_id != '') {
+		//Start Yashwant 29/mar/2023 This function used for IN PRocess-posted Filter
+		} elseif ($search_application_type_id == '' && $search_from_date == '' && $search_to_date == '' && $search_user_role != '' && $level_1_2_3_office == '') 
+		{
+			if($search_application_type_id != '') 
+			{
 
 				$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
 
 				$i=0;
 				foreach ($application_customer_id as $each_customer_id) {
+
 					if (!empty($each_customer_id['customer_id'])) {
 						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
 
-						if (in_array($application_customer_type,$search_application_type_id)) {
-							$seach_application_customer_id_list[$i] = $each_customer_id['customer_id'];
+						if (in_array($application_customer_type, $search_application_type_id, TRUE)) {
+							$application_customer_id_list[$i] = $each_customer_id['customer_id'];
 							$i=$i+1;
 						}
 					}
 				}
 
 				$application_current_levels = $this->$table->find('all')->where(['customer_id IN' => $seach_application_customer_id_list])->toArray(); 
-			} else {
-				
+
+			}else{
 				$application_current_levels = $this->$table->find('all')->where($conditions)->toArray();  
 			}
 			
@@ -1981,7 +2161,9 @@ class ReportsController extends AppController {
 				}
 			}
 		
-		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $level_1_2_3_office != '' && $search_from_date == '' && $search_to_date == '' && $search_user_email_id =='') {
+		/*Start Yashwant 30/mar/2023 This function used for IN PRocess-Office-Filter  MULTI-SELECT*/
+		} elseif ($search_application_type_id == ''  && $search_user_role != '' && $level_1_2_3_office != '' && $search_from_date == '' && $search_to_date == '') /*$search_user_email_id ==''*/
+		{
 			
 			if ($search_application_type_id != '') {
 
@@ -2027,12 +2209,13 @@ class ReportsController extends AppController {
 				}
 			}
 		
-		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role == '' && $level_1_2_3_office == '' && $search_from_date != '' && $search_to_date != '') {
+		/*=====Start Yashwant 31/mar/2023 This function used for IN PRocess-Search-from_date & Search_t-Date-Filter ======*/
+		} elseif ($search_application_type_id == '' && $search_user_role == '' && $level_1_2_3_office == '' && $search_from_date != '' && $search_to_date != '') {
 			
 			if ($search_application_type_id != '') {
 
 				$application_customer_id = $this->$table->find('all')->where($date_conditions)->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
-
+				
 				$i=0;
 				foreach ($application_customer_id as $each_customer_id) {
 					if (!empty($each_customer_id['customer_id'])) {
@@ -2047,10 +2230,122 @@ class ReportsController extends AppController {
 			
 			} else {
 
-				$application_customer_id_list = $this->$table->find('all')->select(['customer_id'])->where($date_conditions_1)->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->combine('id', 'customer_id')->toArray();  
+				$application_customer_id_list = $this->$table->find('all')->select(['customer_id'])->where($date_conditions)->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->combine('id', 'customer_id')->toArray();
+			}
+	
+		/*=====Start Yashwant 02/mar/2023 This function used for IN PRocess Report Count ======*/
+		 } elseif(!empty($data_id)) {
+
+			
+			$application_customer_id = $this->$table->find('all')->where($conditions)->toArray();
+
+			$i=0;
+			foreach ($application_customer_id as $each_customer_id) 
+			{
+				
+				if (!empty($each_customer_id['customer_id'])) 
+				{
+					$application_customer_type = $this->Reportsfunctions->newApplicantType($each_customer_id['customer_id']);
+					
+					if (in_array($application_customer_type, $data_id, TRUE)) 
+					
+					{
+						$application_customer_id_list[$i] = $each_customer_id['customer_id'];
+					
+						$i=$i+1;
+					}
+					
+				}
+			}
+			
+		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $level_1_2_3_office == '' && $search_from_date == '' && $search_to_date == '') 
+		{
+			
+			if ($search_application_type_id != '') {
+
+				$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
+
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) {
+					if (!empty($each_customer_id['customer_id'])) {
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+						if (in_array($application_customer_type,$search_application_type_id)) {
+							$seach_application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+
+				$application_current_levels = $this->$table->find('all')->where(['customer_id IN' => $seach_application_customer_id_list])->toArray(); 
+
+			} else {
+				
+				$application_current_levels = $this->$table->find('all')->where($conditions)->toArray();  
+			}
+			
+			$i=0;
+			foreach ($application_current_levels as $each_current_levels) {
+
+				$application_current_level_user_role = $this->checkUserRoleFromCurrentLevel($each_current_levels['current_level'], $each_current_levels['current_user_email_id']);
+
+				if ($application_current_level_user_role == $search_user_role) {
+					$application_customer_id_list[$i] = $each_current_levels['customer_id'];
+					$i=$i+1;
+				}
+			}
+		
+		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $level_1_2_3_office != '' && $search_from_date == '' && $search_to_date == '' && $search_user_email_id =='') 
+		{
+	
+			if ($search_application_type_id != '') {
+
+				$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
+
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) {
+					if (!empty($each_customer_id['customer_id'])) {
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+						
+						if (in_array($application_customer_type,$search_application_type_id)) {
+							$seach_application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+			
+				$application_current_levels = $this->$table->find('all')->where(['customer_id IN' => $seach_application_customer_id_list])->toArray(); 
+				
+			} else {
+			
+				$application_current_levels = $this->$table->find('all')->where($conditions); 
+				
 			}
 
-		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $level_1_2_3_office != '' && $search_from_date == '' && $search_to_date == '' && $search_user_email_id !='') {
+			$i=0;
+			foreach ($application_current_levels as $each_current_levels) {
+
+				$application_current_level_user_role = $this->checkUserRoleFromCurrentLevel($each_current_levels['current_level'], $each_current_levels['current_user_email_id']);
+
+				if ($application_current_level_user_role == $search_user_role) {
+
+					$user_posted_office_id_xy = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IS' => $each_current_levels['current_user_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id_xy)) {
+						$user_posted_office_id_xyx = $user_posted_office_id_xy['posted_ro_office'];
+					} else {
+						$user_posted_office_id_xyx = '';
+					}
+
+					if (in_array($user_posted_office_id_xyx,$level_1_2_3_office)) {
+						$application_customer_id_list[$i] = $each_current_levels['customer_id'];
+						$i=$i+1;
+					}
+				}
+			}
+		
+		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $level_1_2_3_office != '' && $search_from_date == '' && $search_to_date == '' && $search_user_email_id !='') 
+		{
 			
 			if ($search_application_type_id != '') {
 
@@ -2104,12 +2399,13 @@ class ReportsController extends AppController {
 				}
 			}
 
-		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $search_from_date != '' && $search_to_date != '' && $level_1_2_3_office !='' && ($search_user_email_id != '' || $search_user_email_id == '')) {
-			
+		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $search_from_date != '' && $search_to_date != '' && $level_1_2_3_office !='' && ($search_user_email_id != '' || $search_user_email_id == '')) 
+		{
+		
 			if ($search_application_type_id != '') {
 
 				$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
-
+			
 				$i=0;
 				foreach ($application_customer_id as $each_customer_id) {
 
@@ -2125,10 +2421,12 @@ class ReportsController extends AppController {
 
 				$application_current_levels = $this->$table->find('all')->where(['customer_id IN' => $seach_application_customer_id_list])
 					->where(['date(modified) BETWEEN :start AND :end'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
-			} else {
+				
+				} else {
 
 				$application_current_levels = $this->$table->find('all')->where($date_conditions)->bind(':start', $search_from_date, 'date')
 				->bind(':end', $search_to_date, 'date')->toArray();   
+				
 			}
 
 			$i=0;
@@ -2143,7 +2441,7 @@ class ReportsController extends AppController {
 					}
 
 					$user_posted_office_id_xy = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IS' => $each_current_levels['current_user_email_id']])->first(); 
-
+					
 					if (!empty($user_posted_office_id_xy)) {
 						$user_posted_office_id_xyx = $user_posted_office_id_xy['posted_ro_office'];
 					} else {
@@ -2153,6 +2451,7 @@ class ReportsController extends AppController {
 					if (in_array($user_posted_office_id_xyx,$level_1_2_3_office)) {
 
 						$search_user_email = $this->DmiUserRoles->find('all')->select(['user_email_id'])->where(['id IS' => $search_user_email_id])->first(); 
+					
 						//to remove error empty condition added by laxmi B on 16-02-2023 
 						if ((!empty($each_current_levels['current_user_email_id']) && !empty($search_user_email['user_email_id']) )  && $each_current_levels['current_user_email_id'] == $search_user_email['user_email_id']) {
 							$application_customer_id_list[$i] = $each_current_levels['customer_id'];
@@ -2165,10 +2464,10 @@ class ReportsController extends AppController {
 					}
 				}
 			}
-
+			
 		} else {
 			$application_customer_id = $this->$table->find('all')->select(['customer_id'])->where($conditions)->extract('customer_id')->toArray();  
-
+		
 			// $i=0;
 			// foreach ($application_customer_id as $each_customer_id)
 			// {
@@ -2180,54 +2479,56 @@ class ReportsController extends AppController {
 		}
 
 		if (!empty($application_customer_id_list)) {
-
+			
 			$i=0;
 			if ($pending_application_type == 'new') {
 				foreach ($application_customer_id_list as $customer_id) {
 					$customer_id_list = $this->DmiGrantCertificatesPdfs->find('all')->where(['customer_id IS' => $customer_id])->first(); 
-
+				
 					if (empty($customer_id_list)) {
 						$final_customer_id_list[$i] = $customer_id;
 						$i=$i+1;
 					}
 				}
-
+			
 			} elseif ($pending_application_type == 'renewal') {
 
 				foreach ($application_customer_id_list as $customer_id ) {
 
 					$customer_id_list = $this->DmiRenewalFinalSubmits->find('all')->where(['customer_id IS' => $customer_id, 'status' => 'approved'])->first(); 
-
+					
 					if (empty($customer_id_list)) {
 						$final_customer_id_list[$i] = $customer_id;
 						$i=$i+1;
 					}
 				}
-
+				
 				$final_table = 'DmiRenewalFinalSubmits';
 			}
 
 
 			//if data same data id exist in rejcted table it is not apper in report added by laxmi B. on 20-01-2023
-              $this->loadModel('DmiRejectedApplLogs');
-              $rejectedList = $this->DmiRejectedApplLogs->find('all', array('fields'=>array('customer_id')))->order(['id' => 'DESC'])->toArray();//
-              $reject_id = array();
-              $i=0;
-              if(!empty($rejectedList)){
-                 foreach($rejectedList as $reject){
-                 	$reject_id[$i] = $reject['customer_id'];
-                 	$i++;
+			$this->loadModel('DmiRejectedApplLogs');
+			$rejectedList = $this->DmiRejectedApplLogs->find('all', array('fields'=>array('customer_id')))->order(['id' => 'DESC'])->toArray();//
+			
+			$reject_id = array();
+			$i=0;
+			if(!empty($rejectedList)){
+				foreach($rejectedList as $reject){
+					$reject_id[$i] = $reject['customer_id'];
+					$i++;
+				}
 
-                  }
-
-                    if(!empty($final_customer_id_list)){
-                    $final_customer_id_list = array_diff($final_customer_id_list, $reject_id);
-                   } 
-                }//end by laxmi b.
+				if(!empty($final_customer_id_list)){
+					$final_customer_id_list = array_diff($final_customer_id_list, $reject_id);
+					
+				} 
+			}//end by laxmi b.
 		}
 
-              
+		
 		return $final_customer_id_list;
+		
 	}
 
 
@@ -2257,7 +2558,7 @@ class ReportsController extends AppController {
 				$each_user_detail = $each_user;
 				$current_level = $each_user_detail['current_level'];
 				$application_form_type = $this->Customfunctions->checkApplicantFormType($each_user_detail['customer_id']);
-
+			
 				if ($application_form_type == 'A') {
 					$application_type[$i]='CA (Form-A)';
 				} elseif ($application_form_type == 'B') {
@@ -2279,7 +2580,98 @@ class ReportsController extends AppController {
 				$user_posted_office_id=array();
 				if (!empty($user_email_id[$i])) {
 					$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IN' => $user_email_id[$i]])->first(); 
+					
 				}
+				if (!empty($user_posted_office_id)) {
+					$user_office[$i] = $this->DmiRoOffices->find('all')->select(['ro_office'])->where(['id' => $user_posted_office_id['posted_ro_office']])->first(); 
+					
+				}
+
+				if (!empty($user_office[$i])) {
+					$user_office[$i] = $user_office[$i]['ro_office'];
+				} else {
+					$user_office[$i] = '--';
+				}
+
+				$check_roles=array();
+				if (!empty($user_email_id[$i])) {
+					$check_roles = $this->DmiUserRoles->find('all')->where(['user_email_id IN' => $user_email_id[$i]])->first(); 
+				}
+
+				if (!empty($check_roles)) {
+					$user_list[$i] = $check_roles;
+				} else {
+					$user_list[$i] = '---';
+				}
+
+				$user_roles[$i] = $this->checkUserRoleFromCurrentLevel($each_user_detail['current_level'],$each_user_detail['current_user_email_id']);
+				$i=$i+1;
+				 
+			}
+			
+		}
+
+		$this->set('date',$date);
+		$this->set('user_list',$user_list);
+		$this->set('application_type',$application_type);
+		$this->set('user_roles',$user_roles);
+		$this->set('user_office',$user_office);
+		$this->set('user_email_id',$user_email_id);
+		$this->set('application_id',$application_id);
+	
+	}
+
+
+	// Pending Back Application Report Results
+	// Description : 
+	// @Author :
+	// #Contributer : Ankur Jangid (Migration)
+	// Date : 18-09-2017
+
+	public function pendingBackApplicationReportResults($current_users_details,$table) {
+
+		$date = [];
+		$user_list = null;
+		$application_type = null;
+		$user_roles = null;
+		$user_office = null;
+		$user_email_id =null;
+		$application_id = null;
+
+		if (!empty($current_users_details)) {
+
+			$i=0;
+			foreach ($current_users_details as $each_user) {
+
+				$customer_id = $each_user['customer_id'];
+				$each_user_detail = $each_user;
+				$current_level = $each_user_detail['current_level'];
+				$application_form_type = $this->Customfunctions->checkApplicantFormType($each_user_detail['customer_id']);
+				
+				if ($application_form_type == 'A') {
+					$application_type[$i]='CA (Form-A)';
+				} elseif ($application_form_type == 'B') {
+					$application_type[$i]='Printing Press (Form-B)';
+				} elseif ($application_form_type == 'C') {
+					$application_type[$i]='Laboratory (Form-C)';
+				} elseif ($application_form_type == 'D') {
+					$application_type[$i]='Laboratory (Form-D)';
+				} elseif ($application_form_type == 'E') {
+					$application_type[$i]='CA (Form-E)';
+				} elseif ($application_form_type == 'F') {
+					$application_type[$i]='CA (Form-F)';
+				}
+
+				$date[$i] = $each_user_detail['modified'];
+				$user_email_id[$i] = $each_user_detail['current_user_email_id'];
+				$application_id[$i] = $each_user_detail['customer_id'];
+
+				$user_posted_office_id=array();
+
+				if (!empty($user_email_id[$i])) {
+					$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IN' => $user_email_id[$i]])->first(); 
+				}
+
 				if (!empty($user_posted_office_id)) {
 					$user_office[$i] = $this->DmiRoOffices->find('all')->select(['ro_office'])->where(['id' => $user_posted_office_id['posted_ro_office']])->first(); 
 				}
@@ -2304,6 +2696,7 @@ class ReportsController extends AppController {
 				$user_roles[$i] = $this->checkUserRoleFromCurrentLevel($each_user_detail['current_level'],$each_user_detail['current_user_email_id']);
 				$i=$i+1;
 			}
+
 		}
 
 		$this->set('date',$date);
@@ -2315,6 +2708,7 @@ class ReportsController extends AppController {
 		$this->set('application_id',$application_id);
 	
 	}
+
 
 
 
@@ -2417,11 +2811,38 @@ class ReportsController extends AppController {
 
 
 
-	// Approved New Application Type / Approved Renewal Application Type
-	// Description : ----
+	// Approved New Application Type / Approved Renewal Application Type 
+	// Description : For AQCMS Stats
 	// @Author : Pravin Bhakare
 	// #Contributer : Ankur Jangid (Migration)
 	// Date : ----
+
+	//newapp_id replace ->cert_type By Shreeya
+	public function approvedNewApplicationTypeForStats($cert_type)
+	{
+		$this->Session->write('approved_application_type','new');
+		$this->redirect('/reports/approved_applications_report_for_stats/'.$cert_type);
+	}
+
+	public function approvedRenewalApplicationTypeForStats()
+	{
+		$this->Session->write('approved_application_type','renewal');
+		$this->redirect('/reports/approved_applications_report_for_stats');
+	}
+
+	// This function is added to show all the approved application on 16-06-2022
+	public function approvedAllApplicationTypeForStats()
+	{
+		$this->Session->write('approved_application_type','all_reports');
+		$this->redirect('/reports/approved_applications_report_for_stats');
+	}
+
+
+	// Approved New Application Type / Approved Renewal Application Type 
+	// Description : For Normal Listing
+	// @Author : Pravin Bhakare
+	// #Contributer : Ankur Jangid (Migration)
+	// Date : 28-04-2023
 
 	public function approvedNewApplicationType()
 	{
@@ -2447,15 +2868,483 @@ class ReportsController extends AppController {
 	// Approved Applications Report
 	// Description : ----
 	// @Author : Pravin Bhakare
+	// #Contributer : Yashwant & Shreeya
+	// Date : 25-05-2023
+
+	public function approvedApplicationsReportForStats($cert_type) // $newappId replace $cert_type by Shreeya
+	{
+		
+		// $newappId replace $cert_type by Shreeya
+		$cert_type=base64_decode($cert_type);
+		$data_id =array($cert_type);
+
+		//added by laxmi on 15-02-2023
+		$aqcms_from_date ='' ;
+		$aqcms_to_date = '';
+		$aqcms_ro_office_short_code = '';
+		$aqcms_ro_office_id = '';
+
+		$approved_application_type = $this->Session->read('approved_application_type');
+	
+		if ($approved_application_type == 'new' || $approved_application_type =='') {
+
+			$table = 'DmiFinalSubmits';
+			$report_heading = 'Approved New Applications Report';
+		
+		} 
+		// elseif ($approved_application_type == 'renewal') {
+			
+		// 	$table = 'DmiRenewalFinalSubmits';
+		// 	$report_heading = 'Approved Renewal Applications Report';
+
+		// }
+		elseif ($approved_application_type == 'all_reports') {
+			
+			$table = 'DmiGrantCertificatesPdfs';
+			$report_heading = 'All Approved Report';
+			
+			// this below code is added to show the deafult office by Akash on 16-06-2022
+			$posted_ro_office = $this->DmiUsers->find('all',array('fields'=>'posted_ro_office', 'conditions'=>array('email IS'=>$_SESSION['username'])))->first();
+			$default_ro_office = $this->DmiRoOffices->find('all',array('conditions'=>array('id IS'=>$posted_ro_office['posted_ro_office'])))->first();
+			$this->set('default_ro_office',$default_ro_office['ro_office']);
+		}
+
+		//************************New Code Added for show count list by Shreeya Date [25-05-2023]**************************************************************************
+
+		//check the which certificate type is present 
+		if ($cert_type== 'CA') 
+		{
+			$cert_type = 1;
+		} 
+		elseif ($cert_type== 'PP') 
+		{
+			$cert_type = 2;
+		} 
+		elseif ($cert_type== 'LAB') 
+		{
+			$cert_type = 3;
+		} 
+
+
+		//check the which application type is present 
+		if($approved_application_type=='new'){
+			$processFunction = 'new_app_processed';
+		}elseif($approved_application_type=='renewal'){
+			$processFunction = 'renewal_app_processed';
+		}elseif($approved_application_type=='backlog'){
+			$processFunction = 'backlog_app_processed';
+		}
+
+		
+		//show the count according to application type  and cutomer_id
+		$searchConditions = array();
+		$application_processed[] = $this->Reportstatistics->$processFunction($searchConditions,null,null,$cert_type,$approved_application_type);
+		$applListToShow = $application_processed[0][3];
+		
+
+		$date=array();
+		$application_type=array();
+		$application_user_email_id=array();
+		$user_office=array();
+		$application_customer_id=array();
+		$name_of_the_firm=array();
+		$address_of_the_firm=array();
+		$contact_details_of_the_firm=array();
+		$approved_TBL_details_tbl_name=array();
+		$approved_TBL_details_tbl_registered_no=array();
+		$laboratory_details_name=array();
+		$laboratory_details_address=array();
+
+		
+		$i=0;
+			//applied array_unique function on 18-07-2019
+			foreach (array_unique($applListToShow) as $approved_application) {
+
+				$approved_application_details = array(); //this line added on 18-07-2019
+
+				// THIS BELOW CONDITION IS ADDED FOR THE ALL REPORTS BY AKASH ON 16-06-2022
+				if ($approved_application_type == 'all_reports') {
+					$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('customer_id IS'=>$approved_application),'order' => array('id' => 'desc')))->first();
+				} elseif ($approved_application_type == 'new' || $approved_application_type =='') {
+					$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['customer_id' => $approved_application])->first(); 
+				} elseif ($approved_application_type == 'backlog') {
+					$approved_application_details = $this->DmiFinalSubmits->find('all')->where(['customer_id' => $approved_application,'status'=>'approved','current_level'=>'level_3'])->first(); 
+				} elseif ($approved_application_type == 'renewal') {
+					$approved_application_detail = $this->DmiGrantCertificatesPdfs->find('all')->select(['id'])->where(['customer_id IS'=>$approved_application])->combine('id','id')->toArray(); 
+					//applied this condition on 27-04-2019
+					if (!empty($approved_application_detail)) {
+						$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['id IN'=> $approved_application_detail])->order(['id' => 'DESC'])->first(); 
+					}
+				}
+
+				//this condition added on 18-07-2019
+				if (!empty($approved_application_details)) {
+
+					$approved_application_result = $approved_application_details;
+
+					//to check if the application is old or not to print on the excel and for viewing part dont by Akash 07-04-2022
+
+					// THIS BELOW CONDITION IS ADDED FOR THE ALL REPORTS BY AKASH ON 16-06-2022
+					if ($approved_application_type == 'all_reports') {
+			
+						if ($approved_application_result['pdf_version'] > '1') {
+							$approved_application_type_text[$i] = "<b>RENEWAL</b>";
+						} elseif ($approved_application_result['user_email_id'] == 'old_application') {
+							$approved_application_type_text[$i] = "<i>OLD</i>";
+						} else {
+							$approved_application_type_text[$i] = "NEW";
+						}
+
+					} else {
+
+						if ($approved_application_type == 'renewal') {
+							$approved_application_type_text[$i] = "<b>RENEWAL</b>";
+						} elseif ($approved_application_result['user_email_id'] == 'old_application') {
+							$approved_application_type_text[$i] = "<i>OLD</i>";
+						} else {
+							$approved_application_type_text[$i] = "NEW";
+						} 
+
+					}
+
+				
+					if ($approved_application_result['user_email_id'] == 'old_application') {
+						$old_app_approved_by = $this->Customfunctions->old_app_approved_by($approved_application_result['customer_id']);
+						$approved_application_result['user_email_id'] = $old_app_approved_by;
+					}
+
+					$explode = explode("/",$approved_application_result['customer_id']);
+					 
+					$approved_office_id = $this->DmiRoOffices->find('all')->select(['ro_email_id'])->where(['short_code' => $explode[2]])->first();  
+
+					$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email'=>$approved_office_id['ro_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id)) {
+
+						$user_office_details = $this->DmiRoOffices->find('all')->select(['ro_office'])->where(['id'=>$user_posted_office_id['posted_ro_office']])->first(); 
+
+						if (!empty($user_office_details)) {
+							$user_office[$i] = $user_office_details['ro_office'];
+						} else {
+							$user_office[$i] = 'N/A';
+						}
+					} else {
+						$user_office[$i] = 'N/A';
+					}
+
+					$application_form_type = $this->Customfunctions->checkApplicantFormType($approved_application_result['customer_id']);
+
+					if ($application_form_type == 'A') {
+						$application_type[$i]='CA (Form-A)';
+					} elseif ($application_form_type == 'B') {
+						$application_type[$i]='Printing Press (Form-B)';
+					} elseif ($application_form_type == 'C') {
+						$application_type[$i]='Laboratory (Form-C)';
+					} elseif ($application_form_type == 'D') {
+						$application_type[$i]='Laboratory (Form-D)';
+					} elseif ($application_form_type == 'E') {
+						$application_type[$i]='CA (Form-E)';
+					} elseif ($application_form_type == 'F') {
+						$application_type[$i]='CA (Form-F)';
+					}
+
+					$date[$i] = $approved_application_result['created'];
+					$application_customer_id[$i] = $approved_application_result['customer_id'];
+				
+					//added by the akash on 13-11-2021
+					$firmDetails = $this->DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$approved_application_result['customer_id'])))->first();
+					
+					$name_of_the_firm[$i] = $firmDetails['firm_name'];
+					$address_of_the_firm[$i] = $firmDetails['street_address'];
+					$contact_details_of_the_firm[$i] = base64_decode($firmDetails['email']);
+					$phoneno[$i] = $firmDetails['mobile_no'];
+
+					//tbl details
+					$tbl_details = $this->DmiAllTblsDetails->find('all',array('conditions'=>array('customer_id IS'=>$approved_application_result['customer_id'],'OR' => array('delete_status IS NULL', 'delete_status' => 'no'))))->toArray();
+
+					if (!empty($tbl_details)) {
+						$j=0;
+						foreach ($tbl_details as $each) {
+
+							$approved_TBL_details_tbl_name[$i][$j] = $each['tbl_name'];
+							$approved_TBL_details_tbl_registered_no[$i][$j] = $each['tbl_registered_no'];
+							$j++;
+						}
+
+					} else {
+						$approved_TBL_details_tbl_name[$i][0] = 'N/A';
+						$approved_TBL_details_tbl_registered_no[$i][0] = 'N/A';
+					}
+
+
+
+					//lab details
+					$lab_details = $this->DmiCustomerLaboratoryDetails->find('all',array('conditions'=>array('customer_id IS'=>$approved_application_result['customer_id'])))->toArray();
+					if (!empty($lab_details)) {
+						$laboratory_details_name[$i] = $lab_details[0]['laboratory_name'];
+						$laboratory_details_address[$i] = $lab_details[0]['street_address'];
+					} else {
+						$laboratory_details_name[$i] = 'N/A';
+						$laboratory_details_address[$i] = 'N/A';
+					}
+
+					$commodity_value = $this->DmiFirms->find('all')->select(['sub_commodity'])->where(['customer_id'=>$approved_application_result['customer_id']])->first(); 
+
+					$commodity_list[$i] = $this->Customfunctions->showCommdityInApplList($commodity_value['sub_commodity']);
+
+
+					//Added this Code on the 08-04-2022 as the base encoding was not on some emails so to dispaly the email , checking if the encoding is needed or not.
+					$checkEmailForEncoding[$i] = $approved_application_result['user_email_id'];
+
+					if($this->isBase64Encoded($checkEmailForEncoding[$i]) == true){
+						$application_user_email_id[$i] = base64_decode($approved_application_result['user_email_id']);
+					} else {
+						$application_user_email_id[$i] = $approved_application_result['user_email_id'];
+					}
+					
+					//check the expiry dateand print to the reports  added by Akash on 24-05-2022 
+					$grant_date = chop($approved_application_details['date'],"00:00:00");
+					$valid_upto[$i] = $this->Customfunctions->getCertificateValidUptoDate($approved_application_result['customer_id'],$grant_date);
+
+					//check the state name added by akash on 14-06-2022
+					$state_name[$i] = $this->getStateName($approved_application_result['customer_id']);
+					
+					//Certificate Issued on
+					$issued_on[$i] = chop($approved_application_result['date'],"00:00:00");
+
+					$i=$i+1;
+				}
+			}
+			
+		
+
+		$this->set('date',$date);
+		$this->set('application_customer_id',$application_customer_id);
+		$this->set('application_user_email_id',$application_user_email_id);
+		$this->set('application_type',$application_type);
+		$this->set('user_office',$user_office);
+		//$this->set('approved_application_list',$approved_application_list);
+		$this->set('commodity_list',$commodity_list);
+		$this->set('approved_application_type',$approved_application_type_text);
+		$this->set('name_of_the_firm',$name_of_the_firm);
+		$this->set('address_of_the_firm',$address_of_the_firm);
+		$this->set('contact_details_of_the_firm',$contact_details_of_the_firm);
+		$this->set('approved_TBL_details_tbl_name',$approved_TBL_details_tbl_name);
+		$this->set('approved_TBL_details_tbl_registered_no',$approved_TBL_details_tbl_registered_no);
+		$this->set('laboratory_details_name',$laboratory_details_name);
+		$this->set('laboratory_details_address',$laboratory_details_address);
+		$this->set('valid_upto',$valid_upto);
+		$this->set('state_name',$state_name);
+		$this->set('phoneno',$phoneno);
+		$this->set('issued_on',$issued_on);
+
+
+		//*****************End************************************
+
+		$this->set('table', $table);	// set table value ( Done by pravin 16-07-2018)
+		$this->set('report_heading', $report_heading);
+
+		$application_type_xy = array('A'=>'CA (Form-A)', 'C'=>'Laboratory (Form-C)', 'E'=>'CA (Form-E)', 'B'=>'Printing Press (Form-B)', 'D'=>'Laboratory (Form-D)', 'F'=>'CA (Form-F)');
+		// $newappId replace $cert_type by Shreeya date [25-05-2023]
+		if($cert_type=='CA')
+		{
+			$application_type_xy = array('A'=>'CA (Form-A)','E'=>'CA (Form-E)','F'=>'CA (Form-F)');
+		}
+		elseif($cert_type=='PP') 
+		{
+			$application_type_xy = array('B'=>'Printing Press (Form-B)');
+		}
+		elseif ($cert_type=='LAB') {
+			$application_type_xy = array('C'=>'Laboratory (Form-C)','D'=>'Laboratory (Form-D)');
+		}
+
+
+		//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
+		if(!empty($application_type_xy)){
+			asort($application_type_xy);
+		}
+		
+		$this->set('application_type_xy',$application_type_xy);
+		// $newappId replace $cert_type by Shreeya date [25-05-2023]
+		$this->set('cert_type',$cert_type);
+
+		//added 'office_type'=>'RO' condition on 27-07-2018   // Change on 3/11/2018 -  add order by condition - by Pravin Bhakare
+		$ro_office = $this->DmiRoOffices->find('all')->select(['id', 'ro_office'])->where(['office_type' => 'RO','delete_status IS NULL'])->order(['ro_office' => 'ASC'])->combine('id', 'ro_office')->toArray(); 
+		$this->set('ro_office',$ro_office);
+
+		$search_application_type_id = $this->Session->read('search_application_type_id');
+		$application_approved_office = $this->Session->read('application_approved_office');
+		$search_from_date = $this->Session->read('search_from_date');
+		$search_to_date = $this->Session->read('search_to_date');
+
+		$this->set('search_application_type_id',$search_application_type_id);
+		$this->set('application_approved_office',$application_approved_office);
+		$this->set('search_from_date',$search_from_date);
+		$this->set('search_to_date',$search_to_date);
+
+		$search_flag = 'off'; // added by Ankur
+		// Set default value for download report click event (Done by pravin 13-03-2018)
+		$download_report = 'no';
+
+		//if from to date and office id in  session condtion added by laxmi B on 15-02-2023
+
+		$aqcms_from_date = $this->Session->read('from_date') ;
+		$aqcms_to_date = $this->Session->read('to_date');
+		$aqcms_ro_office_short_code = $this->Session->read('roOfficeShortCode');
+		$aqcms_ro_office_id = $this->Session->read('ro_office_id');
+		$this->Session->delete('ro_office_id');
+		$this->Session->delete('roOfficeShortCode');
+		$this->Session->delete('from_date');
+		$this->Session->delete('to_date');
+
+			
+
+		if ((((!empty($aqcms_from_date && !empty($aqcms_to_date))) || !empty($aqcms_ro_office_short_code))) || null != ($this->request->getData('search_logs')) || null != ($this->request->getData('download_report'))) 
+		{
+		
+			$search_flag = 'on'; // added by Ankur
+			//Check not empty "Download Report as Excel" button Request, if condition TRUE then set value "yes" for "Download Report as Excel" click event
+			//and pass this value to "approved_application_search_conditions" function (Done by pravin 13-03-2018)
+			if (!empty($this->request->getData('download_report'))) {
+				$download_report = 'yes';
+			}
+
+			$search_application_type_id = $this->request->getData('application_type');
+			$application_approved_office = $this->request->getData('office');
+			$search_from_date =  $this->request->getData('from_date');
+			$search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
+			$search_to_date =  $this->request->getData('to_date');
+			$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
+			$this->date_comparison($search_from_date, $search_to_date);
+
+			// Change on 3/11/2018 - For download excel report, Take search filter field value from session variables instend of POST variable - By Pravin
+			if ($download_report == 'yes') {
+				
+				$search_application_type_id = $this->Session->read('search_application_type_id');
+				$application_approved_office = $this->Session->read('application_approved_office');
+				$search_from_date = $this->Session->read('search_from_date');
+				$search_to_date = $this->Session->read('search_to_date');
+			}
+
+			$this->Session->delete('search_application_type_id');
+			$this->Session->delete('application_approved_office');
+			$this->Session->delete('search_from_date');
+			$this->Session->delete('search_to_date');
+			
+			
+
+			//set from_date and to_date and office name from session of statstics report added by laxmi B. on 15-02-2023
+			if(!empty($aqcms_from_date) && !empty($aqcms_to_date && empty($aqcms_ro_office_short_code) )){
+				$search_from_date = $aqcms_from_date;
+				$search_to_date = $aqcms_to_date;
+				$search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
+				$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
+				$this->date_comparison($search_from_date, $search_to_date);
+
+			}elseif(!empty($aqcms_from_date) && !empty($aqcms_to_date && !empty($aqcms_ro_office_short_code))){
+		   
+
+				$search_from_date = $aqcms_from_date;
+				$search_to_date = $aqcms_to_date;
+				$search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
+				$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
+				$this->date_comparison($search_from_date, $search_to_date);
+				
+				$ro_office = $this->DmiRoOffices->find('all')->select(['id'])->where(['id IN' => $aqcms_ro_office_id])->where(['short_code IN'=>$aqcms_ro_office_short_code])->first(); 
+				$application_approved_office = [$ro_office['id']];
+					
+
+			} elseif(!empty($aqcms_ro_office_short_code)){
+				$ro_office = $this->DmiRoOffices->find('all')->select(['id'])->where(['id IN' => $aqcms_ro_office_id])->where(['short_code IN'=>$aqcms_ro_office_short_code])->first(); 
+				$application_approved_office = [$ro_office['id']];
+			}//end
+
+
+			$this->Session->write('search_application_type_id', $search_application_type_id);
+			$this->Session->write('application_approved_office', $application_approved_office);
+			$this->Session->write('search_from_date', $search_from_date);
+			$this->Session->write('search_to_date', $search_to_date);
+
+			$this->set('search_application_type_id', $search_application_type_id);
+			$this->set('application_approved_office', $application_approved_office);
+			$this->set('search_from_date', $search_from_date);
+			$this->set('search_to_date', $search_to_date);
+
+			$approved_application_lists = $this->approvedApplicationSearchConditions($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$data_id,$approved_application_type);
+			$approved_application_list = $approved_application_lists[0];
+			$download_approved_application_list = $approved_application_lists[1];
+
+			$i=0;
+			foreach ($approved_application_list as $each) {
+
+				$approved_application_list[$i] = $each['customer_id'];
+				$i=$i+1;
+			}
+
+			$j=0;
+			foreach ($download_approved_application_list as $each) {
+
+				$download_approved_application_list[$j] = $each['customer_id'];
+				$j=$j+1;
+			}
+			//if data same data id exist in rejcted table it is not apper in report added by laxmi B. on 20-01-2023
+			
+			$this->loadModel('DmiRejectedApplLogs');
+			$rejectedList = $this->DmiRejectedApplLogs->find('all')->select(['id','customer_id'])->order(['id','customer_id'])->combine('id','customer_id')->toArray();
+			
+			if(!empty($rejectedList)){
+				if(!empty($approved_application_list)){
+					$approved_application_list = array_diff($approved_application_list, $rejectedList);
+				}
+			}//end laxmi B.
+
+
+			//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
+			if ($download_report == 'yes') {
+
+				$this->downloadApprovedApplicationReportResults($download_approved_application_list, $approved_application_type);
+			}
+
+			$this->approvedApplicationReportResults($approved_application_list, $approved_application_type);
+	
+		} else {
+			
+			
+			$approved_application_lists = $this->approvedApplicationSearchConditions($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$data_id,$approved_application_type);
+			
+			$approved_application_list = $approved_application_lists[0];
+
+			$i=0;
+			foreach ($approved_application_list as $each) {
+				$approved_application_list[$i] = $each['customer_id'];
+				$i=$i+1;
+			}
+			 //if data same data id exist in rejcted table it is not apper in report added by laxmi B. on 20-01-2023
+			$this->loadModel('DmiRejectedApplLogs');
+			$rejectedList = $this->DmiRejectedApplLogs->find('all')->select(['id','customer_id'])->order(['id','customer_id'])->combine('id','customer_id')->toArray();
+			
+			if(!empty($rejectedList)){
+				
+				if(!empty($approved_application_list)){
+					$approved_application_list = array_diff($approved_application_list, $rejectedList);
+				}
+			}//end laxmi B.
+			 
+			//below query commented by shreeya for display list of granted new application already added this code not use this function
+			//$this->approvedApplicationReportResults($approved_application_list,$approved_application_type);
+			
+		}
+
+	}
+
+
+	// Approved Applications Report
+	// Description : ----
+	// @Author : Pravin Bhakare
 	// #Contributer : Ankur Jangid (Migration)
 	// Date : ----
 
 	public function approvedApplicationsReport() {
-		//added by laxmi on 15-02-2023
-            $aqcms_from_date ='' ;
-            $aqcms_to_date = '';
-            $aqcms_ro_office_short_code = '';
-            $aqcms_ro_office_id = '';					 
 
 		$approved_application_type = $this->Session->read('approved_application_type');
 
@@ -2507,20 +3396,8 @@ class ReportsController extends AppController {
 		// Set default value for download report click event (Done by pravin 13-03-2018)
 		$download_report = 'no';
 
-		    //if from to date and office id in  session condtion added by laxmi B on 15-02-2023
-
-		    $aqcms_from_date = $this->Session->read('from_date') ;
-            $aqcms_to_date = $this->Session->read('to_date');
-            $aqcms_ro_office_short_code = $this->Session->read('roOfficeShortCode');
-            $aqcms_ro_office_id = $this->Session->read('ro_office_id');
-            $this->Session->delete('ro_office_id');
-			$this->Session->delete('roOfficeShortCode');
-			$this->Session->delete('from_date');
-			$this->Session->delete('to_date');
-
+		if (null != ($this->request->getData('search_logs')) || null != ($this->request->getData('download_report'))) {
 			
-
-		if ((((!empty($aqcms_from_date && !empty($aqcms_to_date))) || !empty($aqcms_ro_office_short_code))) || null != ($this->request->getData('search_logs')) || null != ($this->request->getData('download_report'))) { 																																																		 
 			$search_flag = 'on'; // added by Ankur
 			//Check not empty "Download Report as Excel" button Request, if condition TRUE then set value "yes" for "Download Report as Excel" click event
 			//and pass this value to "approved_application_search_conditions" function (Done by pravin 13-03-2018)
@@ -2549,35 +3426,6 @@ class ReportsController extends AppController {
 			$this->Session->delete('application_approved_office');
 			$this->Session->delete('search_from_date');
 			$this->Session->delete('search_to_date');
-			
-			
-
-            //set from_date and to_date and office name from session of statstics report added by laxmi B. on 15-02-2023
-			if(!empty($aqcms_from_date) && !empty($aqcms_to_date && empty($aqcms_ro_office_short_code) )){
-				  $search_from_date = $aqcms_from_date;
-				  $search_to_date = $aqcms_to_date;
-				  $search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
-				  $search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
-				  $this->date_comparison($search_from_date, $search_to_date);
-
-			 }elseif(!empty($aqcms_from_date) && !empty($aqcms_to_date && !empty($aqcms_ro_office_short_code))){
-			 
-
-				 $search_from_date = $aqcms_from_date;
-				  $search_to_date = $aqcms_to_date;
-				  $search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
-				  $search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
-				  $this->date_comparison($search_from_date, $search_to_date);
-				   
-				 $ro_office = $this->DmiRoOffices->find('all')->select(['id'])->where(['id IN' => $aqcms_ro_office_id])->where(['short_code IN'=>$aqcms_ro_office_short_code])->first(); 
-				 $application_approved_office = [$ro_office['id']];
-				  
-
-				 }elseif(!empty($aqcms_ro_office_short_code)){
-				 $ro_office = $this->DmiRoOffices->find('all')->select(['id'])->where(['id IN' => $aqcms_ro_office_id])->where(['short_code IN'=>$aqcms_ro_office_short_code])->first(); 
-				 $application_approved_office = [$ro_office['id']];
-			 }//end
-
 
 			$this->Session->write('search_application_type_id', $search_application_type_id);
 			$this->Session->write('application_approved_office', $application_approved_office);
@@ -2607,19 +3455,6 @@ class ReportsController extends AppController {
 				$j=$j+1;
 			}
 
-			  //if data same data id exist in rejcted table it is not apper in report added by laxmi B. on 20-01-2023
-               
-              $this->loadModel('DmiRejectedApplLogs');
-              $rejectedList = $this->DmiRejectedApplLogs->find('all')->select(['id','customer_id'])->order(['id','customer_id'])->combine('id','customer_id')->toArray();
-             
-              if(!empty($rejectedList)){
-              	
-              	if(!empty($approved_application_list)){
-                    $approved_application_list = array_diff($approved_application_list, $rejectedList);
-              	}
-              }//end laxmi B.
-
-
 			//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
 			if ($download_report == 'yes') {
 
@@ -2640,23 +3475,10 @@ class ReportsController extends AppController {
 				$i=$i+1;
 			}
 
-			 //if data same data id exist in rejcted table it is not apper in report added by laxmi B. on 20-01-2023
-              $this->loadModel('DmiRejectedApplLogs');
-              $rejectedList = $this->DmiRejectedApplLogs->find('all')->select(['id','customer_id'])->order(['id','customer_id'])->combine('id','customer_id')->toArray();
-             
-              if(!empty($rejectedList)){
-              	
-              	if(!empty($approved_application_list)){
-                    $approved_application_list = array_diff($approved_application_list, $rejectedList);
-              	}
-              }//end laxmi B.
-              
 			$this->approvedApplicationReportResults($approved_application_list,$approved_application_type);
 		}
 	
 	}
-
-
 
 
 	// Approved Application Search Conditions
@@ -2665,7 +3487,8 @@ class ReportsController extends AppController {
 	// #Contributer : Ankur Jangid (Migration)
 	// Date : ----
 
-	public function approvedApplicationSearchConditions ($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag) {
+	public function approvedApplicationSearchConditions ($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$data_id=null,$approved_application_type=null) 
+	{
 
 		$approved_application_list = [];
 
@@ -2698,9 +3521,173 @@ class ReportsController extends AppController {
 			$approved_application_list = $this->$table->find('all')->where($conditions)->order(['id' => 'DESC'])->toArray();
 
 			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
-		
-		} elseif ($search_application_type_id != '' && $application_approved_office != '' && $search_from_date =='' && $search_to_date == '' ) {
+		} 
+		///===========================YAshwant 05-Apr-2023====================================
+		elseif ($search_application_type_id == '' && $application_approved_office == '' && $search_from_date !='' && $search_to_date != '') 
+		{
+			
+			$approved_application_customer_id = $this->DmiApplicationEsignedStatuses->find('all')->select(['customer_id'])->where(['application_status' =>"Granted"])->where(['date(modified) BETWEEN :start AND :end'])
+			->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->order(['created'=>'DESC'])->toArray();
 
+			//echo"<pre>";print_r($approved_application_customer_id);exit;
+
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) 
+			{
+
+				if (!empty($each_customer_id['customer_id'])) 
+				{
+					$application_customer_type = $this->Reportsfunctions->newApplicantType($each_customer_id['customer_id']);
+
+					if(in_array($application_customer_type, $data_id, TRUE)) 
+					{
+						$approved_application_list[$i] = $each_customer_id['customer_id'];
+						$i=$i+1;
+					}
+				}
+			}
+
+			if (!empty($approved_application_list)) 
+			{
+				$conditions = ['customer_id IN' => $approved_application_list];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray();
+
+			
+		}
+		///==========YAshwant 05-Apr-2023 END Search FRom-To filter ====================================
+
+		///==========YAshwant 05-Apr-2023 START Search Select Office Filter filter ==================
+
+		elseif ($search_application_type_id == '' && $application_approved_office != '' && $search_from_date =='' && $search_to_date == '' ) 
+		{
+			
+			//$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['status' => 'approved', 'current_level' => 'level_3'])->toArray();
+
+			$approved_application_customer_id = $this->DmiApplicationEsignedStatuses->find('all')->select(['customer_id'])->where(['application_status' =>"Granted"])->toArray();
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) 
+			{
+
+				if (!empty($each_customer_id['customer_id'])) 
+				{
+					$application_customer_type = $this->Reportsfunctions->newApplicantType($each_customer_id['customer_id']);
+
+					if(in_array($application_customer_type, $data_id, TRUE)) 
+					{
+						/*$approved_application_list[$i] = $each_customer_id['customer_id'];
+						$i=$i+1;*/
+
+
+					$approved_application_details_list = $this->DmiGrantCertificatesPdfs->find('all')->select(['id', 'id'])->where(['customer_id' => $each_customer_id['customer_id']])->combine('id', 'id')->toArray(); 
+
+						if (!empty($approved_application_details_list)) 
+						{
+
+							$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['id' => max($approved_application_details_list)])->first();  
+
+							$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email' => $approved_application_details['user_email_id']])->first();  
+
+							if (!empty($user_posted_office_id)) {
+
+								if (in_array($user_posted_office_id['posted_ro_office'],$application_approved_office)) {
+
+									$approved_application_list[$i] = $each_customer_id['customer_id'];
+									$i=$i+1;
+								}
+							}
+						}
+					}
+
+				}
+			}
+
+			if (!empty($approved_application_list)) 
+			{
+				$conditions = ['customer_id IN' => $approved_application_list];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray();
+		
+		}
+		///==========YAshwant 05-Apr-2023 END Search Select Office Filter filter ==================
+		/*Yashwant====10/Mar/2023 This below Condition Used For NEW Appln(E-signed) count for GRanted=============*/
+
+		elseif (!empty($data_id)) 
+		{
+			
+			$approved_application_customer_id = $this->DmiApplicationEsignedStatuses->find('all')->select(['customer_id'])->where(['application_status' =>"Granted"])->toArray();
+
+			//$approved_application_customer_id = $this->DmiRenewalEsignedStatuses->find('all')->select(['customer_id'])->where(['application_status' =>"Granted"])->toArray();
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) 
+			{
+
+				if (!empty($each_customer_id['customer_id'])) 
+				{
+					$application_customer_type = $this->Reportsfunctions->newApplicantType($each_customer_id['customer_id']);
+
+					if(in_array($application_customer_type, $data_id, TRUE)) 
+					{
+						$approved_application_list[$i] = $each_customer_id['customer_id'];
+						$i=$i+1;
+					}
+				}
+			}
+
+			if (!empty($approved_application_list)) 
+			{
+				$conditions = ['customer_id IN' => $approved_application_list];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+		} elseif ($search_application_type_id == '' && $application_approved_office == '' && $search_from_date !='' && $search_to_date != '') 
+		{
+			
+			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['date(modified) BETWEEN :start AND :end'])
+			->where(['status' => 'approved', 'current_level' => 'level_3'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) {
+				$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']); 
+
+				if (in_array($application_customer_type, $search_application_type_id)) {
+					$approved_application_list[$i] = $each_customer_id['customer_id']; 
+					$i=$i+1;
+				}
+			}
+
+			// below if-else code added by Ankur Jangid
+			if (!empty($approved_application_list)) {
+				$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3'];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+		
+		} elseif ($search_application_type_id != '' && $application_approved_office != '' && $search_from_date =='' && $search_to_date == '' ) 
+		{
+			
 			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['status' => 'approved', 'current_level' => 'level_3'])->toArray(); 
 
 			$i=0;
@@ -2743,7 +3730,7 @@ class ReportsController extends AppController {
 		
 		
 		} elseif ($search_application_type_id != '' && $application_approved_office == '' && $search_from_date !='' && $search_to_date != '') {
-
+		
 			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['date(modified) BETWEEN :start AND :end'])
 			->where(['status' => 'approved', 'current_level' => 'level_3'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
 
@@ -2769,7 +3756,7 @@ class ReportsController extends AppController {
 			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
 		
 		} elseif ($search_application_type_id != '' && $application_approved_office != '' && $search_from_date !='' && $search_to_date != '') {
-
+			
 			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['date(modified) BETWEEN :start AND :end'])
 				->where(['status' => 'approved', 'current_level' => 'level_3'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
 
@@ -2806,7 +3793,7 @@ class ReportsController extends AppController {
 			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
 		
 		} elseif ($search_application_type_id == '' && $application_approved_office != '' && $search_from_date =='' && $search_to_date == '') {
-
+			
 			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['status' => 'approved', 'current_level' => 'level_3'])->toArray(); 
 
 			$i=0;
@@ -2842,7 +3829,7 @@ class ReportsController extends AppController {
 			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
 		
 		} elseif ($search_application_type_id == '' && $application_approved_office != '' && $search_from_date !='' && $search_to_date != '') {
-
+			
 			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['date(modified) BETWEEN :start AND :end', 'status' => 'approved',
 				'current_level' => 'level_3'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
 
@@ -2879,7 +3866,7 @@ class ReportsController extends AppController {
 			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
 
 		} elseif ($search_application_type_id == '' && $application_approved_office == '' && $search_from_date !='' && $search_to_date != '') {
-
+		
 			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['date(modified) BETWEEN :start AND :end', 'status' => 'approved',
 				'current_level' => 'level_3'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
 
@@ -2901,7 +3888,7 @@ class ReportsController extends AppController {
 			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
 		
 		} else {
-
+		
 			if ($search_flag == 'on') {
 				$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['status' => 'approved', 'current_level' => 'level_3'])
 				->order(['created'=>'DESC'])->extract('customer_id')->toArray(0); 
@@ -2926,7 +3913,6 @@ class ReportsController extends AppController {
 					->order(['created'=>'DESC'])->limit(['100'])->extract('customer_id')->toArray(0); 
 				}
 
-				
 			}
 
 			$approved_application_list = $approved_application_customer_id;
@@ -2950,7 +3936,7 @@ class ReportsController extends AppController {
 	
 			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
 		}
-
+	
 		return array($approved_application_list,$download_approved_application_list);
 	
 	}
@@ -2967,6 +3953,7 @@ class ReportsController extends AppController {
 
 	public function approvedApplicationReportResults($approved_application_list,$approved_application_type) {
 
+		
 		$date=array();
 		$application_type=array();
 		$application_user_email_id=array();
@@ -2980,12 +3967,11 @@ class ReportsController extends AppController {
 		$laboratory_details_name=array();
 		$laboratory_details_address=array();
 		// set values null added laxmi on 16-02-2023
-		 $approved_application_type_text = array();
-		 $valid_upto= array();
-		 $state_name = array();
-		 $phoneno = array();
-		 $issued_on = array();
-
+		$approved_application_type_text = array();
+		$valid_upto= array();
+		$state_name = array();
+		$phoneno = array();
+		$issued_on = array();
 
 
 		if (!empty($approved_application_list)) {
@@ -3001,6 +3987,8 @@ class ReportsController extends AppController {
 					$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('customer_id IS'=>$approved_application),'order' => array('id' => 'desc')))->first();
 				} elseif ($approved_application_type == 'new' || $approved_application_type =='') {
 					$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['customer_id' => $approved_application])->first(); 
+				} elseif ($approved_application_type == 'backlog') {
+					$approved_application_details = $this->DmiFinalSubmits->find('all')->where(['customer_id' => $approved_application,'status'=>'approved','current_level'=>'level_3'])->first(); 
 				} elseif ($approved_application_type == 'renewal') {
 					$approved_application_detail = $this->DmiGrantCertificatesPdfs->find('all')->select(['id'])->where(['customer_id IS'=>$approved_application])->combine('id','id')->toArray(); 
 					//applied this condition on 27-04-2019
@@ -3041,8 +4029,8 @@ class ReportsController extends AppController {
 
 				
 					if ($approved_application_result['user_email_id'] == 'old_application') {
-							$old_app_approved_by = $this->Customfunctions->old_app_approved_by($approved_application_result['customer_id']);
-							$approved_application_result['user_email_id'] = $old_app_approved_by;
+						$old_app_approved_by = $this->Customfunctions->old_app_approved_by($approved_application_result['customer_id']);
+						$approved_application_result['user_email_id'] = $old_app_approved_by;
 					}
 
 					$explode = explode("/",$approved_application_result['customer_id']);
@@ -3345,6 +4333,167 @@ class ReportsController extends AppController {
 
 
 
+	// Download Grant Backlog Application Report Results
+	// Description : function is uesd for download granted backlog applications report
+	// #Author : Yashwant 
+	// Date : 06-APR-2023
+
+	public function downloadGrantBacklogApplicationReportResults($approved_application_list,$approved_application_type)
+	{
+		$this->viewBuilder()->setLayout('downloadpdf');
+
+		$date=array();
+		$application_type=array();
+		$application_user_email_id=array();
+		$user_office=array();
+		$application_customer_id=array();
+
+		if (!empty($approved_application_list)) {
+
+			$i=0;
+			foreach (array_unique($approved_application_list) as $approved_application)//applied array_unique function on 18-07-2019
+			{
+				$approved_application_details = array(); //this line added on 18-07-2019
+
+				if ($approved_application_type == 'new' || $approved_application_type =='') {
+					$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['customer_id' => $approved_application])->first();
+				} 
+
+				if ($approved_application_type == 'backlog' || $approved_application_type =='') {
+					$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['customer_id' => $approved_application])->first();
+				} elseif ($approved_application_type == 'renewal') {
+					$approved_application_detail = $this->DmiGrantCertificatesPdfs->find('all')->select(['id'])->where(['customer_id' => $approved_application])->combine('id', 'id')->toArray(); 
+
+					if (!empty($approved_application_detail)) {//applied this condition on 27-04-2019
+						$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['id' => max($approved_application_detail)])->first();
+					}
+				}
+				
+				if (!empty($approved_application_details)) { //this condition added on 18-07-2019
+
+					$approved_application_result = $approved_application_details;
+					
+					//to check if the application is old or not to print on the excel and for viewing part dont by Akash 07-04-2022
+					if ($approved_application_type == 'renewal') {
+						$approved_application_type_text[$i] = "Renewal";
+					} elseif ($approved_application_result['user_email_id'] == 'old_application') {
+						$approved_application_type_text[$i] = "Old";
+					} else {
+						$approved_application_type_text[$i] = "New";
+					} 
+
+
+					if ($approved_application_result['user_email_id'] == 'old_application') {
+						$old_app_approved_by = $this->Customfunctions->old_app_approved_by($approved_application_result['customer_id']);
+						$approved_application_result['user_email_id'] = $old_app_approved_by;
+					}
+
+					$explode = explode("/",$approved_application_result['customer_id']);
+
+					$approved_office_id = $this->DmiRoOffices->find('all')->select(['ro_email_id'])->where(['short_code' => $explode[2]])->first(); 
+
+					$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email' => $approved_office_id['ro_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id)) {
+						$user_office_details = $this->DmiRoOffices->find('all')->select(['ro_office'])->where(['id' => $user_posted_office_id['posted_ro_office']])->first(); 
+
+						if (!empty($user_office_details)) {
+							$user_office[$i] = $user_office_details['ro_office'];
+						} else {
+							$user_office[$i] = '--';
+						}
+					} else {
+						$user_office[$i] = '--';
+					}
+
+					$application_form_type = $this->Customfunctions->checkApplicantFormType($approved_application_result['customer_id']);
+
+					if ($application_form_type == 'A') {$application_type[$i]='CA (Form-A)';}
+					elseif ($application_form_type == 'B') {$application_type[$i]='Printing Press (Form-B)';}
+					elseif ($application_form_type == 'C') {$application_type[$i]='Laboratory (Form-C)';}
+					elseif ($application_form_type == 'D') {$application_type[$i]='Laboratory (Form-D)';}
+					elseif ($application_form_type == 'E') {$application_type[$i]='CA (Form-E)';}
+					elseif ($application_form_type == 'F') {$application_type[$i]='CA (Form-F)';}
+
+					$date[$i] = $approved_application_result['created'];
+					$application_customer_id[$i] = $approved_application_result['customer_id'];
+
+					//To get the Firm details to show in the excel this queries are added By Akash Thakre on 08-04-2022
+					$firmDetails = $this->DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$approved_application_result['customer_id'])))->first();
+
+					$name_of_the_firm[$i] = $firmDetails['firm_name'];
+					$address_of_the_firm[$i] = $firmDetails['street_address'];
+					$contact_details_of_the_firm[$i] = base64_decode($firmDetails['email']);
+
+					//To get the TBL details like approved tbl name and registred no to print the Excel file added this below code by Akash Thakre on 08-04-2022
+					$tbl_details = $this->DmiAllTblsDetails->find('all',array('conditions'=>array('customer_id IS'=>$approved_application_result['customer_id'],'delete_status IS NULL')))->toArray();
+
+					if (!empty($tbl_details)) {
+						$j=0;
+						foreach ($tbl_details as $each) {
+
+							$approved_TBL_details_tbl_name[$i][$j] = $each['tbl_name'];
+							$approved_TBL_details_tbl_registered_no[$i][$j] = $each['tbl_registered_no'];
+							$j++;
+						}
+
+					} else {
+						$approved_TBL_details_tbl_name[$i][0] = '--';
+						$approved_TBL_details_tbl_registered_no[$i][0] = '--';
+					}
+
+
+					//lab details
+					$lab_details = $this->DmiCustomerLaboratoryDetails->find('all',array('conditions'=>array('customer_id IS'=>$approved_application_result['customer_id'])))->toArray();
+					if (!empty($lab_details)) {
+						$laboratory_details_name[$i] = $lab_details[0]['laboratory_name'];
+						$laboratory_details_address[$i] = $lab_details[0]['street_address'];
+					} else {
+						$laboratory_details_name[$i] = '--';
+						$laboratory_details_address[$i] = '--';
+					}
+
+
+					$commodity_value = $this->DmiFirms->find('all')->select(['sub_commodity'])->where(['customer_id' => $approved_application_result['customer_id']])->first(); 
+
+					$commodity_list[$i] = $this->Customfunctions->showCommdityInApplList($commodity_value['sub_commodity']);
+
+					//Added this Code on the 08-04-2022 as the base encoding was not on some emails so to dispaly the email , checking if the encoding is needed or not.
+					$checkEmailForEncoding[$i] = $approved_application_result['user_email_id'];
+
+					if($this->isBase64Encoded($checkEmailForEncoding[$i]) == true){
+						$application_user_email_id[$i] = base64_decode($approved_application_result['user_email_id']);
+					} else {
+						$application_user_email_id[$i] = $approved_application_result['user_email_id'];
+					}
+
+					$i=$i+1;
+				}
+			}
+		}
+
+		$this->set('orders',$date);
+		$this->set('application_id',$application_customer_id);
+		$this->set('application_user_email_id',$application_user_email_id);
+		$this->set('application_type',$application_type);
+		$this->set('user_office',$user_office);
+		$this->set('approved_application_list',$approved_application_list);
+		$this->set('commodity_list',$commodity_list);
+		$this->set('approved_application_type',$approved_application_type_text);
+		$this->set('name_of_the_firm',$name_of_the_firm);
+		$this->set('address_of_the_firm',$address_of_the_firm);
+		$this->set('contact_details_of_the_firm',$contact_details_of_the_firm);
+		$this->set('approved_TBL_details_tbl_name',$approved_TBL_details_tbl_name);
+		$this->set('approved_TBL_details_tbl_registered_no',$approved_TBL_details_tbl_registered_no);
+		$this->set('laboratory_details_name',$laboratory_details_name);
+		$this->set('laboratory_details_address',$laboratory_details_address);
+
+		$this->layout = null;
+		$this->autoLayout = false;
+		Configure::write('debug', '0');
+		$this -> render('/element/download_report_excel_format/download_approved_application_report_results');
+	}
+	
 
 
 	
@@ -3353,6 +4502,7 @@ class ReportsController extends AppController {
 	// @Author : Pravin Bhakare
 	// #Contributer : Ankur Jangid (Migration)
 	// Date : 12-09-2017
+
 
 
 	public function search_user_id($user_name_details,$search_user_id) {
@@ -3476,7 +4626,7 @@ class ReportsController extends AppController {
 
 				$i=0;
 				foreach ($user_email_details as $user_email_id) {
-					$user_email_details = $this->DmiUserRoles->find('all')->select(['id', 'user_email_id'])->where(['user_email_id' => $user_email_id, 'ro_inspection' => 'yes'])->first(); 
+					$user_email_details = $this->DmiUserRoles->find('all')->select(['id', 'user_email_id'])->where(['user_email_id' => $user_email_id, 'ro_inspection' => 'yes'])->first();
 					if (!empty($user_email_details)) {
 						$user_email_details_xy[$i] = $user_email_details;
 						?><option value="<?php echo $user_email_details_xy[$i]['id']; ?>"><?php echo base64_decode($user_email_details_xy[$i]['user_email_id']); ?></option><?php
@@ -3608,10 +4758,159 @@ class ReportsController extends AppController {
 
 
 	// Newly Added Firm List Report
-	// Description : ----
+	// Description : For AQCMS Stats
+	// @Author : Pravin Bhakare
+	// #Contributer : Yeshwant
+	// Date : 
+
+	public function newlyAddedFirmListReportForStats($cert_type) 
+	{
+
+		$application_type_array = array('A'=>'CA (Form-A)','C'=>'Laboratory (Form-C)','E'=>'CA (Form-E)','B'=>'Printing Press (Form-B)','D'=>'Laboratory (Form-D)','F'=>'CA (Form-F)');
+
+		$cert_type_decode= base64_decode($cert_type);
+		/*if($cert_type_decode=='1')
+		{
+			$application_type_array = array('A'=>'CA (Form-A)','E'=>'CA (Form-E)','F'=>'CA (Form-F)');
+		}
+		elseif ($cert_type_decode=='2') 
+		{
+			$application_type_array = array('B'=>'Printing Press (Form-B)');
+		}
+		elseif ($cert_type_decode=='3') {
+			$application_type_array = array('C'=>'Laboratory (Form-C)','D'=>'Laboratory (Form-D)');
+		}*/
+		
+
+
+		//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
+		asort($application_type_array);
+
+
+		$this->set('cert_type_decode',$cert_type_decode);
+		$this->set('application_type_array',$application_type_array);
+
+		// Apply "Order by" clause to get state list by order wise (Done By Pravin 10-01-2018)
+		$states = $this->DmiStates->find('all')->select(['id', 'state_name'])->where(['OR' => [['delete_status IS' => null], ['delete_status IS' => 'no']]])
+			->order(['state_name' => 'ASC'])->combine('id', 'state_name')->toArray(); 
+		$this->set('states',$states);
+
+		// Change on 05/11/2018, Get list of all district - By Pravin Bhakare
+		$all_district_name = $this->DmiDistricts->find('all')->select(['id', 'district_name'])->where(['OR' => [['delete_status IS' => null], ['delete_status ='=>'no']]])
+			->order(['district_name' => 'ASC'])->combine('id', 'district_name')->toArray(); 
+		$this->set('all_district_name', $all_district_name);
+
+		$company_id = null;
+		$application_type = null;
+		$state = null;
+		$district = null;
+		$search_from_date = null;
+		$search_to_date = null;
+
+		$application_type = $this->Session->read('application_type');
+		$company_id = $this->Session->read('company_id');
+		$state = $this->Session->read('state');
+		$district = $this->Session->read('district');
+		$search_from_date = $this->Session->read('search_from_date');
+		$search_to_date = $this->Session->read('search_to_date');
+
+		$download_application_type = $this->Session->read('application_type');
+		$download_company_id = $this->Session->read('company_id');
+		$download_state = $this->Session->read('state');
+		$download_district = $this->Session->read('district');
+		$download_search_from_date = $this->Session->read('search_from_date');
+		$download_search_to_date = $this->Session->read('search_to_date');
+
+		$search_flag = 'off'; // added by Ankur
+		$download_report = 'no';
+
+		if (null != ($this->request->getData('search_logs')) || null != ($this->request->getData('download_report'))) {
+			$search_flag = 'on'; // added by Ankur
+
+			//Check not empty "Download Report as Excel" button Request, if condition TRUE then set value "yes" for "Download Report as Excel" click event
+			//(Done by pravin 14-03-2018)
+			if (!empty($this->request->getData('download_report'))) {
+				$download_report = 'yes';
+			}
+
+			$company_id = htmlentities($this->request->getData('company_id'), ENT_QUOTES);
+			$application_type = $this->request->getData('application_type');
+			
+
+			$table = 'DmiStates';
+			$post_input_request = $this->request->getData('state');
+			if (!empty($post_input_request)) {
+				$state = $this->Customfunctions->dropdownSelectInputCheck($table,$post_input_request); // calling library function
+			} else {
+				$state = '';
+			}
+
+			$table = 'DmiDistricts';
+			$post_input_request = $this->request->getData('district');
+			if (!empty($post_input_request)) {
+				$district = $this->Customfunctions->dropdownSelectInputCheck($table,$post_input_request); // calling library function
+			} else {
+				$district = '';
+			}
+
+			$download_firms_data_details_result = $this->DmiFirms->newlyAddedFirmListReportConditionsForStats($download_application_type,$download_company_id,$download_state,$download_district,$download_search_from_date,$download_search_to_date,$search_flag,$cert_type);
+
+			$search_from_date =  $this->request->getData('from_date');
+			$search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
+			$search_to_date =  $this->request->getData('to_date');
+			$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
+			$this->date_comparison($search_from_date,$search_to_date);
+
+			$this->Session->delete('application_type');	
+			$this->Session->delete('company_id');
+			$this->Session->delete('state'); $this->Session->delete('district');
+			$this->Session->delete('search_from_date'); $this->Session->delete('search_to_date');
+
+			$this->Session->write('application_type',$application_type);
+			$this->Session->write('company_id',$company_id);
+			$this->Session->write('search_from_date',$search_from_date); $this->Session->write('search_to_date',$search_to_date);
+			$this->Session->write('state',$state); $this->Session->write('district',$district);
+
+			$firms_data_details_result = $this->DmiFirms->newlyAddedFirmListReportConditionsForStats($application_type,$company_id,$state,$district,$search_from_date,$search_to_date,$search_flag,$cert_type);
+			$this->newlyAddedFirmReportResult($firms_data_details_result,$application_type_array);
+
+			if ($download_report == 'yes') {
+				$this->downloadNewlyAddedFirmReportResult($download_firms_data_details_result,$application_type_array);
+			}
+		
+		} else {
+
+			if ($this->request->getData('download_report') =='') {
+				$download_report = 'no';
+			}
+			$firms_data_details_result = $this->DmiFirms->newlyAddedFirmListReportConditionsForStats($application_type,$company_id,$state,$district,$search_from_date,$search_to_date,$search_flag,$cert_type);
+
+			$this->newlyAddedFirmReportResult($firms_data_details_result,$application_type_array);
+
+			if(!empty($firms_data_details_result))
+			{
+				if($download_report=='yes')
+				{	
+					$this->downloadNewlyAddedFirmReportResult($firms_data_details_result,$application_type_array);
+				}
+			}
+		}
+			
+
+		$this->set('application_type',$application_type);
+		$this->set('state',$state); 
+		$this->set('company_id',$company_id);
+		$this->set('district',$district); $this->set('search_from_date',$search_from_date);	 $this->set('search_to_date',$search_to_date);
+	}
+
+
+
+
+	// Newly Added Firm List Report
+	// Description : For Front Listing
 	// @Author : Pravin Bhakare
 	// #Contributer : Ankur Jangid (Migration)
-	// Date : ----
+	// Date : 28-04-2023
 
 	public function newlyAddedFirmListReport() {
 
@@ -3718,13 +5017,11 @@ class ReportsController extends AppController {
 	}
 
 
-
 	// Newly Added Firm Report Result
 	// Description : ----
 	// @Author : Pravin Bhakare
 	// #Contributer : Ankur Jangid (Migration)
 	// Date : ----
-
 	public function newlyAddedFirmReportResult($final_customer_id_list,$application_type_array) {
 
 		$firms_data_details = array();
@@ -3771,43 +5068,43 @@ class ReportsController extends AppController {
 
 		$this->viewBuilder()->setLayout('downloadpdf');
 
-			$firms_data_details = array();
-			$application_type_name = array();
-			$districts = array();
-			$states = array();
+		$firms_data_details = array();
+		$application_type_name = array();
+		$districts = array();
+		$states = array();
 
-			if (!empty($final_customer_id_list)) {
-				$conditions = ['customer_id IN' => $final_customer_id_list];
-			} else {
-				$conditions = ['customer_id IS' => ''];
+		if (!empty($final_customer_id_list)) {
+			$conditions = ['customer_id IN' => $final_customer_id_list];
+		} else {
+			$conditions = ['customer_id IS' => ''];
+		}
+
+		if (!empty($final_customer_id_list)) {
+
+			$final_result_firm_data = $this->DmiFirms->find('all')->select(['id', 'customer_primary_id', 'firm_name', 'certification_type', 'state', 'district',
+			'created', 'customer_id'])->where($conditions)->group(['id', 'customer_primary_id'])->order(['created' => 'DESC'])->toArray();
+
+			$i = 0;
+			foreach ($final_result_firm_data as $firms_data) {
+
+				$firms_data_details[$i] = $firms_data;
+				$application_form_type = $this->Customfunctions->checkApplicantFormType($firms_data['customer_id']);
+				$application_type_name[$i] = $application_type_array[$application_form_type];
+				$districts[$i] = $this->DmiDistricts->find('all')->select(['district_name'])->where(['id' => $firms_data['district']])->extract('district_name')->first(); 
+				$states[$i] = $this->DmiStates->find('all')->select(['state_name'])->where(['id' => $firms_data['state']])->extract('state_name')->first(); 
+				$i=$i+1;
 			}
+		}
 
-			if (!empty($final_customer_id_list)) {
+		$this->set('orders',$firms_data_details);
+		$this->set('application_type_name',$application_type_name);
+		$this->set('firms_districts',$districts);
+		$this->set('firms_states',$states);
 
-				$final_result_firm_data = $this->DmiFirms->find('all')->select(['id', 'customer_primary_id', 'firm_name', 'certification_type', 'state', 'district',
-				'created', 'customer_id'])->where($conditions)->group(['id', 'customer_primary_id'])->order(['created' => 'DESC'])->toArray();
-
-				$i = 0;
-				foreach ($final_result_firm_data as $firms_data) {
-
-					$firms_data_details[$i] = $firms_data;
-					$application_form_type = $this->Customfunctions->checkApplicantFormType($firms_data['customer_id']);
-					$application_type_name[$i] = $application_type_array[$application_form_type];
-					$districts[$i] = $this->DmiDistricts->find('all')->select(['district_name'])->where(['id' => $firms_data['district']])->extract('district_name')->first(); 
-					$states[$i] = $this->DmiStates->find('all')->select(['state_name'])->where(['id' => $firms_data['state']])->extract('state_name')->first(); 
-					$i=$i+1;
-				}
-			}
-
-			$this->set('orders',$firms_data_details);
-			$this->set('application_type_name',$application_type_name);
-			$this->set('firms_districts',$districts);
-			$this->set('firms_states',$states);
-
-			$this->layout = null;
-			$this->autoLayout = false;
-			Configure::write('debug', '0');
-			$this -> render('/element/download_report_excel_format/download_newly_added_firm_report_result');
+		$this->layout = null;
+		$this->autoLayout = false;
+		Configure::write('debug', '0');
+		$this -> render('/element/download_report_excel_format/download_newly_added_firm_report_result');
 	}
 
 
@@ -4173,7 +5470,6 @@ class ReportsController extends AppController {
 		} else {
 			$final_customer_id = $this->DmiGrantCertificatesPdfs->renewalDueReportConditions($renewal_year,$state,$district,$application_type);
 		}
-
 
 		//to fetch id data which entry is not in rejected table added by laxmi B. on 23-01-23
 		$this->loadModel('DmiRejectedApplLogs');
@@ -4718,5 +6014,6171 @@ class ReportsController extends AppController {
 	}	
 
 
+
+
+	// Sent Email Report
+	// Description : This Function Developed For In-Process Report for Renewal Appln Showing Count & list
+	// @Author : Yashwant 
+	// #Contributer : Shreeya
+	// Date : 03/Mar/2023
+
+	public function inprocessRenwalApplicationsReport($cert_type,$appl_type) //renewal_id replace ->cert_type By Shreeya
+	{
+	
+		/*===================Added New Code show list of count (Start) Date [25-05-2023 By Shreeya] ===========*/
+		//pass the parameter of cert_type,appl_type
+		$appl_type=base64_decode($appl_type);
+		$cert_type=base64_decode($cert_type);
+		$data_id =array($cert_type);
+
+		
+		if ($cert_type== 'CA') 
+		{
+			$cert_type = 1;
+		} 
+		elseif ($cert_type== 'PP') 
+		{
+			$cert_type = 2;
+		} 
+		elseif ($cert_type== 'LAB') 
+		{
+			$cert_type = 3;
+		} 
+
+
+
+		//check the which application type is present
+		if($appl_type=='new'){
+			$processFunction = 'new_app_processed';
+		}elseif($appl_type=='renewal'){
+			$processFunction = 'renewal_app_processed';
+		}elseif($appl_type=='backlog'){
+			$processFunction = 'backlog_app_processed';
+		}
+
+		
+		//show the count according to application type 
+		$searchConditions = array();
+		$application_processed[] = $this->Reportstatistics->$processFunction($searchConditions,null,null,$cert_type,$appl_type);
+		$applListToShow = $application_processed[0][2];
+		
+
+		$application_id = null;
+		$application_type = null;
+		$user_roles = null;
+		$user_office = null;
+		$user_email_id =null;
+		$date = []; // Rename the variable to avoid overwriting the previous $date variable
+		
+		$i = 0;
+		foreach ($applListToShow as $each_customer_id) {
+
+			
+			$application_id[$i] = $each_customer_id;
+		
+
+			$table = 'DmiAllApplicationsCurrentPositions';
+			$current_users_details = $this->$table->find('all')->where(['customer_id IN' => $each_customer_id])->order(['id' => 'DESC'])->first(); 
+		
+			
+			$application_form_type = $this->Customfunctions->checkApplicantFormType($each_customer_id);
+			
+				if ($application_form_type == 'A') {
+					$application_type[$i]='CA (Form-A)';
+				} elseif ($application_form_type == 'B') {
+					$application_type[$i]='Printing Press (Form-B)';
+				} elseif ($application_form_type == 'C') {
+					$application_type[$i]='Laboratory (Form-C)';
+				} elseif ($application_form_type == 'D') {
+					$application_type[$i]='Laboratory (Form-D)';
+				} elseif ($application_form_type == 'E') {
+					$application_type[$i]='CA (Form-E)';
+				} elseif ($application_form_type == 'F') {
+					$application_type[$i]='CA (Form-F)';
+				}
+
+			$date[$i] = $current_users_details['modified']; // Store the value in a new array
+			$user_email_id[$i] = $current_users_details['current_user_email_id'];
+			$current_level[$i] = $current_users_details['current_level'];
+
+
+				$user_posted_office_id=array();
+				if (!empty($user_email_id[$i])) {
+					$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IN' => $user_email_id[$i]])->first(); 
+					
+				}
+				if (!empty($user_posted_office_id)) {
+					$user_office[$i] = $this->DmiRoOffices->find('all')->select(['ro_office'])->where(['id' => $user_posted_office_id['posted_ro_office']])->first(); 
+					
+				}
+
+				if (!empty($user_office[$i])) {
+					$user_office[$i] = $user_office[$i]['ro_office'];
+				} else {
+					$user_office[$i] = '--';
+				}
+
+				$check_roles=array();
+				if (!empty($user_email_id[$i])) {
+					$check_roles = $this->DmiUserRoles->find('all')->where(['user_email_id IN' => $user_email_id[$i]])->first(); 
+				}
+
+				if (!empty($check_roles)) {
+					$user_list[$i] = $check_roles;
+				} else {
+					$user_list[$i] = '---';
+				}
+
+				$user_roles[$i] = $this->checkUserRoleFromCurrentLevel($current_users_details['current_level'],$current_users_details['current_user_email_id']);
+
+
+
+			$i = $i + 1;
+		
+			$this->set('date',$date);
+			$this->set('user_list',$user_list);
+			$this->set('application_type',$application_type);
+			$this->set('user_roles',$user_roles);
+			$this->set('user_office',$user_office);
+			$this->set('user_email_id',$user_email_id);
+			$this->set('application_id',$application_id);
+		}
+		
+		/*====(End)===*/
+
+
+
+		$application_pending_days = $this->Session->read('pending_days');
+
+		if (!empty($application_pending_days)) {
+			$report_name = 'Pending Renewal Applications Report (More than 15 Days)';
+		} else {
+			$report_name ='Pending Renewal Applications Report';
+		}
+
+		$this->set('report_name',$report_name);
+		//$table = 'DmiRenewalFinalSubmits';
+		$table = 'DmiRenewalAllCurrentPositions';
+		//$table = 'DmiFirms';
+		$pending_application_type = 'renewal';
+
+		$application_type_xy = array('A'=>'CA (Form-A)','C'=>'Laboratory (Form-C)','E'=>'CA (Form-E)','B'=>'Printing Press (Form-B)','D'=>'Laboratory (Form-D)','F'=>'CA (Form-F)');
+		//RenewalId replace ->cert_type By Shreeya on Date [25-05-2023]
+		if($cert_type=='CA')
+		{
+			$application_type_xy = array('A'=>'CA (Form-A)','E'=>'CA (Form-E)','F'=>'CA (Form-F)');
+		}
+		elseif($cert_type=='PP') 
+		{
+			$application_type_xy = array('B'=>'Printing Press (Form-B)');
+		}
+		elseif ($cert_type=='LAB') {
+			$application_type_xy = array('C'=>'Laboratory (Form-C)','D'=>'Laboratory (Form-D)');
+		}
+
+
+
+
+		//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
+		asort($application_type_xy);
+		$this->set('application_type_xy',$application_type_xy);
+		//RenewalId replace ->cert_type By Shreeya on Date [25-05-2023]
+		$this->set('cert_type',$cert_type);
+
+		$user_roles_xy = array('RO/SO'=>'RO/SO','MO/SMO'=>'MO/SMO','IO'=>'IO');
+		//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
+		asort($user_roles_xy);
+		$this->set('user_roles_xy',$user_roles_xy);
+
+		$ro_office = $this->DmiRoOffices->find('all')->select(['id', 'ro_office'])->where(['office_type' => 'RO','delete_status IS NULL'])->order(['ro_office' => 'ASC'])
+			->combine('id', 'ro_office')->toArray(); 
+		$this->set('ro_office',$ro_office);
+
+		$search_application_type_id = $this->Session->read('search_application_type_id');
+
+		$search_user_role = $this->Session->read('search_user_role');
+		$ro_office_id = $this->Session->read('ro_office_id');
+		$mo_office_id = $this->Session->read('mo_office_id');
+		$io_office_id = $this->Session->read('io_office_id');
+		$search_from_date = $this->Session->read('search_from_date');
+		$search_to_date = $this->Session->read('search_to_date');
+		$search_user_email_id = $this->Session->read('search_user_email_id');
+
+		$download_search_application_type_id = $this->Session->read('search_application_type_id');
+		$download_search_user_role = $this->Session->read('search_user_role');
+		$download_ro_office_id = $this->Session->read('ro_office_id');
+		$download_mo_office_id = $this->Session->read('mo_office_id');
+		$download_io_office_id = $this->Session->read('io_office_id');
+		$download_search_from_date = $this->Session->read('search_from_date');
+		$download_search_to_date = $this->Session->read('search_to_date');
+		$download_search_user_email_id = $this->Session->read('search_user_email_id');
+
+		$this->set('search_application_type_id',$search_application_type_id);
+		$this->set('search_user_role',$search_user_role);
+		$this->set('ro_office_id',$ro_office_id);
+		$this->set('mo_office_id',$mo_office_id);
+		$this->set('io_office_id',$io_office_id);
+		$this->set('search_from_date',$search_from_date);
+		$this->set('search_to_date',$search_to_date);
+		$this->set('search_user_email_id',$search_user_email_id);
+		$download_report = 'no';
+
+		
+		if (null != ($this->request->getData('search_logs')) || null != ($this->request->getData('download_report'))) {
+
+			if (!empty($this->request->getData('download_report'))) {
+				$download_report = 'yes';
+			}
+
+			$search_application_type_id = $this->request->getData('application_type');
+			$search_user_role =  $this->request->getData('user_role');
+			$ro_office_id =  $this->request->getData('ro_office');
+			$mo_office_id =  $this->request->getData('mo_office');
+			$io_office_id =  $this->request->getData('io_office');
+
+			$search_user_email_id =  $this->request->getData('user_id');
+			$search_from_date =  $this->request->getData('from_date');
+			$search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
+			$search_to_date =  $this->request->getData('to_date');
+			$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
+			$this->date_comparison($search_from_date,$search_to_date);
+
+			// Change on 2/11/2018 - For download excel report, Take search filter field value from session variables instend of POST variable - By Pravin
+			if ($download_report == 'yes') {
+
+				$search_user_role = $this->Session->read('search_user_role');
+				$ro_office_id = $this->Session->read('ro_office_id');
+				$mo_office_id = $this->Session->read('mo_office_id');
+				$io_office_id = $this->Session->read('io_office_id');
+				$search_from_date = $this->Session->read('search_from_date');
+				$search_to_date = $this->Session->read('search_to_date');
+				$search_user_email_id = $this->Session->read('search_user_email_id');
+			}
+
+			$download_application_customer_id_list = $this->pendingRenewalAppln($download_search_application_type_id,$download_search_user_role,$download_ro_office_id,$download_mo_office_id,$download_io_office_id,$download_search_from_date,$download_search_to_date,$download_search_user_email_id,$table,$pending_application_type,$application_pending_days,$data_id);
+
+			$this->Session->delete('search_application_type_id');
+			$this->Session->delete('search_user_role');
+			$this->Session->delete('ro_office_id');
+			$this->Session->delete('mo_office_id');
+			$this->Session->delete('io_office_id');
+			$this->Session->delete('search_from_date');
+			$this->Session->delete('search_to_date');
+			$this->Session->delete('search_user_email_id');
+
+			$this->Session->write('search_application_type_id',$search_application_type_id);
+			$this->Session->write('search_user_role',$search_user_role);
+			$this->Session->write('ro_office_id',$ro_office_id);
+			$this->Session->write('mo_office_id',$mo_office_id);
+			$this->Session->write('io_office_id',$io_office_id);
+			$this->Session->write('search_from_date',$search_from_date);
+			$this->Session->write('search_to_date',$search_to_date);
+			$this->Session->write('search_user_email_id',$search_user_email_id);
+
+			$this->set('search_application_type_id',$search_application_type_id);
+			$this->set('search_user_role',$search_user_role);
+			$this->set('ro_office_id',$ro_office_id);
+			$this->set('mo_office_id',$mo_office_id);
+			$this->set('io_office_id',$io_office_id);
+			$this->set('search_from_date',$search_from_date);
+			$this->set('search_to_date',$search_to_date);
+			$this->set('search_user_email_id',$search_user_email_id);
+
+			$application_customer_id_list = $this->pendingRenewalAppln($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days,$data_id);
+
+			if (!empty($application_customer_id_list)) {
+
+				$current_users_details = $this->$table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->order(['id' => 'DESC'])->toArray(); 
+
+				//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
+				if ($download_report == 'yes') 
+				{
+					$download_pending_application = $this->$table->find('all')->where(['customer_id IN' => $download_application_customer_id_list])->order(['id' => 'DESC'])->toArray(); 
+					$this->downloadPendingApplicationReport($download_pending_application,$pending_application_type,$table);
+				}
+
+			} else {
+				$current_users_details = null;
+			}
+			//Below query commented by shreya for display list of renewal application
+			//$this->pendingApplicationReportResults($current_users_details,$pending_application_type,$table);
+		
+		} else {
+
+			$application_customer_id_list = $this->pendingRenewalAppln($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days,$data_id);
+
+			if (!empty($application_customer_id_list)) 
+			{
+
+				$current_users_details = $this->$table->find('all')->where(['customer_id IN' => $application_customer_id_list])->order(['id' => 'DESC'])->toArray(); 
+
+				//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
+				if ($download_report == 'yes')
+				 {
+					$download_pending_application = $this->$table->find('all')->where(['customer_id IN' => $application_customer_id_list])
+						->order(['id' => 'DESC'])->toArray(); 
+					$this->downloadPendingApplicationReport($download_pending_application,$pending_application_type,$table);
+				}
+
+			} else {
+				$current_users_details = null;
+			}
+			//Below query commented by shreya for display list of renewal application already use this code 
+			//$this->pendingApplicationReportResults($current_users_details,$pending_application_type,$table);
+
+		}
+	}
+
+
+
+
+
+	// Pending Renewal Applications
+	// Description : 
+	// @Author : Yashwant
+	// Date : 03/Mar/2023
+
+	public function pendingRenewalAppln($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days,$data_id)
+	{
+
+		$current_date = new \DateTime(date("d-m-Y")); // Ankur updated new DateTime to new \DateTime as Class "App\Controller\DateTime" not found
+		$modify_date_obj = $current_date->modify('-15 day');
+		$modify_date = $modify_date_obj->format('d-m-Y H:i:s');
+
+
+		if (!empty($application_pending_days)) 
+		{
+
+			$conditions = ['DATE(modified) <' => $modify_date]; 
+			
+			$date_conditions = ['date(modified) BETWEEN :start AND :end', 'DATE(created) <' => $modify_date]; 
+			
+			$date_conditions_1 = ['date(modified) BETWEEN :start AND :end', 'DATE(created) <' => $modify_date]; 
+		} else {
+
+			$conditions = [];
+			
+			$date_conditions = ['date(modified) BETWEEN :start AND :end']; 
+			
+			$date_conditions_1 = ['date(modified) BETWEEN :start AND :end', 'DATE(created) <' => $modify_date];  
+		}
+
+		$final_customer_id_list = null;
+
+		if ($ro_office_id != '' && $search_user_role == 'RO/SO') {
+			$level_1_2_3_office = $ro_office_id;
+		} elseif ($mo_office_id != '' && $search_user_role == 'MO/SMO') {
+			$level_1_2_3_office = $mo_office_id;
+		} elseif ($io_office_id != '' && $search_user_role == 'IO') {
+			$level_1_2_3_office = $io_office_id;
+		} else {
+			$level_1_2_3_office = '';
+		}
+
+
+		if ($search_application_type_id != '' && $search_user_role == '' && $search_from_date == '' && $search_to_date == '') 
+		{
+
+			$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
+			
+			$i=0;
+			foreach ($application_customer_id as $each_customer_id) 
+			{
+
+				if (!empty($each_customer_id['customer_id'])) 
+				{
+					$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+					
+					if (in_array($application_customer_type, $search_application_type_id, TRUE)) {
+						$application_customer_id_list[$i] = $each_customer_id['customer_id'];
+						$i=$i+1;
+					}
+				}
+			}
+		
+		/*Start- Yashwant 29-MArch-2023 This function used for Inprocess- Renewal POsted Filter*/
+		} elseif ($search_application_type_id == '' && $search_user_role != '' && $search_from_date == '' && $search_to_date == '' && $level_1_2_3_office == '') 
+		{
+			if ($search_application_type_id != '') 
+			{
+				$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) 
+				{
+					if (!empty($each_customer_id['customer_id'])) 
+					{
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+						
+						if (in_array($application_customer_type, $search_application_type_id, TRUE)) {
+							$application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+				$application_current_levels = $this->$table->find('all')->where(['customer_id IN' => $seach_application_customer_id_list])->toArray(); 
+
+			} else {
+				$application_current_levels = $this->$table->find('all')->where($conditions)->toArray();  
+			}
+			
+			$i=0;
+			foreach ($application_current_levels as $each_current_levels) {
+
+				$application_current_level_user_role = $this->checkUserRoleFromCurrentLevel($each_current_levels['current_level'], $each_current_levels['current_user_email_id']);
+
+				if ($application_current_level_user_role == $search_user_role) {
+					$application_customer_id_list[$i] = $each_current_levels['customer_id'];
+					$i=$i+1;
+				}
+			}
+		
+		/*====Start- Yashwant 30-MArch-2023 This function used for Inprocess- Renewal Offices  Multi-Select Filter====*/
+		} elseif ($search_application_type_id == '' && $search_user_role != '' && $level_1_2_3_office != '' && $search_from_date == '' && $search_to_date == '') 
+		{
+			if ($search_application_type_id != '') 
+			{
+				$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
+
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) {
+					if (!empty($each_customer_id['customer_id'])) {
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+						if (in_array($application_customer_type,$search_application_type_id)) {
+							$seach_application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+				$application_current_levels = $this->$table->find('all')->where(['customer_id IN' => $seach_application_customer_id_list])->toArray(); 
+			
+			} else {
+			
+				$application_current_levels = $this->$table->find('all')->where($conditions); 
+			}
+
+			$i=0;
+			foreach ($application_current_levels as $each_current_levels) 
+			{
+
+				$application_current_level_user_role = $this->checkUserRoleFromCurrentLevel($each_current_levels['current_level'], $each_current_levels['current_user_email_id']);
+
+				if ($application_current_level_user_role == $search_user_role) {
+
+					$user_posted_office_id_xy = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IS' => $each_current_levels['current_user_email_id']])->first(); 
+
+
+					if (!empty($user_posted_office_id_xy)) {
+						$user_posted_office_id_xyx = $user_posted_office_id_xy['posted_ro_office'];
+					} else {
+						$user_posted_office_id_xyx = '';
+					}
+
+					if (in_array($user_posted_office_id_xyx,$level_1_2_3_office)) {
+						$application_customer_id_list[$i] = $each_current_levels['customer_id'];
+						$i=$i+1;
+					}
+				}
+			}
+
+		/*====Start- Yashwant 31-MArch-2023 This function used for Inprocess- Renewal Search FROM-TO Date Filter====*/
+		} elseif ($search_application_type_id == ''  && $search_user_role == '' && $level_1_2_3_office == '' && $search_from_date != '' && $search_to_date != '') 
+		{
+			
+			if ($search_application_type_id != '') {
+
+				$application_customer_id = $this->$table->find('all')->where($date_conditions)->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
+
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) {
+					if (!empty($each_customer_id['customer_id'])) {
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+						if (in_array($application_customer_type,$search_application_type_id)) {
+							$application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+			
+			} else {
+				$application_customer_id_list = $this->$table->find('all')->select(['customer_id'])->where($date_conditions)->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->combine('id', 'customer_id')->toArray();  
+			}
+		
+		/*=============== Yashwant 06 Mar 2023 Start ================*/
+		}elseif(!empty($data_id)){
+
+			$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
+				
+			$i=0;
+			foreach ($application_customer_id as $each_customer_id) 
+			{
+
+				if (!empty($each_customer_id['customer_id'])) 
+				{
+					$application_customer_type = $this->Reportsfunctions->newApplicantType($each_customer_id['customer_id']);
+					
+					if (in_array($application_customer_type, $data_id, TRUE)) 
+						{
+							$application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+
+						}
+				}
+			}
+
+		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $level_1_2_3_office == '' && $search_from_date == '' && $search_to_date == '') 
+		{
+
+			if ($search_application_type_id != '') 
+			{
+
+				$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
+
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) {
+					if (!empty($each_customer_id['customer_id'])) {
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+						if (in_array($application_customer_type,$search_application_type_id)) {
+							$seach_application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+
+				$application_current_levels = $this->$table->find('all')->where(['customer_id IN' => $seach_application_customer_id_list])->toArray(); 
+			
+			} else {
+				
+				$application_current_levels = $this->$table->find('all')->where($conditions)->toArray();  
+			}
+			
+			$i=0;
+			foreach ($application_current_levels as $each_current_levels) {
+
+				$application_current_level_user_role = $this->checkUserRoleFromCurrentLevel($each_current_levels['current_level'], $each_current_levels['current_user_email_id']);
+
+				if ($application_current_level_user_role == $search_user_role) {
+					$application_customer_id_list[$i] = $each_current_levels['customer_id'];
+					$i=$i+1;
+				}
+			}
+		
+		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $level_1_2_3_office != '' && $search_from_date == '' && $search_to_date == '' && $search_user_email_id =='') 
+		{
+			
+			if ($search_application_type_id != '') 
+			{
+
+				$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
+
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) {
+					if (!empty($each_customer_id['customer_id'])) {
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+						if (in_array($application_customer_type,$search_application_type_id)) {
+							$seach_application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+				$application_current_levels = $this->$table->find('all')->where(['customer_id IN' => $seach_application_customer_id_list])->toArray(); 
+			
+			} else {
+			
+				$application_current_levels = $this->$table->find('all')->where($conditions); 
+			}
+
+			$i=0;
+			foreach ($application_current_levels as $each_current_levels) 
+			{
+
+				$application_current_level_user_role = $this->checkUserRoleFromCurrentLevel($each_current_levels['current_level'], $each_current_levels['current_user_email_id']);
+
+				if ($application_current_level_user_role == $search_user_role) {
+
+					$user_posted_office_id_xy = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IS' => $each_current_levels['current_user_email_id']])->first(); 
+
+
+					if (!empty($user_posted_office_id_xy)) {
+						$user_posted_office_id_xyx = $user_posted_office_id_xy['posted_ro_office'];
+					} else {
+						$user_posted_office_id_xyx = '';
+					}
+
+					if (in_array($user_posted_office_id_xyx,$level_1_2_3_office)) {
+						$application_customer_id_list[$i] = $each_current_levels['customer_id'];
+						$i=$i+1;
+					}
+				}
+			}
+		
+		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $level_1_2_3_office != '' && $search_from_date == '' && $search_to_date == '' && $search_user_email_id !='')
+		{
+			
+			if ($search_application_type_id != '') {
+
+				$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
+
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) {
+
+					if (!empty($each_customer_id['customer_id'])) {
+
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+						if (in_array($application_customer_type, $search_application_type_id)) {
+							$seach_application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+
+				$application_current_levels = $this->$table->find('all')->where(['customer_id IN' => $seach_application_customer_id_list])->toArray(); 
+			
+			} else {
+			
+				$application_current_levels = $this->$table->find('all')->where($conditions)->toArray();	 
+			}
+
+			$i=0;
+			foreach ($application_current_levels as $each_current_levels) {
+
+				$application_current_level_user_role = $this->checkUserRoleFromCurrentLevel($each_current_levels['current_level'], $each_current_levels['current_user_email_id']);
+
+				if ($application_current_level_user_role == $search_user_role) {
+
+					$user_posted_office_id_xy = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IS' => $each_current_levels['current_user_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id_xy)) {
+						$user_posted_office_id_xyx = $user_posted_office_id_xy['posted_ro_office'];
+					} else {
+						$user_posted_office_id_xyx = '';
+					}
+
+					if (in_array($user_posted_office_id_xyx,$level_1_2_3_office)) {
+
+						$search_user_email = $this->DmiUserRoles->find('all')->select(['user_email_id'])->where(['id IS' => $search_user_email_id])->first(); 
+
+						if ($each_current_levels['current_user_email_id'] == $search_user_email['user_email_id']) {
+							$application_customer_id_list[$i] = $each_current_levels['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+			}
+
+		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $search_from_date != '' && $search_to_date != '' && $level_1_2_3_office !='' && ($search_user_email_id != '' || $search_user_email_id == '')) 
+		{
+			
+			if ($search_application_type_id != '') {
+
+				$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
+
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) {
+
+					if (!empty($each_customer_id['customer_id'])) {
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+						if (in_array($application_customer_type,$search_application_type_id)) {
+							$seach_application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+
+				$application_current_levels = $this->$table->find('all')->where(['customer_id IN' => $seach_application_customer_id_list])
+					->where(['date(modified) BETWEEN :start AND :end'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
+			} else {
+
+				$application_current_levels = $this->$table->find('all')->where($date_conditions)->bind(':start', $search_from_date, 'date')
+				->bind(':end', $search_to_date, 'date')->toArray();   
+			}
+
+			$i=0;
+			foreach ($application_current_levels as $each_current_levels) 
+			{
+
+				$application_current_level_user_role = $this->checkUserRoleFromCurrentLevel($each_current_levels['current_level'],$each_current_levels['current_user_email_id']);
+
+				if ($application_current_level_user_role == $search_user_role) {
+
+					if ($level_1_2_3_office == '') {
+						$level_1_2_3_office = [];
+					}
+
+					$user_posted_office_id_xy = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IS' => $each_current_levels['current_user_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id_xy)) {
+						$user_posted_office_id_xyx = $user_posted_office_id_xy['posted_ro_office'];
+					} else {
+						$user_posted_office_id_xyx = '';
+					}
+
+					if (in_array($user_posted_office_id_xyx,$level_1_2_3_office)) 
+					{
+
+						$search_user_email = $this->DmiUserRoles->find('all')->select(['user_email_id'])->where(['id IS' => $search_user_email_id])->first(); 
+						//to remove error empty condition added by laxmi B on 16-02-2023 
+						if ((!empty($each_current_levels['current_user_email_id']) && !empty($search_user_email['user_email_id']) )  && $each_current_levels['current_user_email_id'] == $search_user_email['user_email_id']) 
+						{
+							$application_customer_id_list[$i] = $each_current_levels['customer_id'];
+							$i=$i+1;
+						}
+
+					} 
+					else 
+					{
+						$application_customer_id_list[$i] = $each_current_levels['customer_id'];
+						$i=$i+1;
+					}
+				}
+			}
+
+		} else {
+			$application_customer_id = $this->$table->find('all')->select(['customer_id'])->where($conditions)->extract('customer_id')->toArray();  
+			// replaced foreach with query by Ankur
+			$application_customer_id_list = $application_customer_id;
+		}
+
+		if (!empty($application_customer_id_list)) 
+		{
+			
+			$i=0;
+
+			if ($pending_application_type == 'new') 
+			{
+				foreach ($application_customer_id_list as $customer_id) 
+				{
+					$customer_id_list = $this->DmiGrantCertificatesPdfs->find('all')->where(['customer_id IS' => $customer_id])->first(); 
+
+					if (empty($customer_id_list)) 
+					{
+						$final_customer_id_list[$i] = $customer_id;
+						$i=$i+1;
+					}
+				}
+			} 
+
+			elseif ($pending_application_type == 'renewal') 
+			{
+				foreach ($application_customer_id_list as $customer_id ) 
+				{
+
+					$customer_id_list = $this->DmiRenewalFinalSubmits->find('all')->where(['customer_id IS' => $customer_id, 'status' => 'approved'])->first(); 
+					
+					
+					if (empty($customer_id_list)) 
+					{
+						$final_customer_id_list[$i] = $customer_id;
+						$i=$i+1;
+					}
+				}
+
+				$final_table = 'DmiRenewalFinalSubmits';
+			}
+
+		}
+		return $final_customer_id_list;
+	}
+
+	
+
+	// Inprocess Backlog Applications Report
+	// Description : This Function Is Used for In-Process Backlog Aplln.Report Count & list
+	// @Author : Yashwant
+	// Date : 08-Mar-2023
+
+	public function inprocessBacklogApplicationsReport($cert_type,$appl_type)//$backlog_id replace ->cert_type by shreeya
+	{
+
+		/*===================Added New Code show the list of count (Start) Date [25-05-2023 By Shreeya] ===========*/
+		//pass the parameter of cert_type,appl_type
+		$appl_type=base64_decode($appl_type);
+		$cert_type=base64_decode($cert_type);
+		$data_id =array($cert_type);
+
+		
+		if ($cert_type== 'CA') 
+		{
+			$cert_type = 1;
+		} 
+		elseif ($cert_type== 'PP') 
+		{
+			$cert_type = 2;
+		} 
+		elseif ($cert_type== 'LAB') 
+		{
+			$cert_type = 3;
+		} 
+
+
+
+		//check the which application type is present
+		if($appl_type=='new'){
+			$processFunction = 'new_app_processed';
+		}elseif($appl_type=='renewal'){
+			$processFunction = 'renewal_app_processed';
+		}elseif($appl_type=='backlog'){
+			$processFunction = 'backlog_app_processed';
+		}
+
+		
+		//show the count according to application type 
+		$searchConditions = array();
+		$application_processed[] = $this->Reportstatistics->$processFunction($searchConditions,null,null,$cert_type,$appl_type);
+		$applListToShow = $application_processed[0][2];
+		
+
+		$application_id = null;
+		$application_type = null;
+		$user_roles = null;
+		$user_office = null;
+		$user_email_id =null;
+		$date = []; // Rename the variable to avoid overwriting the previous $date variable
+		
+		$i = 0;
+		foreach ($applListToShow as $each_customer_id) {
+
+			$application_id[$i] = $each_customer_id;
+		
+
+			$table = 'DmiAllApplicationsCurrentPositions';
+			$current_users_details = $this->$table->find('all')->where(['customer_id IN' => $each_customer_id])->order(['id' => 'DESC'])->first(); 
+		
+			
+			$application_form_type = $this->Customfunctions->checkApplicantFormType($each_customer_id);
+			
+				if ($application_form_type == 'A') {
+					$application_type[$i]='CA (Form-A)';
+				} elseif ($application_form_type == 'B') {
+					$application_type[$i]='Printing Press (Form-B)';
+				} elseif ($application_form_type == 'C') {
+					$application_type[$i]='Laboratory (Form-C)';
+				} elseif ($application_form_type == 'D') {
+					$application_type[$i]='Laboratory (Form-D)';
+				} elseif ($application_form_type == 'E') {
+					$application_type[$i]='CA (Form-E)';
+				} elseif ($application_form_type == 'F') {
+					$application_type[$i]='CA (Form-F)';
+				}
+
+			$date[$i] = $current_users_details['modified']; // Store the value in a new array
+			$user_email_id[$i] = $current_users_details['current_user_email_id'];
+			$current_level[$i] = $current_users_details['current_level'];
+
+
+				$user_posted_office_id=array();
+				if (!empty($user_email_id[$i])) {
+					$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IN' => $user_email_id[$i]])->first(); 
+					
+				}
+				if (!empty($user_posted_office_id)) {
+					$user_office[$i] = $this->DmiRoOffices->find('all')->select(['ro_office'])->where(['id' => $user_posted_office_id['posted_ro_office']])->first(); 
+					
+				}
+
+				if (!empty($user_office[$i])) {
+					$user_office[$i] = $user_office[$i]['ro_office'];
+				} else {
+					$user_office[$i] = '--';
+				}
+
+				$check_roles=array();
+				if (!empty($user_email_id[$i])) {
+					$check_roles = $this->DmiUserRoles->find('all')->where(['user_email_id IN' => $user_email_id[$i]])->first(); 
+				}
+
+				if (!empty($check_roles)) {
+					$user_list[$i] = $check_roles;
+				} else {
+					$user_list[$i] = '---';
+				}
+
+				$user_roles[$i] = $this->checkUserRoleFromCurrentLevel($current_users_details['current_level'],$current_users_details['current_user_email_id']);
+
+
+
+			$i = $i + 1;
+		
+			$this->set('date',$date);
+			$this->set('user_list',$user_list);
+			$this->set('application_type',$application_type);
+			$this->set('user_roles',$user_roles);
+			$this->set('user_office',$user_office);
+			$this->set('user_email_id',$user_email_id);
+			$this->set('application_id',$application_id);
+		}
+
+		/*====(End)===*/
+
+		// $BacklogId=base64_decode($backlog_id);
+		// $data_id =array($BacklogId);
+		
+		$application_pending_days = $this->Session->read('pending_days');
+
+		if (!empty($application_pending_days)) {
+			$report_name = 'Pending Backlog Applications Report (More than 15 Days)';
+		} else {
+			$report_name ='Pending Backlog Applications Report';
+		}
+
+		$this->set('report_name',$report_name);
+		/*$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');//initialize model in component
+		$final_submitT	= 'DmiFinalSubmits';//change table name by laxmi on 14-12-2023 
+		$conditions = array();
+		$date_conditions = array();
+
+		$firm_result = $DmiFirms->find('all')->where(['is_already_granted IS' => 'yes'])->combine('id', 'customer_id')->toArray();
+
+		$DmiFinalSubmits = TableRegistry::getTableLocator()->get($final_submitT);
+		$final_submit_result = $DmiFinalSubmits->find('all')->select(['customer_id'])->distinct(['customer_id'])->where(['customer_id IN' => $firm_result])->toArray();*/
+
+		//echo"<pre>";print_r($final_submit_result);exit;
+
+
+		//$table = 'DmiRenewalAllCurrentPositions';
+		//$table = 'DmiFirms';
+
+		$application_type_xy = array('A'=>'CA (Form-A)','C'=>'Laboratory (Form-C)','E'=>'CA (Form-E)','B'=>'Printing Press (Form-B)','D'=>'Laboratory (Form-D)','F'=>'CA (Form-F)');
+
+		//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
+
+		//$BacklogId replace ->cert_type By Shreeya on Date [25-05-2023]
+		if($cert_type=='CA')
+		{
+			$application_type_xy = array('A'=>'CA (Form-A)','E'=>'CA (Form-E)','F'=>'CA (Form-F)');
+		}
+		elseif($cert_type=='PP') 
+		{
+			$application_type_xy = array('B'=>'Printing Press (Form-B)');
+		}
+		elseif ($cert_type=='LAB') {
+			$application_type_xy = array('C'=>'Laboratory (Form-C)','D'=>'Laboratory (Form-D)');
+		}
+
+		//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
+		asort($application_type_xy);
+		$this->set('application_type_xy',$application_type_xy);
+		//$BacklogId replace ->cert_type By Shreeya on Date [25-05-2023]
+		$this->set('cert_type',$cert_type);
+
+		$user_roles_xy = array('RO/SO'=>'RO/SO','MO/SMO'=>'MO/SMO','IO'=>'IO');
+		//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
+		asort($user_roles_xy);
+		$this->set('user_roles_xy',$user_roles_xy);
+
+		$ro_office = $this->DmiRoOffices->find('all')->select(['id', 'ro_office'])->where(['office_type' => 'RO','delete_status IS NULL'])->order(['ro_office' => 'ASC'])
+			->combine('id', 'ro_office')->toArray(); 
+		$this->set('ro_office',$ro_office);
+
+		$search_application_type_id = $this->Session->read('search_application_type_id');
+
+		$search_user_role = $this->Session->read('search_user_role');
+		$ro_office_id = $this->Session->read('ro_office_id');
+		$mo_office_id = $this->Session->read('mo_office_id');
+		$io_office_id = $this->Session->read('io_office_id');
+		$search_from_date = $this->Session->read('search_from_date');
+		$search_to_date = $this->Session->read('search_to_date');
+		$search_user_email_id = $this->Session->read('search_user_email_id');
+
+		$download_search_application_type_id = $this->Session->read('search_application_type_id');
+		$download_search_user_role = $this->Session->read('search_user_role');
+		$download_ro_office_id = $this->Session->read('ro_office_id');
+		$download_mo_office_id = $this->Session->read('mo_office_id');
+		$download_io_office_id = $this->Session->read('io_office_id');
+		$download_search_from_date = $this->Session->read('search_from_date');
+		$download_search_to_date = $this->Session->read('search_to_date');
+		$download_search_user_email_id = $this->Session->read('search_user_email_id');
+
+		$this->set('search_application_type_id',$search_application_type_id);
+		$this->set('search_user_role',$search_user_role);
+		$this->set('ro_office_id',$ro_office_id);
+		$this->set('mo_office_id',$mo_office_id);
+		$this->set('io_office_id',$io_office_id);
+		$this->set('search_from_date',$search_from_date);
+		$this->set('search_to_date',$search_to_date);
+		$this->set('search_user_email_id',$search_user_email_id);
+		$download_report = 'no';
+
+		
+		if (null != ($this->request->getData('search_logs')) || null != ($this->request->getData('download_report'))) {
+
+			if (!empty($this->request->getData('download_report'))) {
+				$download_report = 'yes';
+			}
+
+			$search_application_type_id = $this->request->getData('application_type');
+			$search_user_role =  $this->request->getData('user_role');
+			$ro_office_id =  $this->request->getData('ro_office');
+			$mo_office_id =  $this->request->getData('mo_office');
+			$io_office_id =  $this->request->getData('io_office');
+
+			$search_user_email_id =  $this->request->getData('user_id');
+			$search_from_date =  $this->request->getData('from_date');
+			$search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
+			$search_to_date =  $this->request->getData('to_date');
+			$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
+			$this->date_comparison($search_from_date,$search_to_date);
+
+			// Change on 2/11/2018 - For download excel report, Take search filter field value from session variables instend of POST variable - By Pravin
+			if ($download_report == 'yes') {
+
+				$search_user_role = $this->Session->read('search_user_role');
+				$ro_office_id = $this->Session->read('ro_office_id');
+				$mo_office_id = $this->Session->read('mo_office_id');
+				$io_office_id = $this->Session->read('io_office_id');
+				$search_from_date = $this->Session->read('search_from_date');
+				$search_to_date = $this->Session->read('search_to_date');
+				$search_user_email_id = $this->Session->read('search_user_email_id');
+			}
+
+			$download_application_customer_id_list = $this->pendingBacklogAppln($download_search_application_type_id,$download_search_user_role,$download_ro_office_id,$download_mo_office_id,$download_io_office_id,$download_search_from_date,$download_search_to_date,$download_search_user_email_id,$table,$application_pending_days,$data_id);
+
+			$this->Session->delete('search_application_type_id');
+			$this->Session->delete('search_user_role');
+			$this->Session->delete('ro_office_id');
+			$this->Session->delete('mo_office_id');
+			$this->Session->delete('io_office_id');
+			$this->Session->delete('search_from_date');
+			$this->Session->delete('search_to_date');
+			$this->Session->delete('search_user_email_id');
+
+			$this->Session->write('search_application_type_id',$search_application_type_id);
+			$this->Session->write('search_user_role',$search_user_role);
+			$this->Session->write('ro_office_id',$ro_office_id);
+			$this->Session->write('mo_office_id',$mo_office_id);
+			$this->Session->write('io_office_id',$io_office_id);
+			$this->Session->write('search_from_date',$search_from_date);
+			$this->Session->write('search_to_date',$search_to_date);
+			$this->Session->write('search_user_email_id',$search_user_email_id);
+
+			$this->set('search_application_type_id',$search_application_type_id);
+			$this->set('search_user_role',$search_user_role);
+			$this->set('ro_office_id',$ro_office_id);
+			$this->set('mo_office_id',$mo_office_id);
+			$this->set('io_office_id',$io_office_id);
+			$this->set('search_from_date',$search_from_date);
+			$this->set('search_to_date',$search_to_date);
+			$this->set('search_user_email_id',$search_user_email_id);
+
+			$application_customer_id_list = $this->pendingBacklogAppln($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$application_pending_days,$data_id);
+
+			if (!empty($application_customer_id_list)) {
+
+				$current_users_details = $this->$table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->order(['id' => 'DESC'])->toArray(); 
+
+				//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
+				if ($download_report == 'yes') {
+					$download_pending_application = $this->$table->find('all')->where(['customer_id IN' => $download_application_customer_id_list])->order(['id' => 'DESC'])->toArray(); 
+					$this->downloadPendingApplicationReport($download_pending_application,$pending_application_type,$table);
+				}
+
+			} else {
+				$current_users_details = null;
+			}
+			//Below query commented by shreya for display list of backlog application
+			//$this->pendingBackApplicationReportResults($current_users_details,$table);
+		
+		} else {
+
+			$application_customer_id_list = $this->pendingBacklogAppln($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$application_pending_days,$data_id);
+
+			if (!empty($application_customer_id_list)) {
+
+				$current_users_details = $this->$table->find('all')->where(['customer_id IN' => $application_customer_id_list])->order(['id' => 'DESC'])->toArray(); 
+
+				//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
+				if ($download_report == 'yes') {
+					$download_pending_application = $this->$table->find('all')->where(['customer_id IN' => $application_customer_id_list])
+						->order(['id' => 'DESC'])->toArray(); 
+					$this->downloadPendingApplicationReport($download_pending_application,$pending_application_type,$table);
+				}
+
+			} else 
+			{
+				$current_users_details = null;
+			}
+			//Below query commented by shreya for display list of backlog application
+			//$this->pendingBackApplicationReportResults($current_users_details,$table);
+
+		}
+	}
+
+
+
+
+
+	// Pending Backlog Application
+	// Description : This Function Is Used for In-Process Backlog Aplln.Report Count & list
+	// @Author : Yashwant
+	// Date : 08-Mar-2023
+
+	public function pendingBacklogAppln($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$application_pending_days,$data_id)
+	{
+		$current_date = new \DateTime(date("d-m-Y")); // Ankur updated new DateTime to new \DateTime as Class "App\Controller\DateTime" not found
+		$modify_date_obj = $current_date->modify('-15 day');
+		$modify_date = $modify_date_obj->format('d-m-Y H:i:s');
+
+
+		if (!empty($application_pending_days)) 
+		{
+
+			$conditions = ['DATE(modified) <' => $modify_date]; 
+			
+			$date_conditions = ['date(modified) BETWEEN :start AND :end', 'DATE(created) <' => $modify_date]; 
+			
+			$date_conditions_1 = ['date(modified) BETWEEN :start AND :end', 'DATE(created) <' => $modify_date]; 
+		
+		} else {
+
+			$conditions = [];
+			
+			$date_conditions = ['date(modified) BETWEEN :start AND :end']; 
+			
+			$date_conditions_1 = ['date(modified) BETWEEN :start AND :end', 'DATE(created) <' => $modify_date];  
+		}
+
+		$final_customer_id_list = null;
+
+		if ($ro_office_id != '' && $search_user_role == 'RO/SO') {
+			$level_1_2_3_office = $ro_office_id;
+		} elseif ($mo_office_id != '' && $search_user_role == 'MO/SMO') {
+			$level_1_2_3_office = $mo_office_id;
+		} elseif ($io_office_id != '' && $search_user_role == 'IO') {
+			$level_1_2_3_office = $io_office_id;
+		} else {
+			$level_1_2_3_office = '';
+		}
+
+		if ($search_application_type_id != '' && $search_user_role == '' && $search_from_date == '' && $search_to_date == '') 
+		{	
+			$application_customer_id = $this->$table->find('all')->where($conditions)->where(['is_already_granted IS' => 'yes'])->toArray();
+			//$application_customer_id = $DmiFirms->find('all')->where($conditions)->where(['is_already_granted IS' => 'yes'])->combine('id', 'customer_id')->toArray(); 
+			
+			$i=0;
+			foreach ($application_customer_id as $each_customer_id) 
+			{
+				if (!empty($each_customer_id['customer_id'])) 
+				{
+					$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+					
+					if (in_array($application_customer_type, $search_application_type_id, TRUE)) 
+					{
+						$application_customer_id_list[$i] = $each_customer_id['customer_id'];
+						$i=$i+1;
+					}
+				}
+			}
+		
+
+		/*===Start YAshwant 31-MAR-2023 BAcklog Search FROM-TO Date Filter=======*/
+		} elseif ($search_application_type_id == '' && $search_user_role == '' && $level_1_2_3_office == '' && $search_from_date != '' && $search_to_date != '') 
+		{
+			if ($search_application_type_id != '') 
+			{
+
+				$application_customer_id = $this->$table->find('all')->where($date_conditions)->where(['is_already_granted IS' => 'yes'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
+
+				/*$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+				$firm_result = $DmiFirms->find('all')->where($conditions)->where(['is_already_granted IS' => 'yes'])->combine('id', 'customer_id')->toArray(); 
+				$DmiFinalSubmits = TableRegistry::getTableLocator()->get('DmiFinalSubmits');
+				$application_customer_id = $DmiFinalSubmits->find('all')->select(['customer_id'])->distinct(['customer_id'])->where(['customer_id IN' => $firm_result])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray();*/
+			
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) 
+				{
+					if (!empty($each_customer_id['customer_id'])) {
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+						if (in_array($application_customer_type,$search_application_type_id)) {
+							$application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+			
+			} else {
+				$application_customer_id_list = $this->$table->find('all')->select(['customer_id'])->where($date_conditions)->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->combine('id', 'customer_id')->toArray();  
+			}
+		
+
+		/*=====Start Yashwant 08/mar/2023 This function used for IN PRocess Report Count ======*/
+		} elseif(!empty($data_id))
+		{
+			//$application_customer_id = $this->$table->find('all')->where($conditions)->toArray();
+			$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+			$firm_result = $DmiFirms->find('all')->where($conditions)->where(['is_already_granted IS' => 'yes'])->combine('id', 'customer_id')->toArray(); 
+			//$firm_result = $this->$table->find('all')->where($conditions)->where(['is_already_granted IS' => 'yes'])->combine('id','customer_id')->toArray();
+			//$application_customer_id = $this->$table->find('all')->where($conditions)->where(['is_already_granted IS' => 'yes'])->toArray();
+
+			$DmiFinalSubmits = TableRegistry::getTableLocator()->get('DmiFinalSubmits');
+			$application_customer_id = $DmiFinalSubmits->find('all')->select(['customer_id'])->distinct(['customer_id'])->where(['customer_id IN' => $firm_result])->toArray();
+			//yashwant-08/Mar/2023 == Grant-Backlog Appln-Query
+			//$application_customer_id = $DmiFinalSubmits->find('all')->select(['customer_id'])->distinct(['customer_id'])->where(['customer_id IN' => $firm_result,'current_level' => 'level_3', 'status' => 'approved'])->toArray();
+
+			
+			$i=0;
+			foreach ($application_customer_id as $each_customer_id) 
+			{
+				if (!empty($each_customer_id['customer_id'])) 
+				{
+					$application_customer_type = $this->Reportsfunctions->newApplicantType($each_customer_id['customer_id']);
+					if (in_array($application_customer_type, $data_id, TRUE)) 
+					{
+						$application_customer_id_list[$i] = $each_customer_id['customer_id'];
+						$i=$i+1;
+					}
+				}
+			}
+		
+		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $level_1_2_3_office == '' && $search_from_date == '' && $search_to_date == '') 
+		{
+
+			if ($search_application_type_id != '') {
+
+				$application_customer_id = $this->$table->find('all')->where($conditions)->where(['is_already_granted IS' => 'yes'])->toArray(); 
+				/*$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+				$firm_result = $DmiFirms->find('all')->where($conditions)->where(['is_already_granted IS' => 'yes'])->combine('id', 'customer_id')->toArray(); 
+				$DmiFinalSubmits = TableRegistry::getTableLocator()->get('DmiFinalSubmits');
+				$application_customer_id = $DmiFinalSubmits->find('all')->select(['customer_id'])->distinct(['customer_id'])->where(['customer_id IN' => $firm_result])->toArray();*/
+
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) {
+					if (!empty($each_customer_id['customer_id'])) {
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+						if (in_array($application_customer_type,$search_application_type_id)) {
+							$seach_application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+
+				$application_current_levels = $this->$table->find('all')->where(['customer_id IN' => $seach_application_customer_id_list])->toArray(); 
+			} else {
+				
+				$application_current_levels = $this->$table->find('all')->where($conditions)->toArray();  
+			}
+			
+			$i=0;
+			foreach ($application_current_levels as $each_current_levels) {
+
+				$application_current_level_user_role = $this->checkUserRoleFromCurrentLevel($each_current_levels['current_level'], $each_current_levels['current_user_email_id']);
+
+				if ($application_current_level_user_role == $search_user_role) {
+					$application_customer_id_list[$i] = $each_current_levels['customer_id'];
+					$i=$i+1;
+				}
+			}
+		
+		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $level_1_2_3_office != '' && $search_from_date == '' && $search_to_date == '' && $search_user_email_id =='')
+		{
+			
+			if ($search_application_type_id != '') 
+			{
+
+				$application_customer_id = $this->$table->find('all')->where($conditions)->where(['is_already_granted IS' => 'yes'])->toArray(); 
+
+				/*$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+				$firm_result = $DmiFirms->find('all')->where($conditions)->where(['is_already_granted IS' => 'yes'])->combine('id', 'customer_id')->toArray(); 
+				$DmiFinalSubmits = TableRegistry::getTableLocator()->get('DmiFinalSubmits');
+				$application_customer_id = $DmiFinalSubmits->find('all')->select(['customer_id'])->distinct(['customer_id'])->where(['customer_id IN' => $firm_result])->toArray();*/
+
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) {
+					if (!empty($each_customer_id['customer_id'])) {
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+						if (in_array($application_customer_type,$search_application_type_id)) {
+							$seach_application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+				$application_current_levels = $this->$table->find('all')->where(['customer_id IN' => $seach_application_customer_id_list])->toArray(); 
+			
+			} else {
+			
+				$application_current_levels = $this->$table->find('all')->where($conditions); 
+			}
+
+			$i=0;
+			foreach ($application_current_levels as $each_current_levels) 
+			{
+
+				$application_current_level_user_role = $this->checkUserRoleFromCurrentLevel($each_current_levels['current_level'], $each_current_levels['current_user_email_id']);
+
+				if ($application_current_level_user_role == $search_user_role) {
+
+					$user_posted_office_id_xy = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IS' => $each_current_levels['current_user_email_id']])->first(); 
+
+
+					if (!empty($user_posted_office_id_xy)) {
+						$user_posted_office_id_xyx = $user_posted_office_id_xy['posted_ro_office'];
+					} else {
+						$user_posted_office_id_xyx = '';
+					}
+
+					if (in_array($user_posted_office_id_xyx,$level_1_2_3_office)) {
+						$application_customer_id_list[$i] = $each_current_levels['customer_id'];
+						$i=$i+1;
+					}
+				}
+			}
+		
+		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role == '' && $level_1_2_3_office == '' && $search_from_date != '' && $search_to_date != '') 
+		{
+			
+			if ($search_application_type_id != '') 
+			{
+				$application_customer_id = $this->$table->find('all')->where($date_conditions)->where(['is_already_granted IS' => 'yes'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
+				/*$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+				$firm_result = $DmiFirms->find('all')->where($conditions)->where(['is_already_granted IS' => 'yes'])->combine('id', 'customer_id')->toArray(); 
+				$DmiFinalSubmits = TableRegistry::getTableLocator()->get('DmiFinalSubmits');
+				$application_customer_id = $DmiFinalSubmits->find('all')->select(['customer_id'])->distinct(['customer_id'])->where(['customer_id IN' => $firm_result])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray();*/
+
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) 
+				{
+					if (!empty($each_customer_id['customer_id'])) {
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+						if (in_array($application_customer_type,$search_application_type_id)) {
+							$application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+
+			} else{
+
+				$application_customer_id_list = $this->$table->find('all')->select(['customer_id'])->where($date_conditions_1)->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->combine('id', 'customer_id')->toArray();  
+			}
+
+		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $level_1_2_3_office != '' && $search_from_date == '' && $search_to_date == '' && $search_user_email_id !='') 
+		{
+			if ($search_application_type_id != '') {
+
+				$application_customer_id = $this->$table->find('all')->where($conditions)->where(['is_already_granted IS' => 'yes'])->toArray(); 
+
+				/*$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+				$firm_result = $DmiFirms->find('all')->where($conditions)->where(['is_already_granted IS' => 'yes'])->combine('id', 'customer_id')->toArray(); 
+				$DmiFinalSubmits = TableRegistry::getTableLocator()->get('DmiFinalSubmits');
+				$application_customer_id = $DmiFinalSubmits->find('all')->select(['customer_id'])->distinct(['customer_id'])->where(['customer_id IN' => $firm_result])->toArray();*/
+
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) {
+
+					if (!empty($each_customer_id['customer_id'])) {
+
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+						if (in_array($application_customer_type, $search_application_type_id)) {
+							$seach_application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+
+				$application_current_levels = $this->$table->find('all')->where(['customer_id IN' => $seach_application_customer_id_list])->toArray(); 
+			
+			} else {
+			
+				$application_current_levels = $this->$table->find('all')->where($conditions)->toArray();	 
+			}
+
+			$i=0;
+			foreach ($application_current_levels as $each_current_levels) {
+
+				$application_current_level_user_role = $this->checkUserRoleFromCurrentLevel($each_current_levels['current_level'], $each_current_levels['current_user_email_id']);
+
+				if ($application_current_level_user_role == $search_user_role) {
+
+					$user_posted_office_id_xy = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IS' => $each_current_levels['current_user_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id_xy)) {
+						$user_posted_office_id_xyx = $user_posted_office_id_xy['posted_ro_office'];
+					} else {
+						$user_posted_office_id_xyx = '';
+					}
+
+					if (in_array($user_posted_office_id_xyx,$level_1_2_3_office)) {
+
+						$search_user_email = $this->DmiUserRoles->find('all')->select(['user_email_id'])->where(['id IS' => $search_user_email_id])->first(); 
+
+						if ($each_current_levels['current_user_email_id'] == $search_user_email['user_email_id']) {
+							$application_customer_id_list[$i] = $each_current_levels['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+			}
+
+		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $search_from_date != '' && $search_to_date != '' && $level_1_2_3_office !='' && ($search_user_email_id != '' || $search_user_email_id == ''))
+		{
+			
+			if ($search_application_type_id != '') 
+			{
+
+				$application_customer_id = $this->$table->find('all')->where($conditions)->where(['is_already_granted IS' => 'yes'])->toArray(); 
+
+				/*$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+				$firm_result = $DmiFirms->find('all')->where($conditions)->where(['is_already_granted IS' => 'yes'])->combine('id', 'customer_id')->toArray(); 
+				$DmiFinalSubmits = TableRegistry::getTableLocator()->get('DmiFinalSubmits');
+				$application_customer_id = $DmiFinalSubmits->find('all')->select(['customer_id'])->distinct(['customer_id'])->where(['customer_id IN' => $firm_result])->toArray();*/
+
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) {
+
+					if (!empty($each_customer_id['customer_id'])) {
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+						if (in_array($application_customer_type,$search_application_type_id)) {
+							$seach_application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+
+				$application_current_levels = $this->$table->find('all')->where(['customer_id IN' => $seach_application_customer_id_list])
+					->where(['date(modified) BETWEEN :start AND :end'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
+			} else {
+
+				$application_current_levels = $this->$table->find('all')->where($date_conditions)->bind(':start', $search_from_date, 'date')
+				->bind(':end', $search_to_date, 'date')->toArray();   
+			}
+
+			$i=0;
+			foreach ($application_current_levels as $each_current_levels) {
+
+				$application_current_level_user_role = $this->checkUserRoleFromCurrentLevel($each_current_levels['current_level'],$each_current_levels['current_user_email_id']);
+
+				if ($application_current_level_user_role == $search_user_role) {
+
+					if ($level_1_2_3_office == '') {
+						$level_1_2_3_office = [];
+					}
+
+					$user_posted_office_id_xy = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IS' => $each_current_levels['current_user_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id_xy)) {
+						$user_posted_office_id_xyx = $user_posted_office_id_xy['posted_ro_office'];
+					} else {
+						$user_posted_office_id_xyx = '';
+					}
+
+					if (in_array($user_posted_office_id_xyx,$level_1_2_3_office)) {
+
+						$search_user_email = $this->DmiUserRoles->find('all')->select(['user_email_id'])->where(['id IS' => $search_user_email_id])->first(); 
+						//to remove error empty condition added by laxmi B on 16-02-2023 
+						if ((!empty($each_current_levels['current_user_email_id']) && !empty($search_user_email['user_email_id']) )  && $each_current_levels['current_user_email_id'] == $search_user_email['user_email_id']) {
+							$application_customer_id_list[$i] = $each_current_levels['customer_id'];
+							$i=$i+1;
+						}
+
+					} else {
+						$application_customer_id_list[$i] = $each_current_levels['customer_id'];
+						$i=$i+1;
+					}
+				}
+			}
+		
+		/*== Below Condition Check In-process backlog Record in Two-Tables finalSubmit & CertificationPdf Table yashwant 08/mar/2023 ===*/
+		} 
+
+		if (!empty($application_customer_id_list)) 
+		{
+			$i=0;
+
+			foreach ($application_customer_id_list as $customer_id) 
+			{
+				$customer_id_list = $this->DmiGrantCertificatesPdfs->find('all')->where(['customer_id IS' => $customer_id])->first(); 
+				if (empty($customer_id_list)) 
+				{
+					$final_customer_id_list[$i] = $customer_id;
+					$i=$i+1;
+				}
+			}
+		} 
+
+		return $final_customer_id_list;
+	
+	
+	}
+
+
+
+
+	// approved Renewal Grant Report
+	// Description : Function derives for Ganted Renewal Application(Esigned)
+	// @Author : Yashwant & shreeya
+	// Date : 10-Mar-2023
+
+	public function approvedRenewalGrantReport($cert_type) //$newapp_id ->replace by cert_type by shreeya
+	{
+		// $newappId replace $cert_type by Shreeya date [26-05-2023]
+		$cert_type=base64_decode($cert_type);
+		$data_id =array($cert_type);
+		
+		$aqcms_from_date ='' ;
+		$aqcms_to_date = '';
+		$aqcms_ro_office_short_code = '';
+		$aqcms_ro_office_id = '';
+
+		$approved_application_type = $this->Session->read('approved_application_type');
+		$approved_application_type = 'renewal';
+
+		/*if ($approved_application_type == 'new' || $approved_application_type =='') 
+		{
+			$table = 'DmiFinalSubmits';
+			$report_heading = 'Approved New Applications Report';
+		}*/ 
+		if ($approved_application_type == 'renewal') {
+			
+			$table = 'DmiRenewalFinalSubmits';
+			$report_heading = 'Approved Renewal Applications Report';
+
+		}elseif ($approved_application_type == 'all_reports') {
+			
+			$table = 'DmiGrantCertificatesPdfs';
+			$report_heading = 'All Approved Report';
+
+			
+			// this below code is added to show the deafult office by Akash on 16-06-2022
+			$posted_ro_office = $this->DmiUsers->find('all',array('fields'=>'posted_ro_office', 'conditions'=>array('email IS'=>$_SESSION['username'])))->first();
+			$default_ro_office = $this->DmiRoOffices->find('all',array('conditions'=>array('id IS'=>$posted_ro_office['posted_ro_office'])))->first();
+			$this->set('default_ro_office',$default_ro_office['ro_office']);
+		}
+
+		//************************New Code Added for show count list by Shreeya Date [25-05-2023]**************************************************************************
+
+		//check the which certificate type is present by shreeya on date [26-05-2023]
+		if ($cert_type== 'CA') 
+		{
+			$cert_type = 1;
+		} 
+		elseif ($cert_type== 'PP') 
+		{
+			$cert_type = 2;
+		} 
+		elseif ($cert_type== 'LAB') 
+		{
+			$cert_type = 3;
+		} 
+
+
+		//check the which application type is present by shreeya on date [26-05-2023]
+		if($approved_application_type=='new'){
+			$processFunction = 'new_app_processed';
+		}elseif($approved_application_type=='renewal'){
+			$processFunction = 'renewal_app_processed';
+		}elseif($approved_application_type=='backlog'){
+			$processFunction = 'backlog_app_processed';
+		}
+
+		
+		//show the count according to application type  and cutomer_id by shreeya on date [26-05-2023]
+		$searchConditions = array();
+		$application_processed[] = $this->Reportstatistics->$processFunction($searchConditions,null,null,$cert_type,$approved_application_type);
+		$applListToShow = $application_processed[0][3];
+		
+
+		$date=array();
+		$application_type=array();
+		$application_user_email_id=array();
+		$user_office=array();
+		$application_customer_id=array();
+		$name_of_the_firm=array();
+		$address_of_the_firm=array();
+		$contact_details_of_the_firm=array();
+		$approved_TBL_details_tbl_name=array();
+		$approved_TBL_details_tbl_registered_no=array();
+		$laboratory_details_name=array();
+		$laboratory_details_address=array();
+
+		
+		$i=0;
+			//applied array_unique function on 18-07-2019
+			foreach (array_unique($applListToShow) as $approved_application) {
+			
+				$approved_application_details = array(); //this line added on 18-07-2019
+
+				// THIS BELOW CONDITION IS ADDED FOR THE ALL REPORTS BY AKASH ON 16-06-2022
+				if ($approved_application_type == 'all_reports') {
+					$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('customer_id IS'=>$approved_application),'order' => array('id' => 'desc')))->first();
+				} elseif ($approved_application_type == 'new' || $approved_application_type =='') {
+					$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['customer_id' => $approved_application])->first(); 
+				} elseif ($approved_application_type == 'backlog') {
+					$approved_application_details = $this->DmiFinalSubmits->find('all')->where(['customer_id' => $approved_application,'status'=>'approved','current_level'=>'level_3'])->first(); 
+				} elseif ($approved_application_type == 'renewal') {
+					
+					$approved_application_detail = $this->DmiGrantCertificatesPdfs->find('all')->select(['id'])->where(['customer_id IS'=>$approved_application])->combine('id','id')->toArray(); 
+					//print_r($approved_application.'@'.$i.'@@');
+					//applied this condition on 27-04-2019
+					if (!empty($approved_application_detail)) {
+						$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['id IN'=> $approved_application_detail])->order(['id' => 'DESC'])->first(); 
+						
+					}
+				}
+
+				//this condition added on 18-07-2019
+				if (!empty($approved_application_details)) {
+		
+					$approved_application_result = $approved_application_details;
+
+					//to check if the application is old or not to print on the excel and for viewing part dont by Akash 07-04-2022
+
+					// THIS BELOW CONDITION IS ADDED FOR THE ALL REPORTS BY AKASH ON 16-06-2022
+					if ($approved_application_type == 'all_reports') {
+			
+						if ($approved_application_result['pdf_version'] > '1') {
+							$approved_application_type_text[$i] = "<b>RENEWAL</b>";
+						} elseif ($approved_application_result['user_email_id'] == 'old_application') {
+							$approved_application_type_text[$i] = "<i>OLD</i>";
+						} else {
+							$approved_application_type_text[$i] = "NEW";
+						}
+						
+					} else {
+						
+						if ($approved_application_type == 'renewal') {
+							$approved_application_type_text[$i] = "<b>RENEWAL</b>";
+						} elseif ($approved_application_result['user_email_id'] == 'old_application') {
+							$approved_application_type_text[$i] = "<i>OLD</i>";
+						} else {
+							$approved_application_type_text[$i] = "NEW";
+						} 
+
+					}
+
+				
+					if ($approved_application_result['user_email_id'] == 'old_application') {
+						$old_app_approved_by = $this->Customfunctions->old_app_approved_by($approved_application_result['customer_id']);
+						$approved_application_result['user_email_id'] = $old_app_approved_by;
+					}
+
+					$explode = explode("/",$approved_application_result['customer_id']);
+
+					$approved_office_id = $this->DmiRoOffices->find('all')->select(['ro_email_id'])->where(['short_code' => $explode[2]])->first();  
+
+					$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email'=>$approved_office_id['ro_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id)) {
+
+						$user_office_details = $this->DmiRoOffices->find('all')->select(['ro_office'])->where(['id'=>$user_posted_office_id['posted_ro_office']])->first(); 
+
+						if (!empty($user_office_details)) {
+							$user_office[$i] = $user_office_details['ro_office'];
+						} else {
+							$user_office[$i] = 'N/A';
+						}
+					} else {
+						$user_office[$i] = 'N/A';
+					}
+
+					$application_form_type = $this->Customfunctions->checkApplicantFormType($approved_application_result['customer_id']);
+
+					if ($application_form_type == 'A') {
+						$application_type[$i]='CA (Form-A)';
+					} elseif ($application_form_type == 'B') {
+						$application_type[$i]='Printing Press (Form-B)';
+					} elseif ($application_form_type == 'C') {
+						$application_type[$i]='Laboratory (Form-C)';
+					} elseif ($application_form_type == 'D') {
+						$application_type[$i]='Laboratory (Form-D)';
+					} elseif ($application_form_type == 'E') {
+						$application_type[$i]='CA (Form-E)';
+					} elseif ($application_form_type == 'F') {
+						$application_type[$i]='CA (Form-F)';
+					}
+
+					$date[$i] = $approved_application_result['created'];
+					$application_customer_id[$i] = $approved_application_result['customer_id'];
+
+					//added by the akash on 13-11-2021
+					$firmDetails = $this->DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$approved_application_result['customer_id'])))->first();
+
+					$name_of_the_firm[$i] = $firmDetails['firm_name'];
+					$address_of_the_firm[$i] = $firmDetails['street_address'];
+					$contact_details_of_the_firm[$i] = base64_decode($firmDetails['email']);
+					$phoneno[$i] = $firmDetails['mobile_no'];
+
+					//tbl details
+					$tbl_details = $this->DmiAllTblsDetails->find('all',array('conditions'=>array('customer_id IS'=>$approved_application_result['customer_id'],'OR' => array('delete_status IS NULL', 'delete_status' => 'no'))))->toArray();
+
+					if (!empty($tbl_details)) {
+						$j=0;
+						foreach ($tbl_details as $each) {
+
+							$approved_TBL_details_tbl_name[$i][$j] = $each['tbl_name'];
+							$approved_TBL_details_tbl_registered_no[$i][$j] = $each['tbl_registered_no'];
+							$j++;
+						}
+
+					} else {
+						$approved_TBL_details_tbl_name[$i][0] = 'N/A';
+						$approved_TBL_details_tbl_registered_no[$i][0] = 'N/A';
+					}
+
+
+
+					//lab details
+					$lab_details = $this->DmiCustomerLaboratoryDetails->find('all',array('conditions'=>array('customer_id IS'=>$approved_application_result['customer_id'])))->toArray();
+					if (!empty($lab_details)) {
+						$laboratory_details_name[$i] = $lab_details[0]['laboratory_name'];
+						$laboratory_details_address[$i] = $lab_details[0]['street_address'];
+					} else {
+						$laboratory_details_name[$i] = 'N/A';
+						$laboratory_details_address[$i] = 'N/A';
+					}
+
+					$commodity_value = $this->DmiFirms->find('all')->select(['sub_commodity'])->where(['customer_id'=>$approved_application_result['customer_id']])->first(); 
+
+					$commodity_list[$i] = $this->Customfunctions->showCommdityInApplList($commodity_value['sub_commodity']);
+
+
+					//Added this Code on the 08-04-2022 as the base encoding was not on some emails so to dispaly the email , checking if the encoding is needed or not.
+					$checkEmailForEncoding[$i] = $approved_application_result['user_email_id'];
+
+					if($this->isBase64Encoded($checkEmailForEncoding[$i]) == true){
+						$application_user_email_id[$i] = base64_decode($approved_application_result['user_email_id']);
+					} else {
+						$application_user_email_id[$i] = $approved_application_result['user_email_id'];
+					}
+					
+					//check the expiry dateand print to the reports  added by Akash on 24-05-2022 
+					$grant_date = chop($approved_application_details['date'],"00:00:00");
+					$valid_upto[$i] = $this->Customfunctions->getCertificateValidUptoDate($approved_application_result['customer_id'],$grant_date);
+
+					//check the state name added by akash on 14-06-2022
+					$state_name[$i] = $this->getStateName($approved_application_result['customer_id']);
+					
+					//Certificate Issued on
+					$issued_on[$i] = chop($approved_application_result['date'],"00:00:00");
+
+					$i=$i+1;
+				}
+			}
+			
+			//exit;
+
+		$this->set('date',$date);
+		$this->set('application_customer_id',$application_customer_id);
+		$this->set('application_user_email_id',$application_user_email_id);
+		$this->set('application_type',$application_type);
+		$this->set('user_office',$user_office);
+		//$this->set('approved_application_list',$approved_application_list);
+		$this->set('commodity_list',$commodity_list);
+		$this->set('approved_application_type',$approved_application_type_text);
+		$this->set('name_of_the_firm',$name_of_the_firm);
+		$this->set('address_of_the_firm',$address_of_the_firm);
+		$this->set('contact_details_of_the_firm',$contact_details_of_the_firm);
+		$this->set('approved_TBL_details_tbl_name',$approved_TBL_details_tbl_name);
+		$this->set('approved_TBL_details_tbl_registered_no',$approved_TBL_details_tbl_registered_no);
+		$this->set('laboratory_details_name',$laboratory_details_name);
+		$this->set('laboratory_details_address',$laboratory_details_address);
+		$this->set('valid_upto',$valid_upto);
+		$this->set('state_name',$state_name);
+		$this->set('phoneno',$phoneno);
+		$this->set('issued_on',$issued_on);
+
+
+		//*****************End************************************
+
+
+		$this->set('table', $table);	// set table value ( Done by pravin 16-07-2018)
+		$this->set('report_heading', $report_heading);
+
+		$application_type_xy = array('A'=>'CA (Form-A)','C'=>'Laboratory (Form-C)','E'=>'CA (Form-E)','B'=>'Printing Press (Form-B)','D'=>'Laboratory (Form-D)','F'=>'CA (Form-F)');
+		//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
+		asort($application_type_xy);
+		$this->set('application_type_xy', $application_type_xy);
+		// $newappId replace $cert_type by Shreeya date [26-05-2023]	
+		$this->set('cert_type',$cert_type);
+
+		// $newappId replace $cert_type by Shreeya date [26-05-2023]
+		if($cert_type=='CA'){
+			$application_type_xy = array('A'=>'CA (Form-A)','E'=>'CA (Form-E)','F'=>'CA (Form-F)');
+		}elseif($cert_type=='PP') {
+			$application_type_xy = array('B'=>'Printing Press (Form-B)');
+		}elseif ($cert_type=='LAB') {
+			$application_type_xy = array('C'=>'Laboratory (Form-C)','D'=>'Laboratory (Form-D)');
+		}
+
+
+		//added 'office_type'=>'RO' condition on 27-07-2018   // Change on 3/11/2018 -  add order by condition - by Pravin Bhakare
+		$ro_office = $this->DmiRoOffices->find('all')->select(['id', 'ro_office'])->where(['office_type' => 'RO','delete_status IS NULL'])->order(['ro_office' => 'ASC'])->combine('id', 'ro_office')->toArray(); 
+		$this->set('ro_office',$ro_office);
+
+		$search_application_type_id = $this->Session->read('search_application_type_id');
+		$application_approved_office = $this->Session->read('application_approved_office');
+		$search_from_date = $this->Session->read('search_from_date');
+		$search_to_date = $this->Session->read('search_to_date');
+
+		$this->set('search_application_type_id',$search_application_type_id);
+		$this->set('application_approved_office',$application_approved_office);
+		$this->set('search_from_date',$search_from_date);
+		$this->set('search_to_date',$search_to_date);
+
+		$search_flag = 'off'; // added by Ankur
+		// Set default value for download report click event (Done by pravin 13-03-2018)
+		$download_report = 'no';
+
+		//if from to date and office id in  session condtion added by laxmi B on 15-02-2023
+
+		$aqcms_from_date = $this->Session->read('from_date') ;
+		$aqcms_to_date = $this->Session->read('to_date');
+		$aqcms_ro_office_short_code = $this->Session->read('roOfficeShortCode');
+		$aqcms_ro_office_id = $this->Session->read('ro_office_id');
+		$this->Session->delete('ro_office_id');
+		$this->Session->delete('roOfficeShortCode');
+		$this->Session->delete('from_date');
+		$this->Session->delete('to_date');
+
+
+
+		if ((((!empty($aqcms_from_date && !empty($aqcms_to_date))) || !empty($aqcms_ro_office_short_code))) || null != ($this->request->getData('search_logs')) || null != ($this->request->getData('download_report'))) 
+		{
+			$search_flag = 'on'; // added by Ankur
+			//Check not empty "Download Report as Excel" button Request, if condition TRUE then set value "yes" for "Download Report as Excel" click event
+			//and pass this value to "approved_application_search_conditions" function (Done by pravin 13-03-2018)
+			if (!empty($this->request->getData('download_report'))) {
+				$download_report = 'yes';
+			}
+
+			$search_application_type_id = $this->request->getData('application_type');
+			$application_approved_office = $this->request->getData('office');
+			$search_from_date =  $this->request->getData('from_date');
+			$search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
+			$search_to_date =  $this->request->getData('to_date');
+			$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
+			$this->date_comparison($search_from_date, $search_to_date);
+
+			// Change on 3/11/2018 - For download excel report, Take search filter field value from session variables instend of POST variable - By Pravin
+			if ($download_report == 'yes') {
+				
+				$search_application_type_id = $this->Session->read('search_application_type_id');
+				$application_approved_office = $this->Session->read('application_approved_office');
+				$search_from_date = $this->Session->read('search_from_date');
+				$search_to_date = $this->Session->read('search_to_date');
+			}
+
+			$this->Session->delete('search_application_type_id');
+			$this->Session->delete('application_approved_office');
+			$this->Session->delete('search_from_date');
+			$this->Session->delete('search_to_date');
+			
+			
+
+			//set from_date and to_date and office name from session of statstics report added by laxmi B. on 15-02-2023
+			if(!empty($aqcms_from_date) && !empty($aqcms_to_date && empty($aqcms_ro_office_short_code) )){
+				$search_from_date = $aqcms_from_date;
+				$search_to_date = $aqcms_to_date;
+				$search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
+				$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
+				$this->date_comparison($search_from_date, $search_to_date);
+
+			} elseif(!empty($aqcms_from_date) && !empty($aqcms_to_date && !empty($aqcms_ro_office_short_code))) {
+
+				$search_from_date = $aqcms_from_date;
+				$search_to_date = $aqcms_to_date;
+				$search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
+				$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
+				$this->date_comparison($search_from_date, $search_to_date);
+
+				$ro_office = $this->DmiRoOffices->find('all')->select(['id'])->where(['id IN' => $aqcms_ro_office_id])->where(['short_code IN'=>$aqcms_ro_office_short_code])->first(); 
+				$application_approved_office = [$ro_office['id']];
+			
+			} elseif(!empty($aqcms_ro_office_short_code)) {
+
+				$ro_office = $this->DmiRoOffices->find('all')->select(['id'])->where(['id IN' => $aqcms_ro_office_id])->where(['short_code IN'=>$aqcms_ro_office_short_code])->first(); 
+				$application_approved_office = [$ro_office['id']];
+			}//end
+
+
+			$this->Session->write('search_application_type_id', $search_application_type_id);
+			$this->Session->write('application_approved_office', $application_approved_office);
+			$this->Session->write('search_from_date', $search_from_date);
+			$this->Session->write('search_to_date', $search_to_date);
+
+			$this->set('search_application_type_id', $search_application_type_id);
+			$this->set('application_approved_office', $application_approved_office);
+			$this->set('search_from_date', $search_from_date);
+			$this->set('search_to_date', $search_to_date);
+
+			$approved_application_lists = $this->approvedRenewalAppliSearchConditions($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$data_id,$approved_application_type);
+
+
+
+			$approved_application_list = $approved_application_lists[0];
+
+			$download_approved_application_list = $approved_application_lists[1];
+
+			$i=0;
+			foreach ($approved_application_list as $each) {
+
+				$approved_application_list[$i] = $each['customer_id'];
+				$i=$i+1;
+			}
+
+			$j=0;
+			foreach ($download_approved_application_list as $each) {
+
+				$download_approved_application_list[$j] = $each['customer_id'];
+				$j=$j+1;
+			}
+
+
+
+			$this->loadModel('DmiRejectedApplLogs');
+			$rejectedList = $this->DmiRejectedApplLogs->find('all')->select(['id','customer_id'])->order(['id','customer_id'])->combine('id','customer_id')->toArray();
+
+			if(!empty($rejectedList)){
+
+				if(!empty($approved_application_list)){
+					$approved_application_list = array_diff($approved_application_list, $rejectedList);
+				}
+			}
+
+
+			//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
+			if ($download_report == 'yes') {
+
+				$this->downloadApprovedApplicationReportResults($download_approved_application_list, $approved_application_type);
+			}
+
+			$this->approvedApplicationReportResults($approved_application_list, $approved_application_type);
+
+		} else {
+
+			$approved_application_lists = $this->approvedRenewalAppliSearchConditions($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$data_id,$approved_application_type);
+
+			$approved_application_list = $approved_application_lists[0];
+
+			$i=0;
+			foreach ($approved_application_list as $each) 
+			{
+				$approved_application_list[$i] = $each['customer_id'];
+				$i=$i+1;
+			}
+
+			//if data same data id exist in rejcted table it is not apper in report added 
+			$this->loadModel('DmiRejectedApplLogs');
+			$rejectedList = $this->DmiRejectedApplLogs->find('all')->select(['id','customer_id'])->order(['id','customer_id'])->combine('id','customer_id')->toArray();
+
+			if(!empty($rejectedList))
+			{
+				if(!empty($approved_application_list)){
+					$approved_application_list = array_diff($approved_application_list, $rejectedList);
+				}
+			}//end laxmi B.
+			
+			//bellow function is commented by shreeya already use this code [ Date 26-05-2023]
+			//$this->approvedApplicationReportResults($approved_application_list,$approved_application_type);
+		}
+
+	}
+
+
+	// approved Renewal Application Search Conditions
+	// Description : 
+	// @Author : Yashwant
+	// Date : 10-Mar-2023
+
+	public function approvedRenewalAppliSearchConditions ($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$data_id,$approved_application_type) 
+	{
+
+		$approved_application_list = [];
+
+		if ($search_application_type_id != '' && $application_approved_office == '' && $search_from_date =='' && $search_to_date == '') {
+
+			if ($table == 'DmiFinalSubmits') {
+				$approved_application_customer_id = $this->DmiGrantCertificatesPdfs->find('all')->select(['customer_id'])->group(['customer_id HAVING COUNT(customer_id) < 2'])->toArray();
+			} elseif ($table == 'DmiGrantCertificatesPdfs') {
+				$approved_application_customer_id = $this->DmiGrantCertificatesPdfs->find('all')->select(['customer_id'])->group(['customer_id HAVING COUNT(customer_id) >= 1'])->toArray();
+			} else {
+				$approved_application_customer_id = $this->DmiGrantCertificatesPdfs->find('all')->select(['customer_id'])->group(['customer_id HAVING COUNT(customer_id) > 1'])->toArray();
+			}
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id)	
+			{
+				$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+				if (in_array($application_customer_type, $search_application_type_id)) 
+				{
+					$approved_application_list[$i] = $each_customer_id['customer_id'];
+					$i=$i+1;
+				}
+			}
+
+			if (!empty($approved_application_list)) {
+				$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3']; 
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3']; 
+			}
+
+			$approved_application_list = $this->$table->find('all')->where($conditions)->order(['id' => 'DESC'])->toArray();
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+
+		///===========================YAshwant 06-Apr-2023====================================
+		} elseif ($search_application_type_id == '' && $application_approved_office == '' && $search_from_date !='' && $search_to_date != '') 
+		{
+
+			$approved_application_customer_id = $this->DmiRenewalEsignedStatuses->find('all')->select(['customer_id'])->where(['application_status' =>"Granted"])->where(['date(modified) BETWEEN :start AND :end'])
+			->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->order(['created'=>'DESC'])->toArray();
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) 
+			{
+				if (!empty($each_customer_id['customer_id'])) 
+				{
+					$application_customer_type = $this->Reportsfunctions->newApplicantType($each_customer_id['customer_id']);
+
+					if(in_array($application_customer_type, $data_id, TRUE)) 
+					{
+						$approved_application_list[$i] = $each_customer_id['customer_id'];
+						$i=$i+1;
+					}
+				}
+			}
+
+			if (!empty($approved_application_list)) {
+				$conditions = ['customer_id IN' => $approved_application_list];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray();
+
+
+		///==========YAshwant 06-Apr-2023 START Search Select Office Filter filter ==================
+		} elseif ($search_application_type_id == '' && $application_approved_office != '' && $search_from_date =='' && $search_to_date == '' ) 
+		{
+
+			//$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['status' => 'approved', 'current_level' => 'level_3'])->toArray();
+
+			$approved_application_customer_id = $this->DmiRenewalEsignedStatuses->find('all')->select(['customer_id'])->where(['application_status' =>"Granted"])->toArray();
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) 
+			{
+				if (!empty($each_customer_id['customer_id'])) 
+				{
+					$application_customer_type = $this->Reportsfunctions->newApplicantType($each_customer_id['customer_id']);
+
+					if (in_array($application_customer_type,$data_id)) {
+
+						$approved_application_details_list = $this->DmiGrantCertificatesPdfs->find('all')->select(['id', 'sid'])->where(['customer_id' => $each_customer_id['customer_id']])->combine('id', 'id')->toArray(); 
+
+						if (!empty($approved_application_details_list)) {
+
+							$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['id' => max($approved_application_details_list)])->first();  
+							$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email' => $approved_application_details['user_email_id']])->first();  
+
+							if (!empty($user_posted_office_id)) {
+
+								if (in_array($user_posted_office_id['posted_ro_office'],$application_approved_office)) {
+
+									$approved_application_list[$i] = $each_customer_id['customer_id'];
+									$i=$i+1;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			if (!empty($approved_application_list)) {
+				$conditions = ['customer_id IN' => $approved_application_list];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray();
+
+
+		/*Yashwant====10/Mar/2023 This below Condition Used For Renewal Appln(E-signed) count for GRanted=============*/
+		} elseif (!empty($data_id)) 
+		{
+			//$approved_application_customer_id = $this->DmiApplicationEsignedStatuses->find('all')->select(['customer_id'])->where(['application_status' =>"Granted"])->toArray();
+			$approved_application_customer_id = $this->DmiRenewalEsignedStatuses->find('all')->select(['customer_id'])->where(['application_status' =>"Granted"])->toArray();
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) 
+			{
+				if (!empty($each_customer_id['customer_id'])) 
+				{
+					$application_customer_type = $this->Reportsfunctions->newApplicantType($each_customer_id['customer_id']);
+					if(in_array($application_customer_type, $data_id, TRUE)) 
+					{
+						$approved_application_list[$i] = $each_customer_id['customer_id'];
+						$i=$i+1;
+					}
+				}
+			}
+
+			if (!empty($approved_application_list)) {
+				$conditions = ['customer_id IN' => $approved_application_list];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+		}elseif ($search_application_type_id != '' && $application_approved_office != '' && $search_from_date =='' && $search_to_date == '' ) 
+		{
+			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['status' => 'approved', 'current_level' => 'level_3'])->toArray(); 
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) {
+
+				$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+				if (in_array($application_customer_type,$search_application_type_id))
+				{
+					$approved_application_details_list = $this->DmiGrantCertificatesPdfs->find('all')->select(['id', 'id'])->where(['customer_id' => $each_customer_id['customer_id']])->combine('id', 'id')->toArray(); 
+					if (!empty($approved_application_details_list)) 
+					{
+						$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['id' => max($approved_application_details_list)])->first();  
+						$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email' => $approved_application_details['user_email_id']])->first();  
+						if (!empty($user_posted_office_id)) 
+						{
+							if (in_array($user_posted_office_id['posted_ro_office'],$application_approved_office)) {
+								$approved_application_list[$i] = $each_customer_id['customer_id'];
+								$i=$i+1;
+							}
+						}
+					}
+				}
+			}
+
+
+
+			// below if-else code added by Ankur Jangid
+			if (!empty($approved_application_list)) {
+				$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3'];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+
+		} 
+		elseif ($search_application_type_id != '' && $application_approved_office == '' && $search_from_date !='' && $search_to_date != '') 
+		{
+
+			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['date(modified) BETWEEN :start AND :end'])
+			->where(['status' => 'approved', 'current_level' => 'level_3'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) {
+				$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']); 
+
+				if (in_array($application_customer_type, $search_application_type_id)) {
+					$approved_application_list[$i] = $each_customer_id['customer_id']; 
+					$i=$i+1;
+				}
+			}
+
+			// below if-else code added by Ankur Jangid
+			if (!empty($approved_application_list)) {
+				$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3'];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+		} elseif ($search_application_type_id != '' && $application_approved_office != '' && $search_from_date !='' && $search_to_date != '') 
+		{
+
+			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['date(modified) BETWEEN :start AND :end'])
+			->where(['status' => 'approved', 'current_level' => 'level_3'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) {
+
+				$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+				if (in_array($application_customer_type,$search_application_type_id)) {
+
+					$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['customer_id' => $each_customer_id['customer_id']])->first(); 
+
+					$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IS' => $approved_application_details['user_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id)) {
+
+						if (in_array($user_posted_office_id['posted_ro_office'], $application_approved_office)) {
+							$approved_application_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+			}
+
+			// below if-else code added by Ankur Jangid
+			if (!empty($approved_application_list)) {
+				$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3'];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+		} elseif ($search_application_type_id == '' && $application_approved_office != '' && $search_from_date =='' && $search_to_date == '') 
+		{
+
+			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['status' => 'approved', 'current_level' => 'level_3'])->toArray(); 
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) {
+
+				$approved_application_details_list = $this->DmiGrantCertificatesPdfs->find('all')->select(['id', 'id'])->where(['customer_id IS' => $each_customer_id['customer_id']])->combine('id', 'id')->toArray(); 
+
+				if (!empty($approved_application_details_list)) {
+
+					$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['id' => max($approved_application_details_list)])->first(); 
+
+					$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email' => $approved_application_details['user_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id)) {
+
+						if (in_array($user_posted_office_id['posted_ro_office'],$application_approved_office)) {
+							$approved_application_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+			}
+
+			// below if-else code added by Ankur Jangid
+			if (!empty($approved_application_list)) {
+				$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3'];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+		} elseif ($search_application_type_id == '' && $application_approved_office != '' && $search_from_date !='' && $search_to_date != '') 
+		{
+
+			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['date(modified) BETWEEN :start AND :end', 'status' => 'approved',
+				'current_level' => 'level_3'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) {
+
+				$approved_application_details_list = $this->DmiGrantCertificatesPdfs->find('all')->select(['id', 'id'])->where(['customer_id' => $each_customer_id['customer_id']])->combine('id', 'id')->toArray(); 
+
+				if (!empty($approved_application_details_list)) {
+
+					$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['id' => max($approved_application_details_list)])->first(); 
+
+					$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email' => $approved_application_details['user_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id)) {
+
+						if (in_array($user_posted_office_id['posted_ro_office'], $application_approved_office)) {
+							$approved_application_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+			}
+
+			// below if-else code added by Ankur Jangid
+			if (!empty($approved_application_list)) {
+				$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3'];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+		} elseif ($search_application_type_id == '' && $application_approved_office == '' && $search_from_date !='' && $search_to_date != '') 
+		{
+
+			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['date(modified) BETWEEN : startAND :end', 'status' => 'approved',
+				'current_level' => 'level_3'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) {
+				$approved_application_list[$i] = $each_customer_id['customer_id'];
+				$i=$i+1;
+			}
+
+			// below if-else code added by Ankur Jangid
+			if (!empty($approved_application_list)) 
+			{
+				$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3'];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+		} else {
+
+			if ($search_flag == 'on') {
+				$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['status' => 'approved', 'current_level' => 'level_3'])
+				->order(['created'=>'DESC'])->extract('customer_id')->toArray(0); 
+			} else {
+
+				// THIS BELOW CONDITION IS ADDED FOR THE ALL REPORTS BY AKASH ON 16-06-2022
+				if ($table == 'DmiGrantCertificatesPdfs') {
+
+					$posted_ro_office = $this->DmiUsers->find('all',array('fields'=>'posted_ro_office', 'conditions'=>array('email IS'=>$_SESSION['username'])))->first();
+					$get_short_code = $this->DmiRoOffices->find('all',array('fields'=>'short_code', 'conditions'=>array('id IS'=>$posted_ro_office['posted_ro_office'])))->first();
+					$short_code = $get_short_code['short_code'];
+
+					if ($_SESSION['role'] == 'Head Office') {
+						$approved_application_customer_id = $this->DmiGrantCertificatesPdfs->find('all')->select(['customer_id'])->group(['customer_id HAVING COUNT(customer_id) >= 1'])->limit(['2'])->extract('customer_id')->toArray(0);
+					} else {
+						$approved_application_customer_id = $this->DmiGrantCertificatesPdfs->find('all',array('fields'=>'customer_id','conditions'=>array('customer_id like'=>'%/'.$short_code.'/%'),'group'=>'customer_id having count(customer_id) >= 1','having'=>array('count(customer_id) >= 1')))->toArray();
+					}
+
+				} else {
+					$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['status' => 'approved', 'current_level' => 'level_3'])
+					->order(['created'=>'DESC'])->limit(['100'])->extract('customer_id')->toArray(0); 
+				}
+			}
+
+			$approved_application_list = $approved_application_customer_id;
+
+			// below if-else code added by Ankur Jangid
+			if (!empty($approved_application_list)) {
+
+				// THIS BELOW CONDITION IS ADDED FOR THE ALL REPORTS BY AKASH ON 16-06-2022
+				if ($table == 'DmiGrantCertificatesPdfs') {
+					$conditions = array('customer_id IN'=>$approved_application_list); 
+				} else {
+					$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3'];
+				}
+
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+		}
+
+
+		return array($approved_application_list,$download_approved_application_list);
+
+	}
+
+
+
+
+	// Granted Backlog Applications Report
+	// Description :  Function Used For Backlog Appln(E-signed) count for GRanted
+	// @Author : Yashwant & shreeya
+	// Date : 10-Mar-2023
+
+	public function grantedBacklogApplicationsReport($cert_type) //$backlog_id ->replace by cert_type by shreeya
+	{
+		// $backlog_id replace $cert_type by Shreeya date [26-05-2023]
+		$cert_type=base64_decode($cert_type);
+		$data_id =array($cert_type);
+
+		$aqcms_from_date ='' ;
+		$aqcms_to_date = '';
+		$aqcms_ro_office_short_code = '';
+		$aqcms_ro_office_id = '';
+
+		//$approved_application_type = $this->Session->read('approved_application_type');
+		$table = 'DmiFinalSubmits';
+		$approved_application_type = 'backlog';
+		$report_heading = 'Approved Backlog Applications Report';
+
+	
+		if ($approved_application_type == 'backlog' || $approved_application_type =='') {
+			$table = 'DmiFinalSubmits';
+			$report_heading = 'Approved Backlog Applications Report';
+		} elseif ($approved_application_type == 'all_reports') {
+			
+			$table = 'DmiGrantCertificatesPdfs';
+			$report_heading = 'All Approved Report';
+			
+			// this below code is added to show the deafult office by Akash on 16-06-2022
+			$posted_ro_office = $this->DmiUsers->find('all',array('fields'=>'posted_ro_office', 'conditions'=>array('email IS'=>$_SESSION['username'])))->first();
+			$default_ro_office = $this->DmiRoOffices->find('all',array('conditions'=>array('id IS'=>$posted_ro_office['posted_ro_office'])))->first();
+			$this->set('default_ro_office',$default_ro_office['ro_office']);
+		}
+
+			//************************New Code Added for show count list by Shreeya Date [25-05-2023]**************************************************************************
+
+		//check the which certificate type is present by shreeya on date [26-05-2023]
+		if ($cert_type== 'CA') 
+		{
+			$cert_type = 1;
+		} 
+		elseif ($cert_type== 'PP') 
+		{
+			$cert_type = 2;
+		} 
+		elseif ($cert_type== 'LAB') 
+		{
+			$cert_type = 3;
+		} 
+
+
+		//check the which application type is present by shreeya on date [26-05-2023]
+		if($approved_application_type=='new'){
+			$processFunction = 'new_app_processed';
+		}elseif($approved_application_type=='renewal'){
+			$processFunction = 'renewal_app_processed';
+		}elseif($approved_application_type=='backlog'){
+			$processFunction = 'backlog_app_processed';
+		}
+
+		
+		//show the count according to application type  and cutomer_id by shreeya on date [26-05-2023]
+		$searchConditions = array();
+		$application_processed[] = $this->Reportstatistics->$processFunction($searchConditions,null,null,$cert_type,$approved_application_type);
+		$applListToShow = $application_processed[0][3];
+	
+
+		$date=array();
+		$application_type=array();
+		$application_user_email_id=array();
+		$user_office=array();
+		$application_customer_id=array();
+		$name_of_the_firm=array();
+		$address_of_the_firm=array();
+		$contact_details_of_the_firm=array();
+		$approved_TBL_details_tbl_name=array();
+		$approved_TBL_details_tbl_registered_no=array();
+		$laboratory_details_name=array();
+		$laboratory_details_address=array();
+
+		
+		$i=0;
+			//applied array_unique function on 18-07-2019
+			foreach (array_unique($applListToShow) as $approved_application) {
+
+				$approved_application_details = array(); //this line added on 18-07-2019
+
+				// THIS BELOW CONDITION IS ADDED FOR THE ALL REPORTS BY AKASH ON 16-06-2022
+				if ($approved_application_type == 'all_reports') {
+					$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('customer_id IS'=>$approved_application),'order' => array('id' => 'desc')))->first();
+				} elseif ($approved_application_type == 'new' || $approved_application_type =='') {
+					$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['customer_id' => $approved_application])->first(); 
+				} elseif ($approved_application_type == 'backlog') {
+					$approved_application_details = $this->DmiFinalSubmits->find('all')->where(['customer_id' => $approved_application,'status'=>'approved','current_level'=>'level_3'])->first(); 
+				} elseif ($approved_application_type == 'renewal') {
+					$approved_application_detail = $this->DmiGrantCertificatesPdfs->find('all')->select(['id'])->where(['customer_id IS'=>$approved_application])->combine('id','id')->toArray(); 
+					//applied this condition on 27-04-2019
+					if (!empty($approved_application_detail)) {
+						$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['id IN'=> $approved_application_detail])->order(['id' => 'DESC'])->first(); 
+					}
+				}
+
+				//this condition added on 18-07-2019
+				if (!empty($approved_application_details)) {
+
+					$approved_application_result = $approved_application_details;
+
+					//to check if the application is old or not to print on the excel and for viewing part dont by Akash 07-04-2022
+
+					// THIS BELOW CONDITION IS ADDED FOR THE ALL REPORTS BY AKASH ON 16-06-2022
+					if ($approved_application_type == 'all_reports') {
+			
+						if ($approved_application_result['pdf_version'] > '1') {
+							$approved_application_type_text[$i] = "<b>RENEWAL</b>";
+						} elseif ($approved_application_result['user_email_id'] == 'old_application') {
+							$approved_application_type_text[$i] = "<i>OLD</i>";
+						} else {
+							$approved_application_type_text[$i] = "NEW";
+						}
+
+					} else {
+
+						if ($approved_application_type == 'renewal') {
+							$approved_application_type_text[$i] = "<b>RENEWAL</b>";
+						} elseif ($approved_application_result['user_email_id'] == 'old_application') {
+							$approved_application_type_text[$i] = "<i>OLD</i>";
+						} else {
+							$approved_application_type_text[$i] = "NEW";
+						} 
+
+					}
+
+				
+					if ($approved_application_result['user_email_id'] == 'old_application') {
+						$old_app_approved_by = $this->Customfunctions->old_app_approved_by($approved_application_result['customer_id']);
+						$approved_application_result['user_email_id'] = $old_app_approved_by;
+					}
+
+					$explode = explode("/",$approved_application_result['customer_id']);
+
+					$approved_office_id = $this->DmiRoOffices->find('all')->select(['ro_email_id'])->where(['short_code' => $explode[2]])->first();  
+
+					$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email'=>$approved_office_id['ro_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id)) {
+
+						$user_office_details = $this->DmiRoOffices->find('all')->select(['ro_office'])->where(['id'=>$user_posted_office_id['posted_ro_office']])->first(); 
+
+						if (!empty($user_office_details)) {
+							$user_office[$i] = $user_office_details['ro_office'];
+						} else {
+							$user_office[$i] = 'N/A';
+						}
+					} else {
+						$user_office[$i] = 'N/A';
+					}
+
+					$application_form_type = $this->Customfunctions->checkApplicantFormType($approved_application_result['customer_id']);
+
+					if ($application_form_type == 'A') {
+						$application_type[$i]='CA (Form-A)';
+					} elseif ($application_form_type == 'B') {
+						$application_type[$i]='Printing Press (Form-B)';
+					} elseif ($application_form_type == 'C') {
+						$application_type[$i]='Laboratory (Form-C)';
+					} elseif ($application_form_type == 'D') {
+						$application_type[$i]='Laboratory (Form-D)';
+					} elseif ($application_form_type == 'E') {
+						$application_type[$i]='CA (Form-E)';
+					} elseif ($application_form_type == 'F') {
+						$application_type[$i]='CA (Form-F)';
+					}
+
+					$date[$i] = $approved_application_result['created'];
+					$application_customer_id[$i] = $approved_application_result['customer_id'];
+
+					//added by the akash on 13-11-2021
+					$firmDetails = $this->DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$approved_application_result['customer_id'])))->first();
+
+					$name_of_the_firm[$i] = $firmDetails['firm_name'];
+					$address_of_the_firm[$i] = $firmDetails['street_address'];
+					$contact_details_of_the_firm[$i] = base64_decode($firmDetails['email']);
+					$phoneno[$i] = $firmDetails['mobile_no'];
+
+					//tbl details
+					$tbl_details = $this->DmiAllTblsDetails->find('all',array('conditions'=>array('customer_id IS'=>$approved_application_result['customer_id'],'OR' => array('delete_status IS NULL', 'delete_status' => 'no'))))->toArray();
+
+					if (!empty($tbl_details)) {
+						$j=0;
+						foreach ($tbl_details as $each) {
+
+							$approved_TBL_details_tbl_name[$i][$j] = $each['tbl_name'];
+							$approved_TBL_details_tbl_registered_no[$i][$j] = $each['tbl_registered_no'];
+							$j++;
+						}
+
+					} else {
+						$approved_TBL_details_tbl_name[$i][0] = 'N/A';
+						$approved_TBL_details_tbl_registered_no[$i][0] = 'N/A';
+					}
+
+
+
+					//lab details
+					$lab_details = $this->DmiCustomerLaboratoryDetails->find('all',array('conditions'=>array('customer_id IS'=>$approved_application_result['customer_id'])))->toArray();
+					if (!empty($lab_details)) {
+						$laboratory_details_name[$i] = $lab_details[0]['laboratory_name'];
+						$laboratory_details_address[$i] = $lab_details[0]['street_address'];
+					} else {
+						$laboratory_details_name[$i] = 'N/A';
+						$laboratory_details_address[$i] = 'N/A';
+					}
+
+					$commodity_value = $this->DmiFirms->find('all')->select(['sub_commodity'])->where(['customer_id'=>$approved_application_result['customer_id']])->first(); 
+
+					$commodity_list[$i] = $this->Customfunctions->showCommdityInApplList($commodity_value['sub_commodity']);
+
+
+					//Added this Code on the 08-04-2022 as the base encoding was not on some emails so to dispaly the email , checking if the encoding is needed or not.
+					$checkEmailForEncoding[$i] = $approved_application_result['user_email_id'];
+
+					if($this->isBase64Encoded($checkEmailForEncoding[$i]) == true){
+						$application_user_email_id[$i] = base64_decode($approved_application_result['user_email_id']);
+					} else {
+						$application_user_email_id[$i] = $approved_application_result['user_email_id'];
+					}
+					
+					//check the expiry dateand print to the reports  added by Akash on 24-05-2022 
+					$grant_date = chop($approved_application_details['date'],"00:00:00");
+					$valid_upto[$i] = $this->Customfunctions->getCertificateValidUptoDate($approved_application_result['customer_id'],$grant_date);
+
+					//check the state name added by akash on 14-06-2022
+					$state_name[$i] = $this->getStateName($approved_application_result['customer_id']);
+					
+					//Certificate Issued on
+					$issued_on[$i] = chop($approved_application_result['date'],"00:00:00");
+
+					$i=$i+1;
+				}
+			}
+
+		
+
+		$this->set('date',$date);
+		$this->set('application_customer_id',$application_customer_id);
+		$this->set('application_user_email_id',$application_user_email_id);
+		$this->set('application_type',$application_type);
+		$this->set('user_office',$user_office);
+		//$this->set('approved_application_list',$approved_application_list);
+		$this->set('commodity_list',$commodity_list);
+		$this->set('approved_application_type',$approved_application_type_text);
+		$this->set('name_of_the_firm',$name_of_the_firm);
+		$this->set('address_of_the_firm',$address_of_the_firm);
+		$this->set('contact_details_of_the_firm',$contact_details_of_the_firm);
+		$this->set('approved_TBL_details_tbl_name',$approved_TBL_details_tbl_name);
+		$this->set('approved_TBL_details_tbl_registered_no',$approved_TBL_details_tbl_registered_no);
+		$this->set('laboratory_details_name',$laboratory_details_name);
+		$this->set('laboratory_details_address',$laboratory_details_address);
+		$this->set('valid_upto',$valid_upto);
+		$this->set('state_name',$state_name);
+		$this->set('phoneno',$phoneno);
+		$this->set('issued_on',$issued_on);
+
+
+		//*****************End************************************
+		
+		$this->set('table', $table);	// set table value ( Done by pravin 16-07-2018)
+		$this->set('report_heading', $report_heading);
+
+		
+		$application_type_xy = array('A'=>'CA (Form-A)','C'=>'Laboratory (Form-C)','E'=>'CA (Form-E)','B'=>'Printing Press (Form-B)','D'=>'Laboratory (Form-D)','F'=>'CA (Form-F)');
+		//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
+		asort($application_type_xy);
+		$this->set('application_type_xy',$application_type_xy);
+		// $backlogId replace $cert_type by Shreeya date [26-05-2023]
+		$this->set('cert_type',$cert_type);
+
+		// $backlogId replace $cert_type by Shreeya date [26-05-2023]
+		if($cert_type=='CA'){
+			$application_type_xy = array('A'=>'CA (Form-A)','E'=>'CA (Form-E)','F'=>'CA (Form-F)');
+		}elseif($cert_type=='PP') {
+			$application_type_xy = array('B'=>'Printing Press (Form-B)');
+		}elseif ($cert_type=='LAB') {
+			$application_type_xy = array('C'=>'Laboratory (Form-C)','D'=>'Laboratory (Form-D)');
+		}
+
+		
+
+		//added 'office_type'=>'RO' condition on 27-07-2018   // Change on 3/11/2018 -  add order by condition - by Pravin Bhakare
+		$ro_office = $this->DmiRoOffices->find('all')->select(['id', 'ro_office'])->where(['office_type' => 'RO','delete_status IS NULL'])->order(['ro_office' => 'ASC'])->combine('id', 'ro_office')->toArray(); 
+		$this->set('ro_office',$ro_office);
+
+		$search_application_type_id = $this->Session->read('search_application_type_id');
+		$application_approved_office = $this->Session->read('application_approved_office');
+		$search_from_date = $this->Session->read('search_from_date');
+		$search_to_date = $this->Session->read('search_to_date');
+
+		$this->set('search_application_type_id',$search_application_type_id);
+		$this->set('application_approved_office',$application_approved_office);
+		$this->set('search_from_date',$search_from_date);
+		$this->set('search_to_date',$search_to_date);
+
+		$search_flag = 'off'; // added by Ankur
+		// Set default value for download report click event (Done by pravin 13-03-2018)
+		$download_report = 'no';
+
+		//if from to date and office id in  session condtion added by laxmi B on 15-02-2023
+
+		$aqcms_from_date = $this->Session->read('from_date') ;
+		$aqcms_to_date = $this->Session->read('to_date');
+		$aqcms_ro_office_short_code = $this->Session->read('roOfficeShortCode');
+		$aqcms_ro_office_id = $this->Session->read('ro_office_id');
+		$this->Session->delete('ro_office_id');
+		$this->Session->delete('roOfficeShortCode');
+		$this->Session->delete('from_date');
+		$this->Session->delete('to_date');
+
+
+
+		if ((((!empty($aqcms_from_date && !empty($aqcms_to_date))) || !empty($aqcms_ro_office_short_code))) || null != ($this->request->getData('search_logs')) || null != ($this->request->getData('download_report'))) {
+			$search_flag = 'on'; // added by Ankur
+			//Check not empty "Download Report as Excel" button Request, if condition TRUE then set value "yes" for "Download Report as Excel" click event
+			//and pass this value to "approved_application_search_conditions" function (Done by pravin 13-03-2018)
+			if (!empty($this->request->getData('download_report'))) {
+				$download_report = 'yes';
+			}
+
+			$search_application_type_id = $this->request->getData('application_type');
+			$application_approved_office = $this->request->getData('office');
+			$search_from_date =  $this->request->getData('from_date');
+			$search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
+			$search_to_date =  $this->request->getData('to_date');
+			$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
+			$this->date_comparison($search_from_date, $search_to_date);
+
+			
+			if ($download_report == 'yes') {
+				
+				$search_application_type_id = $this->Session->read('search_application_type_id');
+				$application_approved_office = $this->Session->read('application_approved_office');
+				$search_from_date = $this->Session->read('search_from_date');
+				$search_to_date = $this->Session->read('search_to_date');
+			}
+
+			$this->Session->delete('search_application_type_id');
+			$this->Session->delete('application_approved_office');
+			$this->Session->delete('search_from_date');
+			$this->Session->delete('search_to_date');
+			
+		
+
+			//set from_date and to_date and office name from session of statstics report added by laxmi B. on 15-02-2023
+			if(!empty($aqcms_from_date) && !empty($aqcms_to_date && empty($aqcms_ro_office_short_code) )){
+
+				$search_from_date = $aqcms_from_date;
+				$search_to_date = $aqcms_to_date;
+				$search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
+				$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
+				$this->date_comparison($search_from_date, $search_to_date);
+
+			} elseif(!empty($aqcms_from_date) && !empty($aqcms_to_date && !empty($aqcms_ro_office_short_code))) {
+
+				$search_from_date = $aqcms_from_date;
+				$search_to_date = $aqcms_to_date;
+				$search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
+				$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
+				$this->date_comparison($search_from_date, $search_to_date);
+
+				$ro_office = $this->DmiRoOffices->find('all')->select(['id'])->where(['id IN' => $aqcms_ro_office_id])->where(['short_code IN'=>$aqcms_ro_office_short_code])->first(); 
+				$application_approved_office = [$ro_office['id']];
+
+
+			} elseif(!empty($aqcms_ro_office_short_code)) {
+
+				$ro_office = $this->DmiRoOffices->find('all')->select(['id'])->where(['id IN' => $aqcms_ro_office_id])->where(['short_code IN'=>$aqcms_ro_office_short_code])->first(); 
+				$application_approved_office = [$ro_office['id']];
+			}//end
+
+
+			$this->Session->write('search_application_type_id', $search_application_type_id);
+			$this->Session->write('application_approved_office', $application_approved_office);
+			$this->Session->write('search_from_date', $search_from_date);
+			$this->Session->write('search_to_date', $search_to_date);
+
+			$this->set('search_application_type_id', $search_application_type_id);
+			$this->set('application_approved_office', $application_approved_office);
+			$this->set('search_from_date', $search_from_date);
+			$this->set('search_to_date', $search_to_date);
+
+			$approved_application_lists = $this->grantBcklogSearchConditions($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$data_id,$approved_application_type);
+			$approved_application_list = $approved_application_lists[0];
+			$download_approved_application_list = $approved_application_lists[1];
+
+			$i=0;
+			foreach ($approved_application_list as $each) {
+
+				$approved_application_list[$i] = $each['customer_id'];
+				$i=$i+1;
+			}
+
+			$j=0;
+			foreach ($download_approved_application_list as $each) {
+
+				$download_approved_application_list[$j] = $each['customer_id'];
+				$j=$j+1;
+			}
+
+
+
+			$this->loadModel('DmiRejectedApplLogs');
+			$rejectedList = $this->DmiRejectedApplLogs->find('all')->select(['id','customer_id'])->order(['id','customer_id'])->combine('id','customer_id')->toArray();
+
+			if(!empty($rejectedList)){
+
+				if(!empty($approved_application_list)){
+					$approved_application_list = array_diff($approved_application_list, $rejectedList);
+				}
+			}
+
+
+			//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
+			if ($download_report == 'yes') {
+
+				$this->downloadGrantBacklogApplicationReportResults($download_approved_application_list, $approved_application_type);
+			}
+
+			$this->approvedApplicationReportResults($approved_application_list, $approved_application_type);
+
+		} else {
+
+			$approved_application_lists = $this->grantBcklogSearchConditions($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$data_id,$approved_application_type);
+
+			$approved_application_list = $approved_application_lists[0];
+
+			$i=0;
+			foreach ($approved_application_list as $each) 
+			{
+				$approved_application_list[$i] = $each['customer_id'];
+				$i=$i+1;
+			}
+
+			//if data same data id exist in rejcted table it is not apper in report added 
+			$this->loadModel('DmiRejectedApplLogs');
+			$rejectedList = $this->DmiRejectedApplLogs->find('all')->select(['id','customer_id'])->order(['id','customer_id'])->combine('id','customer_id')->toArray();
+
+			if(!empty($rejectedList)){
+
+				if(!empty($approved_application_list)){
+					$approved_application_list = array_diff($approved_application_list, $rejectedList);
+				}
+			}//end laxmi B.
+			
+			//below code is already used commented by shreeya [Date - 26-05-2023]
+			//$this->approvedApplicationReportResults($approved_application_list,$approved_application_type);
+		}
+
+	}
+
+	// Grant Bcklog Search Conditions
+	// Description :  Function Used For Backlog Appln(E-signed) count for GRanted
+	// @Author : Yashwant
+	// Date : 10-Mar-2023
+	
+
+	public function grantBcklogSearchConditions ($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$data_id,$approved_application_type) 
+	{
+
+		$approved_application_list = [];
+
+		if ($search_application_type_id != '' && $application_approved_office == '' && $search_from_date =='' && $search_to_date == '') {
+
+			if ($table == 'DmiFinalSubmits') {
+				$approved_application_customer_id = $this->DmiGrantCertificatesPdfs->find('all')->select(['customer_id'])->group(['customer_id HAVING COUNT(customer_id) < 2'])->toArray();
+
+			} elseif ($table == 'DmiGrantCertificatesPdfs') {
+				$approved_application_customer_id = $this->DmiGrantCertificatesPdfs->find('all')->select(['customer_id'])->group(['customer_id HAVING COUNT(customer_id) >= 1'])->toArray();
+			} else {
+				$approved_application_customer_id = $this->DmiGrantCertificatesPdfs->find('all')->select(['customer_id'])->group(['customer_id HAVING COUNT(customer_id) > 1'])->toArray();
+			}
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id)	
+			{
+				$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+				if (in_array($application_customer_type, $search_application_type_id)) 
+				{
+					$approved_application_list[$i] = $each_customer_id['customer_id'];
+					$i=$i+1;
+				}
+			}
+
+			if (!empty($approved_application_list)) {
+				$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3']; 
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3']; 
+			}
+
+			$approved_application_list = $this->$table->find('all')->where($conditions)->order(['id' => 'DESC'])->toArray();
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+		
+		
+		//===========================YAshwant 06-Apr-2023====================================
+		} elseif ($search_application_type_id == '' && $application_approved_office == '' && $search_from_date !='' && $search_to_date != '') 
+		{
+			
+			$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+
+			$firm_result = $DmiFirms->find('all')->where(['is_already_granted IS' => 'yes'])->combine('id', 'customer_id')->toArray();
+
+			$DmiFinalSubmits = TableRegistry::getTableLocator()->get('DmiFinalSubmits');
+
+
+			$approved_application_customer_id = $DmiFinalSubmits->find('all')->select(['customer_id'])->distinct(['customer_id'])->where(['customer_id IN' => $firm_result,'current_level' => 'level_3', 'status' => 'approved'])
+			->where(['date(modified) BETWEEN :start AND :end'])
+			->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray();
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) 
+			{
+				if (!empty($each_customer_id['customer_id'])) 
+				{
+					$application_customer_type = $this->Reportsfunctions->newApplicantType($each_customer_id['customer_id']);
+					if(in_array($application_customer_type, $data_id, TRUE)) 
+					{
+						$approved_application_list[$i] = $each_customer_id['customer_id'];
+						$i=$i+1;
+					}
+				}
+			}
+
+			if (!empty($approved_application_list)) {
+				$conditions = ['customer_id IN' => $approved_application_list];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray();
+
+		
+		///==========YAshwant 06-Apr-2023 START Search Select Office Filter filter ==================
+		} elseif ($search_application_type_id == '' && $application_approved_office != '' && $search_from_date =='' && $search_to_date == '' ) 
+		{
+			$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+			$firm_result = $DmiFirms->find('all')->where(['is_already_granted IS' => 'yes'])->combine('id', 'customer_id')->toArray();
+			$DmiFinalSubmits = TableRegistry::getTableLocator()->get('DmiFinalSubmits');
+			$approved_application_customer_id = $DmiFinalSubmits->find('all')->select(['customer_id'])->distinct(['customer_id'])->where(['customer_id IN' => $firm_result,'current_level' => 'level_3', 'status' => 'approved'])->toArray();
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) 
+			{
+				if (!empty($each_customer_id['customer_id'])) 
+				{
+					$application_customer_type = $this->Reportsfunctions->newApplicantType($each_customer_id['customer_id']);
+
+					if(in_array($application_customer_type, $data_id, TRUE)) 
+					{
+						$approved_application_details_list = $this->DmiGrantCertificatesPdfs->find('all')->select(['id', 'id'])->where(['customer_id' => $each_customer_id['customer_id']])->combine('id', 'id')->toArray(); 
+
+						if (!empty($approved_application_details_list)) 
+						{
+							$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['id' => max($approved_application_details_list)])->first();  
+							$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email' => $approved_application_details['user_email_id']])->first();  
+
+							if (!empty($user_posted_office_id)) 
+							{
+								if (in_array($user_posted_office_id['posted_ro_office'],$application_approved_office)) {
+
+									$approved_application_list[$i] = $each_customer_id['customer_id'];
+									$i=$i+1;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			if (!empty($approved_application_list)) 
+			{
+				$conditions = ['customer_id IN' => $approved_application_list];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray();
+		
+		
+		/*Yashwant====10/Mar/2023 This below Condition Used For BAcklog Appln(E-signed) count for GRanted=============*/
+		} elseif (!empty($data_id)) 
+		{
+			$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+			$firm_result = $DmiFirms->find('all')->where(['is_already_granted IS' => 'yes'])->combine('id', 'customer_id')->toArray();
+			$DmiFinalSubmits = TableRegistry::getTableLocator()->get('DmiFinalSubmits');
+			$approved_application_customer_id = $DmiFinalSubmits->find('all')->select(['customer_id'])->distinct(['customer_id'])->where(['customer_id IN' => $firm_result,'current_level' => 'level_3', 'status' => 'approved'])->toArray();
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) 
+			{
+				if (!empty($each_customer_id['customer_id'])) 
+				{
+					$application_customer_type = $this->Reportsfunctions->newApplicantType($each_customer_id['customer_id']);
+					if(in_array($application_customer_type, $data_id, TRUE)) 
+					{
+						$approved_application_list[$i] = $each_customer_id['customer_id'];
+						$i=$i+1;
+					}
+				}
+			}
+
+			if (!empty($approved_application_list)) {
+				$conditions = ['customer_id IN' => $approved_application_list];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+		} elseif ($search_application_type_id != '' && $application_approved_office != '' && $search_from_date =='' && $search_to_date == '' ) 
+		{
+
+			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['status' => 'approved', 'current_level' => 'level_3'])->toArray(); 
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) {
+
+				$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+				if (in_array($application_customer_type,$search_application_type_id))
+				{
+
+					$approved_application_details_list = $this->DmiGrantCertificatesPdfs->find('all')->select(['id', 'id'])->where(['customer_id' => $each_customer_id['customer_id']])->combine('id', 'id')->toArray(); 
+
+					if (!empty($approved_application_details_list)) 
+					{
+
+						$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['id' => max($approved_application_details_list)])->first();  
+
+						$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email' => $approved_application_details['user_email_id']])->first();  
+
+						if (!empty($user_posted_office_id)) 
+						{
+
+							if (in_array($user_posted_office_id['posted_ro_office'],$application_approved_office)) {
+
+								$approved_application_list[$i] = $each_customer_id['customer_id'];
+								$i=$i+1;
+							}
+						}
+					}
+				}
+			}
+
+			// below if-else code added by Ankur Jangid
+			if (!empty($approved_application_list)) {
+				$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3'];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+		
+		} elseif ($search_application_type_id != '' && $application_approved_office == '' && $search_from_date !='' && $search_to_date != '') 
+		{
+			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['date(modified) BETWEEN :start AND :end'])
+			->where(['status' => 'approved', 'current_level' => 'level_3'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) {
+				$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']); 
+
+				if (in_array($application_customer_type, $search_application_type_id)) {
+					$approved_application_list[$i] = $each_customer_id['customer_id']; 
+					$i=$i+1;
+				}
+			}
+
+			// below if-else code added by Ankur Jangid
+			if (!empty($approved_application_list)) {
+				$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3'];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+		} elseif ($search_application_type_id != '' && $application_approved_office != '' && $search_from_date !='' && $search_to_date != '') 
+		{
+			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['date(modified) BETWEEN :start AND :end'])
+			->where(['status' => 'approved', 'current_level' => 'level_3'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) {
+
+				$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+				if (in_array($application_customer_type,$search_application_type_id)) {
+
+					$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['customer_id' => $each_customer_id['customer_id']])->first(); 
+
+					$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IS' => $approved_application_details['user_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id)) {
+
+						if (in_array($user_posted_office_id['posted_ro_office'], $application_approved_office)) {
+							$approved_application_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+			}
+
+			// below if-else code added by Ankur Jangid
+			if (!empty($approved_application_list)) {
+				$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3'];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+		} elseif ($search_application_type_id == '' && $application_approved_office != '' && $search_from_date =='' && $search_to_date == '') 
+		{
+
+			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['status' => 'approved', 'current_level' => 'level_3'])->toArray(); 
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) {
+
+				$approved_application_details_list = $this->DmiGrantCertificatesPdfs->find('all')->select(['id', 'id'])->where(['customer_id IS' => $each_customer_id['customer_id']])->combine('id', 'id')->toArray(); 
+
+				if (!empty($approved_application_details_list)) {
+
+					$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['id' => max($approved_application_details_list)])->first(); 
+
+					$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email' => $approved_application_details['user_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id)) {
+
+						if (in_array($user_posted_office_id['posted_ro_office'],$application_approved_office)) {
+							$approved_application_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+			}
+
+			// below if-else code added by Ankur Jangid
+			if (!empty($approved_application_list)) 
+			{
+				$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3'];
+			} 
+			else 
+			{
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+		} elseif ($search_application_type_id == '' && $application_approved_office != '' && $search_from_date !='' && $search_to_date != '') 
+		{
+
+			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['date(modified) BETWEEN :start AND :end', 'status' => 'approved',
+				'current_level' => 'level_3'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) {
+
+				$approved_application_details_list = $this->DmiGrantCertificatesPdfs->find('all')->select(['id', 'id'])->where(['customer_id' => $each_customer_id['customer_id']])->combine('id', 'id')->toArray(); 
+
+				if (!empty($approved_application_details_list)) {
+
+					$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['id' => max($approved_application_details_list)])->first(); 
+
+					$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email' => $approved_application_details['user_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id)) {
+
+						if (in_array($user_posted_office_id['posted_ro_office'], $application_approved_office)) {
+							$approved_application_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+			}
+
+			// below if-else code added by Ankur Jangid
+			if (!empty($approved_application_list)) {
+				$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3'];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+		} 
+		elseif ($search_application_type_id == '' && $application_approved_office == '' && $search_from_date !='' && $search_to_date != '') 
+		{
+
+			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['date(modified) BETWEEN : startAND :end', 'status' => 'approved',
+				'current_level' => 'level_3'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) {
+				$approved_application_list[$i] = $each_customer_id['customer_id'];
+				$i=$i+1;
+			}
+
+			// below if-else code added by Ankur Jangid
+			if (!empty($approved_application_list)) 
+			{
+				$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3'];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+		} else {
+
+			if ($search_flag == 'on') 
+			{
+				$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['status' => 'approved', 'current_level' => 'level_3'])
+				->order(['created'=>'DESC'])->extract('customer_id')->toArray(0); 
+			} else {
+
+				// THIS BELOW CONDITION IS ADDED FOR THE ALL REPORTS BY AKASH ON 16-06-2022
+				if ($table == 'DmiGrantCertificatesPdfs') {
+
+					$posted_ro_office = $this->DmiUsers->find('all',array('fields'=>'posted_ro_office', 'conditions'=>array('email IS'=>$_SESSION['username'])))->first();
+
+					$get_short_code = $this->DmiRoOffices->find('all',array('fields'=>'short_code', 'conditions'=>array('id IS'=>$posted_ro_office['posted_ro_office'])))->first();
+
+					$short_code = $get_short_code['short_code'];
+
+					if ($_SESSION['role'] == 'Head Office') 
+					{
+
+						$approved_application_customer_id = $this->DmiGrantCertificatesPdfs->find('all')->select(['customer_id'])->group(['customer_id HAVING COUNT(customer_id) >= 1'])->limit(['2'])->extract('customer_id')->toArray(0);
+					} else {
+						$approved_application_customer_id = $this->DmiGrantCertificatesPdfs->find('all',array('fields'=>'customer_id','conditions'=>array('customer_id like'=>'%/'.$short_code.'/%'),'group'=>'customer_id having count(customer_id) >= 1','having'=>array('count(customer_id) >= 1')))->toArray();
+					}
+
+				} else {
+					$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['status' => 'approved', 'current_level' => 'level_3'])
+					->order(['created'=>'DESC'])->limit(['100'])->extract('customer_id')->toArray(0); 
+				}
+
+
+			}
+
+			$approved_application_list = $approved_application_customer_id;
+
+			// below if-else code added by Ankur Jangid
+			if (!empty($approved_application_list)) 
+			{
+
+				// THIS BELOW CONDITION IS ADDED FOR THE ALL REPORTS BY AKASH ON 16-06-2022
+				if ($table == 'DmiGrantCertificatesPdfs') 
+				{
+					$conditions = array('customer_id IN'=>$approved_application_list); 
+				} else 
+				{
+					$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3'];
+				}
+
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+		}
+
+
+		return array($approved_application_list,$download_approved_application_list);
+
+	}
+
+
+
+
+	
+	// renewal Due For Ca Pp Lab
+	// Description :  Function used for Renewal Due Counts & Records List
+	// @Author : Yashwant
+	// Date : 16/Mar/2023
+
+	public function renewalDueForCaPpLab($renw_ca_id)
+	{
+		$report_heading = 'Renewal Due Report';
+		$this->set('report_heading',$report_heading);
+
+		$reCaId=base64_decode($renw_ca_id);
+		$data_id =array($reCaId);
+
+		$searchConditions = array();
+		$from_date = array();
+		$to_date = array();
+
+		$renewal_application_list=array();
+
+		$all_states = $this->DmiStates->find('all')->select(['id', 'state_name'])->where(['OR'=> [['delete_status IS' => null], ['delete_status ='=>'no']]])
+		->order(['state_name' => 'ASC'])->combine('id', 'state_name')->toArray(); 
+
+		$all_district = $this->DmiDistricts->find('all')->select(['id', 'district_name'])->where(['OR'=> [['delete_status IS' => null], ['delete_status ='=>'no']]])
+		->combine('id', 'district_name')->toArray(); 
+
+		$caRenewalDue = 0; 	$printingRenewalDue = 0; $labRenewalDue = 0;
+
+		if (!empty($data_id)) 
+		{
+			$list4RenewalDueCheck = $this->DmiFirms->find('all')->where($searchConditions)->toArray();
+			$i=0;	
+			foreach($list4RenewalDueCheck as $each_application)
+			{
+				$renewalDue = $this->Customfunctions->checkApplicantValidForRenewal($each_application['customer_id']);
+				if($renewalDue == 'yes'){
+
+					$application_customer_type = $this->Reportsfunctions->newApplicantType($each_application['customer_id']);
+					$application_form_type = $this->Customfunctions->checkApplicantFormType($each_application['customer_id']);
+
+					if ($application_form_type == 'A') {
+						$application_type[$i]='CA (Form-A)';
+					} elseif ($application_form_type == 'B') {
+						$application_type[$i]='Printing Press (Form-B)';
+					} elseif ($application_form_type == 'C') {
+						$application_type[$i]='Laboratory (Form-C)';
+					} elseif ($application_form_type == 'D') {
+						$application_type[$i]='Laboratory (Form-D)';
+					} elseif ($application_form_type == 'E') {
+						$application_type[$i]='CA (Form-E)';
+					} elseif ($application_form_type == 'F') {
+						$application_type[$i]='CA (Form-F)';
+					}
+
+					if(in_array($application_customer_type, $data_id, TRUE)) {
+						$renewal_application_list[$i] =$each_application['customer_id'];
+						$i=$i+1;
+					}
+				}
+			}
+		}
+
+		if (!empty($renewal_application_list)) {
+			$current_Renewaldue_details = $this->DmiFirms->find('all')->where(['customer_id IN'=>$renewal_application_list])->order(['id' => 'DESC'])->toArray(); 
+		} else {
+			$current_Renewaldue_details = null;
+		}
+
+		$this->set('renewal_application_list',$renewal_application_list);	
+		$this->set('current_Renewaldue_details',$current_Renewaldue_details);	
+		$this->set('all_states', $all_states);
+		$this->set('all_district', $all_district);
+		$this->set('application_form_type', $application_form_type);	
+		$this->set('application_type', $application_type);	
+	
+	
+	}
+
+	
+
+
+	// pendingScrunitizerApplicationsReport
+	// Description : This Function used for pending Scrunitizer  Counts & Records List
+	// @Author : Yashwant & shreeya
+	// Date : 16/Mar/2023
+
+	public function pendingScrunitizerApplicationsReport($pending_id)
+	{
+		$PenId=base64_decode($pending_id);
+		$data_id =$PenId;
+		
+		
+		$date = [];
+		$user_list = null;
+		$application_type = null;
+		$user_roles = null;
+		$user_office = array();
+		$user_email_id =null;
+		$application_id = null;
+		
+		
+
+		$applTypeArray = $this->Session->read('applTypeArray');
+		$this->loadModel('DmiFlowWiseTablesLists');
+		$applications_current_positions_tables = $this->DmiFlowWiseTablesLists->find('all')->select(['application_form','appl_current_pos'])->where(array('application_type IN'=>$applTypeArray))->order(['id'])->combine('application_form','appl_current_pos')->toArray();
+	
+		$pendingCountForMo = 0; $pendingCountForIo = 0; $pendingCountForHo = 0; 
+		$inprogress_app_with_ro = array();
+		$searchPendingConditions = array();
+			
+		// Initialize an variable for show the count of array 
+		//by shreeya [Date - 31-05-2023]
+		$pendingcount;
+		$appl_type = 1;//added on 02-06-2023 by Shreeya
+		$i=0; //increment variable added bt shreeya [Date - 01-05-2023]
+		foreach($applications_current_positions_tables as $each_table)
+		{
+			
+			
+			$key = array_search ($each_table, $applications_current_positions_tables);
+			$this->loadModel($each_table);
+			$this->loadModel($key);
+			
+			//For Progress with MO
+			if ($data_id=='MO')
+			{
+				 
+				$report_heading = 'Pending Scrutinizer Applications Report';
+
+				//below query commented by shreeya bcoz of added new query Date [ 01-06-23]
+
+				// $inprogress_with_mo = $this->$each_table->find('all')->select(['id', 'customer_id'])
+				// ->where($searchPendingConditions)->where(['current_level' => 'level_1'])
+				// ->combine('id', 'customer_id')->toArray(); 
+				
+				//added new query if customer_is is null could not show null entry in cout
+				//by shreeya on date [ 01-06-2023]
+				$inprogress_with_mo = $this->$each_table->find('all')->select(['id', 'customer_id'])
+				->where($searchPendingConditions)->where(['current_level' => 'level_1'])
+				->where(function ($exp, $q) {return $exp->notEq('customer_id', '');})
+				->combine('id', 'customer_id')->toArray();
+
+				
+				//this foreach loop added for show the existing result of total count
+				//by shreeya on date [ 01-06-2023]
+				foreach($inprogress_with_mo as $key=> $value){
+
+					$pendingcount[$key] = $value ;
+					
+				}
+				
+				//fetch the customer_id according to $inprogress_with_mo
+				if (!empty($inprogress_with_mo)) {
+			
+					$inprogress_mo_details = $this->DmiFirms->find('all')->where(['customer_id IN' => $inprogress_with_mo])->order(['id' => 'DESC'])->toArray();
+					
+				} else {
+					$inprogress_mo_details = null;
+				}
+
+			
+				if (!empty($inprogress_mo_details)) 
+				{
+					// $i=0; commented by shreeya on [Date 01-06-2023]this increment is already use in front
+					foreach ($inprogress_mo_details as $each_user) 
+					{	
+	
+							$customer_id = $each_user['customer_id'];
+							$each_user_detail = $each_user;
+							$current_level = $each_user_detail['current_level'];
+							$application_form_type = $this->Customfunctions->checkApplicantFormType($each_user_detail['customer_id']);
+
+							if ($application_form_type == 'A') 
+							{
+								$application_type[$i]='CA (Form-A)';
+							}
+							elseif ($application_form_type == 'B') 
+							{
+								$application_type[$i]='Printing Press (Form-B)';
+							} elseif ($application_form_type == 'C') 
+							{
+								$application_type[$i]='Laboratory (Form-C)';
+							} elseif ($application_form_type == 'D') 
+							{
+								$application_type[$i]='Laboratory (Form-D)';
+							} elseif ($application_form_type == 'E') 
+							{
+								$application_type[$i]='CA (Form-E)';
+							} elseif ($application_form_type == 'F') 
+							{
+								$application_type[$i]='CA (Form-F)';
+							}
+
+							$date[$i] = $each_user_detail['modified'];
+							
+							// Added for show the list of userid(current_user_email_id) & pending with(current_level)
+							// By shreeya on Date : [16-05-2023]
+							$mo_user  = $this->$each_table->find()->select(['current_user_email_id','current_level'])->where(['customer_id IS' => $customer_id])->order('id DESC')->first();	
+								
+							if(!empty($mo_user)){
+								$current_level[$i] = $mo_user['current_level'];
+							}else{
+								$current_level[$i] = '--';
+							}
+
+
+							if(!empty($mo_user)){
+								$user_email_id[$i] = $mo_user['current_user_email_id'];
+							}else{
+								$user_email_id[$i] = '--';
+							}
+							
+							
+							//$user_email_id[$i] = $each_user_detail['current_user_email_id'];
+							$application_id[$i] = $each_user_detail['customer_id'];
+
+							$user_posted_office_id=array();
+							if (!empty($user_email_id[$i])) 
+							{
+								$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IN' => $user_email_id[$i]])->first(); 
+							}
+							if (!empty($user_posted_office_id)) 
+							{
+								$user_office_details[$i] = $this->DmiRoOffices->find('all')->select(['ro_office'])->where(['id' => $user_posted_office_id['posted_ro_office']])->first(); 
+							}
+						
+							## uncommented this code for show the posted office [Date 16-05-2023 By Shreeya ]
+							if (!empty($user_office_details[$i])) 
+							{
+								$user_office[$i] = $user_office_details[$i]['ro_office'];
+							} else 
+							{
+								$user_office[$i] = '--';
+							}
+
+							$check_roles=array();
+
+							if (!empty($user_email_id[$i])) 
+							{
+								$check_roles = $this->DmiUserRoles->find('all')->where(['user_email_id IN' => $user_email_id[$i]])->first(); 
+							}
+
+							if (!empty($check_roles)) 
+							{
+								$user_list[$i] = $check_roles;
+							} 
+							else {
+								$user_list[$i] = '---';
+							}
+
+							//below condition change variable for show the users roles on listing  $each_user_detail -> $mo_user By Shreeya on Date [16-05-2023]
+							
+							if(!empty($mo_user)){
+								$user_roles[$i] = $this->checkUserRoleFromCurrentLevel($mo_user['current_level'],$mo_user['current_user_email_id']);
+							}else{
+								$user_roles[$i] = '--';
+							}
+							
+							$i=$i+1;
+						
+					}
+					
+				}
+				
+			} elseif($data_id=='IO') {
+
+				
+				$report_heading ='Pending IO Applications Report';
+				//For Progress with IO
+				$inprogress_with_io = $this->$each_table->find('all')->select(['id', 'customer_id'])
+				->where($searchPendingConditions)->where(['current_level' => 'level_2'])
+				->combine('id', 'customer_id')->toArray(); 
+
+				//this foreach loop added for show the total count
+				//by shreeya on date [ 01-06-2023]
+				foreach($inprogress_with_io as $key=> $value){
+
+					$pendingcount[$key] = $value ;
+					
+				}
+				
+				if (!empty($inprogress_with_io)) {
+					$inprogress_io_details = $this->DmiFirms->find('all')->where(['customer_id IN'=>$inprogress_with_io])->order(['id' => 'DESC'])->toArray(); 
+				} else {
+					$inprogress_io_details = null;
+				}
+
+				if (!empty($inprogress_io_details)) 
+				{
+					// $i=0; commented by shreeya on [Date 01-06-2023]this increment is already use in front
+					foreach ($inprogress_io_details as $each_user) 
+					{
+						$customer_id = $each_user['customer_id'];
+						$each_user_detail = $each_user;
+						$current_level = $each_user_detail['current_level'];
+						$application_form_type = $this->Customfunctions->checkApplicantFormType($each_user_detail['customer_id']);
+
+						if ($application_form_type == 'A') {
+							$application_type[$i]='CA (Form-A)';
+						}elseif ($application_form_type == 'B') {
+							$application_type[$i]='Printing Press (Form-B)';
+						} elseif ($application_form_type == 'C') {
+							$application_type[$i]='Laboratory (Form-C)';
+						} elseif ($application_form_type == 'D') {
+							$application_type[$i]='Laboratory (Form-D)';
+						} elseif ($application_form_type == 'E') {
+							$application_type[$i]='CA (Form-E)';
+						} elseif ($application_form_type == 'F') {
+							$application_type[$i]='CA (Form-F)';
+						}
+
+
+						$date[$i] = $each_user_detail['modified'];
+
+						// Added for show the list of userid(current_user_email_id) & pending with(current_level)
+						// By shreeya on Date : [16-05-2023]
+						$mo_user  = $this->$each_table->find()->select(['current_user_email_id','current_level'])->where(['customer_id IS' => $customer_id])->order('id DESC')->first();	
+				
+						if(!empty($mo_user)){
+							$current_level[$i] = $mo_user['current_level'];
+						}else{
+							$current_level[$i] = '--';
+						}
+
+						if(!empty($mo_user)){
+							$user_email_id[$i] = $mo_user['current_user_email_id'];
+						}else{
+							$user_email_id[$i] = '--';
+						}
+
+						
+						$application_id[$i] = $each_user_detail['customer_id'];
+
+
+						$user_posted_office_id=array();
+						if (!empty($user_email_id[$i])) 
+						{
+							$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IN' => $user_email_id[$i]])->first(); 
+						}
+						if (!empty($user_posted_office_id)) 
+						{
+							$user_office_details[$i] = $this->DmiRoOffices->find('all')->select(['ro_office'])->where(['id' => $user_posted_office_id['posted_ro_office']])->first(); 
+						}
+						## uncommented this code for show the posted office [Date 16-05-2023 By Shreeya ]
+						if (!empty($user_office_details[$i])) 
+						{
+							$user_office[$i] = $user_office_details[$i]['ro_office'];
+						} else 
+						{
+							$user_office[$i] = '--';
+						}
+
+						$check_roles=array();
+
+						if (!empty($user_email_id[$i])) 
+						{
+							$check_roles = $this->DmiUserRoles->find('all')->where(['user_email_id IN' => $user_email_id[$i]])->first(); 
+						}
+
+						if (!empty($check_roles)) 
+						{
+							$user_list[$i] = $check_roles;
+						} 
+						else {
+							$user_list[$i] = '---';
+						}
+
+						//below condition change variable for show user roles $each_user_detail -> $mo_user By Shreeya on Date [16-05-2023]
+						if(!empty($mo_user)){
+							$user_roles[$i] = $this->checkUserRoleFromCurrentLevel($mo_user['current_level'],$mo_user['current_user_email_id']);
+						}else{
+							$user_roles[$i] = '--';
+						}
+						$i=$i+1;
+					}
+				}
+				
+			//For Progress with HO
+			} elseif($data_id=='HO') {
+				
+				$report_heading ='Pending HO Applications Report';
+				$inprogress_with_ho = $this->$each_table->find('all')->select(['id', 'customer_id'])
+				->where($searchPendingConditions)->where(['current_level' => 'level_4'])
+				->combine('id', 'customer_id')->toArray(); // updated by Ankur
+
+				//this foreach loop added for show the total count
+				//by shreeya on date [ 01-06-2023]
+				foreach($inprogress_with_ho as $key=> $value){
+
+					$pendingcount[$key] = $value ;
+
+				}
+
+				if (!empty($inprogress_with_ho)) {
+					$inprogress_ho_details = $this->DmiFirms->find('all')->where(['customer_id IN'=>$inprogress_with_ho])->order(['id' => 'DESC'])->toArray(); 
+				} else {
+					$inprogress_ho_details = null;
+				}
+				
+				if (!empty($inprogress_ho_details)) 
+				{
+
+					// $i=0; commented by shreeya on [Date 01-06-2023]this increment is already use in front
+					foreach ($inprogress_ho_details as $each_user) 
+					{
+
+						$customer_id = $each_user['customer_id'];
+
+						$each_user_detail = $each_user;
+
+						$current_level = $each_user_detail['current_level'];
+						$application_form_type = $this->Customfunctions->checkApplicantFormType($each_user_detail['customer_id']);
+
+						if ($application_form_type == 'A') 
+						{
+							$application_type[$i]='CA (Form-A)';
+						}
+						elseif ($application_form_type == 'B') 
+						{
+							$application_type[$i]='Printing Press (Form-B)';
+						} elseif ($application_form_type == 'C') 
+						{
+							$application_type[$i]='Laboratory (Form-C)';
+						} elseif ($application_form_type == 'D') 
+						{
+							$application_type[$i]='Laboratory (Form-D)';
+						} elseif ($application_form_type == 'E') 
+						{
+							$application_type[$i]='CA (Form-E)';
+						} elseif ($application_form_type == 'F') 
+						{
+							$application_type[$i]='CA (Form-F)';
+						}
+
+						$date[$i] = $each_user_detail['modified'];
+
+						// Added for show the list of userid(current_user_email_id) & pending with(current_level)
+						// By shreeya on Date : [16-05-2023]
+						$mo_user  = $this->$each_table->find()->select(['current_user_email_id','current_level'])->where(['customer_id IS' => $customer_id])->order('id DESC')->first();	
+						if(!empty($mo_user)){
+							$current_level[$i] = $mo_user['current_level'];
+						}else{
+							$current_level[$i] = '--';
+						}
+
+
+						if(!empty($mo_user)){
+							$user_email_id[$i] = $mo_user['current_user_email_id'];
+						}else{
+							$user_email_id[$i] = '--';
+						}
+						
+						
+						//$user_email_id[$i] = $each_user_detail['current_user_email_id'];
+						$application_id[$i] = $each_user_detail['customer_id'];
+
+						$user_posted_office_id=array();
+						if (!empty($user_email_id[$i])) 
+						{
+							$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IN' => $user_email_id[$i]])->first(); 
+						}
+						if (!empty($user_posted_office_id)) 
+						{
+							$user_office_details[$i] = $this->DmiRoOffices->find('all')->select(['ro_office'])->where(['id' => $user_posted_office_id['posted_ro_office']])->first(); 
+						}
+					
+						## uncommented this code for show the posted office [Date 16-05-2023 By Shreeya ]
+						if (!empty($user_office_details[$i])) 
+						{
+							$user_office[$i] = $user_office_details[$i]['ro_office'];
+						} else 
+						{
+							$user_office[$i] = '--';
+						}
+
+						$check_roles=array();
+
+						if (!empty($user_email_id[$i])) 
+						{
+							$check_roles = $this->DmiUserRoles->find('all')->where(['user_email_id IN' => $user_email_id[$i]])->first(); 
+						}
+
+						if (!empty($check_roles)) 
+						{
+							$user_list[$i] = $check_roles;
+						} 
+						else {
+							$user_list[$i] = '---';
+						}
+
+						//below condition change variable for shoe user role $each_user_detail -> $mo_user By Shreeya on Date [16-05-2023]
+						
+						if(!empty($mo_user)){
+							$user_roles[$i] = $this->checkUserRoleFromCurrentLevel($mo_user['current_level'],$mo_user['current_user_email_id']);
+						}else{
+							$user_roles[$i] = '--';
+						}
+						
+						$i=$i+1;
+					}
+				}
+			
+			} elseif($data_id=='RO') {
+				
+				$report_heading ='Pending RO Applications Report';
+				//For Progress with RO
+				$inprogress_with_ro = $this->$each_table->find('all')->select(['id', 'customer_id'])
+														->where($searchPendingConditions)->where(['current_level' => 'level_3'])
+														->combine('id', 'customer_id')->toArray(); 
+
+				
+			
+				$pending_with_ro_arr = array(); //Initialize an array by Shreeya on date [02-06-2023]
+				foreach($inprogress_with_ro as $each_record ){
+					//The query searches for records in the specified table where the customer_id is equal to the current record
+					$result_status = $this->$key->find('all')->where(['customer_id' => $each_record, 'status' => 'approved', 'current_level' => 'level_3'])->toArray();
+					//If the $result_status is empty the current record is added to the $pending_with_ro_arr array using the in_array() function to check if it is not already present.
+					if(empty($result_status)){
+						//$inprogress_app_with_ro[] = $each_record;
+						
+						if(!in_array($each_record,$pending_with_ro_arr)){
+							$pending_with_ro_arr[]=$each_record;
+						}
+						
+					}
+				}	
+				//the $pending_with_ro_arr array is assigned to the $inprogress_app_with_ro array. This adds the array of pending records
+				//By Shreeya on Date [02-06-2023]
+				$inprogress_app_with_ro[] = $pending_with_ro_arr;
+				
+				
+				//if the $pending_with_ro_arr is not empty. the pending records based on the $appl_type. 
+				//If $appl_type is not equal to 4, it queries the DmiFirms table using the customer_id from the $pending_with_ro_arr.
+				//By Shreeya on Date [02-06-2023]
+				if (!empty($pending_with_ro_arr)) {
+					
+					if($appl_type!=4){
+						$inprogress_ro_details = $this->DmiFirms->find('all')->where(['customer_id IN'=>$pending_with_ro_arr])->order(['id' => 'DESC'])->toArray(); 
+					}else{
+						//specific for chemist application flow
+						//it queries the DmiChemistRegistrations table using the chemist_id from the $pending_with_ro_arr. The resulting records are stored in the $inprogress_ro_details variable.
+						//By Shreeya on Date [02-06-2023]
+						$this->loadModel('DmiChemistRegistrations');
+						$inprogress_ro_details = $this->DmiChemistRegistrations->find('all')->where(['chemist_id IN'=>$pending_with_ro_arr])->order(['id' => 'DESC'])->toArray(); 
+					}
+					
+					
+				} else {
+					$inprogress_ro_details = null;
+				}
+
+				if (!empty($inprogress_ro_details)) 
+				{
+
+					// $i=0; commented by shreeya on [Date 01-06-2023]this increment is already use in front
+					foreach ($inprogress_ro_details as $each_user) {
+						//If $appl_type is not equal to 4, it assigns the value of $each_user['customer_id'] to
+						// the $customer_id variable. Otherwise, it assigns the value of $each_user['chemist_id'] to the $customer_id variable.
+						//By Shreeya on Date [02-06-2023]
+						if($appl_type!=4){
+							$customer_id = $each_user['customer_id'];
+						}else{
+							$customer_id = $each_user['chemist_id'];
+						}
+						//$each_user_detail = $each_user;
+						//If $appl_type is not equal to 4, it assigns the value of $each_user['current_level'] to the $current_level variable.
+						//By Shreeya on Date [02-06-2023]
+						if($appl_type!=4){
+							$current_level = $each_user['current_level'];
+						}
+						
+						
+						
+						if($appl_type == 4){
+
+							$application_form_type ='Chemist';
+						
+							if ($application_form_type == 'Chemist') {
+								$application_type[$i] = 'CHM (Chemist)';
+							}
+						}
+
+						$application_form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
+						
+						if ($application_form_type == 'A') {
+							$application_type[$i] = 'CA (Form-A)';
+						} elseif ($application_form_type == 'B') {
+							$application_type[$i] = 'Printing Press (Form-B)';
+						} elseif ($application_form_type == 'C') {
+							$application_type[$i] = 'Laboratory (Form-C)';
+						} elseif ($application_form_type == 'D') {
+							$application_type[$i] = 'Laboratory (Form-D)';
+						} elseif ($application_form_type == 'E') {
+							$application_type[$i] = 'CA (Form-E)';
+						} elseif ($application_form_type == 'F') {
+							$application_type[$i] = 'CA (Form-F)';
+						}
+
+						$date[$i] = $each_user['modified'];
+
+						// Added for show the list of userid(current_user_email_id) & pending with(current_level)
+						// By shreeya on Date : [16-05-2023]
+						$mo_user = $this->$each_table->find()
+							->select(['current_user_email_id', 'current_level'])
+							->where(['customer_id IS' => $customer_id])
+							->order('id DESC')
+							->first();
+
+						if (!empty($mo_user)) {
+							$user_email_id[$i] = $mo_user['current_user_email_id'];
+							//$user_email_id[$i]= ''. $each_user[$j] .'-'. $mo_user['current_user_email_id'] . '';
+						} else {
+							$user_email_id[$i] = '--';
+						}
+
+						if (!empty($mo_user)) {
+							$current_level[$i] = $mo_user['current_level'];
+						} else {
+							$current_level[$i] = '--';
+						}
+
+						$application_id[$i] = $customer_id;
+
+						$user_posted_office_id = array();
+						if (!empty($user_email_id[$i])) {
+							$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IN' => $user_email_id[$i]])->first();
+						}
+
+						if (!empty($user_posted_office_id)) {
+							$user_office_details[$i] = $this->DmiRoOffices->find('all')->select(['ro_office'])->where(['id' => $user_posted_office_id['posted_ro_office']])->first();
+						}
+
+						## uncommented this code for show the posted office [Date 16-05-2023 By Shreeya ]
+						if (!empty($user_office_details[$i])) {
+							$user_office[$i] = $user_office_details[$i]['ro_office'];
+						} else {
+							$user_office[$i] = '--';
+						}
+
+						$check_roles = array();
+						if (!empty($user_email_id[$i])) {
+							$check_roles = $this->DmiUserRoles->find('all')->where(['user_email_id IN' => $user_email_id[$i]])->first();
+						}
+
+						if (!empty($check_roles)) {
+							$user_list[$i] = $check_roles;
+						} else {
+							$user_list[$i] = '---';
+						}
+
+						//below condition change variable $each_user_detail -> $mo_user By Shreeya on Date [16-05-2023]
+						if (!empty($mo_user)) {
+							$user_roles[$i] = $this->checkUserRoleFromCurrentLevel($mo_user['current_level'], $mo_user['current_user_email_id']);
+						}
+						else{
+						 	$user_roles[$i] = '3';
+						 }
+						 $i = $i + 1;
+					}
+					
+					
+				}
+			
+			}
+			
+			$appl_type++;
+		}
+		
+		//exit;
+
+		$total_pending = $pendingCountForMo + $pendingCountForIo + $pendingCountForHo + count($inprogress_app_with_ro);
+		
+		
+
+		$this->set('report_heading',$report_heading);
+		$this->set('data_id',$data_id);
+		$this->set('date',$date);
+		$this->set('user_list',$user_list);
+		$this->set('application_type',$application_type);
+		$this->set('user_roles',$user_roles);
+		$this->set('user_office',$user_office);
+		$this->set('user_email_id',$user_email_id);
+		$this->set('application_id',$application_id);
+		$this->set('total_pending',$total_pending);
+		
+		
+	
+		// $this->set('pendingCountForMo',$pendingCountForMo);
+		// $this->set('pendingCountForIo',$pendingCountForIo);
+		// $this->set('pendingCountForHo',$pendingCountForHo);
+
+		//$this->set('inprogress_mo_details',$inprogress_mo_details);
+		// $this->set('inprogress_io_details',$inprogress_io_details);
+		// $this->set('inprogress_ho_details',$inprogress_ho_details);
+		// $this->set('inprogress_ro_details',$inprogress_ro_details);
+		
+		
+	
+		
+	}
+
+
+
+
+
+	// esign New Applications Report
+	// Description : function Used for ESIGNED NEW Application kpi's COUNT & RECORD
+	// @Author : Yashwant
+	// Date : 20-Mar-2023
+
+	public function esignNewApplicationsReport($esigned_new_id)
+	{
+		$EsignNewId=base64_decode($esigned_new_id);
+		$data_id =$EsignNewId;
+
+		$searchPendingConditions =array();
+		$this->loadModel('DmiApplicationEsignedStatuses');
+
+		$applicationEsigned = $this->DmiApplicationEsignedStatuses->find('all')->where($searchPendingConditions)->where(['application_esigned' => 'yes'])->toArray();
+
+		$inspectionReportEsigned = $this->DmiApplicationEsignedStatuses->find('all')->where($searchPendingConditions)->where(['report_esigned' => 'yes'])->toArray();
+
+		$certificateEsigned = $this->DmiApplicationEsignedStatuses->find('all')->where($searchPendingConditions)->where(['certificate_esigned' => 'yes'])->toArray();
+
+		$search_application_type_id='';
+		
+		if($data_id =="APP")
+		{
+			$i=0;
+			foreach ($applicationEsigned as $each) 
+			{
+				$approved_esign_list[$i] = $each['customer_id'];
+				$i=$i+1;	
+			}
+			$report_heading ="Esigned New Applications Reports";
+			$this->set('report_heading', $report_heading);
+			$this->esignNewApplnResults($approved_esign_list,$data_id);
+		}
+
+		if($data_id =="INSPECT")
+		{
+			$i=0;
+			foreach ($inspectionReportEsigned as $each) 
+			{
+				$approved_esign_list[$i] = $each['customer_id'];
+				$i=$i+1;
+			}
+			$report_heading ="Esigned Inspection Application Reports";
+			$this->set('report_heading', $report_heading);
+			$this->esignNewApplnResults($approved_esign_list,$data_id);
+		}
+
+		if($data_id =="GRANT")
+		{
+			$i=0;
+			foreach ($certificateEsigned as $each) 
+			{
+				$approved_esign_list[$i] = $each['customer_id'];
+				$i=$i+1;
+			}
+			$report_heading ="Esigned Grant Certificate Application Reports";
+			$this->set('report_heading', $report_heading);
+			$this->esignNewApplnResults($approved_esign_list,$data_id);
+		}
+
+	
+	}
+
+	
+
+	// esignNewApplnResults
+	// Description : function Used for ESIGNED NEW Application kpi's COUNT & RECORD
+	// @Author : Yashwant
+	// Date : 20-Mar-2023
+
+	public function esignNewApplnResults($approved_esign_list,$data_id) 
+	{
+
+		$date=array();
+		$application_type=array();
+		$application_user_email_id=array();
+		$user_office=array();
+		$application_customer_id=array();
+		$name_of_the_firm=array();
+		$address_of_the_firm=array();
+		$contact_details_of_the_firm=array();
+		$approved_TBL_details_tbl_name=array();
+		$approved_TBL_details_tbl_registered_no=array();
+		$laboratory_details_name=array();
+		$laboratory_details_address=array();
+		$approved_application_type_text = array();
+		$valid_upto= array();
+		$state_name = array();
+		$phoneno = array();
+		$issued_on = array();
+
+		if (!empty($approved_esign_list)) 
+		{
+			$i=0;
+			//applied array_unique function on 18-07-2019
+			foreach (array_unique($approved_esign_list) as $esigned_application) 
+			{
+				$esign_application_details = array(); 
+
+				if ($data_id == 'APP') 
+				{
+					$esign_application_details = $this->DmiApplicationEsignedStatuses->find('all')->where(['customer_id' => $esigned_application,'application_esigned' => 'yes'])->first(); 
+				}
+				elseif($data_id == 'INSPECT') 
+				{
+					$esign_application_details = $this->DmiApplicationEsignedStatuses->find('all')->where(['customer_id' => $esigned_application,'report_esigned' => 'yes'])->first(); 
+				}
+				elseif($data_id == 'GRANT') 
+				{
+					$esign_application_details = $this->DmiApplicationEsignedStatuses->find('all')->where(['customer_id' => $esigned_application,'certificate_esigned' => 'yes'])->first(); 
+				}
+
+				//this condition added on 18-07-2019
+				if (!empty($esign_application_details)) 
+				{
+					$approved_application_result = $esign_application_details;
+					if ($approved_application_result['user_email_id'] == 'old_application') 
+					{
+						$old_app_approved_by = $this->Customfunctions->old_app_approved_by($approved_application_result['customer_id']);
+						$approved_application_result['user_email_id'] = $old_app_approved_by;
+					}
+
+					$explode = explode("/",$approved_application_result['customer_id']);
+
+					$approved_office_id = $this->DmiRoOffices->find('all')->select(['ro_email_id'])->where(['short_code' => $explode[2]])->first();  
+
+					$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email'=>$approved_office_id['ro_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id)) 
+					{
+						$user_office_details = $this->DmiRoOffices->find('all')->select(['ro_office'])->where(['id'=>$user_posted_office_id['posted_ro_office']])->first(); 
+						if (!empty($user_office_details)) {
+							$user_office[$i] = $user_office_details['ro_office'];
+						} else {
+							$user_office[$i] = 'N/A';
+						}
+
+					} else {
+						$user_office[$i] = 'N/A';
+					}
+
+					$application_form_type = $this->Reportsfunctions->checkApplicantFormTypeForReports($approved_application_result['customer_id']);
+
+					if ($application_form_type == 'A') 
+					{
+						$application_type[$i]='CA (Form-A)';
+
+					} elseif ($application_form_type == 'B') 
+					{
+						$application_type[$i]='Printing Press (Form-B)';
+					} elseif ($application_form_type == 'C') 
+					{
+						$application_type[$i]='Laboratory (Form-C)';
+					} elseif ($application_form_type == 'D') 
+					{
+						$application_type[$i]='Laboratory (Form-D)';
+					} elseif ($application_form_type == 'E') 
+					{
+						$application_type[$i]='CA (Form-E)';
+					} elseif ($application_form_type == 'F') 
+					{
+						$application_type[$i]='CA (Form-F)';
+					}
+
+					$date[$i] = $approved_application_result['created'];
+					$application_customer_id[$i] = $approved_application_result['customer_id'];
+
+					//added by the akash on 13-11-2021
+					$firmDetails = $this->DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$approved_application_result['customer_id'])))->first();
+					$name_of_the_firm[$i] = isset($firmDetails['firm_name']);
+					$address_of_the_firm[$i] = isset($firmDetails['street_address']);
+					$contact_details_of_the_firm[$i] = base64_decode(isset($firmDetails['email']));
+					$phoneno[$i] = isset($firmDetails['mobile_no']);
+
+					//tbl details
+					$tbl_details = $this->DmiAllTblsDetails->find('all',array('conditions'=>array('customer_id IS'=>$approved_application_result['customer_id'],'OR' => array('delete_status IS NULL', 'delete_status' => 'no'))))->toArray();
+
+					if (!empty($tbl_details)) 
+					{
+						$j=0;
+						foreach ($tbl_details as $each) {
+
+							$approved_TBL_details_tbl_name[$i][$j] = $each['tbl_name'];
+							$approved_TBL_details_tbl_registered_no[$i][$j] = $each['tbl_registered_no'];
+							$j++;
+						}
+					} 
+					else
+					{
+						$approved_TBL_details_tbl_name[$i][0] = 'N/A';
+						$approved_TBL_details_tbl_registered_no[$i][0] = 'N/A';
+					}
+
+
+					//lab details
+					$lab_details = $this->DmiCustomerLaboratoryDetails->find('all',array('conditions'=>array('customer_id IS'=>$approved_application_result['customer_id'])))->toArray();
+					if (!empty($lab_details)) 
+					{
+						$laboratory_details_name[$i] = $lab_details[0]['laboratory_name'];
+						$laboratory_details_address[$i] = $lab_details[0]['street_address'];
+					} else 
+					{
+						$laboratory_details_name[$i] = 'N/A';
+						$laboratory_details_address[$i] = 'N/A';
+					}
+
+					$commodity_value = $this->DmiFirms->find('all')->select(['sub_commodity'])->where(['customer_id'=>$approved_application_result['customer_id']])->first(); 
+					//$commodity_list[$i] = $this->Customfunctions->showCommdityInApplList($commodity_value['sub_commodity']);
+					//Added this Code on the 08-04-2022 as the base encoding was not on some emails so to dispaly the email , checking if the encoding is needed or not.
+					$checkEmailForEncoding[$i] = $approved_application_result['user_email_id'];
+
+					if($this->isBase64Encoded($checkEmailForEncoding[$i]) == true){
+						$application_user_email_id[$i] = base64_decode($approved_application_result['user_email_id']);
+					} else {
+						$application_user_email_id[$i] = $approved_application_result['user_email_id'];
+					}
+							
+					//check the expiry dateand print to the reports  added by Akash on 24-05-2022 
+					$grant_date = chop($esign_application_details['date'],"00:00:00");
+					$valid_upto[$i] = $this->Customfunctions->getCertificateValidUptoDate($approved_application_result['customer_id'],$grant_date);
+
+					//check the state name added by akash on 14-06-2022
+					//$state_name[$i] = $this->getStateName($approved_application_result['customer_id']);
+					
+					//Certificate Issued on
+					$issued_on[$i] = chop($approved_application_result['date'],"00:00:00");
+
+					$i=$i+1;
+				}
+			}
+		} 
+		
+
+		$this->set('date',$date);
+		$this->set('application_customer_id',$application_customer_id);
+		$this->set('application_user_email_id',$application_user_email_id);
+		$this->set('application_type',$application_type);
+		$this->set('user_office',$user_office);
+		$this->set('approved_esign_list',$approved_esign_list);
+		
+		$this->set('approved_application_type',$approved_application_type_text);
+		$this->set('name_of_the_firm',$name_of_the_firm);
+		$this->set('address_of_the_firm',$address_of_the_firm);
+		$this->set('contact_details_of_the_firm',$contact_details_of_the_firm);
+		$this->set('approved_TBL_details_tbl_name',$approved_TBL_details_tbl_name);
+		$this->set('approved_TBL_details_tbl_registered_no',$approved_TBL_details_tbl_registered_no);
+		$this->set('laboratory_details_name',$laboratory_details_name);
+		$this->set('laboratory_details_address',$laboratory_details_address);
+		$this->set('valid_upto',$valid_upto);
+		$this->set('state_name',$state_name);
+		$this->set('phoneno',$phoneno);
+		$this->set('issued_on',$issued_on);
+
+
+	}
+
+
+
+
+	// esign Renewal Applications Report
+	// Description : This function Used for ESIGNED RENEWAL Application kpi's COUNT & RECORD LIST
+	// @Author : Yashwant
+	// Date : 21-Mar-2023
+
+	public function esignRenewalApplicationsReport($esigned_renewal_id)
+	{
+		
+		$EsignRenewId=base64_decode($esigned_renewal_id);
+		$data_id =$EsignRenewId;
+		$searchPendingConditions =array();
+		$renewal_esign_list=array();
+		
+		$this->loadModel('DmiRenewalEsignedStatuses');
+		$renewalApplicationEsigned = $this->DmiRenewalEsignedStatuses->find('all')->where($searchPendingConditions)->where(['application_esigned' => 'yes'])->toArray();
+		$renewalInspectionReportEsigned = $this->DmiRenewalEsignedStatuses->find('all')->where($searchPendingConditions)->where(['report_esigned' => 'yes'])->toArray();
+		// below query is commented by shreeya adde new query on date [05-06-2023]
+		//$renewalCertificateEsigned = $this->DmiRenewalEsignedStatuses->find('all')->where($searchPendingConditions)->where(['certificate_esigned' => 'yes'],['customer_id' => 'IS NULL'])->toArray();
+		
+		// adde for if customer id is null could not show null records count
+		// added by shreeya on date [05-06-2023]
+		$renewalCertificateEsigned = $this->DmiRenewalEsignedStatuses->find('all')->where($searchPendingConditions)->where(['certificate_esigned' => 'yes'])
+		->where(function ($exp, $q) {return $exp->notEq('customer_id', '');})->toArray();
+
+		
+					
+		if($data_id =="APP"){
+			$i=0;
+			foreach ($renewalApplicationEsigned as $each) {
+			
+				$renewal_esign_list[$i] = $each['customer_id'];
+				$i=$i+1;
+			}
+			
+			$report_heading ="Esigned New Applications Reports";
+			$this->set('report_heading', $report_heading);
+			$this->esignRenewalApplnResults($renewal_esign_list,$data_id);
+		}
+
+		if($data_id =="INSPECT"){
+			
+			$i=0;
+			foreach ($renewalInspectionReportEsigned as $each) {
+				$renewal_esign_list[$i] = $each['customer_id'];
+				$i=$i+1;
+			}
+
+			$report_heading ="Esigned Inspection Application Reports";
+			$this->set('report_heading', $report_heading);
+			$this->esignRenewalApplnResults($renewal_esign_list,$data_id);
+		}
+		
+		if($data_id =="GRANT"){
+			$i=0;
+			foreach ($renewalCertificateEsigned as $each) {
+				$renewal_esign_list[$i] = $each['customer_id'];
+				$i=$i+1;
+			}
+		
+			$report_heading ="Esigned Grant Certificate Application Reports";
+			$this->set('report_heading', $report_heading);
+			$this->esignRenewalApplnResults($renewal_esign_list,$data_id);
+		}
+
+	}
+
+
+	
+	// esign Renewal Application Results
+	// @Author : Yashwant
+	//Contribution : Shreeya
+	// Date : 21-Mar-2023
+
+	public function esignRenewalApplnResults($renewal_esign_list,$data_id) 
+	{
+
+		
+		$date=array();
+		$application_type=array();
+		$application_user_email_id=array();
+		$user_office=array();
+		$application_customer_id=array();
+		$name_of_the_firm=array();
+		$address_of_the_firm=array();
+		$contact_details_of_the_firm=array();
+		$approved_TBL_details_tbl_name=array();
+		$approved_TBL_details_tbl_registered_no=array();
+		$laboratory_details_name=array();
+		$laboratory_details_address=array();
+		$approved_application_type_text = array();
+		$valid_upto= array();
+		$state_name = array();
+		$phoneno = array();
+		$issued_on = array();
+
+
+		$this->loadModel('DmiRenewalEsignedStatuses');
+		if (!empty($renewal_esign_list)) 
+		{
+			
+			$i=0;
+			//applied array_unique function on 18-07-2019
+			//remove array_unique By shreeya on date [02-06-2023]
+			foreach ($renewal_esign_list as $esigned_renew_application) 
+			{
+				
+				$esign_application_details = array(); 
+			
+				if ($data_id == 'APP') {
+					$esign_application_details = $this->DmiRenewalEsignedStatuses->find('all')->where(['customer_id' => $esigned_renew_application,'application_esigned' => 'yes'])->first(); 
+				
+				}elseif($data_id == 'INSPECT') {
+					$esign_application_details = $this->DmiRenewalEsignedStatuses->find('all')->where(['customer_id' => $esigned_renew_application,'report_esigned' => 'yes'])->first(); 
+				}elseif($data_id == 'GRANT') {
+					$esign_application_details = $this->DmiRenewalEsignedStatuses->find('all')->where(['customer_id IN' =>  $esigned_renew_application ?  $esigned_renew_application : [null],'certificate_esigned' => 'yes'])->first(); 
+					
+					/*['customer_id IN' =>
+					count($esigned_renew_application) > 0 ?  $esigned_renew_application : [null])*/
+					//echo"<pre>";print_r($esign_application_details);
+				}
+
+				//this condition added on 18-07-2019
+				if (!empty($esign_application_details)) {
+				
+					$approved_application_result = $esign_application_details;
+
+					if ($approved_application_result['user_email_id'] == 'old_application') {
+
+						$old_app_approved_by = $this->Customfunctions->old_app_approved_by($approved_application_result['customer_id']);
+						$approved_application_result['user_email_id'] = $old_app_approved_by;
+					}
+
+					$explode = explode("/",$approved_application_result['customer_id']);
+
+					$approved_office_id = $this->DmiRoOffices->find('all')->select(['ro_email_id'])->where(['short_code' => $explode[2]])->first();  
+
+					$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email'=>$approved_office_id['ro_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id)) {
+
+						$user_office_details = $this->DmiRoOffices->find('all')->select(['ro_office'])->where(['id'=>$user_posted_office_id['posted_ro_office']])->first(); 
+						if (!empty($user_office_details)) {
+							$user_office[$i] = $user_office_details['ro_office'];
+						} else {
+							$user_office[$i] = 'N/A';
+						}
+
+					} else {
+						$user_office[$i] = 'N/A';
+					}
+
+					$application_form_type = $this->Reportsfunctions->checkApplicantFormTypeForReports($approved_application_result['customer_id']);
+
+					if ($application_form_type == 'A') 
+					{
+						$application_type[$i]='CA (Form-A)';
+
+					} elseif ($application_form_type == 'B') 
+					{
+						$application_type[$i]='Printing Press (Form-B)';
+					} elseif ($application_form_type == 'C') 
+					{
+						$application_type[$i]='Laboratory (Form-C)';
+					} elseif ($application_form_type == 'D') 
+					{
+						$application_type[$i]='Laboratory (Form-D)';
+					} elseif ($application_form_type == 'E') 
+					{
+						$application_type[$i]='CA (Form-E)';
+					} elseif ($application_form_type == 'F') 
+					{
+						$application_type[$i]='CA (Form-F)';
+					}
+
+					$date[$i] = $approved_application_result['created'];
+					$application_customer_id[$i] = $approved_application_result['customer_id'];
+
+					//added by the akash on 13-11-2021
+					$firmDetails = $this->DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$approved_application_result['customer_id'])))->first();
+
+					$name_of_the_firm[$i] = isset($firmDetails['firm_name']);
+
+
+					$address_of_the_firm[$i] = isset($firmDetails['street_address']);
+
+					$contact_details_of_the_firm[$i] = base64_decode(isset($firmDetails['email']));
+					$phoneno[$i] = isset($firmDetails['mobile_no']);
+
+					//tbl details
+					$tbl_details = $this->DmiAllTblsDetails->find('all',array('conditions'=>array('customer_id IS'=>$approved_application_result['customer_id'],'OR' => array('delete_status IS NULL', 'delete_status' => 'no'))))->toArray();
+
+					if (!empty($tbl_details)) 
+					{
+						$j=0;
+						foreach ($tbl_details as $each) {
+
+							$approved_TBL_details_tbl_name[$i][$j] = $each['tbl_name'];
+							$approved_TBL_details_tbl_registered_no[$i][$j] = $each['tbl_registered_no'];
+							$j++;
+						}
+
+					} else {
+						$approved_TBL_details_tbl_name[$i][0] = 'N/A';
+						$approved_TBL_details_tbl_registered_no[$i][0] = 'N/A';
+					}
+
+
+
+					//lab details
+					$lab_details = $this->DmiCustomerLaboratoryDetails->find('all',array('conditions'=>array('customer_id IS'=>$approved_application_result['customer_id'])))->toArray();
+					if (!empty($lab_details)) 
+					{
+						$laboratory_details_name[$i] = $lab_details[0]['laboratory_name'];
+						$laboratory_details_address[$i] = $lab_details[0]['street_address'];
+					} else 
+					{
+						$laboratory_details_name[$i] = 'N/A';
+						$laboratory_details_address[$i] = 'N/A';
+					}
+
+					$commodity_value = $this->DmiFirms->find('all')->select(['sub_commodity'])->where(['customer_id'=>$approved_application_result['customer_id']])->first(); 
+
+					//$commodity_list[$i] = $this->Customfunctions->showCommdityInApplList($commodity_value['sub_commodity']);
+
+					//Added this Code on the 08-04-2022 as the base encoding was not on some emails so to dispaly the email , checking if the encoding is needed or not.
+					$checkEmailForEncoding[$i] = $approved_application_result['user_email_id'];
+
+					if($this->isBase64Encoded($checkEmailForEncoding[$i]) == true){
+						$application_user_email_id[$i] = base64_decode($approved_application_result['user_email_id']);
+					} else {
+						$application_user_email_id[$i] = $approved_application_result['user_email_id'];
+					}
+							
+					//check the expiry dateand print to the reports  added by Akash on 24-05-2022 
+					$grant_date = chop($esign_application_details['date'],"00:00:00");
+					$valid_upto[$i] = $this->Customfunctions->getCertificateValidUptoDate($approved_application_result['customer_id'],$grant_date);
+
+					//check the state name added by akash on 14-06-2022
+					//$state_name[$i] = $this->getStateName($approved_application_result['customer_id']);
+					
+					//Certificate Issued on
+					$issued_on[$i] = chop($approved_application_result['date'],"00:00:00");
+
+					$i++;
+				}
+			}
+
+			
+		} 
+		
+
+		$this->set('date',$date);
+		$this->set('application_customer_id',$application_customer_id);
+		$this->set('application_user_email_id',$application_user_email_id);
+		$this->set('application_type',$application_type);
+		$this->set('user_office',$user_office);
+		$this->set('renewal_esign_list',$renewal_esign_list);
+		
+		$this->set('approved_application_type',$approved_application_type_text);
+		$this->set('name_of_the_firm',$name_of_the_firm);
+		$this->set('address_of_the_firm',$address_of_the_firm);
+		$this->set('contact_details_of_the_firm',$contact_details_of_the_firm);
+		$this->set('approved_TBL_details_tbl_name',$approved_TBL_details_tbl_name);
+		$this->set('approved_TBL_details_tbl_registered_no',$approved_TBL_details_tbl_registered_no);
+		$this->set('laboratory_details_name',$laboratory_details_name);
+		$this->set('laboratory_details_address',$laboratory_details_address);
+		$this->set('valid_upto',$valid_upto);
+		$this->set('state_name',$state_name);
+		$this->set('phoneno',$phoneno);
+		$this->set('issued_on',$issued_on);
+	
+	}
+
+
+	/*27-mar-2023 Yashwant*/
+
+	// Pending Renewal Applications Report
+	// Description : Start to create Pending New Application main report 
+	// @Author : Pravin Bhakare
+	// #Contributer : Yashwant Singade
+	// Date : 27-03-2023
+	
+	public function pendingNewApplicationsMainReport() 
+	{	
+		 //variable set for session
+		$static_pending_from_date = '';
+		$static_pending_to_date = '';
+		$static_pending_roOfficeShortCode ='';
+		$static_pending_ro_office_id ='';
+
+		$application_pending_days = $this->Session->read('pending_days');
+
+		if (!empty($application_pending_days)) {
+			$report_name = 'Pending New Applications Report ( More than 15 Days)';
+		} else {
+			$report_name ='Pending New Applications Report';
+		}
+
+		$this->set('report_name',$report_name);
+
+		$table = 'DmiAllApplicationsCurrentPositions';
+		$pending_application_type = 'new';
+
+		$application_type_xy = array('A'=>'CA (Form-A)', 'C'=>'Laboratory (Form-C)', 'E'=>'CA (Form-E)', 'B'=>'Printing Press (Form-B)', 'D'=>'Laboratory (Form-D)', 'F'=>'CA (Form-F)');
+
+		//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
+		asort($application_type_xy);
+		$this->set('application_type_xy',$application_type_xy);
+
+		$user_roles_xy = array('RO/SO'=>'RO/SO','MO/SMO'=>'MO/SMO','IO'=>'IO','HO MO/SMO'=>'HO MO/SMO','DY.AMA'=>'DY.AMA','JT.AMA'=>'JT.AMA','AMA'=>'AMA');
+
+		//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
+		asort($user_roles_xy);
+		$this->set('user_roles_xy',$user_roles_xy);
+
+		$ro_office = $this->DmiRoOffices->find('all')->where(['office_type' => 'RO','delete_status IS NULL'])->order(['ro_office' => 'ASC'])->combine('id', 'ro_office')->toArray(); 
+		$this->set('ro_office',$ro_office);
+
+		$search_application_type_id = $this->Session->read('search_application_type_id');   //result
+		$search_user_role = $this->Session->read('search_user_role');
+		$ro_office_id = $this->Session->read('ro_office_id');
+		$mo_office_id = $this->Session->read('mo_office_id');
+		$io_office_id = $this->Session->read('io_office_id');
+		$search_from_date = $this->Session->read('search_from_date');
+		$search_to_date = $this->Session->read('search_to_date');
+		$search_user_email_id = $this->Session->read('search_user_email_id');
+
+		$download_search_application_type_id = $this->Session->read('search_application_type_id');
+		$download_search_user_role = $this->Session->read('search_user_role');
+		$download_ro_office_id = $this->Session->read('ro_office_id');
+		$download_mo_office_id = $this->Session->read('mo_office_id');
+		$download_io_office_id = $this->Session->read('io_office_id');
+		$download_search_from_date = $this->Session->read('search_from_date');
+		$download_search_to_date = $this->Session->read('search_to_date');
+		$download_search_user_email_id = $this->Session->read('search_user_email_id');
+
+		$this->set('search_application_type_id',$search_application_type_id);
+		$this->set('search_user_role',$search_user_role);
+		$this->set('ro_office_id',$ro_office_id);
+		$this->set('mo_office_id',$mo_office_id);
+		$this->set('io_office_id',$io_office_id);
+		$this->set('search_from_date',$search_from_date);
+		$this->set('search_to_date',$search_to_date);
+		$this->set('search_user_email_id',$search_user_email_id);
+
+		// Set default value for download report click event (Done by pravin 14-03-2018)
+		$download_report = 'no';
+		 //set session variable and delete it by laxmi Bhadade on 16-02-2023 
+		$static_pending_from_date = $this->Session->read('from_date');
+		$static_pending_to_date = $this->Session->read('to_date');
+		$static_pending_roOfficeShortCode = $this->Session->read('roOfficeShortCode');
+		$static_pending_ro_office_id = $this->Session->read('ro_office_id');
+		
+		//delete session
+		$this->Session->delete('ro_office_id');
+		$this->Session->delete('roOfficeShortCode');
+		$this->Session->delete('to_date');
+		$this->Session->delete('from_date');
+
+		//Check and Pass the entry for "Search" or "Download Report as Excel" button click event (Done by pravin 14-03-2018)
+		if (((!empty($static_pending_from_date) && !empty($static_pending_to_date)) || !empty($static_pending_roOfficeShortCode)) || (null != ($this->request->getData('search_logs')) || null != ($this->request->getData('download_report')))) {
+			//Check not empty "Download Report as Excel" button Request, if condition TRUE then set value "yes" for "Download Report as Excel" click event
+			//and pass this value to "mo_io_ro_allocation_serach_conditions" function (Done by pravin 14-03-2018)
+			if (!empty($this->request->getData('download_report'))) {
+				$download_report = 'yes';
+			}
+
+			$search_application_type_id = $this->request->getData('application_type');
+			$search_user_role =  $this->request->getData('user_role');
+			$ro_office_id =  $this->request->getData('ro_office');
+			$mo_office_id =  $this->request->getData('mo_office');
+			$io_office_id =  $this->request->getData('io_office');
+
+			$search_user_email_id =  $this->request->getData('user_id');
+			$search_from_date =  $this->request->getData('from_date');
+			$search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
+			$search_to_date =  $this->request->getData('to_date');
+			$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
+			$this->date_comparison($search_from_date,$search_to_date);
+
+			// Change on 2/11/2018 - For download excel report, Take search filter field value from session variables instend of POST variable - By Pravin
+			if ($download_report == 'yes') {
+
+				$search_application_type_id = $this->Session->read('search_application_type_id');
+				$search_user_role = $this->Session->read('search_user_role');
+				$ro_office_id = $this->Session->read('ro_office_id');
+				$mo_office_id = $this->Session->read('mo_office_id');
+				$io_office_id = $this->Session->read('io_office_id');
+				$search_from_date = $this->Session->read('search_from_date');
+				$search_to_date = $this->Session->read('search_to_date');
+				$search_user_email_id = $this->Session->read('search_user_email_id');
+			}
+
+			$download_application_customer_id_list = $this->pendingNewSearchConditions($download_search_application_type_id,$download_search_user_role,$download_ro_office_id,$download_mo_office_id,$download_io_office_id,$download_search_from_date,$download_search_to_date,$download_search_user_email_id,$table,$pending_application_type,$application_pending_days);
+
+			$this->Session->delete('search_application_type_id');
+			$this->Session->delete('search_user_role');
+			$this->Session->delete('ro_office_id');
+			$this->Session->delete('mo_office_id');
+			$this->Session->delete('io_office_id');
+			$this->Session->delete('search_from_date');
+			$this->Session->delete('search_to_date');
+			$this->Session->delete('search_user_email_id');
+
+			//set from_date and to_date and office name from session of statstics report added by laxmi B. on 15-02-2023
+			if(!empty($static_pending_from_date) && !empty($static_pending_to_date && empty($static_pending_roOfficeShortCode) )){
+				$search_from_date = $static_pending_from_date;
+				$search_to_date = $static_pending_to_date;
+				$search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
+				$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
+				$this->date_comparison($search_from_date, $search_to_date);
+
+			} elseif(!empty($static_pending_from_date) && !empty($static_pending_to_date && !empty($static_pending_roOfficeShortCode))) {
+				$search_from_date = $static_pending_from_date;
+				$search_to_date = $static_pending_to_date;
+				$search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
+				$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
+				$this->date_comparison($search_from_date, $search_to_date);
+					
+				$ro_office = $this->DmiRoOffices->find('all')->select(['id'])->where(['id IN' => $static_pending_ro_office_id])->where(['short_code IN'=>$static_pending_roOfficeShortCode])->first(); 
+				$ro_office_id = [$ro_office['id']];
+				$search_user_role = 'RO/SO';
+			} elseif(!empty($static_pending_roOfficeShortCode)) {
+				$ro_office = $this->DmiRoOffices->find('all')->select(['id'])->where(['id IN' => $static_pending_ro_office_id])->where(['short_code IN'=>$static_pending_roOfficeShortCode])->first(); 
+				$ro_office_id = [$ro_office['id']];
+				$search_user_role = 'RO/SO';
+			}
+			//end laxmi
+
+			$this->Session->write('search_application_type_id',$search_application_type_id);
+			$this->Session->write('search_user_role',$search_user_role);
+			$this->Session->write('ro_office_id',$ro_office_id);
+			$this->Session->write('mo_office_id',$mo_office_id);
+			$this->Session->write('io_office_id',$io_office_id);
+			$this->Session->write('search_from_date',$search_from_date);
+			$this->Session->write('search_to_date',$search_to_date);
+			$this->Session->write('search_user_email_id',$search_user_email_id);
+
+			$this->set('search_application_type_id',$search_application_type_id);
+			$this->set('search_user_role',$search_user_role);
+			$this->set('ro_office_id',$ro_office_id);
+			$this->set('mo_office_id',$mo_office_id);
+			$this->set('io_office_id',$io_office_id);
+			$this->set('search_from_date',$search_from_date);
+			$this->set('search_to_date',$search_to_date);
+			$this->set('search_user_email_id',$search_user_email_id);
+
+
+			$application_customer_id_list = $this->pendingNewSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days);
+
+			if (!empty($application_customer_id_list)) {
+
+				$current_users_details = $this->$table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->order(['id' => 'DESC'])->toArray(); 
+
+				//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
+				if ($download_report == 'yes') {
+
+					if (!empty($download_application_customer_id_list)) {
+						$download_condition = ['customer_id IN' => $download_application_customer_id_list];
+					} else {
+						$download_condition = ['customer_id IS' => ''];
+					}
+
+					$download_pending_application = $this->$table->find('all')->where($download_condition)->order(['id' => 'DESC'])->toArray(); 
+					$this->downloadPendingApplicationReport($download_pending_application,$pending_application_type,$table);
+				}
+				
+			} else {
+				$current_users_details = null;
+			}
+
+			$this->pendingApplicationReportResults($current_users_details,$pending_application_type,$tables);
+
+		} else {
+
+			$application_customer_id_list = $this->pendingNewSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days);
+
+			if (!empty($application_customer_id_list)) {
+
+				$current_users_details = $this->$table->find('all')->where(['customer_id IN' => $application_customer_id_list])->order(['id' => 'DESC'])->toArray(); /*->limit(['100'])*/
+				$this->set('current_users_details',$current_users_details);
+
+				//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
+				if ($download_report == 'yes') {
+					$download_pending_application = $this->$table->find('all')->where(['customer_id' => $application_customer_id_list])->order(['id' => 'DESC'])->toArray(); 
+					$this->downloadPendingApplicationReport($download_pending_application,$pending_application_type,$table);
+				}
+
+			} else {
+				$current_users_details = null;
+			}
+
+			$this->pendingApplicationReportResults($current_users_details,$pending_application_type,$table);
+		}
+	
+	
+	}
+
+
+	// Pending New Search Conditions
+	// #Contributer : Yashwant Singade
+	// Date : 27-03-2023
+
+	public function pendingNewSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days)
+	{
+		$current_date = new \DateTime(date("d-m-Y")); // Ankur updated new DateTime to new \DateTime as Class "App\Controller\DateTime" not found
+		$modify_date_obj = $current_date->modify('-15 day');
+		$modify_date = $modify_date_obj->format('d-m-Y H:i:s');
+
+		if (!empty($search_from_date)) {
+
+			$conditions = ['DATE(modified) <' => $modify_date]; 
+			
+			$date_conditions = ['date(modified) BETWEEN :start AND :end', 'DATE(created) <' => $modify_date]; 
+			
+			$date_conditions_1 = ['date(modified) BETWEEN :start AND :end', 'DATE(created) <' => $modify_date]; 
+		
+		} else {
+
+			$conditions = [];
+			
+			$date_conditions = ['date(modified) BETWEEN :start AND :end']; 
+			
+			$date_conditions_1 = ['date(modified) BETWEEN :start AND :end', 'DATE(created) <' => $modify_date];  
+		}
+
+		$final_customer_id_list = null;
+
+		if ($ro_office_id != '' && $search_user_role == 'RO/SO') {
+			$level_1_2_3_office = $ro_office_id;
+		} elseif ($mo_office_id != '' && $search_user_role == 'MO/SMO') {
+			$level_1_2_3_office = $mo_office_id;
+		} elseif ($io_office_id != '' && $search_user_role == 'IO') {
+			$level_1_2_3_office = $io_office_id;
+		} else {
+			$level_1_2_3_office = '';
+		}
+
+
+		if ($search_application_type_id != '' && $search_user_role == '' && $search_from_date == '' && $search_to_date == '') {
+
+			$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
+
+			$i=0;
+			foreach ($application_customer_id as $each_customer_id) {
+
+				if (!empty($each_customer_id['customer_id'])) {
+					$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+					if (in_array($application_customer_type, $search_application_type_id, TRUE)) {
+						$application_customer_id_list[$i] = $each_customer_id['customer_id'];
+						$i=$i+1;
+					}
+				}
+			}
+
+		}
+		
+
+		elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $level_1_2_3_office == '' && $search_from_date == '' && $search_to_date == '') 
+		{
+
+			if ($search_application_type_id != '') {
+
+				$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
+
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) {
+					if (!empty($each_customer_id['customer_id'])) {
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+						if (in_array($application_customer_type,$search_application_type_id)) {
+							$seach_application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+
+				$application_current_levels = $this->$table->find('all')->where(['customer_id IN' => $seach_application_customer_id_list])->toArray(); 
+			} else {
+				
+				$application_current_levels = $this->$table->find('all')->where($conditions)->toArray();  
+			}
+			
+			$i=0;
+			foreach ($application_current_levels as $each_current_levels) {
+
+				$application_current_level_user_role = $this->checkUserRoleFromCurrentLevel($each_current_levels['current_level'], $each_current_levels['current_user_email_id']);
+
+				if ($application_current_level_user_role == $search_user_role) {
+					$application_customer_id_list[$i] = $each_current_levels['customer_id'];
+					$i=$i+1;
+				}
+			}
+		
+		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $level_1_2_3_office != '' && $search_from_date == '' && $search_to_date == '' && $search_user_email_id =='') {
+			
+			if ($search_application_type_id != '') {
+
+				$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
+
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) {
+					if (!empty($each_customer_id['customer_id'])) {
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+						if (in_array($application_customer_type,$search_application_type_id)) {
+							$seach_application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+				$application_current_levels = $this->$table->find('all')->where(['customer_id IN' => $seach_application_customer_id_list])->toArray(); 
+			
+			} else {
+			
+				$application_current_levels = $this->$table->find('all')->where($conditions); 
+			}
+
+			$i=0;
+			foreach ($application_current_levels as $each_current_levels) {
+
+				$application_current_level_user_role = $this->checkUserRoleFromCurrentLevel($each_current_levels['current_level'], $each_current_levels['current_user_email_id']);
+
+				if ($application_current_level_user_role == $search_user_role) {
+
+					$user_posted_office_id_xy = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IS' => $each_current_levels['current_user_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id_xy)) {
+						$user_posted_office_id_xyx = $user_posted_office_id_xy['posted_ro_office'];
+					} else {
+						$user_posted_office_id_xyx = '';
+					}
+
+					if (in_array($user_posted_office_id_xyx,$level_1_2_3_office)) {
+						$application_customer_id_list[$i] = $each_current_levels['customer_id'];
+						$i=$i+1;
+					}
+				}
+			}
+		
+		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role == '' && $level_1_2_3_office == '' && $search_from_date != '' && $search_to_date != '') {
+			
+			if ($search_application_type_id != '') {
+
+				$application_customer_id = $this->$table->find('all')->where($date_conditions)->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
+
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) {
+					if (!empty($each_customer_id['customer_id'])) {
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+						if (in_array($application_customer_type,$search_application_type_id)) {
+							$application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+			
+			} else {
+
+				$application_customer_id_list = $this->$table->find('all')->select(['customer_id'])->where($date_conditions_1)->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->combine('id', 'customer_id')->toArray();  
+			}
+
+		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $level_1_2_3_office != '' && $search_from_date == '' && $search_to_date == '' && $search_user_email_id !='') {
+			
+			if ($search_application_type_id != '') {
+
+				$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
+
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) {
+
+					if (!empty($each_customer_id['customer_id'])) {
+
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+						if (in_array($application_customer_type, $search_application_type_id)) {
+							$seach_application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+
+				$application_current_levels = $this->$table->find('all')->where(['customer_id IN' => $seach_application_customer_id_list])->toArray(); 
+			
+			} else {
+			
+				$application_current_levels = $this->$table->find('all')->where($conditions)->toArray();	 
+			}
+
+			$i=0;
+			foreach ($application_current_levels as $each_current_levels) {
+
+				$application_current_level_user_role = $this->checkUserRoleFromCurrentLevel($each_current_levels['current_level'], $each_current_levels['current_user_email_id']);
+
+				if ($application_current_level_user_role == $search_user_role) {
+
+					$user_posted_office_id_xy = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IS' => $each_current_levels['current_user_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id_xy)) {
+						$user_posted_office_id_xyx = $user_posted_office_id_xy['posted_ro_office'];
+					} else {
+						$user_posted_office_id_xyx = '';
+					}
+
+					if (in_array($user_posted_office_id_xyx,$level_1_2_3_office)) {
+
+						$search_user_email = $this->DmiUserRoles->find('all')->select(['user_email_id'])->where(['id IS' => $search_user_email_id])->first(); 
+
+						if ($each_current_levels['current_user_email_id'] == $search_user_email['user_email_id']) {
+							$application_customer_id_list[$i] = $each_current_levels['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+			}
+
+		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $search_from_date != '' && $search_to_date != '' && $level_1_2_3_office !='' && ($search_user_email_id != '' || $search_user_email_id == '')) {
+			
+			if ($search_application_type_id != '') {
+
+				$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
+
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) {
+
+					if (!empty($each_customer_id['customer_id'])) {
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+						if (in_array($application_customer_type,$search_application_type_id)) {
+							$seach_application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+
+				$application_current_levels = $this->$table->find('all')->where(['customer_id IN' => $seach_application_customer_id_list])
+					->where(['date(modified) BETWEEN :start AND :end'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
+			} else {
+
+				$application_current_levels = $this->$table->find('all')->where($date_conditions)->bind(':start', $search_from_date, 'date')
+				->bind(':end', $search_to_date, 'date')->toArray();   
+			}
+
+			$i=0;
+			foreach ($application_current_levels as $each_current_levels) {
+
+				$application_current_level_user_role = $this->checkUserRoleFromCurrentLevel($each_current_levels['current_level'],$each_current_levels['current_user_email_id']);
+
+				if ($application_current_level_user_role == $search_user_role) {
+
+					if ($level_1_2_3_office == '') {
+						$level_1_2_3_office = [];
+					}
+
+					$user_posted_office_id_xy = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IS' => $each_current_levels['current_user_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id_xy)) {
+						$user_posted_office_id_xyx = $user_posted_office_id_xy['posted_ro_office'];
+					} else {
+						$user_posted_office_id_xyx = '';
+					}
+
+					if (in_array($user_posted_office_id_xyx,$level_1_2_3_office)) {
+
+						$search_user_email = $this->DmiUserRoles->find('all')->select(['user_email_id'])->where(['id IS' => $search_user_email_id])->first(); 
+						//to remove error empty condition added by laxmi B on 16-02-2023 
+						if ((!empty($each_current_levels['current_user_email_id']) && !empty($search_user_email['user_email_id']) )  && $each_current_levels['current_user_email_id'] == $search_user_email['user_email_id']) {
+							$application_customer_id_list[$i] = $each_current_levels['customer_id'];
+							$i=$i+1;
+						}
+
+					} else {
+						$application_customer_id_list[$i] = $each_current_levels['customer_id'];
+						$i=$i+1;
+					}
+				}
+			}
+
+		} else {
+			$application_customer_id = $this->$table->find('all')->select(['customer_id'])->where($conditions)->extract('customer_id')->toArray();  
+
+			// $i=0;
+			// foreach ($application_customer_id as $each_customer_id)
+			// {
+			// 		$application_customer_id_list[$i] = $each_customer_id['customer_id'];
+			// 		$i=$i+1;
+			// }
+			
+			$application_customer_id_list = $application_customer_id;
+		}
+
+		if (!empty($application_customer_id_list)) {
+
+			$i=0;
+			if ($pending_application_type == 'new') {
+				foreach ($application_customer_id_list as $customer_id) {
+					$customer_id_list = $this->DmiGrantCertificatesPdfs->find('all')->where(['customer_id IS' => $customer_id])->first(); 
+
+					if (empty($customer_id_list)) {
+						$final_customer_id_list[$i] = $customer_id;
+						$i=$i+1;
+					}
+				}
+
+			} elseif ($pending_application_type == 'renewal') {
+
+				foreach ($application_customer_id_list as $customer_id ) {
+
+					$customer_id_list = $this->DmiRenewalFinalSubmits->find('all')->where(['customer_id IS' => $customer_id, 'status' => 'approved'])->first(); 
+
+					if (empty($customer_id_list)) {
+						$final_customer_id_list[$i] = $customer_id;
+						$i=$i+1;
+					}
+				}
+
+				$final_table = 'DmiRenewalFinalSubmits';
+			}
+
+
+			//if data same data id exist in rejcted table it is not apper in report added by laxmi B. on 20-01-2023
+			$this->loadModel('DmiRejectedApplLogs');
+			$rejectedList = $this->DmiRejectedApplLogs->find('all', array('fields'=>array('customer_id')))->order(['id' => 'DESC'])->toArray();//
+			$reject_id = array();
+			$i=0;
+			if(!empty($rejectedList)){
+				foreach($rejectedList as $reject){
+					$reject_id[$i] = $reject['customer_id'];
+					$i++;
+				}
+
+				if(!empty($final_customer_id_list)){
+					$final_customer_id_list = array_diff($final_customer_id_list, $reject_id);
+				} 
+			}//end by laxmi b.
+		}
+
+			
+		return $final_customer_id_list;
+	
+	
+	}
+
+
+
+	// Pending Renewal Applications Report
+	// Description : Start to create Pending renewal application main report 
+	// @Author : Pravin Bhakare
+	// #Contributer : Yashwant Singade
+	// Date : 27-03-2023
+
+	public function pendingRenewalApplicationsReport(){
+		
+		$application_pending_days = $this->Session->read('pending_days');
+
+		if (!empty($application_pending_days)) {
+			$report_name = 'Pending Renewal Applications Report (More than 15 Days)';
+		} else {
+			$report_name ='Pending Renewal Applications Report';
+		}
+
+		$this->set('report_name',$report_name);
+
+		$table = 'DmiRenewalAllCurrentPositions';
+								
+		$pending_application_type = 'renewal';
+
+		$application_type_xy = array('A'=>'CA (Form-A)','C'=>'Laboratory (Form-C)','E'=>'CA (Form-E)','B'=>'Printing Press (Form-B)','D'=>'Laboratory (Form-D)','F'=>'CA (Form-F)');
+
+		//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
+		asort($application_type_xy);
+		$this->set('application_type_xy',$application_type_xy);
+
+		$user_roles_xy = array('RO/SO'=>'RO/SO','MO/SMO'=>'MO/SMO','IO'=>'IO');
+		//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
+		asort($user_roles_xy);
+		$this->set('user_roles_xy',$user_roles_xy);
+
+		$ro_office = $this->DmiRoOffices->find('all')->select(['id', 'ro_office'])->where(['office_type' => 'RO','delete_status IS NULL'])->order(['ro_office' => 'ASC'])
+			->combine('id', 'ro_office')->toArray(); 
+		$this->set('ro_office',$ro_office);
+
+		$search_application_type_id = $this->Session->read('search_application_type_id');
+																				
+							
+												
+
+		$search_user_role = $this->Session->read('search_user_role');
+		$ro_office_id = $this->Session->read('ro_office_id');
+		$mo_office_id = $this->Session->read('mo_office_id');
+		$io_office_id = $this->Session->read('io_office_id');
+		$search_from_date = $this->Session->read('search_from_date');
+		$search_to_date = $this->Session->read('search_to_date');
+		$search_user_email_id = $this->Session->read('search_user_email_id');
+
+		$download_search_application_type_id = $this->Session->read('search_application_type_id');
+		$download_search_user_role = $this->Session->read('search_user_role');
+		$download_ro_office_id = $this->Session->read('ro_office_id');
+		$download_mo_office_id = $this->Session->read('mo_office_id');
+		$download_io_office_id = $this->Session->read('io_office_id');
+		$download_search_from_date = $this->Session->read('search_from_date');
+		$download_search_to_date = $this->Session->read('search_to_date');
+		$download_search_user_email_id = $this->Session->read('search_user_email_id');
+
+		$this->set('search_application_type_id',$search_application_type_id);
+		$this->set('search_user_role',$search_user_role);
+		$this->set('ro_office_id',$ro_office_id);
+		$this->set('mo_office_id',$mo_office_id);
+		$this->set('io_office_id',$io_office_id);
+		$this->set('search_from_date',$search_from_date);
+		$this->set('search_to_date',$search_to_date);
+		$this->set('search_user_email_id',$search_user_email_id);
+
+		// Set default value for download report click event (Done by pravin 14-03-2018)
+		$download_report = 'no';
+
+		//Check and Pass the entry for "Search" or "Download Report as Excel" button click event (Done by pravin 14-03-2018)
+		if (null != ($this->request->getData('search_logs')) || null != ($this->request->getData('download_report'))) {
+
+			//Check not empty "Download Report as Excel" button Request, if condition TRUE then set value "yes" for "Download Report as Excel" click event
+			//and pass this value to "mo_io_ro_allocation_serach_conditions" function (Done by pravin 14-03-2018)
+			if (!empty($this->request->getData('download_report'))) {
+				$download_report = 'yes';
+			}
+
+			$search_application_type_id = $this->request->getData('application_type');
+			$search_user_role =  $this->request->getData('user_role');
+			$ro_office_id =  $this->request->getData('ro_office');
+			$mo_office_id =  $this->request->getData('mo_office');
+			$io_office_id =  $this->request->getData('io_office');
+
+			$search_user_email_id =  $this->request->getData('user_id');
+			$search_from_date =  $this->request->getData('from_date');
+			$search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
+			$search_to_date =  $this->request->getData('to_date');
+			$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
+			$this->date_comparison($search_from_date,$search_to_date);
+
+			// Change on 2/11/2018 - For download excel report, Take search filter field value from session variables instend of POST variable - By Pravin
+			if ($download_report == 'yes') {
+
+				$search_user_role = $this->Session->read('search_user_role');
+				$ro_office_id = $this->Session->read('ro_office_id');
+				$mo_office_id = $this->Session->read('mo_office_id');
+				$io_office_id = $this->Session->read('io_office_id');
+				$search_from_date = $this->Session->read('search_from_date');
+				$search_to_date = $this->Session->read('search_to_date');
+				$search_user_email_id = $this->Session->read('search_user_email_id');
+			}
+
+			$download_application_customer_id_list = $this->pendingRenewalMainApplnReport($download_search_application_type_id,$download_search_user_role,$download_ro_office_id,$download_mo_office_id,$download_io_office_id,$download_search_from_date,$download_search_to_date,$download_search_user_email_id,$table,$pending_application_type,$application_pending_days);
+
+			$this->Session->delete('search_application_type_id');
+			$this->Session->delete('search_user_role');
+			$this->Session->delete('ro_office_id');
+			$this->Session->delete('mo_office_id');
+			$this->Session->delete('io_office_id');
+			$this->Session->delete('search_from_date');
+			$this->Session->delete('search_to_date');
+			$this->Session->delete('search_user_email_id');
+
+			$this->Session->write('search_application_type_id',$search_application_type_id);
+			$this->Session->write('search_user_role',$search_user_role);
+			$this->Session->write('ro_office_id',$ro_office_id);
+			$this->Session->write('mo_office_id',$mo_office_id);
+			$this->Session->write('io_office_id',$io_office_id);
+			$this->Session->write('search_from_date',$search_from_date);
+			$this->Session->write('search_to_date',$search_to_date);
+			$this->Session->write('search_user_email_id',$search_user_email_id);
+
+			$this->set('search_application_type_id',$search_application_type_id);
+			$this->set('search_user_role',$search_user_role);
+			$this->set('ro_office_id',$ro_office_id);
+			$this->set('mo_office_id',$mo_office_id);
+			$this->set('io_office_id',$io_office_id);
+			$this->set('search_from_date',$search_from_date);
+			$this->set('search_to_date',$search_to_date);
+			$this->set('search_user_email_id',$search_user_email_id);
+
+																					
+							
+
+			$application_customer_id_list = $this->pendingRenewalMainApplnReport($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days,$data_id);
+																													
+
+			if (!empty($application_customer_id_list)) {
+
+				$current_users_details = $this->$table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->order(['id' => 'DESC'])->toArray(); 
+
+				//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
+				if ($download_report == 'yes') {
+					$download_pending_application = $this->$table->find('all')->where(['customer_id IN' => $download_application_customer_id_list])->order(['id' => 'DESC'])->toArray(); 
+					$this->downloadPendingApplicationReport($download_pending_application,$pending_application_type,$table);
+				}
+
+			} else {
+				$current_users_details = null;
+			}
+
+			$this->pendingApplicationReportResults($current_users_details,$pending_application_type,$table);
+			
+		} else {
+									
+	
+
+			$application_customer_id_list = $this->pendingRenewalMainApplnReport($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days);
+
+			if (!empty($application_customer_id_list)) {
+
+				$current_users_details = $this->$table->find('all')->where(['customer_id IN' => $application_customer_id_list])->order(['id' => 'DESC'])->toArray(); 
+
+				//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
+				if ($download_report == 'yes') {
+					$download_pending_application = $this->$table->find('all')->where(['customer_id IN' => $application_customer_id_list])
+						->order(['id' => 'DESC'])->toArray(); 
+					$this->downloadPendingApplicationReport($download_pending_application,$pending_application_type,$table);
+				}
+
+			} else {
+				$current_users_details = null;
+			}
+
+			$this->pendingApplicationReportResults($current_users_details,$pending_application_type,$table);
+
+		}
+	}
+
+
+
+	// pending Renewal MainApplication Report
+	// @Author : Pravin Bhakare
+	// #Contributer : Yashwant Singade
+	// Date : 27-03-2023
+
+	public function pendingRenewalMainApplnReport($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days)
+	{
+
+		$current_date = new \DateTime(date("d-m-Y")); // Ankur updated new DateTime to new \DateTime as Class "App\Controller\DateTime" not found
+		$modify_date_obj = $current_date->modify('-15 day');
+		$modify_date = $modify_date_obj->format('d-m-Y H:i:s');
+
+
+		if (!empty($application_pending_days)) 
+		{
+			$conditions = ['DATE(modified) <' => $modify_date]; 
+			
+			$date_conditions = ['date(modified) BETWEEN :start AND :end', 'DATE(created) <' => $modify_date]; 
+			
+			$date_conditions_1 = ['date(modified) BETWEEN :start AND :end', 'DATE(created) <' => $modify_date]; 
+
+		} else {
+
+			$conditions = [];
+			
+			$date_conditions = ['date(modified) BETWEEN :start AND :end']; 
+			
+			$date_conditions_1 = ['date(modified) BETWEEN :start AND :end', 'DATE(created) <' => $modify_date];  
+		}
+
+		$final_customer_id_list = null;
+
+		if ($ro_office_id != '' && $search_user_role == 'RO/SO') 
+		{
+			$level_1_2_3_office = $ro_office_id;
+
+		} elseif ($mo_office_id != '' && $search_user_role == 'MO/SMO') 
+		{
+			$level_1_2_3_office = $mo_office_id;
+		} 
+		elseif ($io_office_id != '' && $search_user_role == 'IO') 
+		{
+			$level_1_2_3_office = $io_office_id;
+		} else 
+		{
+			$level_1_2_3_office = '';
+		}
+
+
+		if ($search_application_type_id != '' && $search_user_role == '' && $search_from_date == '' && $search_to_date == '') 
+		{
+
+			$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
+			
+			$i=0;
+			foreach ($application_customer_id as $each_customer_id) 
+			{
+
+				if (!empty($each_customer_id['customer_id'])) 
+				{
+					$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+					
+					if (in_array($application_customer_type, $search_application_type_id, TRUE)) {
+						$application_customer_id_list[$i] = $each_customer_id['customer_id'];
+						$i=$i+1;
+					}
+				}
+			}
+		}
+
+		elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $level_1_2_3_office == '' && $search_from_date == '' && $search_to_date == '') 
+		{
+
+			if ($search_application_type_id != '') 
+			{
+
+				$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
+
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) {
+					if (!empty($each_customer_id['customer_id'])) {
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+						if (in_array($application_customer_type,$search_application_type_id)) {
+							$seach_application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+
+				$application_current_levels = $this->$table->find('all')->where(['customer_id IN' => $seach_application_customer_id_list])->toArray(); 
+			} else 
+			{
+				
+				$application_current_levels = $this->$table->find('all')->where($conditions)->toArray();  
+			}
+			
+			$i=0;
+			foreach ($application_current_levels as $each_current_levels) {
+
+				$application_current_level_user_role = $this->checkUserRoleFromCurrentLevel($each_current_levels['current_level'], $each_current_levels['current_user_email_id']);
+
+				if ($application_current_level_user_role == $search_user_role) {
+					$application_customer_id_list[$i] = $each_current_levels['customer_id'];
+					$i=$i+1;
+				}
+			}
+		
+		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $level_1_2_3_office != '' && $search_from_date == '' && $search_to_date == '' && $search_user_email_id =='') 
+		{
+			
+			if ($search_application_type_id != '') 
+			{
+
+				$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
+
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) {
+					if (!empty($each_customer_id['customer_id'])) {
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+						if (in_array($application_customer_type,$search_application_type_id)) {
+							$seach_application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+				$application_current_levels = $this->$table->find('all')->where(['customer_id IN' => $seach_application_customer_id_list])->toArray(); 
+			
+			} else {
+			
+				$application_current_levels = $this->$table->find('all')->where($conditions); 
+			}
+
+			$i=0;
+			foreach ($application_current_levels as $each_current_levels) 
+			{
+
+				$application_current_level_user_role = $this->checkUserRoleFromCurrentLevel($each_current_levels['current_level'], $each_current_levels['current_user_email_id']);
+
+				if ($application_current_level_user_role == $search_user_role) {
+
+					$user_posted_office_id_xy = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IS' => $each_current_levels['current_user_email_id']])->first(); 
+
+
+					if (!empty($user_posted_office_id_xy)) {
+						$user_posted_office_id_xyx = $user_posted_office_id_xy['posted_ro_office'];
+					} else {
+						$user_posted_office_id_xyx = '';
+					}
+
+					if (in_array($user_posted_office_id_xyx,$level_1_2_3_office)) {
+						$application_customer_id_list[$i] = $each_current_levels['customer_id'];
+						$i=$i+1;
+					}
+				}
+			}
+		
+		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role == '' && $level_1_2_3_office == '' && $search_from_date != '' && $search_to_date != '') 
+		{
+			
+			if ($search_application_type_id != '') {
+
+				$application_customer_id = $this->$table->find('all')->where($date_conditions)->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
+
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) {
+					if (!empty($each_customer_id['customer_id'])) {
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+						if (in_array($application_customer_type,$search_application_type_id)) {
+							$application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+			
+			} 
+			else
+			{
+
+				$application_customer_id_list = $this->$table->find('all')->select(['customer_id'])->where($date_conditions_1)->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->combine('id', 'customer_id')->toArray();  
+			}
+
+		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $level_1_2_3_office != '' && $search_from_date == '' && $search_to_date == '' && $search_user_email_id !='') 
+		{
+			
+			if ($search_application_type_id != '') {
+
+				$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
+
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) {
+
+					if (!empty($each_customer_id['customer_id'])) {
+
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+						if (in_array($application_customer_type, $search_application_type_id)) {
+							$seach_application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+
+				$application_current_levels = $this->$table->find('all')->where(['customer_id IN' => $seach_application_customer_id_list])->toArray(); 
+			
+			} else {
+			
+				$application_current_levels = $this->$table->find('all')->where($conditions)->toArray();	 
+			}
+
+			$i=0;
+			foreach ($application_current_levels as $each_current_levels) {
+
+				$application_current_level_user_role = $this->checkUserRoleFromCurrentLevel($each_current_levels['current_level'], $each_current_levels['current_user_email_id']);
+
+				if ($application_current_level_user_role == $search_user_role) {
+
+					$user_posted_office_id_xy = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IS' => $each_current_levels['current_user_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id_xy)) {
+						$user_posted_office_id_xyx = $user_posted_office_id_xy['posted_ro_office'];
+					} else {
+						$user_posted_office_id_xyx = '';
+					}
+
+					if (in_array($user_posted_office_id_xyx,$level_1_2_3_office)) {
+
+						$search_user_email = $this->DmiUserRoles->find('all')->select(['user_email_id'])->where(['id IS' => $search_user_email_id])->first(); 
+
+						if ($each_current_levels['current_user_email_id'] == $search_user_email['user_email_id']) {
+							$application_customer_id_list[$i] = $each_current_levels['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+			}
+
+		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $search_from_date != '' && $search_to_date != '' && $level_1_2_3_office !='' && ($search_user_email_id != '' || $search_user_email_id == '')) 
+		{
+			
+			if ($search_application_type_id != '') {
+
+				$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
+
+				$i=0;
+				foreach ($application_customer_id as $each_customer_id) {
+
+					if (!empty($each_customer_id['customer_id'])) {
+						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+						if (in_array($application_customer_type,$search_application_type_id)) {
+							$seach_application_customer_id_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+
+				$application_current_levels = $this->$table->find('all')->where(['customer_id IN' => $seach_application_customer_id_list])
+					->where(['date(modified) BETWEEN :start AND :end'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
+			} else {
+
+				$application_current_levels = $this->$table->find('all')->where($date_conditions)->bind(':start', $search_from_date, 'date')
+				->bind(':end', $search_to_date, 'date')->toArray();   
+			}
+
+			$i=0;
+			foreach ($application_current_levels as $each_current_levels) 
+			{
+
+				$application_current_level_user_role = $this->checkUserRoleFromCurrentLevel($each_current_levels['current_level'],$each_current_levels['current_user_email_id']);
+
+				if ($application_current_level_user_role == $search_user_role) {
+
+					if ($level_1_2_3_office == '') {
+						$level_1_2_3_office = [];
+					}
+
+					$user_posted_office_id_xy = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IS' => $each_current_levels['current_user_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id_xy)) {
+						$user_posted_office_id_xyx = $user_posted_office_id_xy['posted_ro_office'];
+					} else {
+						$user_posted_office_id_xyx = '';
+					}
+
+					if (in_array($user_posted_office_id_xyx,$level_1_2_3_office)) 
+					{
+
+						$search_user_email = $this->DmiUserRoles->find('all')->select(['user_email_id'])->where(['id IS' => $search_user_email_id])->first(); 
+						//to remove error empty condition added by laxmi B on 16-02-2023 
+						if ((!empty($each_current_levels['current_user_email_id']) && !empty($search_user_email['user_email_id']) )  && $each_current_levels['current_user_email_id'] == $search_user_email['user_email_id']) 
+						{
+							$application_customer_id_list[$i] = $each_current_levels['customer_id'];
+							$i=$i+1;
+						}
+
+					} 
+					else 
+					{
+						$application_customer_id_list[$i] = $each_current_levels['customer_id'];
+						$i=$i+1;
+					}
+				}
+			}
+
+		} else 
+		{
+			$application_customer_id = $this->$table->find('all')->select(['customer_id'])->where($conditions)->extract('customer_id')->toArray();  
+
+			// replaced foreach with query by Ankur
+			$application_customer_id_list = $application_customer_id;
+		}
+
+		if (!empty($application_customer_id_list)) 
+		{
+			
+			$i=0;
+
+			if ($pending_application_type == 'new') 
+			{
+				foreach ($application_customer_id_list as $customer_id) 
+				{
+					$customer_id_list = $this->DmiGrantCertificatesPdfs->find('all')->where(['customer_id IS' => $customer_id])->first(); 
+
+					if (empty($customer_id_list)) 
+					{
+						$final_customer_id_list[$i] = $customer_id;
+						$i=$i+1;
+					}
+				}
+			} 
+
+			elseif ($pending_application_type == 'renewal') 
+			{
+				foreach ($application_customer_id_list as $customer_id ) 
+				{
+
+					$customer_id_list = $this->DmiRenewalFinalSubmits->find('all')->where(['customer_id IS' => $customer_id, 'status' => 'approved'])->first(); 
+					
+					
+					if (empty($customer_id_list)) 
+					{
+						$final_customer_id_list[$i] = $customer_id;
+						$i=$i+1;
+						//echo"<pre>";print_r($final_customer_id_list);
+					}
+				}
+
+				$final_table = 'DmiRenewalFinalSubmits';
+			}
+
+		}
+		return $final_customer_id_list;
+
+
+	}
+
+
+
+
+	/*This function is uesd for Approved New & OLd applications Main report Yashwant-27-03-2023*/
+	// Approved Applications Report
+	// Description : ----
+	// @Author : Pravin Bhakare
+	// #Contributer : Yashwant
+	// Date : 27-03-2023
+
+	public function approvedNewAndOldApplicationType() 
+	{
+
+		$aqcms_from_date ='' ;
+		$aqcms_to_date = '';
+		$aqcms_ro_office_short_code = '';
+		$aqcms_ro_office_id = '';
+		$approved_application_type = $this->Session->read('approved_application_type');
+
+		if ($approved_application_type == 'new' || $approved_application_type =='') {
+
+			$table = 'DmiFinalSubmits';
+			$report_heading = 'Approved New Applications Report';
+		
+		} elseif ($approved_application_type == 'renewal') {
+			
+			$table = 'DmiRenewalFinalSubmits';
+			$report_heading = 'Approved Renewal Applications Report';
+
+		}elseif ($approved_application_type == 'all_reports') {
+			
+			$table = 'DmiGrantCertificatesPdfs';
+			$report_heading = 'All Approved Report';
+			
+			// this below code is added to show the deafult office by Akash on 16-06-2022
+			$posted_ro_office = $this->DmiUsers->find('all',array('fields'=>'posted_ro_office', 'conditions'=>array('email IS'=>$_SESSION['username'])))->first();
+			$default_ro_office = $this->DmiRoOffices->find('all',array('conditions'=>array('id IS'=>$posted_ro_office['posted_ro_office'])))->first();
+			$this->set('default_ro_office',$default_ro_office['ro_office']);
+		}
+
+		$this->set('table', $table);	// set table value ( Done by pravin 16-07-2018)
+		$this->set('report_heading', $report_heading);
+
+		$application_type_xy = array('A'=>'CA (Form-A)','C'=>'Laboratory (Form-C)','E'=>'CA (Form-E)','B'=>'Printing Press (Form-B)','D'=>'Laboratory (Form-D)','F'=>'CA (Form-F)');
+
+		//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
+		asort($application_type_xy);
+		$this->set('application_type_xy', $application_type_xy);
+
+		//added 'office_type'=>'RO' condition on 27-07-2018   // Change on 3/11/2018 -  add order by condition - by Pravin Bhakare
+		$ro_office = $this->DmiRoOffices->find('all')->select(['id', 'ro_office'])->where(['office_type' => 'RO','delete_status IS NULL'])->order(['ro_office' => 'ASC'])->combine('id', 'ro_office')->toArray(); 
+		$this->set('ro_office',$ro_office);
+
+		$search_application_type_id = $this->Session->read('search_application_type_id');
+		$application_approved_office = $this->Session->read('application_approved_office');
+		$search_from_date = $this->Session->read('search_from_date');
+		$search_to_date = $this->Session->read('search_to_date');
+
+		$this->set('search_application_type_id',$search_application_type_id);
+		$this->set('application_approved_office',$application_approved_office);
+		$this->set('search_from_date',$search_from_date);
+		$this->set('search_to_date',$search_to_date);
+
+		$search_flag = 'off'; // added by Ankur
+		// Set default value for download report click event (Done by pravin 13-03-2018)
+		$download_report = 'no';
+
+		//if from to date and office id in  session condtion added by laxmi B on 15-02-2023
+
+			$aqcms_from_date = $this->Session->read('from_date') ;
+			$aqcms_to_date = $this->Session->read('to_date');
+			$aqcms_ro_office_short_code = $this->Session->read('roOfficeShortCode');
+			$aqcms_ro_office_id = $this->Session->read('ro_office_id');
+			$this->Session->delete('ro_office_id');
+			$this->Session->delete('roOfficeShortCode');
+			$this->Session->delete('from_date');
+			$this->Session->delete('to_date');
+
+			
+
+		if ((((!empty($aqcms_from_date && !empty($aqcms_to_date))) || !empty($aqcms_ro_office_short_code))) || null != ($this->request->getData('search_logs')) || null != ($this->request->getData('download_report'))) { 																																																		 
+			$search_flag = 'on'; // added by Ankur
+			//Check not empty "Download Report as Excel" button Request, if condition TRUE then set value "yes" for "Download Report as Excel" click event
+			//and pass this value to "approved_application_search_conditions" function (Done by pravin 13-03-2018)
+			if (!empty($this->request->getData('download_report'))) {
+				$download_report = 'yes';
+			}
+
+			$search_application_type_id = $this->request->getData('application_type');
+			$application_approved_office = $this->request->getData('office');
+			$search_from_date =  $this->request->getData('from_date');
+			$search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
+			$search_to_date =  $this->request->getData('to_date');
+			$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
+			$this->date_comparison($search_from_date, $search_to_date);
+
+			// Change on 3/11/2018 - For download excel report, Take search filter field value from session variables instend of POST variable - By Pravin
+			if ($download_report == 'yes') {
+				
+				$search_application_type_id = $this->Session->read('search_application_type_id');
+				$application_approved_office = $this->Session->read('application_approved_office');
+				$search_from_date = $this->Session->read('search_from_date');
+				$search_to_date = $this->Session->read('search_to_date');
+			}
+
+			$this->Session->delete('search_application_type_id');
+			$this->Session->delete('application_approved_office');
+			$this->Session->delete('search_from_date');
+			$this->Session->delete('search_to_date');
+			
+			
+
+			//set from_date and to_date and office name from session of statstics report added by laxmi B. on 15-02-2023
+			if(!empty($aqcms_from_date) && !empty($aqcms_to_date && empty($aqcms_ro_office_short_code) )){
+				$search_from_date = $aqcms_from_date;
+				$search_to_date = $aqcms_to_date;
+				$search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
+				$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
+				$this->date_comparison($search_from_date, $search_to_date);
+
+			}elseif(!empty($aqcms_from_date) && !empty($aqcms_to_date && !empty($aqcms_ro_office_short_code))){
+		   
+
+				$search_from_date = $aqcms_from_date;
+				$search_to_date = $aqcms_to_date;
+				$search_from_date = $this->Customfunctions->dateFormatCheck($search_from_date);
+				$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
+				$this->date_comparison($search_from_date, $search_to_date);
+				
+				$ro_office = $this->DmiRoOffices->find('all')->select(['id'])->where(['id IN' => $aqcms_ro_office_id])->where(['short_code IN'=>$aqcms_ro_office_short_code])->first(); 
+				$application_approved_office = [$ro_office['id']];
+					
+
+			} elseif(!empty($aqcms_ro_office_short_code)){
+				$ro_office = $this->DmiRoOffices->find('all')->select(['id'])->where(['id IN' => $aqcms_ro_office_id])->where(['short_code IN'=>$aqcms_ro_office_short_code])->first(); 
+				$application_approved_office = [$ro_office['id']];
+			}//end
+
+
+			$this->Session->write('search_application_type_id', $search_application_type_id);
+			$this->Session->write('application_approved_office', $application_approved_office);
+			$this->Session->write('search_from_date', $search_from_date);
+			$this->Session->write('search_to_date', $search_to_date);
+
+			$this->set('search_application_type_id', $search_application_type_id);
+			$this->set('application_approved_office', $application_approved_office);
+			$this->set('search_from_date', $search_from_date);
+			$this->set('search_to_date', $search_to_date);
+
+			$approved_application_lists = $this->approvedNewOLdAppliSearchCondin($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$data_id,$approved_application_type);
+			$approved_application_list = $approved_application_lists[0];
+			$download_approved_application_list = $approved_application_lists[1];
+
+			$i=0;
+			foreach ($approved_application_list as $each) {
+
+				$approved_application_list[$i] = $each['customer_id'];
+				$i=$i+1;
+			}
+
+			$j=0;
+			foreach ($download_approved_application_list as $each) {
+
+				$download_approved_application_list[$j] = $each['customer_id'];
+				$j=$j+1;
+			}
+			//if data same data id exist in rejcted table it is not apper in report added by laxmi B. on 20-01-2023
+			
+			$this->loadModel('DmiRejectedApplLogs');
+			$rejectedList = $this->DmiRejectedApplLogs->find('all')->select(['id','customer_id'])->order(['id','customer_id'])->combine('id','customer_id')->toArray();
+			
+			if(!empty($rejectedList)){
+				if(!empty($approved_application_list)){
+					$approved_application_list = array_diff($approved_application_list, $rejectedList);
+				}
+			}//end laxmi B.
+
+
+			//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
+			if ($download_report == 'yes') {
+
+				$this->downloadApprovedApplicationReportResults($download_approved_application_list, $approved_application_type);
+			}
+
+			$this->approvedApplicationReportResults($approved_application_list, $approved_application_type);
+		
+		} else {
+			
+			$approved_application_lists = $this->approvedNewOLdAppliSearchCondin($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$approved_application_type);
+
+			
+			$approved_application_list = $approved_application_lists[0];
+
+			$i=0;
+			foreach ($approved_application_list as $each) {
+				$approved_application_list[$i] = $each['customer_id'];
+				$i=$i+1;
+			}
+			 //if data same data id exist in rejcted table it is not apper in report added by laxmi B. on 20-01-2023
+			$this->loadModel('DmiRejectedApplLogs');
+			$rejectedList = $this->DmiRejectedApplLogs->find('all')->select(['id','customer_id'])->order(['id','customer_id'])->combine('id','customer_id')->toArray();
+			
+			if(!empty($rejectedList)){
+				
+				if(!empty($approved_application_list)){
+					$approved_application_list = array_diff($approved_application_list, $rejectedList);
+				}
+			}//end laxmi B.
+			 
+			$this->approvedApplicationReportResults($approved_application_list,$approved_application_type);
+		}
+
+	}
+
+
+	// Approved OLD / NEW Application Search Conditions
+	// Description : ----
+	// @Author : Pravin Bhakare
+	// #Contributer : Ankur Jangid (Migration)
+	// Date : ----
+
+	public function approvedNewOLdAppliSearchCondin ($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$approved_application_type) {
+
+		$approved_application_list = [];
+
+		if ($search_application_type_id != '' && $application_approved_office == '' && $search_from_date =='' && $search_to_date == '') {
+			
+			if ($table == 'DmiFinalSubmits') {
+				$approved_application_customer_id = $this->DmiGrantCertificatesPdfs->find('all')->select(['customer_id'])->group(['customer_id HAVING COUNT(customer_id) < 2'])->toArray();
+			} elseif ($table == 'DmiGrantCertificatesPdfs') {
+				$approved_application_customer_id = $this->DmiGrantCertificatesPdfs->find('all')->select(['customer_id'])->group(['customer_id HAVING COUNT(customer_id) >= 1'])->toArray();
+			} else {
+				$approved_application_customer_id = $this->DmiGrantCertificatesPdfs->find('all')->select(['customer_id'])->group(['customer_id HAVING COUNT(customer_id) > 1'])->toArray();
+			}
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id)	{
+				$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+				if (in_array($application_customer_type, $search_application_type_id)) {
+					$approved_application_list[$i] = $each_customer_id['customer_id'];
+					$i=$i+1;
+				}
+			}
+
+			if (!empty($approved_application_list)) {
+				$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3']; 
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3']; 
+			}
+
+			$approved_application_list = $this->$table->find('all')->where($conditions)->order(['id' => 'DESC'])->toArray();
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+		} 
+		
+
+		
+		elseif ($search_application_type_id != '' && $application_approved_office != '' && $search_from_date =='' && $search_to_date == '' ) 
+		{
+
+			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['status' => 'approved', 'current_level' => 'level_3'])->toArray(); 
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) {
+
+				$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+				if (in_array($application_customer_type,$search_application_type_id)) {
+
+					$approved_application_details_list = $this->DmiGrantCertificatesPdfs->find('all')->select(['id', 'id'])->where(['customer_id' => $each_customer_id['customer_id']])->combine('id', 'id')->toArray(); 
+
+					if (!empty($approved_application_details_list)) {
+
+						$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['id' => max($approved_application_details_list)])->first();  
+
+						$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email' => $approved_application_details['user_email_id']])->first();  
+
+						if (!empty($user_posted_office_id)) {
+
+							if (in_array($user_posted_office_id['posted_ro_office'],$application_approved_office)) {
+
+								$approved_application_list[$i] = $each_customer_id['customer_id'];
+								$i=$i+1;
+							}
+						}
+					}
+				}
+			}
+
+			// below if-else code added by Ankur Jangid
+			if (!empty($approved_application_list)) {
+				$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3'];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+		
+		
+		} elseif ($search_application_type_id != '' && $application_approved_office == '' && $search_from_date !='' && $search_to_date != '') {
+
+			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['date(modified) BETWEEN :start AND :end'])
+			->where(['status' => 'approved', 'current_level' => 'level_3'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) {
+				$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']); 
+
+				if (in_array($application_customer_type, $search_application_type_id)) {
+					$approved_application_list[$i] = $each_customer_id['customer_id']; 
+					$i=$i+1;
+				}
+			}
+
+			// below if-else code added by Ankur Jangid
+			if (!empty($approved_application_list)) {
+				$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3'];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+		
+		} elseif ($search_application_type_id != '' && $application_approved_office != '' && $search_from_date !='' && $search_to_date != '') {
+
+			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['date(modified) BETWEEN :start AND :end'])
+				->where(['status' => 'approved', 'current_level' => 'level_3'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) {
+
+				$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
+
+				if (in_array($application_customer_type,$search_application_type_id)) {
+
+					$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['customer_id' => $each_customer_id['customer_id']])->first(); 
+
+					$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IS' => $approved_application_details['user_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id)) {
+
+						if (in_array($user_posted_office_id['posted_ro_office'], $application_approved_office)) {
+							$approved_application_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+			}
+
+			// below if-else code added by Ankur Jangid
+			if (!empty($approved_application_list)) {
+				$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3'];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+		
+		} elseif ($search_application_type_id == '' && $application_approved_office != '' && $search_from_date =='' && $search_to_date == '') 
+		{
+
+			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['status' => 'approved', 'current_level' => 'level_3'])->toArray(); 
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) {
+
+				$approved_application_details_list = $this->DmiGrantCertificatesPdfs->find('all')->select(['id', 'id'])->where(['customer_id IS' => $each_customer_id['customer_id']])->combine('id', 'id')->toArray(); 
+
+				if (!empty($approved_application_details_list)) {
+
+					$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['id' => max($approved_application_details_list)])->first(); 
+
+					$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email' => $approved_application_details['user_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id)) {
+
+						if (in_array($user_posted_office_id['posted_ro_office'],$application_approved_office)) {
+							$approved_application_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+			}
+
+			// below if-else code added by Ankur Jangid
+			if (!empty($approved_application_list)) {
+				$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3'];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+		
+		} elseif ($search_application_type_id == '' && $application_approved_office != '' && $search_from_date !='' && $search_to_date != '') {
+
+			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['date(modified) BETWEEN :start AND :end', 'status' => 'approved',
+				'current_level' => 'level_3'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) {
+
+				$approved_application_details_list = $this->DmiGrantCertificatesPdfs->find('all')->select(['id', 'id'])->where(['customer_id' => $each_customer_id['customer_id']])->combine('id', 'id')->toArray(); 
+
+				if (!empty($approved_application_details_list)) {
+
+					$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['id' => max($approved_application_details_list)])->first(); 
+
+					$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email' => $approved_application_details['user_email_id']])->first(); 
+
+					if (!empty($user_posted_office_id)) {
+
+						if (in_array($user_posted_office_id['posted_ro_office'], $application_approved_office)) {
+							$approved_application_list[$i] = $each_customer_id['customer_id'];
+							$i=$i+1;
+						}
+					}
+				}
+			}
+
+			// below if-else code added by Ankur Jangid
+			if (!empty($approved_application_list)) {
+				$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3'];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+		} elseif ($search_application_type_id == '' && $application_approved_office == '' && $search_from_date !='' && $search_to_date != '') {
+
+			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['date(modified) BETWEEN :start AND :end', 'status' => 'approved',
+				'current_level' => 'level_3'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
+
+			$i=0;
+			foreach ($approved_application_customer_id as $each_customer_id) {
+				$approved_application_list[$i] = $each_customer_id['customer_id'];
+				$i=$i+1;
+			}
+
+			// below if-else code added by Ankur Jangid
+			if (!empty($approved_application_list)) {
+				$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3'];
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+		
+		} else {
+
+			if ($search_flag == 'on') {
+				$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['status' => 'approved', 'current_level' => 'level_3'])
+				->order(['created'=>'DESC'])->extract('customer_id')->toArray(0); 
+			} else {
+
+				// THIS BELOW CONDITION IS ADDED FOR THE ALL REPORTS BY AKASH ON 16-06-2022
+				if ($table == 'DmiGrantCertificatesPdfs') {
+
+					$posted_ro_office = $this->DmiUsers->find('all',array('fields'=>'posted_ro_office', 'conditions'=>array('email IS'=>$_SESSION['username'])))->first();
+					$get_short_code = $this->DmiRoOffices->find('all',array('fields'=>'short_code', 'conditions'=>array('id IS'=>$posted_ro_office['posted_ro_office'])))->first();
+					$short_code = $get_short_code['short_code'];
+
+					if ($_SESSION['role'] == 'Head Office') {
+						//$approved_application_customer_id = $this->DmiGrantCertificatesPdfs->find('all',array('fields'=>array('customer_id'),'group'=>array('customer_id having count(customer_id) >= 1'),'having'=>array('count(customer_id) >= 1')))->toArray();
+						$approved_application_customer_id = $this->DmiGrantCertificatesPdfs->find('all')->select(['customer_id'])->group(['customer_id HAVING COUNT(customer_id) >= 1'])->limit(['2'])->extract('customer_id')->toArray(0);
+					} else {
+						$approved_application_customer_id = $this->DmiGrantCertificatesPdfs->find('all',array('fields'=>'customer_id','conditions'=>array('customer_id like'=>'%/'.$short_code.'/%'),'group'=>'customer_id having count(customer_id) >= 1','having'=>array('count(customer_id) >= 1')))->toArray();
+					}
+
+				} else {
+					$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['status' => 'approved', 'current_level' => 'level_3'])
+					->order(['created'=>'DESC'])->extract('customer_id')->toArray(0); 
+				}
+
+			}
+
+			$approved_application_list = $approved_application_customer_id;
+
+			// below if-else code added by Ankur Jangid
+			if (!empty($approved_application_list)) {
+
+				// THIS BELOW CONDITION IS ADDED FOR THE ALL REPORTS BY AKASH ON 16-06-2022
+				if ($table == 'DmiGrantCertificatesPdfs') {
+					$conditions = array('customer_id IN'=>$approved_application_list); 
+				} else {
+					$conditions = ['customer_id IN' => $approved_application_list, 'status' => 'approved', 'current_level' => 'level_3'];
+				}
+
+			} else {
+				$conditions = ['customer_id IS' => '', 'status' => 'approved', 'current_level' => 'level_3'];
+			}
+
+
+			$approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+	
+			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
+		}
+
+		return array($approved_application_list,$download_approved_application_list);
+	
+	}
+
+
+
+
+
+
+
+
+
 }
-?>
+
+?>	
+
+

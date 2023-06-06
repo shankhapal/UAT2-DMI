@@ -67,7 +67,7 @@ use Cake\View\ViewBuilder;
 			$caRenewalDue = 0; 	$printingRenewalDue = 0; $labRenewalDue = 0;
 			
 			$list4RenewalDueCheck = $this->DmiFirms->find('all')->where($searchConditions)->combine('id', 'customer_id')->toArray();
-
+		
 			//$list4RenewalDueCheck = $this->DmiFirms->find('list',array('valueField'=>'customer_id','conditions'=>$searchConditions))->toList();		
 			
 			foreach($list4RenewalDueCheck as $each_application){
@@ -94,17 +94,18 @@ use Cake\View\ViewBuilder;
 			}
 			
 			$application_processed_type = array('new_app_processed','renewal_app_processed','backlog_app_processed');
-			
+		
 			foreach($application_processed_type as $each){	
-
+				
 				$application_processed[] = $this->Reportstatistics->$each($searchConditions);
+				
 			}
 			
 			/*$applications_current_positions_tables =  array('DmiFinalSubmits'=>'DmiAllApplicationsCurrentPositions',
 															'DmiRenewalFinalSubmits'=>'DmiRenewalAllCurrentPositions');*/
 			//comment above & fetch all array of table from flowise table added by laxmi B. on 10-02-2023
-			 $applTypeArray = $this->Session->read('applTypeArray');
-			 $this->loadModel('DmiFlowWiseTablesLists');
+			$applTypeArray = $this->Session->read('applTypeArray');
+			$this->loadModel('DmiFlowWiseTablesLists');
             $applications_current_positions_tables = $this->DmiFlowWiseTablesLists->find('all')->select(['application_form','appl_current_pos'])->where(array('application_type IN'=>$applTypeArray))->order(['id'])->combine('application_form','appl_current_pos')->toArray();
            
 			$pendingCountForMo = 0; $pendingCountForIo = 0; $pendingCountForHo = 0;
@@ -124,12 +125,22 @@ use Cake\View\ViewBuilder;
 					$this->loadModel($each_table);
 					$this->loadModel($key);
 					
+				//below query commented by shreeya bcoz of added new query Date [ 01-06-23]
+				//For Progress with MO
+				// $inprogress_with_mo = $this->$each_table->find('all')->select(['id', 'customer_id'])
+				// 										->where($searchPendingConditions)->where(['current_level' => 'level_1'])
+				// 										->combine('id', 'customer_id')->toArray(); // updated by Ankur
+				// $pendingCountForMo = $pendingCountForMo + count($inprogress_with_mo);
+
+				//added new query if customer_is is null could not show null entry in cout
+				//by shreeya on date [ 01-06-2023]
 				//For Progress with MO
 				$inprogress_with_mo = $this->$each_table->find('all')->select(['id', 'customer_id'])
-														->where($searchPendingConditions)->where(['current_level' => 'level_1'])
-														->combine('id', 'customer_id')->toArray(); // updated by Ankur
-				$pendingCountForMo = $pendingCountForMo + count($inprogress_with_mo);
-
+												->where($searchPendingConditions)->where(['current_level' => 'level_1'])
+												->where(function ($exp, $q) {return $exp->notEq('customer_id', '');
+												})->combine('id', 'customer_id')->toArray();
+				$pendingCountForMo = $pendingCountForMo + count($inprogress_with_mo);								
+			
 				//For Progress with IO
 				$inprogress_with_io = $this->$each_table->find('all')->select(['id', 'customer_id'])
 														->where($searchPendingConditions)->where(['current_level' => 'level_2'])
@@ -149,15 +160,29 @@ use Cake\View\ViewBuilder;
 														->where($searchPendingConditions)->where(['current_level' => 'level_3'])
 														->combine('id', 'customer_id')->toArray(); // updated by Ankur
 
+														
 				foreach($inprogress_with_ro as $each_record ){
+				
 					$result_status = $this->$key->find('all')->where(['customer_id' => $each_record, 'status' => 'approved', 'current_level' => 'level_3'])->toArray();
 					
-					if(empty($result_status)){
+					//below condition commented by Shreeya 
+					/*if(empty($result_status)){
 						$inprogress_app_with_ro[] = $each_record;
+					}*/
+					
+					if(empty($result_status)){
+						//$each_record is not already in the array, it will be added to the $inprogress_app_with_ro array using the [] notation.By Shreeya on Date [02-06-2023]
+						if(!in_array($each_record,$inprogress_app_with_ro)){
+							$inprogress_app_with_ro[] = $each_record;
+						}
 					}
-				}			
+				}
+				
+				$inprogress_app_with_ro = array_unique($inprogress_app_with_ro);
+				
 			}
-			
+	
+		
 			$this->loadModel('DmiApplicationEsignedStatuses');
 						
 			$applicationEsigned = $this->DmiApplicationEsignedStatuses->find('all')->where($searchPendingConditions)->where(['application_esigned' => 'yes'])->toArray(); 
@@ -169,8 +194,14 @@ use Cake\View\ViewBuilder;
 			
 			$renewalApplicationEsigned = $this->DmiRenewalEsignedStatuses->find('all')->where($searchPendingConditions)->where(['application_esigned' => 'yes'])->toArray();
 			$renewalInspectionReportEsigned = $this->DmiRenewalEsignedStatuses->find('all')->where($searchPendingConditions)->where(['report_esigned' => 'yes'])->toArray();
-			$renewalCertificateEsigned = $this->DmiRenewalEsignedStatuses->find('all')->where($searchPendingConditions)->where(['certificate_esigned' => 'yes'])->toArray();
-
+			// below query is commented by shreeya adde new query on date [05-06-2023]
+			//$renewalCertificateEsigned = $this->DmiRenewalEsignedStatuses->find('all')->where($searchPendingConditions)->where(['certificate_esigned' => 'yes'])->toArray();
+			
+			// adde for if customer id is null could not show null records count
+			// added by shreeya on date [05-06-2023]
+			$renewalCertificateEsigned = $this->DmiRenewalEsignedStatuses->find('all')->where($searchPendingConditions)->where(['certificate_esigned' => 'yes'])
+			->where(function ($exp, $q) {return $exp->notEq('customer_id', '');})->toArray();
+		
 
 
 			$this->loadModel('DmiApplicantPaymentDetails');
@@ -183,7 +214,7 @@ use Cake\View\ViewBuilder;
 			$newApplicationrevenue_Query = $this->DmiApplicantPaymentDetails->find('all')->where($searchPendingConditions)
 						->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); // updated by Ankur
 			$newApplicationrevenue = ['sum' => $newApplicationrevenue_Query];
-			
+		
 			$renewalApplicationrevenue_Query =$this->DmiRenewalApplicantPaymentDetails->find('all')->where($searchPendingConditions)
 						->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); 
 			$renewalApplicationrevenue = ['sum' => $renewalApplicationrevenue_Query];			
@@ -220,29 +251,34 @@ use Cake\View\ViewBuilder;
 			$totalProcessed = 0; 
 			foreach($application_processed as $each_application){ 
 				$totalProcessed = $totalProcessed + $each_application[0][0]+$each_application[0][1]+$each_application[0][2];  
+				
 			}
 			
 			$totalGrant = 0; 			
 			foreach($application_processed as $each_application){ 
 				$totalGrant = $totalGrant + $each_application[1][0]+$each_application[1][1]+$each_application[1][2];  
+				
 			} 
+			
 			//print_r(count($newApplicationrevenueTrans));exit;
 			
 			$total_renewal=$caRenewalDue+$printingRenewalDue+$labRenewalDue;
 			$total_pending=$pendingCountForMo+$pendingCountForIo+$pendingCountForHo+count($inprogress_app_with_ro);
 			$total_esigned=count($applicationEsigned)+count($inspectionReportEsigned)+count($certificateEsigned)+
-							 count($renewalApplicationEsigned)+count($renewalInspectionReportEsigned)+count($renewalCertificateEsigned);
+			count($renewalApplicationEsigned)+count($renewalInspectionReportEsigned)+count($renewalCertificateEsigned);
 			
 
 					 
 			$total_revenue = $this->thousandsCurrencyFormat($newApplicationrevenue['sum'] + $renewalApplicationrevenue['sum']);				 
 			
 			$new_appl_revenue = $this->thousandsCurrencyFormat($newApplicationrevenue['sum']);
+		
 			$renewal_appl_revenue = $this->thousandsCurrencyFormat($renewalApplicationrevenue['sum']); 
 			
 			$this->loadModel('DmiFrontStatistics');
 			
 			/* LIMS STATISTIC*/
+			
 			
 			$this->loadModel('DmiUsers');
 			$this->loadModel('DmiRoOffices');
