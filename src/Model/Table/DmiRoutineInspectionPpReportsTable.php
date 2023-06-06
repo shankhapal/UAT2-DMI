@@ -33,58 +33,18 @@ class DmiRoutineInspectionPpReportsTable extends Table{
 				$DmiRtiAllocations = TableRegistry::getTableLocator()->get('DmiRtiAllocations');
 				$CustomersController = new CustomersController;
 				
-				// fetch packer approve data
 				$approved_record = $DmiRtiFinalReports->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id desc'))->first();
-			
 				
-			
 				$allocated_record = '';
-				
 				if(!empty($approved_record)){
-						// if packer is approved then compair approve date to allocation date
-						$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'date(created) > '=>$approved_record['created']),'order'=>'id desc'))->first();
+					echo "ok";
 				}
-				if(empty($allocated_record)){
-
-						$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
-						
-						$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();
-
-						if(empty($allocated_record)){
-							$current_version = $current_version - 1;
-							$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();
-						}
-				}
-
-				$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
-				$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();	
+				else{
 				
-				$last_approved_record = $DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),array('order'=>'id desc')))->first();
-
-				$current_allocated_record = '';
-
-				if(!empty($last_approved_record)){
-
-						$current_allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'date(created) > '=>$last_approved_record['created']),'order'=>'id desc'))->first();
-
-						$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
-						$current_version = $current_version - 1;
-						$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();	
-				
-				}
-				if($last_report_details != null && $last_approved_record != null){
-				
-						$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
-						$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();		
-						$form_fields_details = $report_fields;
-			
-				}elseif($last_report_details != null && $last_approved_record == null){
-						
-						$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
-						$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();		
-						$form_fields_details = $report_fields;
-
-				}else{
+					// $current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
+					// $current_version = $current_version - 1;
+					
+					// $last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version),'order'=>'id desc'))->first();	
 					
 					if(!empty($last_report_details)){
 						$last_insp_suggestion = $last_report_details['last_insp_suggestion'];

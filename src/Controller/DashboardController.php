@@ -1062,7 +1062,7 @@ class DashboardController extends AppController{
 							
 								// fetched record conditionaly 
 								$grant_record_list =  $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array($condition)), array('order'=>'id desc'))->distinct('customer_id')->toArray();
-				  
+								
 								if(!empty($grant_record_list))
 								{
 								
@@ -1079,54 +1079,8 @@ class DashboardController extends AppController{
 										$routin_inspection_period = $this->DmiRoutineInspectionPeriod->find('all',array('conditions'=>array('firm_type IS'=>$splited_secondary_id_value)))->first();
 									
 										$period = $routin_inspection_period['period'];
-									
-										$inspection = 'no'; //by default
-
-										$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id);
-									
-										//check final submit status for level 2 & 3 and approved for each allocated id
-										$routine_inspection = $this->DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'pending'),array('order'=>'id desc')))->first();
-																	 
-										$created = ''; // by default blank 
-										//if routine_inspection not empty 
-										if(!empty($routine_inspection)){
-											$created = $routine_inspection['created']; // hold created date
-										}else{
-											 // if routine_inspection empty 
-											$site_inspection = $this->DmiSiteinspectionFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'pending'),array('order'=>'id desc')))->first();
 										
-											if(!empty($site_inspection)){
-					  
-												$created = $site_inspection['created'];		// hold created date											
-											}
-											 
-										}
-										 // when created date not empty 
-										 if(!empty($created)) {
-											 
-											$split_created	= 	explode(' ',(string) $created); //conver into array 
-												
-											$date1 = $split_created[0]; //hold only date 
-										
-											$date2 = date("Y/m/d"); // current date
-						
-											//calculate difference 
-											$diff = abs(strtotime(str_replace('/','-',$date2)) - strtotime(str_replace('/','-',$date1)));
-
-											$years = floor($diff / (365*12*60*60*24)); // retrun years
-											
-											$months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24)); // return month
-											
-											//check conditionally if month greter to period then do inspection yes
-											if($months > $period){
-												$inspection = 'yes';
-											}
-										 
-										 }
-										 else{ // if created date is empty do inspection yes
-											 $inspection = 'yes';
-										 }
-										 
+										$inspection = 'yes'; //by default
 										 
 										if($inspection == 'yes'){
 
@@ -1148,61 +1102,133 @@ class DashboardController extends AppController{
 										
 											$get_allocations = $this->DmiRtiAllocations->find('all',array('conditions' => array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
 											
+											$site_inspection = $this->DmiSiteinspectionFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'pending'),array('order'=>'id desc')))->first();
 											
 											$last_approved_record = $this->DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),array('order'=>'id desc')))->first();
-										
-											$current_allocated_record = '';
-											if(!empty($last_approved_record)){
-
-												$current_allocated_record = $this->DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'date(created) > '=>$last_approved_record['created']),'order'=>'id desc'))->first();
-
-											}
 											
-											if(!empty($current_allocated_record))
-											{
-												$mo_user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$current_allocated_record['level_2'])))->first();
-											
-												$comm_with = $mo_user_details['f_name'].' '.$mo_user_details['l_name'];
+											if(!empty($last_approved_record) || !empty($site_inspection) ){
 
-											}else{
+												if(!empty($site_inspection)){
+													
+													$created = $site_inspection['created'];		// hold created date											
+												}
+												if(!empty($last_approved_record)){
+											
+													$created = $last_approved_record['created'];
+												}
 												
-												$comm_with='Not Allocated';
-											}
-										
-
-											// pr($approved_record3);
-											if(!empty($get_allocations))
-											{
-												$mo_user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$get_allocations['level_2'])))->first();
-											
-												$comm_with = $mo_user_details['f_name'].' '.$mo_user_details['l_name'];
-
-											}else{
 												
-												$comm_with='Not Allocated';
+												if(!empty($created)) {
+
+													$split_created	= 	explode(' ',(string) $created); //conver into array 
+													
+													$date1 = $split_created[0]; //hold only date 
+
+													$date2 = date("Y/m/d"); // current date
+
+													// $date2 = '2020-08-08';
+
+													$diff = abs(strtotime($date2)-strtotime($date1));
+
+													$years = floor($diff / (365*60*60*24));
+
+													$months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24));
+													
+													//check conditionally if month greter to period then do inspection yes
+													if($months > $period){
+														
+														if(!empty($last_approved_record)){
+															
+															
+															$current_allocated_record = $this->DmiRtiAllocations->find('all', array('conditions' => array('customer_id IS' => $customer_id,'date(created) > ' => $last_approved_record['created']),'order' => 'id desc'))->first();
+															
+															if(!empty($current_allocated_record))
+															{
+																
+																$mo_user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$current_allocated_record['level_2'])))->first();
+															
+																$comm_with = $mo_user_details['f_name'].' '.$mo_user_details['l_name'];
+
+															}else{
+																
+																$comm_with='Not Allocated';
+															}
+
+															
+
+														}
+														if(!empty($site_inspection)){
+															
+															$get_allocations = $this->DmiRtiAllocations->find('all',array('conditions' => array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+						
+															if(!empty($get_allocations))
+															{
+																$mo_user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$get_allocations['level_2'])))->first();
+															
+																$comm_with = $mo_user_details['f_name'].' '.$mo_user_details['l_name'];
+
+															}else{
+																
+																$comm_with='Not Allocated';
+															}
+														}
+														
+													}
+
+													$creat_array = true;
+													
+													//creating array to list records with respect to above conditions
+													if($creat_array==true){
+
+														$appl_list_array[$i]['appl_type'] = 'Routine Inspection';
+														$appl_list_array[$i]['customer_id'] = $customer_id.'-'.$form_type;
+														$appl_list_array[$i]['firm_name'] = $firm_name;
+														$appl_list_array[$i]['comm_with'] = $comm_with;
+														$appl_list_array[$i]['appl_view_link'] = $appl_view_link;
+														$appl_list_array[$i]['appl_edit_link'] = '';
+														$appl_list_array[$i]['alloc_sub_tab']='routine_inspection_allocation_tab';
+									
+													}
+
+													$i=$i+1;
+
+
+
+												}
+
+												
+												
+												
+												
+												
+												
+												
+											
+											
 											}
+											
+	// $comm_with='Not Allocated';
+											// if(!empty($get_allocations) && !empty($site_inspection))
+											// {
+												
+											// 	$mo_user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$get_allocations['level_2'])))->first();
+											
+											// 	$comm_with = $mo_user_details['f_name'].' '.$mo_user_details['l_name'];
+
+											// }else{
+												
+											// 	$comm_with='Not Allocated';
+											// }
 						
 												
-											$creat_array = true;
+											// $creat_array = true;
+											
 											
 										
 											
 										}
 										
-										//creating array to list records with respect to above conditions
-										if($creat_array==true){
-
-											$appl_list_array[$i]['appl_type'] = 'Routine Inspection';
-											$appl_list_array[$i]['customer_id'] = $customer_id.'-'.$form_type;
-											$appl_list_array[$i]['firm_name'] = $firm_name;
-											$appl_list_array[$i]['comm_with'] = $comm_with;
-											$appl_list_array[$i]['appl_view_link'] = $appl_view_link;
-											$appl_list_array[$i]['appl_edit_link'] = '';
-											$appl_list_array[$i]['alloc_sub_tab']='routine_inspection_allocation_tab';
-					   
-										}
-
-										$i=$i+1;
+										
 									}
 									
 								}

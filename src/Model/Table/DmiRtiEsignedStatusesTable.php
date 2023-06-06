@@ -66,13 +66,15 @@
 			$query_conditions = array('customer_id'=>$customer_id, 'application_type'=>$type, 'application_status'=>$status ,$grantDateCondition);
 		}else{
 			$query_conditions = array('customer_id'=>$customer_id, 'application_type'=>$type, $grantDateCondition);
+			
 		}
 		
 		// Added condition for final submit redirect to dashboard by shankhpal on 31/05/2023		
 		if($query_conditions[0] == null){
 				$get_esign_details = $this->find('all',array('conditions'=>$query_conditions,'order'=>'id desc'))->first();	
 		}else{
-				$get_esign_details = $this->find('all',array('customer_id'=>$customer_id,'application_status'=>$query_conditions['application_status'],'order'=>'id desc'))->first();		
+				
+				$get_esign_details = $this->find('all',array('customer_id'=>$customer_id,'application_status'=>$query_conditions['application_status'],'order'=>'id desc'))->first();	
 		}
 		
 		$esign_status = 'no';
