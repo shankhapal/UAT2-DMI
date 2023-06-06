@@ -8,76 +8,83 @@
 	<html xmlns="http://www.w3.org/1999/xhtml">
 		<head>
 			<meta name="viewport" content="width=device-width,initial-scale=1">
-				<?php //ALL PLUGINS CSS				
-					echo $this->Html->css('../dashboard/plugins/fontawesome-free/css/all.min');
-					echo $this->Html->css('../dashboard/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min');
-					echo $this->Html->css('../dashboard/plugins/icheck-bootstrap/icheck-bootstrap.min');
-					echo $this->Html->css('../dashboard/plugins/jqvmap/jqvmap.min');
-					echo $this->Html->css('../dashboard/dist/css/adminlte.min');
-					echo $this->Html->css('../dashboard/plugins/overlayScrollbars/css/OverlayScrollbars.min');
-					echo $this->Html->css('../dashboard/plugins/daterangepicker/daterangepicker');
-					echo $this->Html->css('../dashboard/plugins/summernote/summernote-bs4');
+			<?php //ALL PLUGINS CSS				
+				echo $this->Html->css('../dashboard/plugins/fontawesome-free/css/all.min');
+				echo $this->Html->css('../dashboard/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min');
+				echo $this->Html->css('../dashboard/plugins/icheck-bootstrap/icheck-bootstrap.min');
+				echo $this->Html->css('../dashboard/plugins/jqvmap/jqvmap.min');
+				echo $this->Html->css('../dashboard/dist/css/adminlte.min');
+				echo $this->Html->css('../dashboard/plugins/overlayScrollbars/css/OverlayScrollbars.min');
+				echo $this->Html->css('../dashboard/plugins/daterangepicker/daterangepicker');
+				echo $this->Html->css('../dashboard/plugins/summernote/summernote-bs4');
+			
+
+				//Fetch Charset
+				echo $this->Html->meta('icon');
+				echo $this->Html->charset();
+
+				//Fetch Meta Elements
+				echo $this->fetch('meta');
+				echo $this->fetch('css');
+				echo $this->fetch('script');
+
+				//Load CSS Files
+				echo $this->Html->css('font-awesome.min');
+				echo $this->Html->css('bootstrap.min');
+				echo $this->Html->css('cwdialog');
+				echo $this->Html->css('../dashboard/css/datepicker3');
+				echo $this->Html->css('../dashboard/css/bootstrap-glyphicons.min');
+				//echo $this->Html->css('../dashboard/css/style');
+				echo $this->Html->css('dataTables.bootstrap.min');
+				//echo $this->Html->css('toastr.min');
+				echo $this->Html->css('../multiselect/jquery.multiselect');
+				echo $this->Html->css('custom-style');
+				echo $this->Html->css('jquery-confirm.min');
+
+				//Load JS Files
+				echo $this->Html->script('jquery_main.min');
+				echo $this->Html->script('sha512.min');
+				echo $this->Html->script('no_back');
+				echo $this->Html->script('cwdialog');
 				
-
-					//Fetch Charset
-					echo $this->Html->meta('icon');
-					echo $this->Html->charset();
-
-					//Fetch Meta Elements
-					echo $this->fetch('meta');
-					echo $this->fetch('css');
-					echo $this->fetch('script');
-
-					//Load CSS Files
-					echo $this->Html->css('font-awesome.min');
-					echo $this->Html->css('bootstrap.min');
-					echo $this->Html->css('cwdialog');
-					echo $this->Html->css('../dashboard/css/datepicker3');
-					echo $this->Html->css('../dashboard/css/bootstrap-glyphicons.min');
-				//	echo $this->Html->css('../dashboard/css/style');
-					echo $this->Html->css('dataTables.bootstrap.min');
-				//	echo $this->Html->css('toastr.min');
-					echo $this->Html->css('../multiselect/jquery.multiselect');
-					echo $this->Html->css('custom-style');
-					echo $this->Html->css('jquery-confirm.min');
-
-					//Load JS Files
-					echo $this->Html->script('jquery_main.min');
-					echo $this->Html->script('sha512.min');
-					echo $this->Html->script('no_back');
-					echo $this->Html->script('cwdialog');
+				// The CK EDITOR script is now applied conditionaly only - Akash [27-12-2022]
+				$get_action = $this->request->getParam('action');
+				if($get_action == 'addPage' || $get_action == 'editPage'){
 					echo $this->Html->script('ckeditor/ckeditor', array('inline' => false));
-					echo $this->Html->script('../chosen-select/chosen.jquery');
-					echo $this->Html->script('../multiselect/jquery.multiselect');
-					echo $this->Html->script('toastr.min');
+				}
 
-					//Load Datatables Scripts
-					echo $this->Html->script('jquery.dataTables.min');
-					echo $this->Html->script('dataTables.bootstrap.min');
-					echo $this->Html->script('dataTables.responsive.min');
-					echo $this->Html->script('responsive.bootstrap.min');
+				echo $this->Html->script('../chosen-select/chosen.jquery');
+				echo $this->Html->script('../multiselect/jquery.multiselect');
+				echo $this->Html->script('toastr.min');
 
-					//Load Validations Scripts
-					echo $this->Html->script('bs-custom-file-input.min');
-					echo $this->Html->script('ca_forms_validations');
-					echo $this->Html->script('printing_forms_validations_new');
-					echo $this->Html->script('laboratory_forms_validations');
-					echo $this->Html->script('admin_forms_validation');
-					echo $this->Html->script('auth_old_processed_validations');
-					echo $this->Html->script('table_filter');
-				// 	echo $this->Html->script('validation');
-				//	echo $this->Html->script('primary_forms_validations');
-				// 	echo $this->Html->script('jssor.slider-21.1.6.min');
-					echo $this->Html->script('jquery-confirm.min');
-					echo $this->Html->script('Validations/surrender_form_validations');
+				//Load Datatables Scripts
+				echo $this->Html->script('jquery.dataTables.min');
+				echo $this->Html->script('dataTables.bootstrap.min');
+				echo $this->Html->script('dataTables.responsive.min');
+				echo $this->Html->script('responsive.bootstrap.min');
 
-					
-				?>
+				//Load Validations Scripts
+				echo $this->Html->script('bs-custom-file-input.min');
+				echo $this->Html->script('ca_forms_validations');
+				echo $this->Html->script('printing_forms_validations_new');
+				echo $this->Html->script('laboratory_forms_validations');
+				echo $this->Html->script('admin_forms_validation');
+				echo $this->Html->script('auth_old_processed_validations');
+				echo $this->Html->script('table_filter');
+				//echo $this->Html->script('validation');
+				//echo $this->Html->script('primary_forms_validations');
+				//echo $this->Html->script('jssor.slider-21.1.6.min');
+				echo $this->Html->script('jquery-confirm.min');
+				echo $this->Html->script('Validations/surrender_form_validations');
+			?>
 
 			<title>Directorate of Marketing & Inspection</title>
 		</head>
+
 		<?php echo $this->element('common_loader'); ?>
+
 		<body class="hold-transition sidebar-mini layout-fixed">
+
 			<?php echo $this->element('common_side_menus/dashboard_side_menus'); ?>
 
 			<div class="wrapper main-header">
@@ -113,13 +120,10 @@
 			echo $this->Html->script("../dashboard/dist/js/pages/dashboard.js");
 		?>
 		
-		<?php echo $this->Html->script('bootstrap.min'); echo $this->Html->script('../dashboard/js/bootstrap-datepicker'); ?>
-
-
-		<?php //added this code to fetch message boxes view commonly
-			if(!empty($message)){
-				echo $this->element('message_boxes');
-			}
+		<?php // Date Picker and Message Box 
+			echo $this->Html->script('bootstrap.min'); 
+			echo $this->Html->script('../dashboard/js/bootstrap-datepicker');
+			if(!empty($message)){ echo $this->element('message_boxes'); }
 		?>
 
 		<input type="hidden" id="bottom_layout_csrf_call" value="<?php echo json_encode($this->request->getParam('_csrfToken'))?>">

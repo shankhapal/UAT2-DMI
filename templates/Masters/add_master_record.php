@@ -93,9 +93,22 @@
 											} elseif  ($masterId=='19') {
 
 												echo $this->element('masters_management_elements/add_master_elements/add_document_type');
+											
 											} elseif ($masterId=='20') {
 												// For Routine Inspection (RTI) added by shankhpal shende on 06/11/2022
 												echo $this->element('masters_management_elements/add_master_elements/add_period');
+
+											} elseif ($masterId=='21') {
+												// For Management of Misgrading's Action's Masters (MMR) -> Akash [05-06-2023]
+												echo $this->element('masters_management_elements/add_master_elements/add_misgrade_category');
+											
+											} elseif  ($masterId=='22') {
+												// For Management of Misgrading's Action's Masters (MMR) -> Akash [05-06-2023]
+												echo $this->element('masters_management_elements/add_master_elements/add_misgrade_levels');
+
+											} elseif ($masterId == '23') {
+												// For Management of Misgrading's Action's Masters (MMR) -> Akash [05-06-2023]
+												echo $this->element('masters_management_elements/add_master_elements/add_misgrade_actions');
 											}
 										?>
 									</div>

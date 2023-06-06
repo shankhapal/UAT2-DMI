@@ -3523,7 +3523,8 @@ class CustomfunctionsComponent extends Component {
 				
 		require_once(ROOT . DS .'vendor' . DS . 'phpqrcode' . DS . 'qrlib.php');
 		
-		if($type == 'SOC'){
+		
+		if($type == 'SOC'){ # For Surrender Flow (SOC)
 		
 			$split_customer_id = explode('/',$result[0]); 
 			if ($split_customer_id[1] == 1) {
@@ -3540,13 +3541,32 @@ class CustomfunctionsComponent extends Component {
 						If a violation is observed, action shall be taken as per APGM Act and GGM Rule.";
 			}
 
-		}elseif ($type == 'CHM') {
+		} elseif ($type == 'SPN') { # For Suspension Flow (SCN)
+			
+			$data = "This Certificate of Authorisation is Suspended by the competent authority dated " . date('d-m-Y') . ".\n\n" .
+					"Therefore Applicant do not grade and mark " . $this->commodityNames($result[0]) . " commodity/ies under AGMARK.\n\n" .
+					"If violation is observed, action shall be taken as per APGM Act and GGM Rule.";
+
+		} elseif ($type == 'CAN') {	# For Cancellation Flow (CAN)
+
+			$data = "This Certificate of Authorisation is Cancelled by the competent authority dated " . date('d-m-Y') . ".\n\n" .
+					"Therefore Applicant do not grade and mark " . $this->commodityNames($result[0]) . " commodity/ies under AGMARK.\n\n" .
+					"If violation is observed, action shall be taken as per APGM Act and GGM Rule.";
+
+		}elseif ($type == 'CHM') {	# For Chemist Flow (CHM)
+
 			$data = "Chemist Name :".$result[0]." ## "." CA ID :".$result[1]." CA Name : ".$result[2]."##"." Date : ".$result[3]."##"."Region : ".$result[4];
-		}elseif ($type=='FDC') {
+		
+		}elseif ($type=='FDC') {	# For 15 Digit Code Flow (FDC)
+
 			$data = "CA ID : ".$result[0]." ## "." CA Name : ".$result[1]."##"." Chemist Name : ".$result[2]."##"." Date : ".$result[3]."##"."Region : ".$result[4]."##".$result[5];		  
-		}elseif($type=='ECode'){
+		
+		}elseif($type=='ECode'){	# For  E Code Flow (EC)
+
 			$data = "CA ID : ".$result[0]." ## "." CA Name : ".$result[1]."##"." Chemist Name : ".$result[2]."##"." Date : ".$result[3]."##"." Region : ".$result[4];		  
+		
 		}else{
+
 			$data = "Certificate No :".$result[0]." ## "."Firm Name :".$result[3]." ## "."Grant Date :".$result[1]." ## "." Valid up to date: ".$result[2][max(array_keys($result[2]))];
 		}
 
@@ -3686,6 +3706,52 @@ class CustomfunctionsComponent extends Component {
 
 
 
+
+	// Author : Akash Thakre
+	// Description : This will return QR code for Sample Test Report
+	// Date : 04-05-2023
+
+	public function getQrCodeSampleTestReport($Sample_code_as,$sample_forwarded_office,$test_report){
+				
+		$LimsReportsQrcodes = TableRegistry::getTableLocator()->get('LimsReportsQrcodes'); //initialize model in component
+		
+		require_once(ROOT . DS .'vendor' . DS . 'phpqrcode' . DS . 'qrlib.php');
+
+		//updated by shankhpal on 21/11/2022
+		$data = "Name of RO/SO:".$sample_forwarded_office[0]['user_flag'].",".$sample_forwarded_office[0]['ro_office']."##"."Address of RO/SO :".$sample_forwarded_office[0]['ro_office']."##"."Sample Code No :".$Sample_code_as."##"."Commodity :".$test_report[0]['commodity_name']."##"."Grade:".$test_report[0]['grade_desc'];
+
+		$qrimgname = rand();
+
+		$server_imagpath = '/writereaddata/LIMS/QRCodes/'.$qrimgname.".png";
+
+		$file_path = $_SERVER["DOCUMENT_ROOT"].'/writereaddata/LIMS/QRCodes/'.$qrimgname.".png";
+
+		$file_name = $file_path;
+
+		QRcode::png($data,$file_name);
+
+		$date = date('Y-m-d H:i:s');
+
+		$workflow = TableRegistry::getTableLocator()->get('workflow');
+
+		//$sample_code = $workflow->find('all',array(,'conditions'=>array('org_sample_code'=>$Sample_code_as),'order'=>'id asc'))->toArray();
+		$sample_code = $workflow->find('all',array('fields'=>'org_sample_code', 'conditions'=>array('stage_smpl_cd IS'=>$Sample_code_as)))->first();
+
+		$stage_smpl_code = $sample_code['org_sample_code'];
+
+		$SampleReportAdd = $LimsReportsQrcodes->newEntity([
+			'sample_code'=>$stage_smpl_code,
+			'qr_code_path'=>$server_imagpath,
+			'created'=>$date,
+			'modified'=>$date
+		]);
+
+		$LimsReportsQrcodes->save($SampleReportAdd);
+
+		$qrimage = $LimsReportsQrcodes->find('all',array('field'=>'qr_code_path','conditions'=>array('sample_code'=>$stage_smpl_code),'order'=>'id desc'))->first();
+
+		return $qrimage;
+	}
 
 }
 ?>

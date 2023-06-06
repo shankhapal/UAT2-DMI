@@ -3,6 +3,7 @@ var csrfToken = $('#bottom_layout_csrf_call').val();
 
 $(document).ready(function() {
     $("#form_outer_main :input[type='reset']").hide();
+    bsCustomFileInput.init()
 });
 
 $(function () {

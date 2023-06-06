@@ -100,11 +100,18 @@
 
                                             echo $this->element('masters_management_elements/list_master_elements/all_documents_list');
 
-                                        }
-                                        elseif ($masterId == '20') {
-                                            //added by shankhpal shende on 06/12/2022
+                                        } elseif ($masterId == '20') {
+                                            //For Routine Inspections -> Shankhapal Shende [06-12-2022]
                                             echo $this->element('masters_management_elements/list_master_elements/all_period');
-
+                                        }elseif ($masterId == '21') {
+                                            //For Management of Misgrading's Action's Module -> Akash [05-06-2023]
+                                            echo $this->element('masters_management_elements/list_master_elements/all_misgrade_category');
+                                        } elseif ($masterId == '22') {
+                                            //For Management of Misgrading's Action's Module -> Akash [05-06-2023]
+                                            echo $this->element('masters_management_elements/list_master_elements/all_misgrade_levels');
+                                        } elseif ($masterId == '23') {
+                                            //For Management of Misgrading's Action's Module -> Akash [05-06-2023]
+                                            echo $this->element('masters_management_elements/list_master_elements/all_misgrade_actions');
                                         }
                                     ?>
                                 </table>

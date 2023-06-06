@@ -427,7 +427,7 @@ class ScrutinyController extends AppController{
 		}
 		//End code for Edit/Delete options For RO on Communication with Applicant.
 
-		// Saved referredback comments in chemist flow, Done Aakash Thakare 30-09-2021
+		// Saved referredback comments in chemist flow, Done Akash [30-09-2021]
 		if(null!==($this->request->getData('che_ro_referred_back'))){
 
 			$result = $this->Communication->singleWindowReferredback($this->request->getData(),$allSectionDetails);

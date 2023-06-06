@@ -239,15 +239,46 @@ class MastersController extends AppController {
 			$this->masterAddTitle = 'Add Documents Type';
 			$this->masterEditTitle = 'Edit Documents Type';
 			$this->fieldNameForCheck = 'document_type';
-		}
-		elseif ($masterId=='20') {
-			//for routin Inspection, added on 06-12-2022 by Shankhpal shende
+		
+		//[ 20 For routin Inspections Master ] -> Shankhpal [06-12-2022]
+		} elseif ($masterId=='20') {
+
 			$this->masterTable = 'DmiRoutineInspectionPeriod';
 			$this->masterListTitle = 'Routine Inspection Period (Month)';
 			$this->masterListHeader = 'Routine Inspection';
 			$this->masterAddTitle = 'Add Month';
 			$this->masterEditTitle = 'Edit Month';
 			$this->fieldNameForCheck = 'routin_month';
+
+		//[ 21 For the Misgrade Categories Master ] -> Akash [12-12-2022]
+		} elseif ($masterId=='21') {
+
+			$this->masterTable = 'DmiMmrCategories';
+			$this->masterListTitle = 'List of All Misgrade Categories';
+			$this->masterListHeader = 'Misgrade Categories List';
+			$this->masterAddTitle = 'Add Misgrade Category';
+			$this->masterEditTitle = 'Edit Misgrade Category';
+			$this->fieldNameForCheck = 'misgrade_category';
+		
+		//[ 22 For the Misgrade Levels Master ] -> Akash [12-12-2022]
+		} elseif ($masterId=='22') {
+
+			$this->masterTable = 'DmiMmrLevels';
+			$this->masterListTitle = 'List of All Misgrade Levels';
+			$this->masterListHeader = 'Misgrade Levels';
+			$this->masterAddTitle = 'Add Misgrade Levels';
+			$this->masterEditTitle = 'Edit Misgrade Levels';
+			$this->fieldNameForCheck = 'misgrade_levels';
+
+		//[ 23 For the Misgrade Actions Master ] -> Akash [12-12-2022]
+		} elseif ($masterId=='23') {
+
+			$this->masterTable = 'DmiMmrActions';
+			$this->masterListTitle = 'List of All Misgrade Actions';
+			$this->masterListHeader = 'Misgrade Actions';
+			$this->masterAddTitle = 'Add Misgrade Action';
+			$this->masterEditTitle = 'Edit Misgrade Action';
+			$this->fieldNameForCheck = 'misgrade_actions';
 		}
 	
 	}
@@ -550,12 +581,12 @@ class MastersController extends AppController {
 			$unit = $this->DmiReplicaUnitDetails->find('list',array('keyField'=>'id','valueField'=>'sub_unit','conditions'=>array('delete_status IS NULL')))->toArray();
 			//Set the All Varibles
 			$this->set(compact('commodity_categories','unit'));
+	
 		}elseif($masterId == '20'){
 			  
-			  $this->loadModel('DmiCertificateTypes');
-        $certificate_type = $this->DmiCertificateTypes->find('list',array('valueField'=>'certificate_type','conditions'=>array()))->toArray();
-			
-		    $this->set('certificate_type',$certificate_type);
+			$this->loadModel('DmiCertificateTypes');
+        		$certificate_type = $this->DmiCertificateTypes->find('list',array('valueField'=>'certificate_type','conditions'=>array()))->toArray();
+		    	$this->set('certificate_type',$certificate_type);
 		} 
 
 
@@ -851,33 +882,25 @@ class MastersController extends AppController {
 
 			//Set the All Varibles
 			$this->set(compact('commodity_categories','entered_commodity','entered_charge','entered_qty','selected_unit','replica_code','masterEditTitle','masterListHeader'));
-		}
-		elseif($masterId == '20')
-		{
-			 // added by shankhpal shende on 06/12/2022
-			  $this->loadModel('DmiRoutineInspectionPeriod');
+	
+	
+		// For Routine Inspection -> Shankhpal Shende [06/12/2022]
+		}elseif($masterId == '20'){
 
-				$form_id = 'edit_period';
-		  	$period_id = $this->Session->read('record_id');
-				//period added for master of routine inspection -> shankhpal 16/05/2023
-				// updated period of master by shankhpal shende on 17/05/2023
-				$period_rti = array('0'=>'0','1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8','9'=>'9','10'=>'10','11'=>'11','12'=>'12');
-        
-        $this->set('period_rti',$period_rti);
-	     
-				$this->loadModel('DmiCertificateTypes');
-        $certificate_type = $this->DmiCertificateTypes->find('list',array('valueField'=>'certificate_type','conditions'=>array()))->toArray();
-			
-		    $this->set('certificate_type',$certificate_type);
+			$this->loadModel('DmiRoutineInspectionPeriod');
+			$form_id = 'edit_period';
+			$period_id = $this->Session->read('record_id');
+			//period added for master of routine inspection -> shankhpal 16/05/2023
+			// updated period of master by shankhpal shende on 17/05/2023
+			$period_rti = array('0'=>'0','1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8','9'=>'9','10'=>'10','11'=>'11','12'=>'12');
+			$this->set('period_rti',$period_rti);
 				
-			  $period_details = $this->DmiRoutineInspectionPeriod->find('all',array('conditions'=>array('id IS'=>$period_id)))->first();
-		  	$this->set(compact('period_details'));
-			
-
-			
-
-       
-			
+			$this->loadModel('DmiCertificateTypes');
+			$certificate_type = $this->DmiCertificateTypes->find('list',array('valueField'=>'certificate_type','conditions'=>array()))->toArray();
+			$this->set('certificate_type',$certificate_type);
+					
+			$period_details = $this->DmiRoutineInspectionPeriod->find('all',array('conditions'=>array('id IS'=>$period_id)))->first();
+			$this->set(compact('period_details'));
 		}
 
 
@@ -1317,13 +1340,48 @@ class MastersController extends AppController {
 				$this->message = 'You have '.$action_var.' Documents Type Successfully.';
 				$this->message_theme = 'success';
 			}
-		}elseif ($masterId=='20') {
-        // added by shankhpal shende on 06/12/2022
-			if ($this->Mastertablecontent->addEditPeriodMaster($postData,$record_id)) {
+		
+		// For Routine Inspection -> Shankhpal Shende [06/12/2022]
+		} elseif ($masterId=='20') {
+			 
+			 if ($this->Mastertablecontent->addEditPeriodMaster($postData,$record_id)) {
 
 				///Added this call to save the user action log on 21-02-2022 by Akash
 				$this->Customfunctions->saveActionPoint('Routine Inspection Period Master '."($forActionLog)", 'Success');
 				$this->message = 'You have '.$action_var.' Period Successfully.';
+				$this->message_theme = 'success';
+			}
+
+		// For Misgrade Categories -> Akash [12-12-2022]
+		} elseif ($masterId=='21') {
+
+			if ($this->Mastertablecontent->addEditMisgradeCategories($postData,$record_id)) {
+
+				///Added this call to save the user action log on 21-02-2022 by Akash
+				$this->Customfunctions->saveActionPoint('Misgrade Categories '."($forActionLog)", 'Success');
+				$this->message = 'You have '.$action_var.' Misgrade Category Successfully.';
+				$this->message_theme = 'success';
+			}
+		
+		// For Misgrade Levels -> Akash [12-12-2022]
+		} elseif ($masterId=='22') {
+
+			if ($this->Mastertablecontent->addEditMisgradeLevels($postData,$record_id)) {
+
+				///Added this call to save the user action log on 21-02-2022 by Akash
+				$this->Customfunctions->saveActionPoint('Misgrade Levels '."($forActionLog)", 'Success');
+				$this->message = 'You have '.$action_var.' Misgrade Level Successfully.';
+				$this->message_theme = 'success';
+			}
+		
+		// For Misgrade Action -> Akash [12-12-2022]
+		} elseif ($masterId=='23') {
+
+			if ($this->Mastertablecontent->addEditMisgradeActions($postData,$record_id)) {
+
+				///Added this call to save the user action log on 21-02-2022 by Akash
+				$this->Customfunctions->saveActionPoint(' Misgrade Action '."($forActionLog)", 'Success');
+				$this->message = 'You have '.$action_var.' Misgrade Action Successfully.';
 				$this->message_theme = 'success';
 			}
 		}

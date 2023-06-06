@@ -12,9 +12,9 @@
 						<p class="nav-icon-p">Dashboard</p>
 					</a>
 				</li>
-
-				<?php if ($isAppSurrender == 'no') { ?>
-
+						
+					<?php // Below Condition Block is Updated and included two more condtions for Suspension and Cancellations of the Certificates - Akash [05-06-2023]
+						if ($isSuspended == 'no' || $isCancelled =='no' || $isAppSurrender == 'no') { ?>
 
 						<li class="nav-item has-treeview">
 
@@ -73,12 +73,7 @@
 								
 								<?php } ?>	
 
-								<!-- <li class="nav-item">
-								<a href="#" class="nav-link <?php //echo $menu_susp; ?>">
-									<i class="far fa-clock nav-icon"></i>
-									<p>Suspension</p>
-								</a>
-								</li> -->
+							
 								
 
 

@@ -104,6 +104,7 @@ class AppController extends Controller
 		//added on 01-10-2021 by Amol
 		//if not in advance payment mode
 		$this->Session->write('advancepayment','no');
+		$this->Session->write('forReplica','no');
 
 	   //call to aqcms_statistics data on footer section.
 		$this->loadModel('DmiFrontStatistics');
@@ -138,6 +139,18 @@ class AppController extends Controller
 		$current_user_division = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$username)))->first();
 		$this->set('current_user_division',$current_user_division);
 
+		//Is Approved
+		$IsApproved=null;
+		$final_submit_id = $this->DmiFinalSubmits->find('all', array('conditions' => array('customer_id IS' => $username),'order'=>'id desc'))->first();
+		if (!empty($final_submit_id)) {
+			//get grant status		
+			if ($final_submit_id['status']=='approved' && $final_submit_id['current_level']=='level_3') {
+				$IsApproved='yes';
+			}
+			$this->Session->write('IsApproved',$IsApproved);
+		}else{
+			$this->Session->write('IsApproved',$IsApproved);
+		}
 
 		if(null == ($this->Session->read('paymentforchange'))){
 			$this->Session->write('paymentforchange','available');
@@ -145,6 +158,8 @@ class AppController extends Controller
 
 		$user_last_login = $this->Customfunctions->userLastLogins();
 		$this->set('user_last_login',$user_last_login);
+
+		
 
 	}
 

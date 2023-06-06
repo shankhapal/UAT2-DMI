@@ -3,115 +3,124 @@
 	<div class="content-header">
 		<div class="container-fluid">
 			<div class="row mb-2">
-			    <div class="col-sm-6"><label class="badge badge-primary">Edit Master Records</label></div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><?php echo $this->Html->link('Dashboard', array('controller' => 'dashboard', 'action'=>'home'));?></li>
-                        <li class="breadcrumb-item"><?php echo $this->Html->link('Masters Home', array('controller' => 'masters', 'action'=>'masters-home'));?></li>
-                        <li class="breadcrumb-item active"><?php echo $masterEditTitle ?></li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-    </div>
+				<div class="col-sm-6"><label class="badge badge-primary">Edit Master Records</label></div>
+				<div class="col-sm-6">
+					<ol class="breadcrumb float-sm-right">
+						<li class="breadcrumb-item"><?php echo $this->Html->link('Dashboard', array('controller' => 'dashboard', 'action'=>'home'));?></li>
+						<li class="breadcrumb-item"><?php echo $this->Html->link('Masters Home', array('controller' => 'masters', 'action'=>'masters-home'));?></li>
+						<li class="breadcrumb-item active"><?php echo $masterEditTitle ?></li>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</div>
 
-    <section class="content form-middle">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-10">
-                    <?php echo $this->Form->create(null,array('class'=>'form-group','id'=>$form_id)); ?>
-                        <div class="card">
-                            <div class="card-header card-master"><h5 class="card-title-new"><?php echo $masterEditTitle ?></h5></div>
-                            <div class="form-horizontal">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <?php
-                                            if ($masterId=='1') {
+	<section class="content form-middle">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-10">
+					<?php echo $this->Form->create(null,array('class'=>'form-group','id'=>$form_id)); ?>
+						<div class="card">
+							<div class="card-header card-master"><h5 class="card-title-new"><?php echo $masterEditTitle ?></h5></div>
+							<div class="form-horizontal">
+								<div class="card-body">
+									<div class="row">
+										<?php
+											if ($masterId=='1') {
 
-                                                echo $this->element('masters_management_elements/edit_master_elements/edit_state');
+												echo $this->element('masters_management_elements/edit_master_elements/edit_state');
 
-                                            } elseif ($masterId=='2') {
+											} elseif ($masterId=='2') {
 
-                                                echo $this->element('masters_management_elements/edit_master_elements/edit_district');
+												echo $this->element('masters_management_elements/edit_master_elements/edit_district');
 
-                                            } elseif ($masterId=='3') {
+											} elseif ($masterId=='3') {
 
-                                                echo $this->element('masters_management_elements/edit_master_elements/edit_business_type');
+												echo $this->element('masters_management_elements/edit_master_elements/edit_business_type');
 
-                                            } elseif ($masterId=='4') {
+											} elseif ($masterId=='4') {
 
-                                                echo $this->element('masters_management_elements/edit_master_elements/edit_packing_type');
+												echo $this->element('masters_management_elements/edit_master_elements/edit_packing_type');
 
-                                            } elseif ($masterId=='5') {
+											} elseif ($masterId=='5') {
 
-                                                echo $this->element('masters_management_elements/edit_master_elements/edit_laboratory_type');
+												echo $this->element('masters_management_elements/edit_master_elements/edit_laboratory_type');
 
-                                            } elseif ($masterId=='6') {
+											} elseif ($masterId=='6') {
 
-                                                echo $this->element('masters_management_elements/edit_master_elements/edit_machine_type');
+												echo $this->element('masters_management_elements/edit_master_elements/edit_machine_type');
 
-                                            } elseif ($masterId=='7') {
+											} elseif ($masterId=='7') {
 
-                                                echo $this->element('masters_management_elements/edit_master_elements/edit_tank_shape');
+												echo $this->element('masters_management_elements/edit_master_elements/edit_tank_shape');
 
-                                            } elseif ($masterId=='8') {
+											} elseif ($masterId=='8') {
 
-                                                echo $this->element('masters_management_elements/edit_master_elements/edit_charge');
+												echo $this->element('masters_management_elements/edit_master_elements/edit_charge');
 
-                                            } elseif ($masterId=='9') {
+											} elseif ($masterId=='9') {
 
-                                                echo $this->element('masters_management_elements/edit_master_elements/edit_business_year');
+												echo $this->element('masters_management_elements/edit_master_elements/edit_business_year');
 
-                                            } elseif ($masterId=='10') {
+											} elseif ($masterId=='10') {
 
-                                                echo $this->element('masters_management_elements/edit_master_elements/edit_office');
+												echo $this->element('masters_management_elements/edit_master_elements/edit_office');
 
-                                            } elseif ($masterId=='11') {
+											} elseif ($masterId=='11') {
 
-                                                echo $this->element('masters_management_elements/edit_master_elements/edit_template');
+												echo $this->element('masters_management_elements/edit_master_elements/edit_template');
 
-                                            } elseif ($masterId=='12') {
+											} elseif ($masterId=='12') {
 
-                                                echo $this->element('masters_management_elements/edit_master_elements/edit_pao');
+												echo $this->element('masters_management_elements/edit_master_elements/edit_pao');
 
-                                            } elseif ($masterId=='15') {
+											} elseif ($masterId=='15') {
 
-                                                echo $this->element('masters_management_elements/edit_master_elements/edit_feedback_type');
+												echo $this->element('masters_management_elements/edit_master_elements/edit_feedback_type');
 
-                                            } elseif ($masterId=='16') {
+											} elseif ($masterId=='16') {
 
-                                                echo $this->element('masters_management_elements/edit_master_elements/edit_replica_charges');
+												echo $this->element('masters_management_elements/edit_master_elements/edit_replica_charges');
 
-                                            } elseif ($masterId=='17') {
+											} elseif ($masterId=='17') {
 
-                                                echo $this->element('masters_management_elements/edit_master_elements/edit_education_type');
+												echo $this->element('masters_management_elements/edit_master_elements/edit_education_type');
 
-                                            } elseif ($masterId=='18') {
+											} elseif ($masterId=='18') {
 
-                                                echo $this->element('masters_management_elements/edit_master_elements/edit_division_type');
+												echo $this->element('masters_management_elements/edit_master_elements/edit_division_type');
 
-                                            } elseif ($masterId=='19') {
+											} elseif ($masterId=='19') {
 
-                                                echo $this->element('masters_management_elements/edit_master_elements/edit_documents_list');
-                                            }
-                                            elseif  ($masterId=='20') {
-                                               // added by shankhpal shende on 06/12/2022
-                                                echo $this->element('masters_management_elements/edit_master_elements/edit_period');
-                                            }
-                                        ?>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-footer">
-                                <?php echo $this->element('masters_management_elements/button_elements/edit_submit_common_btn'); ?>
-                                <?php echo $this->Html->link('Back', array('controller' => 'masters', 'action'=>'list_master_records'),array('class'=>'add_btn btn btn-secondary float-right')); ?>
-                            </div>
-                        </div>
-                    <?php echo $this->Form->end(); ?>
-                </div>
-            </div>
-        </div>
-    </section>
+												echo $this->element('masters_management_elements/edit_master_elements/edit_documents_list');
+												
+											}  elseif  ($masterId=='20') {
+												//For Routine Inspection -> Shankhpal Shende [06/12/2022]
+												echo $this->element('masters_management_elements/edit_master_elements/edit_period');
+											} elseif ($masterId=='21') {
+												//For Management of Misgrading's Action's Module (MMR) -> Akash [05-06-2023]
+												echo $this->element('masters_management_elements/edit_master_elements/edit_misgrade_category');
+											} elseif ($masterId=='22') {
+												//For Management of Misgrading's Action's Module (MMR) -> Akash [05-06-2023]
+												echo $this->element('masters_management_elements/edit_master_elements/edit_misgrade_levels');
+											} elseif ($masterId=='23') {
+												//For Management of Misgrading's Action's Module (MMR) -> Akash [05-06-2023]
+												echo $this->element('masters_management_elements/edit_master_elements/edit_misgrade_actions');
+											} 
+										?>
+									</div>
+								</div>
+							</div>
+							<div class="card-footer">
+								<?php echo $this->element('masters_management_elements/button_elements/edit_submit_common_btn'); ?>
+								<?php echo $this->Html->link('Back', array('controller' => 'masters', 'action'=>'list_master_records'),array('class'=>'add_btn btn btn-secondary float-right')); ?>
+							</div>
+						</div>
+					<?php echo $this->Form->end(); ?>
+				</div>
+			</div>
+		</div>
+	</section>
 </div>
 
 <input type="hidden" id="masterId" value="<?php echo $masterId; ?>">
