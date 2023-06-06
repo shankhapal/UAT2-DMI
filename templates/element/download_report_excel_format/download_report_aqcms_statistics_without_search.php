@@ -72,11 +72,12 @@ if (isset($_SESSION['ro_id'])){ $ro_id = $_SESSION['ro_id']; }else{ $ro_id = "";
 			<table cellspacing="0" cellpadding="1" border="1">
 				<tr>
 					<td width="30" align="center" class="subtitle2">3</td>
-					<td width="200" class="stats_title" class="box-3">In-Process</td>
-					<td width="100" align="center" class="stats_main_figs" class="box-3"><?php echo $statistics_counts[0]['ca_ip_app_n']+$statistics_counts[0]['pp_ip_app_n']+$statistics_counts[0]['lb_ip_app_n']+ 
-																		  $statistics_counts[0]['ca_ip_app_r']+$statistics_counts[0]['pp_ip_app_r']+$statistics_counts[0]['lb_ip_app_r']+
-																		  $statistics_counts[0]['ca_ip_app_bk']+$statistics_counts[0]['pp_ip_app_bk']+$statistics_counts[0]['lb_ip_app_bk'];
-															  ?></td>
+					<td width="200" class="stats_title" class="box-3">Total In-Process</td>
+					<td width="100" align="center" class="stats_main_figs" class="box-3">
+						<?php echo $statistics_counts[0]['ca_ip_app_n']+$statistics_counts[0]['pp_ip_app_n']+$statistics_counts[0]['lb_ip_app_n']+ 
+									$statistics_counts[0]['ca_ip_app_r']+$statistics_counts[0]['pp_ip_app_r']+$statistics_counts[0]['lb_ip_app_r']+
+									$statistics_counts[0]['ca_ip_app_bk']+$statistics_counts[0]['pp_ip_app_bk']+$statistics_counts[0]['lb_ip_app_bk'];
+						?></td>
 				</tr>
 				<tr>
 					<td width="30" align="center"></td>
@@ -130,12 +131,39 @@ if (isset($_SESSION['ro_id'])){ $ro_id = $_SESSION['ro_id']; }else{ $ro_id = "";
 					<td width="140" class="stats_subtitle">Approval of Laboratory</td>
 					<td width="100" align="center" class="stats_sub_figs"><?php echo $statistics_counts[0]['lb_ip_app_r']; ?></td>
 				</tr>
+				<!-- added backlog application by shreeya on date [06-06-2023] -->
+				<tr>
+					<td width="30" align="center"></td>
+					<td width="30" align="right" class="subtitle2">3.3</td>
+					<td width="170" class="stats_subtitle">Backlog Application</td>
+				</tr>
+				<tr>
+					<td width="30" align="center"></td>
+					<td width="30" align="center"></td>
+					<td width="30" align="center" class="subtitle2">a</td>
+					<td width="140" class="stats_subtitle">CA</td>
+					<td width="100" align="center" class="stats_sub_figs"><?php echo $statistics_counts[0]['ca_ip_app_bk']; ?></td>
+				</tr>
+				<tr>
+					<td width="30" align="center"></td>
+					<td width="30" align="center"></td>
+					<td width="30" align="center" class="subtitle2">b</td>
+					<td width="140" class="stats_subtitle">Printing Press</td>
+					<td width="100" align="center" class="stats_sub_figs"><?php echo $statistics_counts[0]['pp_ip_app_bk']; ?></td>
+				</tr>
+				<tr>
+					<td width="30" align="center"></td>
+					<td width="30" align="center"></td>
+					<td width="30" align="center" class="subtitle2">c</td>
+					<td width="140" class="stats_subtitle">Approval of Laboratory</td>
+					<td width="100" align="center" class="stats_sub_figs"><?php echo $statistics_counts[0]['lb_ip_app_bk']; ?></td>
+				</tr>
 			</table>
 			<div></div>
 			<table cellspacing="0" cellpadding="1" border="1">
 				<tr>
 					<td width="30" align="center" class="subtitle2">4</td>
-					<td width="200" class="stats_title" class="box-4">Granted</td>
+					<td width="200" class="stats_title" class="box-4">Total Granted</td>
 					<td width="100" align="center" class="stats_main_figs" class="box-4"><?php echo $statistics_counts[0]['ca_new_grant']+$statistics_counts[0]['printing_new_grant']+$statistics_counts[0]['lab_new_grant']+ 
 																	$statistics_counts[0]['ca_renew_grant']+$statistics_counts[0]['printing_renew_grant']+$statistics_counts[0]['lab_renew_grant']+
 																	$statistics_counts[0]['ca_bk_grant']+$statistics_counts[0]['pp_bk_grant']+$statistics_counts[0]['lb_bk_grant'];
@@ -219,12 +247,20 @@ if (isset($_SESSION['ro_id'])){ $ro_id = $_SESSION['ro_id']; }else{ $ro_id = "";
 					<td width="140" class="stats_subtitle">Approval of Laboratory</td>
 					<td width="100" align="center" class="stats_sub_figs"><?php echo $statistics_counts[0]['lb_bk_grant']; ?></td>
 				</tr>
+				<!-- added new tr for  total count  of new application + backlog application by shreeya on date [06-06-2023]-->
+				<tr>
+					<td width="30" align="center" class="subtitle2"></td>
+					<td width="200" class="stats_title" class="box-4">Total New & Backlog</td>
+					<td width="100" align="center" class="stats_main_figs" class="box-4"><?php echo $statistics_counts[0]['ca_new_grant']+$statistics_counts[0]['printing_new_grant']+$statistics_counts[0]['lab_new_grant']+ 
+																	$statistics_counts[0]['ca_bk_grant']+$statistics_counts[0]['pp_bk_grant']+$statistics_counts[0]['lb_bk_grant'];
+					?></td>
+				</tr>
 			</table>
 			<div></div>
 			<table cellspacing="0" cellpadding="1" border="1">
 				<tr>
 					<td width="30" align="center" class="subtitle2">5</td>
-					<td width="200" class="stats_title" class="box-5">Renewal Due</td>
+					<td width="200" class="stats_title" class="box-5">Total Renewal Due</td>
 					<td width="100" align="center" class="stats_main_figs" class="box-5"><?php echo $statistics_counts[0]['ca_renewal_due']+$statistics_counts[0]['pp_renewal_due']+$statistics_counts[0]['lb_renewal_due']; ?></td>
 				</tr>
 				<tr>
@@ -250,7 +286,7 @@ if (isset($_SESSION['ro_id'])){ $ro_id = $_SESSION['ro_id']; }else{ $ro_id = "";
 			<table cellspacing="0" cellpadding="1" border="1">
 				<tr>
 					<td width="30" align="center" class="subtitle2">6</td>
-					<td width="200" class="stats_title" class="box-6">Pending With</td>
+					<td width="200" class="stats_title" class="box-6">Total Pending With</td>
 					<td width="100" align="center" class="stats_main_figs" class="box-6"><?php echo $statistics_counts[0]['pending_mo']+$statistics_counts[0]['pending_io']+$statistics_counts[0]['pending_ro']+$statistics_counts[0]['pending_ho']; ?></td>
 				</tr>
 				<tr>
@@ -282,7 +318,7 @@ if (isset($_SESSION['ro_id'])){ $ro_id = $_SESSION['ro_id']; }else{ $ro_id = "";
 			<table cellspacing="0" cellpadding="1" border="1">
 				<tr>
 					<td width="30" align="center" class="subtitle2">7</td>
-					<td width="200" class="stats_title" class="box-7">Documents E-signed</td>
+					<td width="200" class="stats_title" class="box-7">Total Documents E-signed</td>
 					<td width="100" align="center" class="stats_main_figs" class="box-7"><?php echo $statistics_counts[0]['e_sign_app_n']+$statistics_counts[0]['e_sign_insp_n']+$statistics_counts[0]['e_sign_grantc_n']+
 																			$statistics_counts[0]['e_sign_app_r']+$statistics_counts[0]['e_sign_insp_r']+$statistics_counts[0]['e_sign_grantc_r']; ?></td>
 				</tr>
@@ -324,17 +360,18 @@ if (isset($_SESSION['ro_id'])){ $ro_id = $_SESSION['ro_id']; }else{ $ro_id = "";
 					<td width="140" class="stats_subtitle">Application</td>
 					<td width="100" align="center" class="stats_sub_figs"><?php echo $statistics_counts[0]['e_sign_app_r']; ?></td>
 				</tr>
-				<tr>
+				<!-- commented by shreeya bcoz this tab not using on date [06-05-2023] -->
+				<!-- <tr>
 					<td width="30" align="center"></td>
 					<td width="30" align="center"></td>
 					<td width="30" align="center" class="subtitle2">b</td>
 					<td width="140" class="stats_subtitle">Inspection Report</td>
-					<td width="100" align="center" class="stats_sub_figs"><?php echo $statistics_counts[0]['e_sign_insp_r']; ?></td>
-				</tr>
+					<td width="100" align="center" class="stats_sub_figs"><?php //echo $statistics_counts[0]['e_sign_insp_r']; ?></td>
+				</tr> -->
 				<tr>
 					<td width="30" align="center"></td>
 					<td width="30" align="center"></td>
-					<td width="30" align="center" class="subtitle2">c</td>
+					<td width="30" align="center" class="subtitle2">b</td>
 					<td width="140" class="stats_subtitle">Grant Certificate</td>
 					<td width="100" align="center" class="stats_sub_figs"><?php echo $statistics_counts[0]['e_sign_grantc_r']; ?></td>
 				</tr>
