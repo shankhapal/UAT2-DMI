@@ -4,10 +4,10 @@
 	<div class="modal-dialog modal-dialog-centered">
 		<div class="modal-content">
 			<div class="modal-header">
-				<?php if($comm_with=='Not Allocated'){ ?>
-					<h4 class="modal-title">Final Report Allocation for Scrutiny</h4>
+				<?php if($allocted=='not_allocated'){ ?>
+					<h4 class="modal-title">LIMS Report Allocation for Scrutiny</h4>
 				<?php }else{ ?>
-					<h4 class="modal-title">Re-allocation for Scrutiny</h4>
+					<h4 class="modal-title">LIMS Report Re-allocation for Scrutiny</h4>
 				<?php } ?>
 				<button type="button" class="close" data-dismiss="modal">&times;</button>
 			</div>
@@ -29,7 +29,7 @@
 								<td><?php echo $this->Form->control('mo_users_list', array('type'=>'select', 'id'=>'mo_users_list', 'options'=>$mo_users_list,'label'=>false, 'empty'=>'--Select--', 'required'=>true));
 								//echo $this->Form->control('mo_users_list',array('type'=>'select', 'id'=>'mo_users_list', 'options'=> $mo_users_list, 'label'=>false,)); ?></td>
 								<td>
-									<?php if($comm_with=='Not Allocated'){ ?>
+									<?php if($allocted=='not_allocated'){ ?>
 										<a href="#" class="allocate_btn"  id="scrutiny_allocate_btn">Allocate</a>
 										
 									<?php }else{ ?>

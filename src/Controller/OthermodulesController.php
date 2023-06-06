@@ -59,9 +59,12 @@ class OthermodulesController extends AppController{
 
 
 		$username = $this->getRequest()->getSession()->read('username');
-		
 		if ($username == null){
+			
 			$this->customAlertPage("Sorry You are not authorized to view this page..");
+			
+		} elseif (preg_match("/^[0-9]+\/[0-9]+\/[A-Z]+\/[0-9]+$/", $username,$matches)==1) {
+			//this added intensionally to avoid the login when applicant is logged in - Akash [06-06-2023]
 		} else {
 
 			$this->loadModel('DmiUsers');
@@ -70,7 +73,6 @@ class OthermodulesController extends AppController{
 
 			if (empty($check_user)) {
 				$this->customAlertPage("Sorry You are not authorized to view this page..");
-				exit();
 			}
 		}
 	}

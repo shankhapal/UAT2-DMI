@@ -54,6 +54,13 @@ class DashboardController extends AppController{
 			
 			#This below Sesion delete is added to unset the application_type session on click - Akash[05-12-2022]
 			$this->Session->Delete('application_type');
+
+			//Below all the Session Delete setfor the MMR Application - Akash [06-06-2023]
+			$this->Session->Delete('alloc_user_by');
+			$this->Session->Delete('allocation_to');
+			$this->Session->Delete('sample_code');
+			$this->Session->Delete('pdf_file_name');
+			$this->Session->Delete('application_mode');
 		}
 
 //phase 2 new code from here

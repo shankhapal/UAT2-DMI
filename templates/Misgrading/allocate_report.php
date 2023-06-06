@@ -19,7 +19,7 @@
 				<div class="col-md-12">
 					<?php echo $this->Form->create(null, array('id'=>'frm_sample_forward','class'=>'form-group')); ?>
 						<div class="card card-info">
-							<div class="card-header"><h3 class="card-title-new">Allocate Report to Scrutinizer</h3></div>
+							<div class="card-header"><h3 class="card-title-new">Report Details</h3></div>
 							<div class="form-horizontal mb-3">
 								<div class="card-body">
 									<?php if(!empty($validate_err)){ ?><div class="alert alert-danger textAlignCenter text-danger"><?php echo $validate_err; ?></div><?php } ?>

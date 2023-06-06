@@ -29,10 +29,10 @@
 										<input class="custom-control-input" type="radio" id="scrutinized_report" name="report_type">
 										<label class="custom-control-label" for="scrutinized_report">Scrutinized Report</label>
 									</div>
-									<div class="custom-control custom-radio ml-2">
+									<!--<div class="custom-control custom-radio ml-2">
 										<input class="custom-control-input" type="radio" id="allocate_report" name="report_type">
 										<label class="custom-control-label" for="allocate_report">Allocate Report</label>
-									</div>
+									</div>-->
 								</div>
 							</div>
 							<div class="card-body">
@@ -62,8 +62,8 @@
 													if ($each['packer_attached'] == null && $each['action_final_submit'] == null && $each['scrutiny_status']) {
 														$status = 'N/A';
 													}else{
-														if ($each['packer_attached'] == 'Yes') {
-															$status = 'N/A';
+														if ($each['packer_attached'] == 'Y') {
+															$status = 'Packer is Attached';
 														}elseif ($each['scrutiny_status'] == 'Yes') {
 															$status = 'N/A';
 														}else {
@@ -139,6 +139,7 @@
 									</table>
 								</div>
 
+								<!--
 								<div id="allocated_report_table">
 									<div class="card-header"><h3 class="card-title-new">Allocated Reports</h3></div>
 									<table class="table table-striped table-hover table-sm table-bordered">
@@ -152,7 +153,7 @@
 											</tr>
 										</thead>
 										<tbody class="tableBody">
-											<?php
+											<?php /*
 
 											if (isset($get_allocations)) {
 												$i = 0;
@@ -172,10 +173,12 @@
 															); ?> 
 														</td>
 													</tr>
-											<?php endforeach; } ?>
+											<?php endforeach; } */ ?>
 										</tbody>
 									</table>
 								</div>
+								-->
+
 							</div>
 						</div>
 					</div>

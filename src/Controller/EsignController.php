@@ -871,29 +871,38 @@ public function renewalRequestReEsign(){
 				$url_to_redirect = 	$main_domain_url.'hoinspections/redirectGrantedApplications/1'; //default sending to new granted list
 			}
 
+			
 
 			$this->Session->delete('pdf_file_name');
 			$this->Session->delete('re_esigning');
 			$this->Session->delete('re_esign_grant_date');
 			$this->Session->delete('application_type');
+
 			
-			$source = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/temp/';
-			$destination = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/certificates/'.$folderName.'/';
-			
-			//Renaming the existing grant pdf file for backup, bcoz after moving it will be repalced
-			rename($destination.$pdf_file_name,$destination.'Old-'.$pdf_file_name);
+			$source = $_SERVER["DOCUMENT_ROOT"].'/writereaddata/DMI/temp/';
+			$destination = $_SERVER["DOCUMENT_ROOT"].'/writereaddata/DMI/certificates/'.$folderName.'/';
 			
 			//update pdf path in the grant table as per new structure, applied on 01-11-2022
 			$splitId1 = explode('(',$pdf_file_name);
 			$splitId2 = explode(')',$splitId1[1]);
 			$pdfversion = $splitId2[0];
-			$newpath = '/testdocs/DMI/certificates/'.$folderName.'/'.$pdf_file_name;
-			$this->LoadModel('DmiGrantCertificatesPdfs');
-			$this->DmiGrantCertificatesPdfs->updateAll(array('pdf_file'=>$newpath),array('pdf_version'=>$pdfversion,'customer_id'=>$customer_id));
-			
-			//Entry For the Suspended / Cancelled Firms in the Database and Update Status after esigning.
-			$this->loadModel($model);
-			$this->$model->saveLog($customer_id,$newpath,$pdfversion);
+
+			if ($this->Session->check('for_module')) {
+
+				$path = '/testdocs/DMI/certificates/'.$folderName.'/'.$pdf_file_name;
+				//Entry For the Suspended / Cancelled Firms in the Database and Update Status after esigning.
+				$this->loadModel($model);
+				$this->$model->saveLog($customer_id,$path,$pdfversion);
+
+			} else {
+				//Renaming the existing grant pdf file for backup, bcoz after moving it will be repalced
+				rename($destination.$pdf_file_name,$destination.'Old-'.$pdf_file_name);
+				
+				$newpath = '/testdocs/DMI/certificates/'.$folderName.'/'.$pdf_file_name;
+				$this->loadModel('DmiGrantCertificatesPdfs');
+				$this->DmiGrantCertificatesPdfs->updateAll(array('pdf_file'=>$newpath),array('pdf_version'=>$pdfversion,'customer_id'=>$customer_id));
+
+			}
 
 			$objMoveFile = new ApplicationformspdfsController();//creating object for class of another controller
 			$objMoveFile->moveFile($pdf_file_name,$source,$destination);

@@ -3722,9 +3722,9 @@ class CustomfunctionsComponent extends Component {
 
 		$qrimgname = rand();
 
-		$server_imagpath = '/writereaddata/LIMS/QRCodes/'.$qrimgname.".png";
+		$server_imagpath = '/testdocs/LIMS/QRCodes/'.$qrimgname.".png";
 
-		$file_path = $_SERVER["DOCUMENT_ROOT"].'/writereaddata/LIMS/QRCodes/'.$qrimgname.".png";
+		$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/LIMS/QRCodes/'.$qrimgname.".png";
 
 		$file_name = $file_path;
 

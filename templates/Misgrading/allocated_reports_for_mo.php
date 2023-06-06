@@ -44,7 +44,19 @@
 												<td><?php echo $each['sample_code']; ?></td>
 												<td><?php echo $each['customer_id'] ?></td>
 												<td><?php echo $each['DmiUsers']['f_name']. " ".$each['DmiUsers']['l_name'] ?></td>
-												<td>N/A</td>
+												<td>
+													<?php 
+														if ($each['available_to'] == null) {
+															echo 'N/A';
+														} else {
+															if ($each['available_to'] == 'ro') {
+																echo 'Replied to RO';
+															} elseif ($each['available_to'] == 'mo') {
+																echo 'N/A';
+															}
+														}
+													 ?>
+												</td>
 												<td>
 													<?php echo $this->Html->link(
 														'',
