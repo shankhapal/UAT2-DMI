@@ -26,6 +26,8 @@ class ApplicationController extends AppController{
 		$this->loadComponent('Flowbuttons');
 		$this->loadComponent('Randomfunctions');
 		$this->loadModel('DmiSmsEmailTemplates');
+		//load chemist payment details model for chemist application by laxmi on 03-05-2023
+		$this->loadModel('DmiChemistPaymentDetails');									   
 	
 
 		$this->viewBuilder()->setHelpers(['Form','Html','Time']);
@@ -263,6 +265,9 @@ class ApplicationController extends AppController{
 				$customer_id = $chemistDetails['created_by'];
 				$packer_id = $customer_id;
 				$this->Session->write('packer_id',$packer_id);
+				//for chemist training alredy done set isTrainingCompleted in session with yes by laxmi B on. 17-01-2023
+				$is_training_completed = $chemistDetails['is_training_completed'];
+				$this->Session->write('is_training_completed',$is_training_completed);																			  
 			}
 
 			$this->Session->write('application_dashboard','chemist');
@@ -840,9 +845,21 @@ class ApplicationController extends AppController{
 			$this->set('progress_bar_status',$progress_bar_status);
 
 			//intensionally called from DMiChangeFirms, it will fetch record from dmi firms by default if not found from the function
+			//for chemist applicant save pod id with using customer id who register the chemist
+			//added by laxmi B. on 14-12-2022
+			if($application_type == 4){
+			 $customer_id = $this->Session->read('packer_id');
+			}
 			$firm_detail = $this->DmiChangeFirms->sectionFormDetails($customer_id);
 			$firm_details = $firm_detail[0];
 			$this->set('firm_details',$firm_details);
+				//for chemist applicant save pod id with using customer id who register the chemist
+			//added by laxmi B. on 14-12-2022
+			//revert above customer id to chemist id by laxmi B on 14-12-2022
+			if($application_type == 4){
+				$customer_id = $this->Session->read('username');
+			    $form_type='CHM';
+			}	
 
 			// Fetch submitted Payment Details and show // Done By pravin 13/10/2017
 			$this->Paymentdetails->applicantPaymentDetails($customer_id,$firm_details['district'],$payment_table);
@@ -1000,6 +1017,14 @@ class ApplicationController extends AppController{
 						$message_theme = 'success';
 						$redirect_to = '../applicationformspdfs/'.$section_details['forms_pdf'];
 
+                       //if application type 4 rediirect to chemist home after final submit-Laxmi[30-05-23]
+                        $appl_type = $this->Session->read('application_type');
+						if(!empty($appl_type) && $appl_type == 4){
+							$redirect_to = '../chemist/home';
+																	 
+						}
+
+
 						$this->viewBuilder()->setVar('message', $message);
 						$this->viewBuilder()->setVar('message_theme', $message_theme);
 						$this->viewBuilder()->setVar('redirect_to', $redirect_to);
@@ -1129,6 +1154,13 @@ class ApplicationController extends AppController{
 			$message_theme = 'success';
 			$redirect_to = '../applicationformspdfs/'.$section_details['forms_pdf'];
 			
+		     //After final submitted redirect to home not pdf added by laxmi B. on 30-05-2023
+			   $application_type = $this->Session->read('application_type');
+			   if(!empty($application_type) && $application_type == 4){
+			     $redirect_to = '../chemist/home';
+																  
+			    }
+		
 		} else {
 			$message = $firm_type_text.' - All Sections not filled, Please fill all Section and then Final Submit ';
 			$message_theme = 'failed';
