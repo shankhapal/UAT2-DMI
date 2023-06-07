@@ -68,9 +68,18 @@
                                             <?php echo $this->Form->control('dob', array('type'=>'text', 'escape'=>false, 'id'=>'dob', 'label'=>false, 'class'=>'form-control input-field','placeholder'=>'Enter Date of Birth','readonly'=>true)); ?>
                                             <span class="error invalid-feedback" id="error_dob"></span>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="card-body cardFooterBackground">
+										<!-- is chemist new/ old added by laxmi on 12-12-22-->
+										<div class="col-sm-6">
+										<label for="newoldsignup" class="uapproved">Is training completed?  <span class="cRed">*</span></label><br>
+
+										<input type="radio" name="is_training_completed" id="approved" value="yes">Training Completed
+										<input type="radio" name="is_training_completed" id="approved" value="no" checked>Apply for training
+
+										<span class="error invalid-feedback" id="error_is_training_completed"></span>
+										</div>
+										</div>
+										</div>
+                                       <div class="card-body cardFooterBackground">
                                     <?php echo $this->Form->control('Register', array('type'=>'button', 'id'=>'add_chemist', 'label'=>false, 'class'=>'btn btn-success mtminus12pb7')); ?>
                                 </div>
                             </div>
