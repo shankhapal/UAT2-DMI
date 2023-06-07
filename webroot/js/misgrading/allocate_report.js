@@ -1,6 +1,19 @@
-
 	$(document).ready(function () {
+		/*
+		//Check if the sample is scrutinized or allocated
+		var statusArray = $('#statusArray_id').val();
+
+		if (statusArray.length > 0) {
+			var sampleStatus = JSON.parse(statusArray);
+
+			// Access the property values
+			var savedValue = sampleStatus.saved; // "approved"
+			var allocatedValue = sampleStatus.allocated; // null
+			var scrutinzedValue = sampleStatus.scrutinzed; // "done"
 		
+		  }
+		  */
+
 		//This is added to initialize the custom dropdown
 		create_custom_dropdowns();
 		
@@ -174,7 +187,7 @@
 						columnClass: 'm',
 						content: "The Sample Code / Report " + sample_code + " was successfully allocated for scrutiny to Scrutiny Officer. " + allocation_to + "",
 						onClose: function(){
-							location.reload(); // Reload the page
+							window.location.href = '/misgrading/report_listing_for_allocation';
 						}
 					});
 					/*
@@ -295,7 +308,7 @@
 			
 				// Constructing the HTML content using the firm_details object
 				if (responseObject !== 'not_found') { 
-					var htmlContent = "Note : Please save this attachment by clicking the <i>Save Details</i> button to proceed further..";
+					var htmlContent = "Packer is Attached";
 				}else{
 					htmlContent = '<p>Note: Before proceeding, please ensure that you attach the provided' + "<br>" + 
 					'sample code to the corresponding Packer ID selected from the dropdown menu.</p>';
