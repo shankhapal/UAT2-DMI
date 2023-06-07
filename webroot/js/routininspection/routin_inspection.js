@@ -1741,4 +1741,13 @@ $(document).ready(function () {
   $("#e_briefly_suggestions_radio-no").on("click", function () {
     enumerate_briefly_suggestions.hide();
   });
+
+  $("#last-sugeesion-popup").on("click", function (e) {
+    $(".popup").fadeIn(500);
+    e.preventDefault();
+  });
+
+  $(".close").click(function () {
+    $(".popup").fadeOut(500);
+  });
 });

@@ -14,6 +14,9 @@
 		// added applivation type to get application type of RTI module by shankhpal on 30/05/2023
 		// $application_type = $this->Session->read('application_type');
 		$CustomersController = new CustomersController;
+
+		$DmiRtiCaPackerDetails = TableRegistry::getTableLocator()->get('DmiRtiCaPackerDetails');
+
 		// pass argument for application type = 10 
 		// added by shankhpal shende on 30/05/2023
 		$grantDateCondition = $CustomersController->Customfunctions->returnGrantDateCondition($customer_id,10);
@@ -68,14 +71,8 @@
 			$query_conditions = array('customer_id'=>$customer_id, 'application_type'=>$type, $grantDateCondition);
 			
 		}
-		
-		// Added condition for final submit redirect to dashboard by shankhpal on 31/05/2023		
-		if($query_conditions[0] == null){
-				$get_esign_details = $this->find('all',array('conditions'=>$query_conditions,'order'=>'id desc'))->first();	
-		}else{
-				
-				$get_esign_details = $this->find('all',array('customer_id'=>$customer_id,'application_status'=>$query_conditions['application_status'],'order'=>'id desc'))->first();	
-		}
+		// condition added for cheking esign status added on 07/06/2023 by shankhpal
+		$get_esign_details = $this->find('all',array('conditions'=>$query_conditions,'order'=>'id desc'))->first();
 		
 		$esign_status = 'no';
 		
@@ -91,7 +88,8 @@
 				
 				if($get_esign_details['report_esigned']=='yes'){
 					
-					$esign_status = 'yes';
+						$esign_status = 'yes';
+					
 				}
 			}
 			elseif($current_level == 'level_3' || $current_level == 'level_4'){
@@ -103,7 +101,7 @@
 			}
 		
 		}
-	
+		
 		return $esign_status;
 	}
 	

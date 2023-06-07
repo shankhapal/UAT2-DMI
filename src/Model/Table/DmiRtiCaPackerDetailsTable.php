@@ -32,95 +32,66 @@ class DmiRtiCaPackerDetailsTable extends Table{
 	public function sectionFormDetails($customer_id)
 	{
 		
-		// select record for customer has approved or not
+			// select record for customer has approved or not
 			$DmiRtiFinalReports = TableRegistry::getTableLocator()->get('DmiRtiFinalReports');
 			$DmiRtiAllocations = TableRegistry::getTableLocator()->get('DmiRtiAllocations');
+
 			$CustomersController = new CustomersController;
 			
-			// fetch packer approve data
-			$approved_record = $DmiRtiFinalReports->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id desc'))->first();
-				
-			$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
-		
-			$version = $current_version - 1;
-			$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$version)))->first();
+			$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
 			
-			$allocated_record = '';
-		
+			// get approve record
+			$approved_record = $DmiRtiFinalReports->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id desc'))->first();
+			
 			if(!empty($approved_record)){
-				// if packer is approved then compair approve date to allocation date
 				$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'date(created) > '=>$approved_record['created']),'order'=>'id desc'))->first();
+			}
+			
+			if(!empty($approved_record) && !empty($allocated_record)){
 				
-				if(empty($allocated_record)){
-					
-					$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
-					$version = $current_version - 1;
-					$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$version)))->first();
-					
-					$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
-
-					if($latest_id != null){
-						$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();
-						$form_fields_details = $report_fields;
-
-					}
+				$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
+				$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();
 				
+				$Dmi_check_samples = TableRegistry::getTableLocator()->get('DmiCheckSamples');
+				$sample_details = $Dmi_check_samples->RoutineInspectionSampleDetails();	
+				$added_sample_details = [];
+
+				if(!empty($last_report_details)){
+					$form_fields_details = $last_report_details;
+				}else{
+					$latest_id = false;
 				}
-
 				
 			}
-			if(empty($approved_record)){
-				
-							$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
-							
-							$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();	
-							
-							if(!empty($last_report_details)){
+			if($latest_id != null){
+				$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();
+				$form_fields_details = $report_fields;
 
-							
-									$last_approved_record = $DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),array('order'=>'id desc')))->first();
-									
-									$current_allocated_record = '';
-									if(!empty($last_approved_record) && empty($allocated_record)){
-									
-											$current_allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'date(created) > '=>$last_approved_record['created']),'order'=>'id desc'))->first();
-											
-											if(!empty($current_allocated_record)){
-												
-												$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
-												$version3 = $current_version - 1;
-												$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$version3)))->first();	
-												
-											}else{
-												$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
-												$current_version = $current_version - 1;
-												$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();	
-											}
-									
-									
-									}
-							}
-							if($last_report_details != null && $last_approved_record == null){
-								
-								$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
-								$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();		
-								$form_fields_details = $report_fields;
-							}
-			}else{	
+			}
+			else{	
 					
-					if(!empty($last_report_details)){
-						$enumerate_briefly_suggestions = $last_report_details['enumerate_briefly_suggestions'];
-					}
+				$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
+				$version2 = $current_version - 1;
+				$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$version2)))->first();
+				
+				$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->toArray();
 
-					$form_fields_details = Array (
-						'id' =>"",'customer_id' =>"",'io_reply_once_no' =>"",  'referred_back_comment' =>"",'referred_back_date' =>"",'date_last_inspection' =>"",
-						'date_p_inspection' =>"",'name_authorized_packer' =>"",'street_address' =>"",'email' =>"",'mobile_no' =>"",'certificate_no' =>"",
-						'valid_upto' =>"",'commodity' =>"",'grading_lab' =>"",'printing_press' =>"",'record_of_invice' =>"",'chemist_incharge' =>"",
-						'present_time_of_inspection' =>"",'premises_adequately' =>"",'lab_properly_equipped' =>"",'are_you_upto_date' =>"",'concerned_offices' =>"",
-						'last_lot_no' =>"",'last_lot_date' =>"",'analytical_results' =>"",'month_upto' =>"",'enumerate_briefly_suggestions'=>isset($enumerate_briefly_suggestions)?$enumerate_briefly_suggestions:"",'replica_account_correct' =>"",'discrepancies_replica_aco' =>"",
-						'fssai_approved ' =>"",'io_reply' =>"", 'io_reply_date' =>"", 'form_status' =>"",'referred_back_by_email' =>"", 'referred_back_by_once' =>"", 
-						'current_level' =>"", 'delete_ro_referred_back' =>"",'analytical_result_docs'=>""
-					); 
+				if(!empty($last_report_details)){
+					$enumerate_briefly_suggestions = $last_report_details['enumerate_briefly_suggestions'];
+					$e_briefly_suggestions_radio = $last_report_details['e_briefly_suggestions_radio'];
+				}
+				
+				$form_fields_details = Array (
+					'id' =>"",'customer_id' =>"",'io_reply_once_no' =>"",  'referred_back_comment' =>"",'referred_back_date' =>"",'date_last_inspection' =>"",
+					'date_p_inspection' =>"",'name_authorized_packer' =>"",'street_address' =>"",'email' =>"",'mobile_no' =>"",'certificate_no' =>"",
+					'valid_upto' =>"",'commodity' =>"",'grading_lab' =>"",'printing_press' =>"",'record_of_invice' =>"",'chemist_incharge' =>"",
+					'present_time_of_inspection' =>"",'premises_adequately' =>"",'lab_properly_equipped' =>"",'are_you_upto_date' =>"",'concerned_offices' =>"",
+					'last_lot_no' =>"",'last_lot_date' =>"",'analytical_results' =>"",'month_upto' =>"",
+					'enumerate_briefly_suggestions'=>isset($enumerate_briefly_suggestions)?$enumerate_briefly_suggestions:"",'e_briefly_suggestions_radio'=>isset($e_briefly_suggestions_radio)?$e_briefly_suggestions_radio:"",
+					'replica_account_correct' =>"",'discrepancies_replica_aco' =>"",
+					'fssai_approved ' =>"",'io_reply' =>"", 'io_reply_date' =>"", 'form_status' =>"",'referred_back_by_email' =>"", 'referred_back_by_once' =>"", 
+					'current_level' =>"", 'delete_ro_referred_back' =>"",'analytical_result_docs'=>""
+				); 
 					
 			}
 		
@@ -147,9 +118,14 @@ class DmiRtiCaPackerDetailsTable extends Table{
 			$sub_commodity_value = $MCommodity->find('list',array('valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
 	
 			$Dmi_check_samples = TableRegistry::getTableLocator()->get('DmiCheckSamples');
-			$sample_details = $Dmi_check_samples->RoutineInspectionSampleDetails();	
-			$added_sample_details = $sample_details[1];
 
+			// if !empty($approved_record) && !empty($allocated_record) then added_sample_details set empty array
+			if($added_sample_details != null){
+
+				$sample_details = $Dmi_check_samples->RoutineInspectionSampleDetails();	
+				$added_sample_details = $sample_details[1];
+
+			}
 
 			$DmiCaPpLabMapings = TableRegistry::getTableLocator()->get('DmiCaPpLabMapings');
 			$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
@@ -178,12 +154,40 @@ class DmiRtiCaPackerDetailsTable extends Table{
 			$self_registered_chemist = $DmiChemistRegistrations->find('all',array('conditions'=>array('created_by IS'=>$customer_id)))->toArray();
       
 			$check_if_exist = $this->find()->select(['enumerate_briefly_suggestions'])->where(['customer_id IS' => $customer_id])->order('id desc')->first();
-     	$last_insp_sugg = '';
-			if(!empty($check_if_exist)){
-				$last_insp_sugg = $check_if_exist['enumerate_briefly_suggestions'];
-			}
+     
+			$total_approved = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'current_level'=>'level_3')))->toArray();
+			
+			$total_suggestions = array();
 
-			return array($form_fields_details,$added_sample_details,$certificate_valid_upto,$sub_commodity_value,$lab_list,$printers_list,$self_registered_chemist,$last_insp_sugg);			
+			$DmiRoOffices = TableRegistry::getTableLocator()->get('DmiRoOffices');
+			$DmiUsers = TableRegistry::getTableLocator()->get('DmiUsers');
+
+			foreach ($total_approved as $approved) {
+					$approved_date = $approved['approved_date'];
+					
+					$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+					
+					foreach ($allocated_record as $each_alloc) {
+							$io_email_id = $each_alloc['current_level'];
+					}
+				
+
+					$find_user_belongs = $DmiUsers->find('all',array('conditions'=>array('email IN'=>$io_email_id,'status'=>'active')))->first();
+					$io_user_name = $find_user_belongs['f_name'].' '.$find_user_belongs['l_name'];
+					
+					$split_created = explode(' ', (string) $approved_date); // Convert into array 
+					$date = $split_created[0]; // Hold only the date 
+
+					$total_suggestions[] = array(
+							'io_user_name'=>$io_user_name,
+							'enumerate_briefly_suggestions' => $approved->enumerate_briefly_suggestions,
+							'approved_date' => $date,
+							
+					);
+			}
+			
+
+			return array($form_fields_details,$added_sample_details,$certificate_valid_upto,$sub_commodity_value,$lab_list,$printers_list,$self_registered_chemist,$total_suggestions);			
 	}
 	
 	/* Comment

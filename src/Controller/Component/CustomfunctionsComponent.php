@@ -1153,7 +1153,7 @@ class CustomfunctionsComponent extends Component {
 
 		//check final report status
 		$final_report_list_ids = $Dmi_report_final_submit_table->find('list', array('valueField'=>array('id'),'conditions' => array('customer_id IS'=>$customer_id, $grantDateCondition)))->toArray();
-
+		
 		if (empty($final_report_list_ids)) {
 
 			if ($this->commonSiteinspectionFormsFinalReport($customer_id,$allSectionDetails) == 1) {
@@ -1170,7 +1170,7 @@ class CustomfunctionsComponent extends Component {
 			}
 
 		} else {
-
+			
 			$Dmi_report_final_submit_table_Entity = $Dmi_report_final_submit_table->newEntity(array('customer_id'=>$customer_id,
 																									'status'=>'replied',
 																									'current_level'=>'level_3',
@@ -2811,12 +2811,12 @@ class CustomfunctionsComponent extends Component {
 			$grantDate = $DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
 		
 		}	
-		//  elseif ($application_type == 10) { //added on 30-05-2023 by shankhpal to get RTI grant date
-		//  	// For application type = 10 then fetch grant date from DmiRtiFinalReports
-		//  	$DmiRtiFinalReports = TableRegistry::getTableLocator()->get('DmiRtiFinalReports');
-		//  	$grantDate = $DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id DESC'))->first();
+		 elseif ($application_type == 10) { //added on 30-05-2023 by shankhpal to get RTI grant date
+		 	// For application type = 10 then fetch grant date from DmiRtiFinalReports
+		 	$DmiRtiFinalReports = TableRegistry::getTableLocator()->get('DmiRtiFinalReports');
+		 	$grantDate = $DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id DESC'))->first();
 
-		//  }
+		 }
 
 
 		if ($advancepayment == 'yes') {

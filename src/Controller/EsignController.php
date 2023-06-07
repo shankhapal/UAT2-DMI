@@ -95,8 +95,8 @@ class EsignController extends AppController {
 				//calling final submit process now after signature appended in pdf.
 
 				$url_to_redirect = 	null;
-									
-					if ($Dmi_esign_status_tb->saveEsignStatus()==1) { 
+							
+					if ($Dmi_esign_status_tb->saveEsignStatus()==1) {
 						
 						$split_customer_id = explode('/',$customer_id);
 						

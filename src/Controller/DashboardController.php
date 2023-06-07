@@ -1108,10 +1108,10 @@ class DashboardController extends AppController{
 											
 											if(!empty($last_approved_record) || !empty($site_inspection) ){
 
-												if(!empty($site_inspection)){
+												// if(!empty($site_inspection)){
 													
-													$created = $site_inspection['created'];		// hold created date											
-												}
+												// 	$created = $site_inspection['created'];		// hold created date											
+												// }
 												if(!empty($last_approved_record)){
 											
 													$created = $last_approved_record['created'];
@@ -1157,24 +1157,30 @@ class DashboardController extends AppController{
 															
 
 														}
-														if(!empty($site_inspection)){
-															
-															$get_allocations = $this->DmiRtiAllocations->find('all',array('conditions' => array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
-						
-															if(!empty($get_allocations))
-															{
-																$mo_user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$get_allocations['level_2'])))->first();
-															
-																$comm_with = $mo_user_details['f_name'].' '.$mo_user_details['l_name'];
-
-															}else{
-																
-																$comm_with='Not Allocated';
-															}
-														}
 														
 													}
 
+													
+												
+													if(!empty($approve_records)){
+														$allocated_record = $this->DmiRtiAllocations->find('all', array('conditions' => array('customer_id IS' => $customer_id,'date(created) > ' => $approve_records['created']),'order' => 'id desc'))->first();
+														
+													}else{
+														$allocated_record = $this->DmiRtiAllocations->find('all',array('conditions' => array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+													}
+													
+													if(!empty($allocated_record) || !empty($get_allocations))
+													{
+														
+														$mo_user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$allocated_record['level_2'])))->first();
+													
+														$comm_with = $mo_user_details['f_name'].' '.$mo_user_details['l_name'];
+
+													}else{
+														
+														$comm_with='Not Allocated';
+													}
+															
 													$creat_array = true;
 													
 													//creating array to list records with respect to above conditions
