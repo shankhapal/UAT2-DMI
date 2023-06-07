@@ -958,3 +958,31 @@ date: 04/11/2022
         opacity: 0;
     }
 }
+
+/* added by laxmi for chemist dashboard on 30-12-2022*/
+						   
+   
+
+.text-white1{
+				
+   
+
+	font-size: 18px;
+				  
+}
+/*end by Laxmi*/
+
+/*to forward chemist app from RAL to Ro if checkbox is not checked hide submit button*/
+/*added by laxmi B. on 02-01-2023*/
+#submitbtn{
+    display: none;
+		 
+											
+			   
+}
+/*increase check box size by laxmi B on 29-12-22*/
+#trainingCompleted{
+    transform: scale(2);
+				   
+	 
+}
