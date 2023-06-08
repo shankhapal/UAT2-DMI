@@ -2107,8 +2107,12 @@ class AjaxFunctionsController extends AppController{
 		
 		$this->autoRender = false;
 		$this->loadModel('DmiCheckSamples');
-
+		// call customes Controller 
+		$CustomersController = new CustomersController;
+		
 		$customer_id = $this->Customfunctions->sessionCustomerID();
+		// added version for inserting version in this table by shankhpal on 08/06/2023
+		$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
 		
 		$firm_type = $this->Customfunctions->firmType($customer_id);
 
@@ -2119,7 +2123,9 @@ class AjaxFunctionsController extends AppController{
 		$best_before = htmlentities($_POST['best_before'], ENT_QUOTES);
 		$replica_si_no = htmlentities($_POST['replica_si_no'], ENT_QUOTES);
 
-		$save_details_result = $this->DmiCheckSamples->saveSampleDetails($commodity_name,$pack_size,$lot_no,$date_of_packing,$best_before,$replica_si_no);// call custome method from model
+
+
+		$save_details_result = $this->DmiCheckSamples->saveSampleDetails($commodity_name,$pack_size,$lot_no,$date_of_packing,$best_before,$replica_si_no,$current_version);// call custome method from model
 		
 		$added_sample_details = $this->DmiCheckSamples->RoutineInspectionSampleDetails();
 		

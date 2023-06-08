@@ -199,20 +199,25 @@ $(document).ready(function () {
     if (charLength < minLength) {
       $("#error_shortcomings_noticed")
         .show()
-        .text("Length is short, minimum " + minLength + " required.");
+        .text("Length is short, minimum " + minLength + " required.")
+        .css("color", "blue");
       setTimeout(function () {
         $("#error_shortcomings_noticed").fadeOut();
       }, 8000);
     } else if (charLength > maxLength) {
       $("#error_shortcomings_noticed")
         .show()
-        .text("Length is not valid, maximum " + maxLength + " allowed.");
+        .text("Length is not valid, maximum " + maxLength + " allowed.")
+        .css("color", "blue");
       setTimeout(function () {
         $("#error_shortcomings_noticed").fadeOut();
       }, 8000);
       $(this).val(char.substring(0, maxLength));
     } else {
-      $("#error_shortcomings_noticed").show().text("Length is valid");
+      $("#error_shortcomings_noticed")
+        .show()
+        .text("Length is valid")
+        .css("color", "blue");
       setTimeout(function () {
         $("#error_shortcomings_noticed").fadeOut();
       }, 8000);

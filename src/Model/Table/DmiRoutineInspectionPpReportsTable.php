@@ -48,11 +48,7 @@ class DmiRoutineInspectionPpReportsTable extends Table{
 				
 				$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
 				$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();
-				
-				// $Dmi_check_samples = TableRegistry::getTableLocator()->get('DmiCheckSamples');
-				// $sample_details = $Dmi_check_samples->RoutineInspectionSampleDetails();	
-				// $added_sample_details = [];
-
+			
 				if(!empty($last_report_details)){
 					$form_fields_details = $last_report_details;
 				}else{
@@ -70,16 +66,17 @@ class DmiRoutineInspectionPpReportsTable extends Table{
 					$version2 = $current_version - 1;
 					$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$version2)))->first();
 					
-					$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->toArray();
+					$allocated_record = $DmiRtiAllocations->find('all', ['conditions' => ['customer_id' => $customer_id],
+          'order' => 'id desc'])->toArray();
 
 					if(!empty($last_report_details)){
-						$enumerate_briefly_suggestions = $last_report_details['enumerate_briefly_suggestions'];
-						$e_briefly_suggestions_radio = $last_report_details['e_briefly_suggestions_radio'];
+						$last_insp_suggestion = $last_report_details['last_insp_suggestion'];
+						$suggestions_last_ins_yes_no = $last_report_details['suggestions_last_ins_yes_no'];
 					}
 
 					$form_fields_details = Array ('id' =>"",'customer_id' =>"",'date_last_inspection'=>"",'date_p_inspection'=>"",'email'=>"",'mobile_no'=>"",'packaging_material'=>"",
 					'valid_upto'=>"",'street_address'=>"",'registered_office'=>"",'press_premises'=>"",'physical_check'=>"",'is_printing'=>"",
-					'storage_facilities'=>"",'lab_properly_equipped'=>"",'maintains_proper'=>"",'right_quality_of_printing'=>"",'press_is_marking_logo'=>"",
+					'storage_facilities'=>"",'lab_properly_equipped'=>"",'maintains_proper'=>"",'right_quality_of_printing'=>"",'press_is_marking_logo'=>"",'suggestions_last_ins_yes_no'=>isset($suggestions_last_ins_yes_no)?$suggestions_last_ins_yes_no:"",
 					'last_insp_suggestion'=>isset($last_insp_suggestion)?$last_insp_suggestion:"",'short_obserd'=>"",'if_any_sugg'=>"",'signature'=>"",
 					'signature_name'=>"",'io_reply_once_no' =>"", 'user_email_id' =>"",'user_once_no' =>"", 'referred_back_comment' =>"", 'referred_back_date' =>"", 
 					'io_reply' =>"", 'io_reply_date' =>"", 'form_status' =>"",'approved_date' =>"",'referred_back_by_email' =>"", 'referred_back_by_once' =>"", 

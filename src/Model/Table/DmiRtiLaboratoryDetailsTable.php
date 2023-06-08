@@ -45,6 +45,7 @@ class DmiRtiLaboratoryDetailsTable extends Table{
 			
 			if(!empty($approved_record)){
 				$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'date(created) > '=>$approved_record['created']),'order'=>'id desc'))->first();
+       
 			}
 			
 			if(!empty($approved_record) && !empty($allocated_record)){
@@ -68,13 +69,14 @@ class DmiRtiLaboratoryDetailsTable extends Table{
 				$form_fields_details = $report_fields;
 
 			}else{
-
+            
             $current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
 					  $version2 = $current_version - 1;
 					  $last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$version2)))->first();
-				
-					  $allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id  IS'=>$customer_id),'order'=>'id desc'))->toArray();
-				
+            
+            $allocated_record = $DmiRtiAllocations->find('all', ['conditions' => ['customer_id' => $customer_id],
+             'order' => 'id desc'])->toArray();
+            
             if(!empty($last_report_details)){
               $enumerate_briefly_suggestions = $last_insp_suggestion['last_insp_suggestion'];
               $e_briefly_suggestions_radio = $last_report_details['e_briefly_suggestions_radio'];
@@ -84,7 +86,7 @@ class DmiRtiLaboratoryDetailsTable extends Table{
             'id' =>"",'customer_id' =>"",'date_last_inspection' => "",'date_p_inspection' => "",'name_of_lab' =>"",'street_address' => "",'email' => "",
             'mobile_no' => "",'sub_commodity' => "",'approved_chemist' => "",'present_time_of_inspection' => "",'is_lab_well_lighted' => "",
             'is_properly_equipped' => "",'eq_working_order' => "",'is_analytical_reg_maintained' => "",'are_up_to_date' => "",'being_forwarded' => "",
-            'last_lot_no' => "",'lat_lot_date' => "",'commodity' => "",'name_of_packers' => "",'p_analytical_reg' => "",'e_briefly_suggestions_radio' => "",
+            'last_lot_no' => "",'lat_lot_date' => "",'commodity' => "",'name_of_packers' => "",'p_analytical_reg' => "",'e_briefly_suggestions_radio' =>isset($e_briefly_suggestions_radio)?$e_briefly_suggestions_radio: "",
             'enumerate_briefly_suggestions' => isset($enumerate_briefly_suggestions)?$enumerate_briefly_suggestions:"",'shortcomings_noticed' => "",
             'suggestions' => "",'authorized_persion_name' => "",'name_of_inspecting_officer' => "",'designation_inspecting_officer' => "",
             'authorized_signature_docs' => "",'signnature_of_inspecting_officer_docs' => "",'io_reply_once_no' =>"", 'user_email_id' =>"", 'user_once_no'=>"",'referred_back_comment' =>"",'referred_back_date' =>"",'io_reply' =>"",'io_reply_date' =>"",'form_status' =>"",  

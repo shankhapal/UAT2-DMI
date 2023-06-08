@@ -7,6 +7,7 @@ use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
 use Cake\Datasource\EntityInterface;
 use QRcode;
+use Cake\Chronos\Chronos;  // Chronos library is use for DateTime by shankhpal on 08/06/2023 
 
 class CustomfunctionsComponent extends Component {
 
@@ -3656,6 +3657,24 @@ class CustomfunctionsComponent extends Component {
 			return count($approved_record) + 1;
 			
 		}
+
+		//month calculation
+		//Description: Returns month of given date.
+		//@Author : shankhpal shende
+		//Date : 08/06/2023
+
+		public function monthcalForRti($createdDate){
+			
+			//$currentDate = date("d/m/Y"); // current date
+			$currentDate = "02/08/2023";
+			$date1 = Chronos::createFromFormat('d/m/Y', $createdDate); // Start date
+			$date2 = Chronos::createFromFormat('d/m/Y', $currentDate); // End date
+
+			$monthsDifference = $date1->diffInMonths($date2); // Calculate the month difference
+
+			return $monthsDifference;
+		
+	}
 		
 }
 ?>

@@ -39,22 +39,26 @@ class DmiRtiCaPackerDetailsTable extends Table{
 			$CustomersController = new CustomersController;
 			
 			$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
-			
+		
+			$added_sample_details = [];
 			// get approve record
 			$approved_record = $DmiRtiFinalReports->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id desc'))->first();
 			
 			if(!empty($approved_record)){
+				
 				$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'date(created) > '=>$approved_record['created']),'order'=>'id desc'))->first();
+				
 			}
 			
 			if(!empty($approved_record) && !empty($allocated_record)){
 				
 				$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
+			
 				$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();
-				
-				$Dmi_check_samples = TableRegistry::getTableLocator()->get('DmiCheckSamples');
-				$sample_details = $Dmi_check_samples->RoutineInspectionSampleDetails();	
-				$added_sample_details = [];
+
+				// $Dmi_check_samples = TableRegistry::getTableLocator()->get('DmiCheckSamples');
+				// $sample_details = $Dmi_check_samples->RoutineInspectionSampleDetails();	
+				// $added_sample_details = [];
 
 				if(!empty($last_report_details)){
 					$form_fields_details = $last_report_details;
@@ -64,9 +68,10 @@ class DmiRtiCaPackerDetailsTable extends Table{
 				
 			}
 			if($latest_id != null){
+				
 				$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();
 				$form_fields_details = $report_fields;
-
+				
 			}
 			else{	
 					
@@ -74,7 +79,8 @@ class DmiRtiCaPackerDetailsTable extends Table{
 				$version2 = $current_version - 1;
 				$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$version2)))->first();
 				
-				$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->toArray();
+				$allocated_record = $DmiRtiAllocations->find('all', ['conditions' => ['customer_id' => $customer_id],
+        'order' => 'id desc'])->toArray();
 
 				if(!empty($last_report_details)){
 					$enumerate_briefly_suggestions = $last_report_details['enumerate_briefly_suggestions'];
@@ -119,13 +125,12 @@ class DmiRtiCaPackerDetailsTable extends Table{
 	
 			$Dmi_check_samples = TableRegistry::getTableLocator()->get('DmiCheckSamples');
 
+			$sample_details = $Dmi_check_samples->RoutineInspectionSampleDetails();	
+			$added_sample_details = $sample_details[1];
+
 			// if !empty($approved_record) && !empty($allocated_record) then added_sample_details set empty array
-			if($added_sample_details != null){
-
-				$sample_details = $Dmi_check_samples->RoutineInspectionSampleDetails();	
-				$added_sample_details = $sample_details[1];
-
-			}
+			// if($added_sample_details != null){
+			// }
 
 			$DmiCaPpLabMapings = TableRegistry::getTableLocator()->get('DmiCaPpLabMapings');
 			$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');

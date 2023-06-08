@@ -75,7 +75,7 @@
 			
 		}
 
-		public function saveSampleDetails($commodity_name,$pack_size,$lot_no,$date_of_packing,$best_before,$replica_si_no){
+		public function saveSampleDetails($commodity_name,$pack_size,$lot_no,$date_of_packing,$best_before,$replica_si_no,$current_version){
 								
 								if(strpos(base64_decode($_SESSION['username']), '@') !== false){//for email encoding
 									$customer_id = $_SESSION['customer_id'];
@@ -94,6 +94,7 @@
 									'best_before'=>$best_before,
 									'date_of_packing'=>$date_of_packing,
 									'replica_si_no'=>$replica_si_no,
+									'version'=>$current_version,
 									'created'=>date('Y-m-d H:i:s'),
 									'modified'=>date('Y-m-d H:i:s')
 								
