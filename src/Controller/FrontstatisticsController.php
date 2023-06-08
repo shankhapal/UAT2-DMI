@@ -270,9 +270,9 @@ use Cake\View\ViewBuilder;
 
 					 
 			$total_revenue = $this->thousandsCurrencyFormat($newApplicationrevenue['sum'] + $renewalApplicationrevenue['sum']);				 
-			
-			$new_appl_revenue = $this->thousandsCurrencyFormat($newApplicationrevenue['sum']);
 		
+			$new_appl_revenue = $this->thousandsCurrencyFormat($newApplicationrevenue['sum']);
+			
 			$renewal_appl_revenue = $this->thousandsCurrencyFormat($renewalApplicationrevenue['sum']); 
 			
 			$this->loadModel('DmiFrontStatistics');
