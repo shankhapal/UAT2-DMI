@@ -244,7 +244,9 @@ class ApplicationController extends AppController{
 		$this->loadModel('DmiAllDirectorsDetails');
 		$this->loadModel('DmiFirms');
 		$this->loadModel('DmiChemistRegistrations');
-
+		//load chemist 	payment details table by laxmi.								   
+        $this->loadModel('DmiChemistPaymentDetails');
+		
 		$application_type = $this->Session->read('application_type');
 		$this->set('application_type',$application_type);
 		
