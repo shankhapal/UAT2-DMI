@@ -295,6 +295,16 @@
 												<p class="nav-icon-p"><b>Surrender Applications</b></p>
 											</a>
 										</li>
+										
+										
+										 <!-- added new submenu chemist approval in granted application menu by Laxmi On 29-05-2023 -->
+										<li class="nav-item">
+											<a href="<?php echo $this->request->getAttribute("webroot");?>hoinspections/redirectGrantedApplications/4" class="bg-cyan nav-link ">
+												<i class="far fa-dot-circle nav-icon"></i>
+												<p class="nav-icon-p"><b>Approval for Chemist</b></p>
+											</a>
+										</li>
+
 									</li>
 								</ul>
 							</li>
