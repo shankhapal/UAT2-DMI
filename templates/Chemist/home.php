@@ -9,7 +9,7 @@
 				</div>
 			</div>
 <!-- added withdraw or rejected application condition with anding by Laxmi on 29-05-2023  -->
-	<?php } elseif ($final_submit_status == 'approved' && empty($rejectEntry)) ) { ?>
+	<?php } elseif ($final_submit_status == 'approved' && empty($rejectEntry) ) { ?>
 
 			<div class="col-lg-8">
 				<div class="alert alert-info alert-dismissible">
