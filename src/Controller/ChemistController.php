@@ -452,7 +452,7 @@ class ChemistController extends AppController {
 								$message = 'Your chemist details are not saved please check again';
 								$message_theme = 'warning';
 								$redirect_to = 'chemist_registration';
-							
+							}
 
 						} else {
 
