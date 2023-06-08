@@ -92,7 +92,7 @@
 
 								<?php
 								# This is for Packer Menus
-								 <!-- added or condtion to show chemist registration of on export type  by laxmi on 06-01-2023 -->
+								 # added or condtion to show chemist registration of on export type  by laxmi on 06-01-2023 
 								if(($split_user_name[1] == 1 && $IsApproved=='yes') || ($split_user_name[1] == 3 && $IsApproved=='yes')) { ?>
 
 									<li class="nav-item">
