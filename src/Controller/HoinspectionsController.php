@@ -810,7 +810,7 @@ use App\Network\Response\Response;
 						}
 					//}	
 						
-						$appl_array[$i]['status'] = $getStatus['status'];
+						
 						//This condition block is added to provide message if the SO Office is not having the role of so_pp_grant - Akash [18-01-2023]
 						//updated below conditions on 24-01-2023 by Amol
 						//for PP application
