@@ -26,7 +26,9 @@
 				
 		//check application type new/old 
 		$get_type = $Dmi_firm->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
-		if($get_type['is_already_granted']=='yes'){			
+		//for chemist flow, let it throw 'new' always, no issue, i.e customer id not change with packer id above
+		//on 26-05-2023 by Laxmi																								  
+		if(!empty($get_type) &&  $get_type['is_already_granted']=='yes'){			
 			$type = 'old';
 		}else{
 			$type = 'new';
@@ -44,12 +46,16 @@
 				$status = 'pending';
 			}
 			
-		}elseif($current_level == 'level_2'){
+		}elseif($current_level == 'level_3'){
 			//get application status from final submit table
 			$get_ids = $Dmi_siteinspection_final_report->find('list',array('conditions'=>array('customer_id IS'=>$customer_id,$grantDateCondition)))->toArray();
 			if(!empty($get_ids)){
 				$get_status = $Dmi_siteinspection_final_report->find('all',array('conditions'=>array('id'=>max($get_ids))))->first();
 				$status = $get_status['status'];
+				//added condition to set status as 'Granted', as current level is 3, on 26-05-2023 by Laxmi, for level 2 it is 'approved'
+				if($status=='approved'){
+					$status='Granted';
+				}
 			}else{
 				$status = 'pending';
 			}

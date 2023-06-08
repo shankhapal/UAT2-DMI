@@ -92,7 +92,8 @@
 
 								<?php
 								# This is for Packer Menus
-								if($split_user_name[1] == 1 && $IsApproved=='yes') { ?>
+								 <!-- added or condtion to show chemist registration of on export type  by laxmi on 06-01-2023 -->
+								if(($split_user_name[1] == 1 && $IsApproved=='yes') || ($split_user_name[1] == 3 && $IsApproved=='yes')) { ?>
 
 									<li class="nav-item">
 										<a href="<?php echo $this->request->getAttribute("webroot");?>replica/replica_application" class="nav-link">
