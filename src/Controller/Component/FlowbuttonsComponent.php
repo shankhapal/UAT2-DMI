@@ -456,20 +456,21 @@ class FlowbuttonsComponent extends Component {
 
 			if($office_type == 'RO'){
 					
-					if($inspection == 'no' && $firm_type ==1){
-						
-						$GrantBtn = 'yes';
-					}
+				if($inspection == 'no' && $firm_type ==1){
 					
-				}elseif($office_type = 'SO'){
-	 
-                    if($inspection == 'no' && $firm_type ==1){
-						
-						$GrantBtn = 'yes';
-					}
-	 
+					$GrantBtn = 'yes';
 				}
-		}
+					
+			}elseif($office_type = 'SO'){
+	 
+				if($inspection == 'no' && $firm_type ==1){
+					
+					$GrantBtn = 'yes';
+				}
+	 
+			}
+        }
+		
 		return $GrantBtn;
 	}
 	
