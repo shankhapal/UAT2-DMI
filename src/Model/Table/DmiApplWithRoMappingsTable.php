@@ -66,8 +66,8 @@ class DmiApplWithRoMappingsTable extends Table{
 
 		    if($_SESSION['application_type'] == 4 && $_SESSION['export_unit'] == 'yes'){
 
-		     $office_details = $DmiRoOffices->find('all',array('conditions'=>array('ro_office IS'=>'Mumbai','OR'=>array('delete_status IS NULL','delete_status'=>'no'))))->first();
-		    } 
+		       $office_details = $DmiRoOffices->find('all',array('conditions'=>array('ro_office IS'=>'Mumbai','OR'=>array('delete_status IS NULL','delete_status'=>'no'))))->first();
+		     } 
         }						
 		return $office_details;
 	}
