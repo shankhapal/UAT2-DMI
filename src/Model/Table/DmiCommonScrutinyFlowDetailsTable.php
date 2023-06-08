@@ -55,7 +55,7 @@ class DmiCommonScrutinyFlowDetailsTable extends Table{
 				$checkClient = $client->find('all')->where(array('chemist_id IS'=>$_SESSION['username']))->first();
 			}
 			
-			if (!empty($checkClient) && $checkClient['is_training_completed']=='yes') {
+			if (!empty($checkClient) && ($checkClient['is_training_completed']=='yes' || $checkClient['is_training_completed']== NULL)) {
 				
 				$_SESSION['paymentSection'] = NULL;
 			}
