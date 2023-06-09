@@ -859,12 +859,12 @@ public function renewalRequestReEsign(){
 				$for_module = $this->Session->read('for_module');
 				
 				if ($for_module === 'Suspension') {
-					$url_to_redirect = 	$main_domain_url.'othermodules/misgrading_home'; //default sending to new granted list
+					$url_to_redirect = 	$main_domain_url.'othermodules/list_of_suspended_firms'; //default sending to new granted list
 					$model = 'DmiMmrSuspendedFirmsLogs';
 
 				} elseif ($for_module === 'Cancellation') {
-					$url_to_redirect = 	$main_domain_url.'othermodules/misgrading_home'; //default sending to new granted list
-					$model = 'DmiMmrCancelledFirmsLogs';
+					$url_to_redirect = 	$main_domain_url.'othermodules/list_of_cancelled_firms'; //default sending to new granted list
+					$model = 'DmiMmrCancelledFirms';
 				} 
 
 			} else {

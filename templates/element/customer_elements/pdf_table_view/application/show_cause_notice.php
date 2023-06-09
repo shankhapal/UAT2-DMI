@@ -15,25 +15,43 @@
                 <tbody>
                 <tr>
                     <td class="boldtext"><?php echo $showCauseNotice['customer_id']; ?></td>
-                    <td class="boldtext"><?php echo date("d-m-Y",strtotime($showCauseNotice['date'])); ?></td>
-                    <td class="boldtext"><?php echo date("d-m-Y",strtotime($showCauseNotice['end_date'])); ?></td>
+                    <td class="boldtext">
+                        <?php 
+                            $date = $showCauseNotice['date'];$dateTime = DateTime::createFromFormat('d/m/Y H:i:s', $date);
+                            $formattedDate = $dateTime->format('d/m/Y');
+                            echo $formattedDate;
+                        ?>
+                    </td>
+                    <td class="boldtext">
+                        <?php 
+                            $date = $showCauseNotice['end_date'];$dateTime = DateTime::createFromFormat('d/m/Y H:i:s', $date);
+                            $endDate = $dateTime->format('d/m/Y');
+                            echo $endDate;
+                        ?>
+                    </td>
                     <td>
                         <?php $split_file_path = explode("/",$showCauseNotice['pdf_file']); $file_name = $split_file_path[count($split_file_path) - 1]; ?>
                         <a target="_blank" href="<?php echo $showCauseNotice['pdf_file']; ?>"><?php echo $file_name; ?></a>
                     </td>
-                    <td><?php // to viee in  view mode
-                            if($is_scn_replied_details['to_user'] == 'ro'){
-                                echo $this->Html->link(
-                                    '', 
-                                    ['controller' => 'othermodules', 'action'=>'fetchIdFromScnAppl','?' => ['id' => $showCauseNotice['id'], 'customer_id' => $showCauseNotice['customer_id'],'sample_code' => $showCauseNotice['sample_code'],'scn_mode'=>'view']],
-                                    ['class'=>'fas far fa-eye','title' => 'View']
-                                ); 
-                            }else{
-                                echo $this->Html->link(
-                                    '', 
-                                    ['controller' => 'othermodules', 'action'=>'fetchIdFromScnAppl','?' => ['id' => $showCauseNotice['id'], 'customer_id' => $showCauseNotice['customer_id'],'sample_code' => $showCauseNotice['sample_code'],'scn_mode'=>'edit']],
-                                    ['class'=>'fas fa-file-export','title' => 'Notice Details']
-                                ); 
+                    <td><?php // to viee in  view showCauseNotice
+                            if(!empty($showCauseNotice)){
+
+                                if ($showCauseNotice['status'] == 'replied') {
+
+                                    echo $this->Html->link(
+                                        '', 
+                                        ['controller' => 'othermodules', 'action'=>'fetchIdFromScnAppl','?' => ['id' => $showCauseNotice['id'], 'customer_id' => $showCauseNotice['customer_id'],'sample_code' => $showCauseNotice['sample_code'],'scn_mode'=>'view']],
+                                        ['class'=>'fas far fa-eye','title' => 'View']
+                                    ); 
+
+                                } elseif ($showCauseNotice['status'] == 'saved' || $showCauseNotice['status'] == 'ref_back') {
+                                    echo $this->Html->link(
+                                        '', 
+                                        ['controller' => 'othermodules', 'action'=>'fetchIdFromScnAppl','?' => ['id' => $showCauseNotice['id'], 'customer_id' => $showCauseNotice['customer_id'],'sample_code' => $showCauseNotice['sample_code'],'scn_mode'=>'edit']],
+                                        ['class'=>'fas fa-file-export','title' => 'Notice Details']
+                                    ); 
+                                }
+                               
                             }
                         ?>
                     </td>

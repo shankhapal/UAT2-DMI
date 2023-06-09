@@ -56,8 +56,8 @@
 						
 							<?php 
 							if ($isAllocatd == 'yes') { 
-								if(!empty($allocation_deatils)){
-									if ($allocation_deatils['available_to'] !== 'mo') { ?>
+			
+									if ($_SESSION['application_mode'] == 'edit') { ?>
 										
 										<div class="col-sm-6">
 										<div class="remark-current">
@@ -88,11 +88,8 @@
 										</div>
 									</div>
 
-								<?php }
-								
-								}
-								
-							} ?>
+								<?php } } ?>
+						
 						
 							
 						</div>

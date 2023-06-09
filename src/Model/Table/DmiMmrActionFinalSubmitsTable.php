@@ -21,6 +21,11 @@ class DmiMmrActionFinalSubmitsTable extends Table{
 
 	public function saveActionFinalData($postData){
 		
+		if($postData['misgrade_action'] === 6){
+			$opt_for_showcause = 'Yes';
+		}else {
+			$opt_for_showcause = 'No';
+		}
 
 		$finalSubmitEntity = $this->newEntity(array('customer_id'=>$postData['customer_id'],
 													'misgrade_category'=>$postData['misgrade_category'],
@@ -35,7 +40,9 @@ class DmiMmrActionFinalSubmitsTable extends Table{
 													'created'=>date('Y-m-d H:i:s'),
 													'modified'=>date('Y-m-d H:i:s'),
 													'status'=>'submitted',
-													'sample_code'=>$postData['sample_code']));
+													'sample_code'=>$postData['sample_code'],
+
+												));
 
 		
 		if ($this->save($finalSubmitEntity)) {
@@ -63,13 +70,23 @@ class DmiMmrActionFinalSubmitsTable extends Table{
 			
 			if($DmiMmrActionHomeLogs->save($entity)){
 
+				//This is to update the sample flag entry in sample_inward table
+				$SampleInward = TableRegistry::getTableLocator()->get('SampleInward');
+				$this->SampleInward->updateAll(
+					['report_status' => 'Action Submit', 'packer_id' => $_SESSION['firm_id']],
+					['org_sample_code' => $_SESSION['sample_code']]
+				);
+
 				if ($postData['for_suspension'] == 'Yes') {
 					$final_action = 'Suspension';
 				}elseif ($postData['for_cancel'] == 'Yes') {
 					$final_action = 'Cancellation';
 				}elseif ($postData['for_suspension'] == 'Yes') {
 					$final_action = 'Refer';
+				}elseif ($opt_for_showcause == 'Yes') {
+					$final_action = 'Showcause';
 				}
+				
 				return $final_action;
 			}
 		}

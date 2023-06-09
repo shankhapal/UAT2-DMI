@@ -19,7 +19,7 @@
 						<div class="card-header"><h3 class="card-title-new">Allocated Reports</h3></div>
 						<div class="form-horizontal">
 							<div class="card-body">
-								<table class="table table-striped table-hover table-sm table-bordered">
+								<table id="allocation_table" class="table table-striped table-hover table-sm table-bordered">
 								<caption>Allocated Reports</caption>
 									<thead class="tableHead">
 										<tr>
@@ -58,11 +58,21 @@
 													 ?>
 												</td>
 												<td>
-													<?php echo $this->Html->link(
-														'',
-														['controller' => 'misgrading', 'action' => 'redirectToAllocate', $each['sample_code'], 'level_1','edit'],
-														['class' => 'fas fa-long-arrow-alt-right', 'title' => 'Edit']
-													); ?> 
+													<?php 
+													if ($each['available_to'] == 'ro') {
+														echo $this->Html->link(
+															'',
+															['controller' => 'misgrading', 'action' => 'redirectToAllocate', $each['sample_code'], 'level_1','view'],
+															['class' => 'fas fa-eye', 'title' => 'View']
+														); 
+													}else{
+														echo $this->Html->link(
+															'',
+															['controller' => 'misgrading', 'action' => 'redirectToAllocate', $each['sample_code'], 'level_1','edit'],
+															['class' => 'fas fa-long-arrow-alt-right', 'title' => 'Edit']
+														); 
+													}
+													?> 
 												</td>
 											</tr>
 										<?php endforeach; } ?>
@@ -76,4 +86,4 @@
 		</div>
 	</section>
 </div>
-<?php echo $this->Html->script('misgrading/report_listing_for_allocation'); ?>
+<?php echo $this->Html->script('misgrading/allocated_reports_for_mo'); ?>

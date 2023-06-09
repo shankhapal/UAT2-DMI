@@ -3753,5 +3753,52 @@ class CustomfunctionsComponent extends Component {
 		return $qrimage;
 	}
 
+
+	//Description: Returns the Suspension Status
+	//@Author : Akash Thakre
+	//Date : 09-06-2023
+	//For : MMR
+
+	public function isApplicationSuspended($username){
+
+		#For Suspension
+		$currentDate = date('Y-m-d H:i:s'); 
+		$DmiMmrSuspensions = TableRegistry::getTableLocator()->get('DmiMmrSuspensions');
+		$suspension_record = $DmiMmrSuspensions->find('all')->where(['customer_id IS' => $username,'to_date >=' => $currentDate])->order('id DESC')->first();
+		if (!empty($suspension_record)) {
+		
+			$date = $suspension_record['to_date'];
+			$dateTime = \DateTime::createFromFormat('d/m/Y H:i:s', $date);
+			$isSuspended = $dateTime->format('d/m/Y');
+		}else{
+			$isSuspended = null;
+		}
+
+		return $isSuspended;
+	}
+
+
+	//Description: Returns the Cancellation Status
+	//@Author : Akash Thakre
+	//Date : 09-06-2023
+	//For : MMR
+
+	public function isApplicationCancelled($username) {
+		// For Cancellation
+		$DmiMmrCancelledFirms = TableRegistry::getTableLocator()->get('DmiMmrCancelledFirms');
+		$cancellation_record = $DmiMmrCancelledFirms->find('all')->where(['customer_id IS' => $username])->order('id DESC')->first();
+		
+		if (!empty($cancellation_record)) {
+			$date = $cancellation_record['date'];
+			$dateTime = \DateTime::createFromFormat('d/m/Y H:i:s', $date);
+			$isCancelled = $dateTime->format('d/m/Y');
+		} else {
+			$isCancelled = null;
+		}
+	
+		return $isCancelled;
+	}
+	
+
 }
 ?>

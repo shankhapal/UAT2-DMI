@@ -547,7 +547,7 @@
 					<?php if ($isForSuspension != null && $isForSuspension == 'Yes') {
 						echo "This is the	". $details_of_action['misgrade_level'] ."	for this Packer therefore this Certificate is Suspended For	". $details_of_action['misgarde_details'];
 					} else if ($isForCancellation !=null && $isForCancellation == 'Yes') { 
-						echo "This Certificate is Cancelled For Misgrading";
+						echo "This Certificate is CANCELLED For ". $details_of_action['misgrade_level'] ." : ". $details_of_action['misgarde_details'];
 					}?> 
 			</td>
 			<td style="padding:10px; vertical-align:top;">

@@ -3,7 +3,14 @@
 <div class="content-header">
 	<div class="container-fluid">
 		<div class="row mb-2">
-			<div class="col-sm-6"><?php echo $this->Html->link('Back', array('controller' => 'misgrading', 'action'=>'report_listing_for_allocation'),array('class'=>'add_btn btn btn-secondary')); ?></div>
+			<div class="col-sm-6">
+				<?php if ($_SESSION['current_level'] == 'level_1') {
+					echo $this->Html->link('Back', array('controller' => 'misgrading', 'action'=>'allocated_reports_for_mo'),array('class'=>'add_btn btn btn-secondary')); 
+				}else{
+					echo $this->Html->link('Back', array('controller' => 'misgrading', 'action'=>'report_listing_for_allocation'),array('class'=>'add_btn btn btn-secondary')); 
+				}
+			
+			?></div>
 			<div class="col-sm-6">
 				<ol class="breadcrumb float-sm-right">
 					<li class="breadcrumb-item"><?php echo $this->Html->link('Dashboard', array('controller' => 'dashboard', 'action'=>'home')); ?></li>
@@ -113,6 +120,9 @@
 <input type="hidden" id="sample_code_value" value="<?php echo $sample_code; ?>">
 <input type="hidden" id="current_level" value="<?php echo $_SESSION['current_level']; ?>">
 <input type="hidden" id="is_allocated_id" value="<?php echo $isAllocatd; ?>">
+<input type="hidden" id="application_mode_id" value="<?php echo $_SESSION['application_mode']; ?>">
+
+
 
 <?php
 	echo $this->Html->script('dropdowncustom');

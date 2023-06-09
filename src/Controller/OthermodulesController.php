@@ -1787,6 +1787,12 @@ class OthermodulesController extends AppController{
 
 	public function misgradingHome(){
 
+		$this->Session->Delete('table_id');
+		$this->Session->Delete('firm_id');
+		$this->Session->Delete('sample_code');
+		$this->Session->Delete('scn_mode');
+
+
 		$conn = ConnectionManager::get('default');
 
 		$username = $this->Session->read('username');
@@ -1797,74 +1803,101 @@ class OthermodulesController extends AppController{
 		//get posted office id
 		$postedOffice = $this->DmiUsers->getPostedOffId($username);
 
-		//::: For the Firm who have attached the Sample code and customer_id to take action
-		$underThisOffice = $conn->execute("SELECT DISTINCT dg.id,dg.customer_id,dg.sample_code,df.firm_name, df.email,df.mobile_no,mc.commodity_name
-											FROM dmi_mmr_final_submits AS dg 
-											INNER JOIN dmi_appl_with_ro_mappings AS dd ON dd.customer_id = dg.customer_id
-											INNER JOIN dmi_firms AS df ON df.customer_id = dg.customer_id
-											INNER JOIN sample_inward AS si ON si.org_sample_code = dg.sample_code
-											INNER JOIN m_commodity AS mc ON mc.commodity_code = si.commodity_code
-											WHERE dd.office_id='$postedOffice' AND dg.is_attached_packer_sample = 'Y'")->fetchAll('assoc');
-		$filteredRecords = [];
+		
+		$this->loadModel('DmiRoOffices');
+		$this->loadModel('DmiDistricts');
+		$roDistricts = $this->DmiRoOffices->find('list', array('fields' => array('id'), 'conditions' => array('ro_email_id' => $username)))->toArray();
 
-		foreach ($underThisOffice as $each) {
-			$customer_id = $each['customer_id'];
-
-			// Check if customer_id is present in $is_cancelled
-			$is_cancelled = $this->DmiMmrCancelledFirms
-				->find()
-				->select('customer_id')
-				->where(['customer_id' => $customer_id])
-				->order(['id' => 'DESC'])
-				->first();
-			
-			// Check if customer_id is present in $suspension_record
-			$suspension_record = $this->DmiMmrSuspensions
-				->find('all')
-				->where([
-					'customer_id' => $customer_id,
-					'to_date >=' => $currentDate
-				])
-				->order(['id' => 'DESC'])
-				->first();
-			
-			// Exclude the record if customer_id is present in either $is_cancelled or $suspension_record
-			if ($is_cancelled || $suspension_record) {
-				continue; // Skip to the next iteration of the loop
-			}
-
-			// Rest of your code logic here
-
-			$showcause_status = $this->DmiMmrShowcauseLogs
-				->find()
-				->select(['status'])
-				->where(['sample_code IS' => $each['sample_code']])
-				->order(['id' => 'DESC'])
-				->first();
-
-			$each['showcause_status'] = $showcause_status ? $showcause_status->status : null;
-
-			// Add the record to the filtered array
-			$filteredRecords[] = $each;
+		
+		if (!empty($roDistricts)) {
+			$districtlist = $this->DmiDistricts->find('list', array('fields' => array('id'), 'conditions' => array('ro_id IN' => $roDistricts)))->toArray();
+		} else {
+			$districtlist = $this->DmiDistricts->find('list', array('fields' => array('id'), 'conditions' => array('ro_id IS' => $postedOffice)))->toArray();
 		}
 
+		$underThisOffice = array();
+
+		foreach ($districtlist as $each) {
+			$firmDetails = $conn->execute("SELECT dmfs.id, dmfs.sample_code, dmfs.customer_id, df.firm_name, df.email, df.mobile_no, mc.commodity_name
+				FROM dmi_mmr_final_submits AS dmfs 
+				INNER JOIN dmi_firms as df ON df.customer_id = dmfs.customer_id
+				INNER JOIN dmi_districts AS dd ON dd.id = df.district::INTEGER
+				INNER JOIN dmi_certificate_types AS dct ON dct.id = df.certification_type::INTEGER
+				INNER JOIN dmi_grant_certificates_pdfs AS dgcp ON df.customer_id = dgcp.customer_id 
+				INNER JOIN sample_inward AS si ON si.org_sample_code = dmfs.sample_code
+				INNER JOIN m_commodity AS mc ON mc.commodity_code = si.commodity_code
+				WHERE df.district='$each' AND df.certification_type='1' AND dmfs.is_attached_packer_sample = 'Y' AND dmfs.scrutiny IS NULL")->fetchAll('assoc');
+
+			if (!empty($firmDetails)) {
+				// Filter out duplicate records
+				$filteredFirmDetails = array();
+				$processedIds = array();
+
+				foreach ($firmDetails as $record) {
+					$sampleCode = $record['sample_code'];
+					$customerId = $record['customer_id'];
+
+					$uniqueKey = $sampleCode . '|' . $customerId;
+
+					if (!in_array($uniqueKey, $processedIds)) {
+						$filteredFirmDetails[] = $record;
+						$processedIds[] = $uniqueKey;
+					}
+				}
+
+				$underThisOffice[] = $filteredFirmDetails;
+			}
+		}
+
+		$filteredRecords = [];
+
+		foreach ($underThisOffice as $subarray) {
+
+			foreach ($subarray as $each) {
+
+				$customer_id = $each['customer_id'];
+				
+				// Check if customer_id is present in $is_cancelled
+				$is_cancelled = $this->DmiMmrCancelledFirms->find()->select('customer_id')->where(['customer_id' => $customer_id])->order(['id' => 'DESC'])->first();
+				
+				// Check if customer_id is present in $suspension_record
+				$suspension_record = $this->DmiMmrSuspensions->find('all')->where(['customer_id' => $customer_id,'to_date >=' => $currentDate])->order(['id' => 'DESC'])->first();
+				
+				// Exclude the record if customer_id is present in either $is_cancelled or $suspension_record
+				if ($is_cancelled || $suspension_record) {
+					continue; // Skip to the next iteration of the loop
+				}
+	
+				// Rest of your code logic here
+				$showcause_status = $this->DmiMmrShowcauseLogs->find()->select(['status'])->where(['sample_code IS' => $each['sample_code']])->order(['id' => 'DESC'])->first();
+				$each['showcause_status'] = $showcause_status ? $showcause_status->status : null;
+				
+				// Add the record to the filtered array
+				$filteredRecords[] = $each;
+			
+			}
+		}
+		
 		$this->set('underThisOffice', $filteredRecords);
 
 
+		//This is for the Action Taken Firms
+		$actionTaken = [];
+
+		foreach ($underThisOffice as $subarray) {
+
+			foreach ($subarray as $each) {
+				$customer_id = $each['customer_id'];
+				$action_taken = $this->DmiMmrActionFinalSubmits->find()->where(['customer_id' => $customer_id,'status' => 'action_taken'])->order(['id DESC'])->first();
+				if (!empty($action_taken)) {
+					$actionTaken[] = $action_taken;
+				}
+			}
+		}
+
+		$this->set('actionTaken', $actionTaken);
 
 
-		//::: For the Action Taken Listing
-		$actionTaken = $conn->execute("SELECT DISTINCT on (dmafs.customer_id) dmafs.id,dmafs.customer_id,
-														df.firm_name, df.email,df.mobile_no,dmafs.status,
-														dmafs.is_suspended,dmafs.is_cancelled,dmafs.refer_to_ho
-										FROM dmi_mmr_action_final_submits AS dmafs 
-										INNER JOIN dmi_appl_with_ro_mappings AS dd ON dd.customer_id = dmafs.customer_id
-										INNER JOIN dmi_firms AS df ON df.customer_id = dmafs.customer_id
-										INNER JOIN m_commodity_category AS mc ON mc.category_code = df.commodity::INTEGER
-										INNER JOIN dmi_certificate_types AS dc ON dc.id = df.certification_type::INTEGER
-										WHERE dd.office_id='$postedOffice' AND dmafs.status='final_submit'")->fetchAll('assoc');
-
-		$this->set('actionTaken',$actionTaken);
 
 	}
 
@@ -2131,7 +2164,11 @@ class OthermodulesController extends AppController{
 		$status = '';
 
 		$whichUser = $this->Session->read('whichUser');
-
+		$scn_mode = $this->getRequest()->getQuery('scn_mode');
+		if (!empty($scn_mode)) {
+			$this->Session->write('scn_mode',$scn_mode);
+		}
+		
 		$customer_id = $this->Session->read('firm_id');
 		$this->set('customer_id',$customer_id);
 
@@ -2185,7 +2222,6 @@ class OthermodulesController extends AppController{
 		$grade_descrition = $this->MGradeDesc->find()->select(['grade_desc'])->where(['grade_code' => $sampleDetails['grade'],'display' => 'Y'])->first();
 		
 		$sample_inward_details = $this->SampleInwardDetails->find()->where(['org_sample_code' => $_SESSION['sample_code']])->order('id DESC')->first();
-
 
 		$sampleArray = [
 			'sample_code' => $sampleDetails['org_sample_code'],
@@ -2254,7 +2290,6 @@ class OthermodulesController extends AppController{
 				
 			} elseif(null!==($this->request->getData('save_applicant_comment'))){
 				
-			
 				$comment_by = $this->Session->read('username');
 				$comment_to = 'bWVsdmlucm95LnBAZ292Lmlu';
 				$comment = htmlentities($this->request->getData('reffered_back_comment'), ENT_QUOTES);
@@ -2277,6 +2312,33 @@ class OthermodulesController extends AppController{
 					$message_theme = "failed";
 					$redirect_to = '../customers/secondary-home';
 				}
+
+			} elseif (null!==($this->request->getData('reply_to_applicant'))) {
+
+				$comment_by = $this->Session->read('username');
+				$comment_to = $_SESSION['firm_id'];
+				$comment = htmlentities($this->request->getData('reffered_back_comment'), ENT_QUOTES);
+				$from_user = 'ro';
+				$to_user = 'applicant';
+
+				$result = $this->DmiMmrShowcauseComments->replyFromApplicant($customer_id,$sample_code,$comment_by,$comment_to,$comment,$from_user,$to_user);
+
+
+				if($result == 1){
+
+					$this->Customfunctions->saveActionPoint('Reffered Back Comment Saved', 'Success'); #Action
+					$message = "Comment on Showcause notice is sent tio the agmark successfully.";
+					$message_theme = "success";
+					$redirect_to = '../othermodules/misgrading_home';
+
+				}elseif($result == 2){
+
+					$this->Customfunctions->saveActionPoint('Reffered Back Comment Saved', 'Failed'); #Action
+					$message = " Section, Sorry you can not save blank Reffered back";
+					$message_theme = "failed";
+					$redirect_to = '../othermodules/misgrading_home';
+				}
+
 			}
 		}
 
@@ -2390,12 +2452,12 @@ class OthermodulesController extends AppController{
 			SELECT dmafs.customer_id, df.firm_name, dmafs.sample_code
 			FROM dmi_mmr_action_final_submits AS dmafs 
 			INNER JOIN dmi_firms AS df ON df.customer_id = dmafs.customer_id 
-			WHERE dmafs.status != 'final_submit'
+			WHERE dmafs.status != 'action_taken' AND ( dmafs.for_suspension ='Yes' OR dmafs.for_cancel = 'Yes' ) 
 			GROUP BY dmafs.customer_id, df.firm_name, dmafs.sample_code
 			ORDER BY dmafs.customer_id DESC
 			LIMIT 1
 		")->fetchAll('assoc');
-
+	
 		// Customer IDs
 		$customer_list = [];
 
@@ -2439,6 +2501,125 @@ class OthermodulesController extends AppController{
 	}
 
 	
+
+
+	//Description : To list the granted suspended firms
+	//Author : Akash Thakre
+	//Date : 09-06-2023
+	//For: MMR
+
+	public function listOfSuspendedFirms(){
+
+
+		$username = $this->Session->read('username');
+		$conn = ConnectionManager::get('default');
+
+		//get posted office id
+		$postedOffice = $this->DmiUsers->getPostedOffId($username);
+
+				
+		$this->loadModel('DmiRoOffices');
+		$this->loadModel('DmiDistricts');
+		$roDistricts = $this->DmiRoOffices->find('list', array('fields' => array('id'), 'conditions' => array('ro_email_id' => $username)))->toArray();
+
+
+		if (!empty($roDistricts)) {
+			$districtlist = $this->DmiDistricts->find('list', array('fields' => array('id'), 'conditions' => array('ro_id IN' => $roDistricts)))->toArray();
+		} else {
+			$districtlist = $this->DmiDistricts->find('list', array('fields' => array('id'), 'conditions' => array('ro_id IS' => $postedOffice)))->toArray();
+		}
+
+		$suspendedFirms = array();
+		$currentDate = date('Y-m-d H:i:s'); 
+
+		foreach ($districtlist as $each) {
+
+			$firmDetails = $conn->execute("SELECT dms.id, dms.customer_id, dms.from_date, dms.to_date, dms.pdf_file,
+			 dms.time_period,df.firm_name, df.email, df.mobile_no
+			FROM dmi_mmr_suspensions AS dms 
+			INNER JOIN dmi_firms AS df ON df.customer_id = dms.customer_id
+			INNER JOIN dmi_districts AS dd ON dd.id = df.district::INTEGER
+			INNER JOIN dmi_certificate_types AS dct ON dct.id = df.certification_type::INTEGER
+			INNER JOIN dmi_grant_certificates_pdfs AS dgcp ON df.customer_id = dgcp.customer_id 
+			WHERE df.district = '$each' AND df.certification_type = '1' AND dms.to_date >= '$currentDate'")
+			->fetchAll('assoc');
+		
+			if (!empty($firmDetails)) {
+				$suspendedFirms[] = $firmDetails;
+			}
+	
+		}
+	
+		$filteredRecords = [];
+		foreach ($suspendedFirms as $subarray) {
+			foreach ($subarray as $each) {
+				// Add the record to the filtered array
+				$filteredRecords[] = $each;
+			}
+		}
+		//pr($filteredRecords); exit;
+		$this->set('suspended_firms', $filteredRecords);
+		
+	}
+
+
+
+	//Description : To list the granted Cacnelled firms
+	//Author : Akash Thakre
+	//Date : 09-06-2023
+	//For: MMR
+
+	public function listOfCancelledFirms(){
+
+		$username = $this->Session->read('username');
+		$conn = ConnectionManager::get('default');
+
+		//get posted office id
+		$postedOffice = $this->DmiUsers->getPostedOffId($username);
+
+				
+		$this->loadModel('DmiRoOffices');
+		$this->loadModel('DmiDistricts');
+		$roDistricts = $this->DmiRoOffices->find('list', array('fields' => array('id'), 'conditions' => array('ro_email_id' => $username)))->toArray();
+
+
+		if (!empty($roDistricts)) {
+			$districtlist = $this->DmiDistricts->find('list', array('fields' => array('id'), 'conditions' => array('ro_id IN' => $roDistricts)))->toArray();
+		} else {
+			$districtlist = $this->DmiDistricts->find('list', array('fields' => array('id'), 'conditions' => array('ro_id IS' => $postedOffice)))->toArray();
+		}
+
+		$cancelledFirms = array();
+
+		foreach ($districtlist as $each) {
+
+			$firmDetails = $conn->execute("SELECT dmcf.id, dmcf.customer_id,dmcf.date,dmcf.pdf_file, df.firm_name, df.email, df.mobile_no
+				FROM dmi_mmr_cancelled_firms AS dmcf 
+				INNER JOIN dmi_firms as df ON df.customer_id = dmcf.customer_id
+				INNER JOIN dmi_districts AS dd ON dd.id = df.district::INTEGER
+				INNER JOIN dmi_certificate_types AS dct ON dct.id = df.certification_type::INTEGER
+				INNER JOIN dmi_grant_certificates_pdfs AS dgcp ON df.customer_id = dgcp.customer_id 
+				WHERE df.district='$each' AND df.certification_type='1'")->fetchAll('assoc');
+
+	
+			if (!empty($firmDetails)) {
+				$cancelledFirms[] = $firmDetails;
+			}
+	
+		}
+		
+		$filteredRecords = [];
+		foreach ($cancelledFirms as $subarray) {
+			foreach ($subarray as $each) {
+				// Add the record to the filtered array
+				$filteredRecords[] = $each;
+			}
+		}
+		//pr($filteredRecords); exit;
+		$this->set('cancelled_firms', $filteredRecords);
+
+		
+	}
 
 }
 

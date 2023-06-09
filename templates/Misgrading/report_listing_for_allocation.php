@@ -48,17 +48,20 @@
 												if (!empty($final_reports)) {
 													$sr_no = 1;
 													foreach ($final_reports as $each) {
-														if ($each['packer_attached'] == null && $each['action_final_submit'] == null && $each['scrutiny_status']) {
-														$status = 'N/A';
-														} else {
-															if ($each['packer_attached'] == 'Y') {
-																$status = 'Packer is Attached';
-															} elseif ($each['scrutiny_status'] == 'Yes') {
-																$status = 'N/A';
-															} else {
-																$status = 'N/A';
-															}
-														} ?>
+											
+														if ($each['report_status'] == 'Packer Attached') {
+															$status = 'Packer is Attached';
+														}elseif ($each['report_status'] == 'Allocated'){
+															$status = 'This Report is Allocated to Scrutinizer.';
+														}elseif($each['report_status'] == 'MO Replied'){
+															$status = 'Scrutinizer Replied on this Report.';
+														}elseif ($each['report_status'] == 'Showcause'){
+															$status = 'Showcause Notice Sent';
+														}
+														else{
+															$status = 'N/A';
+														}
+													 ?>
 													<tr>
 														<td><?php echo $sr_no; ?></td>
 														<td><?php echo $each['org_sample_code']; ?></td>
@@ -67,11 +70,23 @@
 														<td><?php echo $each['commodity_name']; ?></td>
 														<td><?php echo $each['sample_type_desc']; ?></td>
 														<td><?php echo $status; ?></td>
-														<td><?php echo $this->Html->link(
-															'',
-															['controller' => 'misgrading', 'action' => 'redirectToAllocate', $each['org_sample_code'], 'level_3', 'edit'],
-															['class' => 'fas fa-long-arrow-alt-right', 'title' => 'Scrutiny Report']
-														); ?></td>
+														<td><?php 
+																if ($each['report_status'] != 'Allocated' && $each['report_status'] != 'Scrutinized' && $each['report_status'] != 'Showcause') {
+																	echo $this->Html->link(
+																		'',
+																		['controller' => 'misgrading', 'action' => 'redirectToAllocate', $each['org_sample_code'], 'level_3', 'edit'],
+																		['class' => 'fas fa-long-arrow-alt-right', 'title' => 'Scrutiny Report']
+																	);
+																} else {
+																	echo $this->Html->link(
+																		'',
+																		['controller' => 'misgrading', 'action' => 'redirectToAllocate', $each['org_sample_code'], 'level_3', 'view'],
+																		['class' => 'fas fa-eye', 'title' => 'View']
+																	);
+																}
+																
+															?>
+														</td>
 													</tr>
 												<?php $sr_no++; } } ?>
 											</tbody>
@@ -100,6 +115,7 @@
 														<td><?php echo $sr_no; ?></td>
 														<td><?php echo $each['customer_id']; ?></td>
 														<td><?php echo $each['sample_code'];  ?></td>
+														<td><?php echo $each['date'];  ?></td>
 													</tr>
 												<?php $sr_no++; } } ?>
 											</tbody>

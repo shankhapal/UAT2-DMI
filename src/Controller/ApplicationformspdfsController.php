@@ -195,7 +195,6 @@ class ApplicationformspdfsController extends AppController{
 					//to preview application
 					$this->callTcpdf($all_data_pdf,'I',$customer_id,$applicationType);//on 23-01-2020 with preview mode
 					$this->callTcpdf($all_data_pdf,'F',$customer_id,$applicationType);//on 23-01-2020 with save mode
-					//exit;
 				}					
 				
 			}
@@ -447,7 +446,6 @@ class ApplicationformspdfsController extends AppController{
 			}else{
 			
 				$this->customAlertPage("Sorry.. Certificate is generated but details not saved in DB because some functions not worked properly.");
-				exit();
 			}
 
 		}else{
@@ -1320,7 +1318,6 @@ class ApplicationformspdfsController extends AppController{
 			{
 				$last_gradings_years = $this->DmiCaRenewalCommodityDetails->find('all',array('fields'=>'year','conditions'=>array('customer_id IS'=>$customer_id,'is_latest'=>'yes'),'group'=>'year', 'order'=>'year DESC'))->toArray();
 				
-				//print_r($last_gradings_years); exit;
 				$p=1;
 				foreach($last_gradings_years as $each_year)
 				{
@@ -2624,7 +2621,7 @@ class ApplicationformspdfsController extends AppController{
 		}
 			
 			
-			$pdf->AddPage();//print_r($html);exit;	
+			$pdf->AddPage();
 			
 			$pdf->writeHTML($html, true, false, true, false, '');
 

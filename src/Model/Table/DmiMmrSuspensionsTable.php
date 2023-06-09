@@ -59,10 +59,18 @@ class DmiMmrSuspensionsTable extends Table{
 			
 			$DmiMmrActionFinalSubmits->updateAll(
 				['is_suspended' => 'Yes',
-				'status' => 'final_submit'],
+				'status' => 'action_taken'],
 				$conditions
 			);
 			
+			//Update the sample inward table report status 
+			$SampleInward = TableRegistry::getTableLocator()->get('SampleInward');
+			$SampleInward->updateAll(
+				['report_status' => 'Action Taken', 'packer_id' => $customer_id],
+				['org_sample_code' => $details['sample_code']]
+			);
+
+
 			return true;
 		}
 	}

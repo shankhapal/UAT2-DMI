@@ -187,7 +187,7 @@
 						columnClass: 'm',
 						content: "The Sample Code / Report " + sample_code + " was successfully allocated for scrutiny to Scrutiny Officer. " + allocation_to + "",
 						onClose: function(){
-							window.location.href = '/misgrading/report_listing_for_allocation';
+							window.location.href = '../misgrading/report_listing_for_allocation';
 						}
 					});
 					/*
@@ -214,7 +214,7 @@
 		
 		var customer_id = $('#packers_id').val();
 		var sample_code = $('#sample_code').val();
-	
+		var application_mode = $('#application_mode_id').val();
 		if (customer_id !== '') {
 
 			$.ajax({
@@ -256,16 +256,19 @@
 					
 						"</div>"+
 						"<div class='card-footer'>";
-				
-						if (responseObject.isSampleAllocated !== 'allocated') {
-							// Add the condition here
-							if (responseObject.status !== 'not_found') {
-								htmlContent += "<button type='button' class='float-right' id='remove_sam_pac' data-customer-id='" + customer_id + "'>Remove</button>";
-							} else {
-								htmlContent += "<button type='button' id='attach_sam_pac' data-customer-id='" + customer_id + "'>Attach</button>";
+
+						if (application_mode == 'edit') {
+							if (responseObject.isSampleAllocated !== 'allocated') {
+								// Add the condition here
+								if (responseObject.status !== 'not_found') {
+									htmlContent += "<button type='button' class='float-right' id='remove_sam_pac' data-customer-id='" + customer_id + "'>Remove</button>";
+								} else {
+									htmlContent += "<button type='button' id='attach_sam_pac' data-customer-id='" + customer_id + "'>Attach</button>";
+								}
 							}
 						}
-					
+							
+						
 
 					htmlContent += "</div>";
 

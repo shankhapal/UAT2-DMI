@@ -35,7 +35,10 @@
 							echo 'The Showcause notice is sent to the packer.';
 						} elseif ($eachdata['showcause_status'] == 'replied') {
 							echo 'Applicant has been replied to issued Showcause notice';
-						} else {
+						} elseif ($eachdata['showcause_status'] == 'ref_back') {
+							echo 'Refferred Back on the issued Showcause notice';
+						} 
+						else {
 							echo 'N/A';
 						}
 					?>
@@ -49,7 +52,7 @@
 
 					<?php //Check if the Values 
 					
-					if ($eachdata['showcause_status'] =='sent') {
+					if ($eachdata['showcause_status'] =='sent' || $eachdata['showcause_status'] == 'ref_back') {
 						echo $this->Html->link(
 							'', 
 							['controller' => 'othermodules', 'action'=>'fetchIdForShowcause','?' => ['id' => $eachdata['id'], 'customer_id' => $eachdata['customer_id'],'sample_code' => $eachdata['sample_code'],'scn_mode'=>'view']],

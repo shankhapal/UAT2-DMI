@@ -1269,18 +1269,20 @@ class CustomersController extends AppController {
 			#Suspension of Certificate @  SPN - PDF - Akash [02-06-2023] 
 			$this->loadModel('DmiMmrSuspensions');
 			$currentDate = date('Y-m-d H:i:s'); // Get the current date and time
-			
 			$suspension_record = $this->DmiMmrSuspensions->find('all')->where(['customer_id IS' => $customer_id,'to_date >=' => $currentDate])->order('id DESC')->first();
 			$this->set('suspension_record', $suspension_record);	
-			
-			if(!empty($suspension_record)){
+		
+			#Cancellation of Certificate @  CAN - PDF - Akash [02-06-2023] 
+			$this->loadModel('DmiMmrCancelledFirms');
+			$cancelled_record = $this->DmiMmrCancelledFirms->find('all')->where(['customer_id IS' => $customer_id])->order('id DESC')->first();
+			$this->set('cancelled_record', $cancelled_record);	
+
+			if(!empty($suspension_record) || !empty($cancelled_record)){
 				#Misgrading Details
 				$this->loadModel('DmiMmrActionFinalSubmits');
 				$misgrading_details = $this->DmiMmrActionFinalSubmits->detailsForPdf($customer_id);
 				$this->set('misgrading_details', $misgrading_details);
 			}
-			
-	
 	
 		//================================================================//
 		
@@ -1316,6 +1318,11 @@ class CustomersController extends AppController {
 			$this->loadModel('DmiMmrSuspendedFirmsLogs');
 			$suspension_grant_certificate = $this->DmiMmrSuspendedFirmsLogs->find('all')->where(['customer_id IS' => $customer_id])->order('id desc')->first();
 			$this->set('suspension_grant_certificate', $suspension_grant_certificate);
+			
+			#Cancellation Application @ CAN  /GRANT PDF/ - Akash [14-04-2023] 
+			$this->loadModel('DmiMmrCancelledFirms');
+			$cancelletion_grant_certificate = $this->DmiMmrCancelledFirms->find('all')->where(['customer_id IS' => $customer_id])->order('id desc')->first();
+			$this->set('cancelletion_grant_certificate', $cancelletion_grant_certificate);
 
 
 
@@ -1496,26 +1503,46 @@ class CustomersController extends AppController {
 			$conn = ConnectionManager::get('default');
 
 			$showCauseNotice = $conn->execute("SELECT dsl.id,dsl.customer_id,dsl.reason,
-										dsl.date,dsl.end_date,dsnp.pdf_file,dsl.status,dsl.sample_code
+										dsl.date,dsl.end_date,dsnp.pdf_file,dsl.status,dsl.sample_code,dsl.modified
 										FROM dmi_mmr_showcause_logs AS dsl
 										INNER JOIN dmi_mmr_showcause_notice_pdfs AS dsnp ON dsnp.customer_id = dsl.customer_id
-										WHERE dsl.customer_id='$customer_id' AND dsl.status='sent'")->fetch('assoc');
-			
-			$this->set('showCauseNotice',$showCauseNotice);
+										WHERE dsl.customer_id='$customer_id'")->fetchAll('assoc');
 		
+			
+
+			$lastRecord = null;
+
+			for ($i = count($showCauseNotice) - 1; $i >= 0; $i--) {
+				$lastRecord = $showCauseNotice[$i];
+				break;
+			}
+			
+			if ($lastRecord !== null) {
+				$this->set('showCauseNotice',$lastRecord);
+			}else{
+				$this->set('showCauseNotice',null);
+			}
+			
+			
 
 		//check if the applicant is commented on the showcause notice.
-		$this->loadModel('DmiMmrShowcauseComments');
-		$is_scn_replied_details = $this->DmiMmrShowcauseComments->find()->where(['customer_id' => $customer_id,'to_user' => 'ro'])->order('id DESC')->first();
-		if(!empty($is_scn_replied_details)){
-			$is_scn_replied='yes';
-		}else{
-			$is_scn_replied='no';
-		}
+		$this->loadModel('DmiMmrShowcauseLogs');
+		$showCauseComment = $this->DmiMmrShowcauseLogs->find()->select(['sample_code'])->where(['customer_id' => $customer_id])->order('id DESC')->first();
 		
-		$this->set('is_scn_replied_details',$is_scn_replied_details);
-		$this->set('is_scn_replied',$is_scn_replied);
-	
+
+		if(!empty($showCauseComment)){
+
+			// fetch comments history
+			$this->loadModel('DmiMmrShowcauseComments');
+			$showcause_comments = $this->DmiMmrShowcauseComments->find('all',array('conditions'=>array('sample_code IS'=>$showCauseComment['sample_code'],'OR'=>array('comment_by IS'=>$customer_id,'comment_to IS'=>$showCauseComment['by_user'])),'order'=>'id'))->toArray();
+			$comments_result = array_merge($showcause_comments);
+			$comments_result = Hash::sort($comments_result, '{n}.created', 'desc');	
+			$this->set('showcause_comments',$comments_result);
+		
+		}else{
+			$this->set('showcause_comments',null);
+		}
+
 
 		// Comment: Added as per suggestion: 
 		// Suggestion: One Copy of inspection report needs to be sent to 
@@ -2170,7 +2197,8 @@ class CustomersController extends AppController {
 					}
 
 				} else {
-					echo "<b>This Application is cancelled on Date: ".$cancellation_record->date->format('d/m/Y')." and no longer available.</b>";
+					$date = new \DateTime($cancellation_record['to_date']);
+					echo "<b>This Application is cancelled on Date: ".$date->format('d/m/Y')." and no longer available.</b>";
 				}
 
 				exit; // This is added Intensionally
@@ -2198,6 +2226,8 @@ class CustomersController extends AppController {
 		$this->loadModel('MCommodityCategory');
 		$this->loadModel('DmiGrantCertificatesPdfs');
 		$this->loadModel('DmiPackingTypes');
+		$this->loadModel('DmiMmrCancelledFirms');
+		$this->loadModel('DmiMmrSuspensions');
 
 
 		if(null!== ($this->request->getData('save'))){
@@ -2219,16 +2249,15 @@ class CustomersController extends AppController {
 				foreach ($grantData as $key => $grantdata) {
 
 					//Check if the firm is cancelled ot not first. - Akash[04-06-2023]
-					$cancellation_record = $this->DmiMmrCancelledFirms->find('all')->where(['customer_id IS' => $customer_id])->order('id DESC')->first();
+					$cancellation_record = $this->Customfunctions->isApplicationCancelled($grantdata['customer_id']);
 					if (empty($cancellation_record)) {
 
 						#Suspension of Certificate @  SPN - PDF - Akash [02-06-2023] 
-						$currentDate = date('Y-m-d H:i:s'); // Get the current date and time
-						$suspension_record = $this->DmiMmrSuspensions->find('all')->where(['customer_id IS' => $customer_id,'to_date >=' => $currentDate])->order('id DESC')->first();	
+						$suspension_record = $this->Customfunctions->isApplicationSuspended($grantdata['customer_id']);
 						if (empty($suspension_record)) {
 						
 							//This Code is added to this function to avoid the customer ids if the firm is surrendered For SOC - Akash [12-05-2023]
-							$isSurrender = $this->Customfunctions->isApplicationSurrendered($customer_id);
+							$isSurrender = $this->Customfunctions->isApplicationSurrendered($grantdata['customer_id']);
 							if (empty($isSurrender)) {
 							
 								$uptoDate = $this->Customfunctions->getCertificateValidUptoDate($grantdata['customer_id'], $grantdata['date']);
