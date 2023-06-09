@@ -93,7 +93,7 @@ class MisgradingController extends AppController{
 		foreach ($finalGrading as $row) {
 
 			// Check if either 'scrutiny_status' or 'action_final_submit' contains 'Yes'
-			if ($row['report_status'] === 'Scrutinized' || $row['report_status'] === 'Action Submit') {
+			if ($row['report_status'] === 'Scrutinized' || $row['report_status'] === 'Action Taken') {
 				continue; // Skip the iteration
 			}
 

@@ -90,4 +90,4 @@
 	</section>
 </div>
 <input type="hidden" id="appl_id" value="<?php echo $customer_id; ?>">
-<?php echo $this->Html->script('Othermodules/suspension_home'); ?>
+<?php echo $this->Html->script('othermodules/suspension_home'); ?>

@@ -72,7 +72,7 @@ class DmiMmrActionFinalSubmitsTable extends Table{
 
 				//This is to update the sample flag entry in sample_inward table
 				$SampleInward = TableRegistry::getTableLocator()->get('SampleInward');
-				$this->SampleInward->updateAll(
+				$SampleInward->updateAll(
 					['report_status' => 'Action Submit', 'packer_id' => $_SESSION['firm_id']],
 					['org_sample_code' => $_SESSION['sample_code']]
 				);
