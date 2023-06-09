@@ -3,7 +3,14 @@
 <div class="content-header">
 	<div class="container-fluid">
 		<div class="row mb-2">
-			<div class="col-sm-6"><?php echo $this->Html->link('Back', array('controller' => 'misgrading', 'action'=>'report_listing_for_allocation'),array('class'=>'add_btn btn btn-secondary')); ?></div>
+			<div class="col-sm-6">
+				<?php if ($_SESSION['current_level'] == 'level_1') {
+					echo $this->Html->link('Back', array('controller' => 'misgrading', 'action'=>'allocated_reports_for_mo'),array('class'=>'add_btn btn btn-secondary')); 
+				}else{
+					echo $this->Html->link('Back', array('controller' => 'misgrading', 'action'=>'report_listing_for_allocation'),array('class'=>'add_btn btn btn-secondary')); 
+				}
+			
+			?></div>
 			<div class="col-sm-6">
 				<ol class="breadcrumb float-sm-right">
 					<li class="breadcrumb-item"><?php echo $this->Html->link('Dashboard', array('controller' => 'dashboard', 'action'=>'home')); ?></li>
@@ -19,7 +26,7 @@
 				<div class="col-md-12">
 					<?php echo $this->Form->create(null, array('id'=>'frm_sample_forward','class'=>'form-group')); ?>
 						<div class="card card-info">
-							<div class="card-header"><h3 class="card-title-new">Allocate Report to Scrutinizer</h3></div>
+							<div class="card-header"><h3 class="card-title-new">Report Details</h3></div>
 							<div class="form-horizontal mb-3">
 								<div class="card-body">
 									<?php if(!empty($validate_err)){ ?><div class="alert alert-danger textAlignCenter text-danger"><?php echo $validate_err; ?></div><?php } ?>
@@ -113,6 +120,9 @@
 <input type="hidden" id="sample_code_value" value="<?php echo $sample_code; ?>">
 <input type="hidden" id="current_level" value="<?php echo $_SESSION['current_level']; ?>">
 <input type="hidden" id="is_allocated_id" value="<?php echo $isAllocatd; ?>">
+<input type="hidden" id="application_mode_id" value="<?php echo $_SESSION['application_mode']; ?>">
+
+
 
 <?php
 	echo $this->Html->script('dropdowncustom');

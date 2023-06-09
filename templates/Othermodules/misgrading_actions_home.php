@@ -39,35 +39,37 @@
 											</div>
 										</div>
 									</div>
-									
-									<div class="col-3 hide_det">
-										<div class="form-group">
-											<label class="col-form-label">Misgrading Category <span class="cRed">*</span></label>
-											<?php echo $this->Form->control('misgrade_category', array('type'=>'select','empty'=>'-- Select Misgrading Category --','id'=>'misgrade_category','value'=>$misCatId,'options'=>$misgradingCategories, 'label'=>false, 'class'=>'form-control')); ?>
-											<span id="error_misgrade_category" class="error invalid-feedback"></span>
-										</div>
+									<?php
+										if ($status != 'submitted' && $status != 'final_submitted') { ?>
 										
-										<div class="form-group">
-											<label class="col-form-label">Action To Be Taken <span class="cRed">*</span></label>
-											<?php echo $this->Form->control('misgrade_action', array('type'=>'select','empty'=>'-- Select Misgrading Action --','id'=>'misgrade_action', 'value'=>$misActId,'options'=>$misgradingActions, 'label'=>false, 'class'=>'form-control')); ?>
-											<span id="error_misgrade_action" class="error invalid-feedback"></span>
+										<div class="col-3 hide_det">
+											<div class="form-group">
+												<label class="col-form-label">Misgrading Category <span class="cRed">*</span></label>
+												<?php echo $this->Form->control('misgrade_category', array('type'=>'select','empty'=>'-- Select Misgrading Category --','id'=>'misgrade_category','value'=>$misCatId,'options'=>$misgradingCategories, 'label'=>false, 'class'=>'form-control')); ?>
+												<span id="error_misgrade_category" class="error invalid-feedback"></span>
+											</div>
+											
+											<div class="form-group">
+												<label class="col-form-label">Action To Be Taken <span class="cRed">*</span></label>
+												<?php echo $this->Form->control('misgrade_action', array('type'=>'select','empty'=>'-- Select Misgrading Action --','id'=>'misgrade_action', 'value'=>$misActId,'options'=>$misgradingActions, 'label'=>false, 'class'=>'form-control')); ?>
+												<span id="error_misgrade_action" class="error invalid-feedback"></span>
+											</div>
 										</div>
-									</div>
-								
+										<div class="col-3 hide_det">
+											<div class="form-group">
+												<label class="col-form-label">Misgrading Level <span class="cRed">*</span></label>
+												<?php echo $this->Form->control('misgrade_level', array('type'=>'select','empty'=>'-- Select Misgrading Level --','id'=>'misgrade_level', 'value'=>$misLvlId,'options'=>$misgradingLevels, 'label'=>false, 'class'=>'form-control')); ?>
+												<span id="error_misgrade_level" class="error invalid-feedback"></span>
+											</div>
+											<div class="form-group" id="time_period_div">
+												<label class="col-form-label">Period <span class="cRed">*</span></label>
+												<?php echo $this->Form->control('time_period', array('type'=>'select','empty'=>'-- Select Period --','id'=>'time_period', 'value'=>$periodId,'options'=>$timePeriod, 'label'=>false, 'class'=>'form-control')); ?>
+												<span id="error_misgrade_action" class="error invalid-feedback"></span>
+											</div>
+										</div>
 
-									<div class="col-3 hide_det">
-										<div class="form-group">
-											<label class="col-form-label">Misgrading Level <span class="cRed">*</span></label>
-											<?php echo $this->Form->control('misgrade_level', array('type'=>'select','empty'=>'-- Select Misgrading Level --','id'=>'misgrade_level', 'value'=>$misLvlId,'options'=>$misgradingLevels, 'label'=>false, 'class'=>'form-control')); ?>
-											<span id="error_misgrade_level" class="error invalid-feedback"></span>
-										</div>
-										<div class="form-group" id="time_period_div">
-											<label class="col-form-label">Period <span class="cRed">*</span></label>
-											<?php echo $this->Form->control('time_period', array('type'=>'select','empty'=>'-- Select Period --','id'=>'time_period', 'value'=>$periodId,'options'=>$timePeriod, 'label'=>false, 'class'=>'form-control')); ?>
-											<span id="error_misgrade_action" class="error invalid-feedback"></span>
-										</div>
-										
-									</div>
+									<?php } ?>
+									
 									
 									<div class="col-md-6" id="actions_div">
 										<div class="card">
@@ -92,13 +94,16 @@
 											</div>
 										</div>
 									</div>
-									<div class="col-6">
-										<div class="form-group">
-											<label class="col-form-label">Reason <span class="cRed">*</span></label>
-											<?php echo $this->Form->control('reason', array('type'=>'textarea','id'=>'reason', 'value'=>$reason,'label'=>false, 'class'=>'form-control')); ?>
-											<span id="error_reason" class="error invalid-feedback"></span>
+									
+									<?php if ($status != 'submitted' && $status != 'final_submitted') { ?>
+										<div class="col-6">
+											<div class="form-group">
+												<label class="col-form-label">Reason <span class="cRed">*</span></label>
+												<?php echo $this->Form->control('reason', array('type'=>'textarea','id'=>'reason', 'value'=>$reason,'label'=>false, 'class'=>'form-control')); ?>
+												<span id="error_reason" class="error invalid-feedback"></span>
+											</div>
 										</div>
-									</div>
+									<?php }?>
 									<div class="col-6">
 										<p id="mis_cat_desc"></p>
 										<p id="mis_level_desc"></p>
@@ -110,10 +115,10 @@
 							<div class="card-footer cardFooterBackground">
 								<?php 
 									if (!empty($status)){
-										//if ($status == 'submitted') {
+										if ($status != 'submitted' && $status != 'final_submitted') {
 											echo $this->Form->submit('Update', array('name'=>'save_action','id'=>'save_action','label'=>false,'class'=>'float-left btn btn-success'));
 											echo $this->Form->control('Final Submit',array('type'=>'button','name'=>'take_action','class'=>'btn btn-primary ml-2 float-left', 'data-toggle'=>'modal','data-target'=>'#confirm_action','label'=>false));
-										//} 
+										} 
 									} else {
 										echo $this->Form->submit('Save', array('name'=>'save_action','id'=>'save_action','label'=>false,'class'=>'float-left btn btn-success'));
 									}

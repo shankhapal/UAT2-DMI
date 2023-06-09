@@ -1,10 +1,8 @@
 
 
 var status_id = $('#status_id').val();
-if (status_id != null && status_id == 'saved') {
+if (status_id == 'submmitted') {
 	$('#actions_div').show();
-}else{
-	$('#actions_div').hide();
 }
 
 $('#save').on('shown.bs.modal', function () {
@@ -44,16 +42,19 @@ $("#final_submit").click(function(){
 
 				var action = '';
 				var redirect_to = '';
-
+				
 				if (response == 'Suspension') {
 					action = 'suspension, this firm will be Suspended for a period of time. This will be now redirecting to the suspension module for consent and e-sign.';
 					redirect_to = '../othermodules/suspensionHome?customer_id=' + encodeURIComponent(customer_id) + '&sample_code=' + encodeURIComponent(sample_code) + '&for_module=' + encodeURIComponent(response);
 				} else if (response == 'Cancellation') {
 					action = 'cancellation, this firm will be Cancelled. This will be now redirecting to the suspension module for consent and e-sign.';
-					redirect_to = 'othermodules/suspensionHome?param1=value1&param2=value2';
+					redirect_to = '../othermodules/suspensionHome?customer_id=' + encodeURIComponent(customer_id) + '&sample_code=' + encodeURIComponent(sample_code) + '&for_module=' + encodeURIComponent(response);
 				} else if (response == 'Refer') {
 					action = 'This is now referring to Head Office';
 					// No redirection needed
+				} else if (response == 'Showcause') {
+					action = 'Showcause Notice, The Show cause notice will be sent to the firm.';
+					redirect_to = '../othermodules/showcause-home?customer_id=' + encodeURIComponent(customer_id) + '&sample_code=' + encodeURIComponent(sample_code) + '&scn_mode=' + 'edit';
 				}
 
 

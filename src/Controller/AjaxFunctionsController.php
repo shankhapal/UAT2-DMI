@@ -1713,50 +1713,63 @@ class AjaxFunctionsController extends AppController{
 
 		//below rejected data fetch using customer id if rejected status is rejected by laxmi on 13-01-2023
 		$this->loadModel('DmiRejectedApplLogs');
-        $rejectedData = $this->DmiRejectedApplLogs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->last();
+		$rejectedData = $this->DmiRejectedApplLogs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->last();
 
 		//Check If application is surrender - Akash [10-05-2023]
 		$isApplSurrender = $this->Customfunctions->isApplicationSurrendered($customer_id);
-
+		$isApplSuspended = $this->Customfunctions->isApplicationSuspended($customer_id);
+		$isApplCancelled = $this->Customfunctions->isApplicationCancelled($customer_id);
+		
 		if ($resultArray['no_result']==null) {
 
-			if (!empty($isApplSurrender)) {
-				echo "<b>This Application is surrendered on ".$isApplSurrender." and no longer available.</b>";
+			if (!empty($isApplCancelled)) {
+				echo "<b>This Application is Cancelled on ".$isApplCancelled." and no longer available.</b>";
 			} else {
-				echo "<table class='table table-sm'>
-				<thead>
-					<tr>
-						<th>Application Id</th>
-						<th>District</th>
-						<th>Position</th>
-						<th>Process</th>
-						<th>Available With</th>";
 
-						//if entery in rejected table with same id status is empty added by laxmi on 13-01-2023
-						if(!empty($rejectedData['customer_id']) && $rejectedData['customer_id'] == $customer_id){
-							echo "<th>Status</th>";
-						}
+				//Check if application is suspended
+				if (!empty($isApplSuspended)) {
+					echo "<b>This Application is Suspended Upto ".$isApplSuspended." and no longer available.</b>";
+				} else {
 
-				echo "</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>".$customer_id."</td>
-						<td>".$resultArray['firm_data']['district']."</td>
-						<td>".$resultArray['current_position']."</td>
-						<td>".$resultArray['process']."</td>
-						<td>".$resultArray['currentPositionUser']." <br>( ".$resultArray['getEmailCurrent']." )"."</td> ";
-						//added by laxmi on 13-12-23
-						if(!empty($rejectedData['customer_id']) && $rejectedData['customer_id'] == $customer_id){
-							echo "<td>Rejected</td>";
-						}
-
-				echo "</tr>
-				</tbody>
-			</table>";
+					//Check if the Application is Surrendered
+					if (!empty($isApplSurrender)) {
+						echo "<b>This Application is Surrendered on ".$isApplSurrender." and no longer available.</b>";
+					} else {
+						echo "<table class='table table-sm'>
+							<thead>
+								<tr>
+									<th>Application Id</th>
+									<th>District</th>
+									<th>Position</th>
+									<th>Process</th>
+									<th>Available With</th>";
+		
+									//if entery in rejected table with same id status is empty added by laxmi on 13-01-2023
+									if(!empty($rejectedData['customer_id']) && $rejectedData['customer_id'] == $customer_id){
+										echo "<th>Status</th>";
+									}
+		
+							echo "</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>".$customer_id."</td>
+									<td>".$resultArray['firm_data']['district']."</td>
+									<td>".$resultArray['current_position']."</td>
+									<td>".$resultArray['process']."</td>
+									<td>".$resultArray['currentPositionUser']." <br>( ".$resultArray['getEmailCurrent']." )"."</td> ";
+									//added by laxmi on 13-12-23
+									if(!empty($rejectedData['customer_id']) && $rejectedData['customer_id'] == $customer_id){
+										echo "<td>Rejected</td>";
+									}
+		
+							echo "</tr>
+							</tbody>
+						</table>";
+					}
+				}
 			}
 			
-
 		}else{
 			echo $resultArray['no_result'];
 		}

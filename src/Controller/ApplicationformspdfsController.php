@@ -205,7 +205,6 @@ class ApplicationformspdfsController extends AppController{
 					//to preview application
 					$this->callTcpdf($all_data_pdf,'I',$customer_id,$applicationType);//on 23-01-2020 with preview mode
 					$this->callTcpdf($all_data_pdf,'F',$customer_id,$applicationType);//on 23-01-2020 with save mode
-					//exit;
 				}					
 				
 			}
@@ -470,7 +469,6 @@ class ApplicationformspdfsController extends AppController{
 			}else{
 			
 				$this->customAlertPage("Sorry.. Certificate is generated but details not saved in DB because some functions not worked properly.");
-				exit();
 			}
 
 		}else{
@@ -536,9 +534,22 @@ class ApplicationformspdfsController extends AppController{
 		$Dmi_esign_status = TableRegistry::getTableLocator()->get($esign_status);
 		
 		$all_data_pdf = $this->render($pdf_view_path);		
-	
-		$rearranged_id = 'G-'.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
 		
+		//Below Block Is added to Change the PDF prefix if the Firm is Suspended or Cancelled- Akash [02-06-2023]
+		if ($this->Session->check('for_module')) {
+
+			$for_module = $this->Session->read('for_module');
+			
+			if ($for_module === 'Suspension') {
+				$rearranged_id = 'SPN-'.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
+			} elseif ($for_module === 'Cancellation') {
+				$rearranged_id = 'CAN-'.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
+			} 
+
+		} else {
+			$rearranged_id = 'G-'.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
+		}
+
 		//updated logic as per new order on 01-04-2021, 5 years validity for PP and Laboratory
 		//as the module is to reesign renewal certificate only, So now need to re-esign the first grant also, if granted with 2 years of validity
 		//but not the old first grant record
@@ -1330,7 +1341,6 @@ class ApplicationformspdfsController extends AppController{
 			{
 				$last_gradings_years = $this->DmiCaRenewalCommodityDetails->find('all',array('fields'=>'year','conditions'=>array('customer_id IS'=>$customer_id,'is_latest'=>'yes'),'group'=>'year', 'order'=>'year DESC'))->toArray();
 				
-				//print_r($last_gradings_years); exit;
 				$p=1;
 				foreach($last_gradings_years as $each_year)
 				{
@@ -1794,7 +1804,7 @@ class ApplicationformspdfsController extends AppController{
 			
 			//added lines below on 08-01-2021 by Amol
 			$this->set('get_grant_details',$get_grant_details);
-			$this->set('user_full_name',$user_full_name);																						   
+			$this->set('user_full_name',$user_full_name);
 			$this->set('certificate_valid_upto',$certificate_valid_upto);
 
 			//This below line is added for the QR Code genration on Shankhpal [16-08-2022]	
@@ -1802,12 +1812,17 @@ class ApplicationformspdfsController extends AppController{
 			$data = [$customer_id,$pdf_date,$certificate_valid_upto,$firm_name_forqr];
 			
 			
-			if ($_SESSION['application_type'] == '9') {	 		//For Suspension [Application Type = 9] - (SOC) -> Akash [02-05-2023]
+			if ($_SESSION['application_type'] == '9') {	 		//For Surrender [Application Type = 9] - (SOC) -> Akash [02-05-2023]
 				$result_for_qr = $this->Customfunctions->getQrCode($data,'SOC');
-			} elseif ($_SESSION['application_type'] == 13) { 	//For Suspension [tempprary Application Type = 13] - (SPN) -> Akash [02-05-2023]
-				$result_for_qr = $this->Customfunctions->getQrCode($data,'SPN');
-			} elseif ($_SESSION['application_type'] == 14) {	//For Suspension [tempprary Application Type = 13] - (CAN) -> Akash [02-05-2023]
-				$result_for_qr = $this->Customfunctions->getQrCode($data,'CAN');
+
+			} elseif ($this->Session->check('for_module')) {
+
+				if($this->Session->read('for_module') == 'Suspension') {
+					$result_for_qr = $this->Customfunctions->getQrCode($data,'SPN'); //For Suspension [Application Type = 9] - (SPN) -> Akash [06-06-2023]
+				} elseif ($this->Session->read('for_module') == 'Cancellation') {
+					$result_for_qr = $this->Customfunctions->getQrCode($data,'CAN'); //For Suspension [Application Type = 9] - (CAN) -> Akash [06-06-2023]
+				}
+			
 			} else {
 				$result_for_qr = $this->Customfunctions->getQrCode($data);
 			}
@@ -1877,16 +1892,20 @@ class ApplicationformspdfsController extends AppController{
 			$firm_name_forqr = $customer_firm_data['firm_name'];//updated on 25-04-2023, to get updated details, if changed appl in process
 			$data = [$customer_id,$pdf_date,$certificate_valid_upto,$firm_name_forqr];
 
-			if ($_SESSION['application_type'] == '9') {	 		//For Suspension [Application Type = 9] - (SOC) -> Akash [02-05-2023]
+			if ($_SESSION['application_type'] == '9') {	 		//For Surrender [Application Type = 9] - (SOC) -> Akash [02-05-2023]
 				$result_for_qr = $this->Customfunctions->getQrCode($data,'SOC');
-			} elseif ($_SESSION['application_type'] == 13) { 	//For Suspension [tempprary Application Type = 13] - (SPN) -> Akash [02-05-2023]
-				$result_for_qr = $this->Customfunctions->getQrCode($data,'SPN');
-			} elseif ($_SESSION['application_type'] == 14) {	//For Suspension [tempprary Application Type = 13] - (CAN) -> Akash [02-05-2023]
-				$result_for_qr = $this->Customfunctions->getQrCode($data,'CAN');
+
+			} elseif ($this->Session->check('for_module')) {
+
+				if($this->Session->read('for_module') == 'Suspension') {
+					$result_for_qr = $this->Customfunctions->getQrCode($data,'SPN'); //For Suspension [Application Type = 9] - (SPN) -> Akash [06-06-2023]
+				} elseif ($this->Session->read('for_module') == 'Cancellation') {
+					$result_for_qr = $this->Customfunctions->getQrCode($data,'CAN'); //For Suspension [Application Type = 9] - (CAN) -> Akash [06-06-2023]
+				}
+			
 			} else {
 				$result_for_qr = $this->Customfunctions->getQrCode($data);
 			}
-			
 			
 			$this->set('result_for_qr',$result_for_qr);
 			
@@ -2634,7 +2653,7 @@ class ApplicationformspdfsController extends AppController{
 		}
 			
 			
-			$pdf->AddPage();//print_r($html);exit;	
+			$pdf->AddPage();
 			
 			$pdf->writeHTML($html, true, false, true, false, '');
 
@@ -3723,7 +3742,7 @@ class ApplicationformspdfsController extends AppController{
 		// #Date : 05-06-2023
 		// Note : For: Management of Misgrading (MMR)
 
-		public function showcauseApplPdf(){
+	public function showcauseApplPdf(){
 
 		$this->loadModel('DmiFirms');
 		$this->loadModel('DmiCustomers');
@@ -3853,7 +3872,7 @@ class ApplicationformspdfsController extends AppController{
 		$this->Session->write('pdf_file_name',$rearranged_id.'('.$current_pdf_version.')'.'.pdf');
 	
 		//creating filename and file path to save
-		$file_path = '/writereaddata/DMI/showcause_notice/'.$rearranged_id.'('.$current_pdf_version.')'.'.pdf';
+		$file_path = '/testdocs/DMI/showcause_notice/'.$rearranged_id.'('.$current_pdf_version.')'.'.pdf';
 		
 		$showcauseNoticeEntity = $this->DmiMmrShowcauseNoticePdfs->newEntity(array(
 	

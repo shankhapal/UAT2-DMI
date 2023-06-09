@@ -1,6 +1,19 @@
-
 	$(document).ready(function () {
+		/*
+		//Check if the sample is scrutinized or allocated
+		var statusArray = $('#statusArray_id').val();
+
+		if (statusArray.length > 0) {
+			var sampleStatus = JSON.parse(statusArray);
+
+			// Access the property values
+			var savedValue = sampleStatus.saved; // "approved"
+			var allocatedValue = sampleStatus.allocated; // null
+			var scrutinzedValue = sampleStatus.scrutinzed; // "done"
 		
+		  }
+		  */
+
 		//This is added to initialize the custom dropdown
 		create_custom_dropdowns();
 		
@@ -74,7 +87,7 @@
 					$.alert({
 						icon: "fas fa-exclamation-circle",
 						columnClass: 'm',
-						content: "The Sample Code " + sample_code + " is successfully attached to the Packer ID: " + customer_id + " successfully.",
+						content: "The Sample Code " + sample_code + " has been successfully attached to the Packer ID: " + customer_id + ".",
 						onClose: function(){
 							location.reload(); // Reload the page
 						}
@@ -104,7 +117,7 @@
 					$.alert({
 						icon: "fas fa-exclamation-circle",
 						columnClass: 'm',
-						content: "The Sample Code " + sample_code + " was successfully removed with the Packer ID :" + customer_id + " Successfully",
+						content: "The Sample Code "+sample_code+" has been successfully removed from the Packer ID "+customer_id+".",
 						onClose: function(){
 							location.reload(); // Reload the page
 						}
@@ -174,7 +187,7 @@
 						columnClass: 'm',
 						content: "The Sample Code / Report " + sample_code + " was successfully allocated for scrutiny to Scrutiny Officer. " + allocation_to + "",
 						onClose: function(){
-							location.reload(); // Reload the page
+							window.location.href = '../misgrading/report_listing_for_allocation';
 						}
 					});
 					/*
@@ -201,7 +214,7 @@
 		
 		var customer_id = $('#packers_id').val();
 		var sample_code = $('#sample_code').val();
-	
+		var application_mode = $('#application_mode_id').val();
 		if (customer_id !== '') {
 
 			$.ajax({
@@ -222,9 +235,9 @@
 
 						// Constructing the HTML content using the firm_details object
 						if (responseObject.status !== 'not_found') {
-							var message = "Note: If you want to attach a different Packer ID to the current Sample Code i.e :- <b> "+sample_code+" </b>	, first remove the currently attached sample code by clicking the Remove button.";
+							var message = "Note: If you wish to attach a different Packer ID to the current Sample Code ("+sample_code+"), please click the <b>Remove</b> button to detach the currently attached sample code.";
 						}else{
-							var message = "Note: If you want to attach Sample Code/Report:- <b>" + sample_code + "</b> to the Packer ID: <b>" + customer_id + "</b>, please click the Attach button.";
+							var message = "Note: To link the Sample Code/Report (" + sample_code + ") with the Packer ID: " + customer_id + ", kindly click the <b>Attach</b> button.";
 						}
 					} else {
 						message='';
@@ -243,16 +256,19 @@
 					
 						"</div>"+
 						"<div class='card-footer'>";
-				
-						if (responseObject.isSampleAllocated !== 'allocated') {
-							// Add the condition here
-							if (responseObject.status !== 'not_found') {
-								htmlContent += "<button type='button' class='float-right' id='remove_sam_pac' data-customer-id='" + customer_id + "'>Remove</button>";
-							} else {
-								htmlContent += "<button type='button' id='attach_sam_pac' data-customer-id='" + customer_id + "'>Attach</button>";
+
+						if (application_mode == 'edit') {
+							if (responseObject.isSampleAllocated !== 'allocated') {
+								// Add the condition here
+								if (responseObject.status !== 'not_found') {
+									htmlContent += "<button type='button' class='float-right' id='remove_sam_pac' data-customer-id='" + customer_id + "'>Remove</button>";
+								} else {
+									htmlContent += "<button type='button' id='attach_sam_pac' data-customer-id='" + customer_id + "'>Attach</button>";
+								}
 							}
 						}
-					
+							
+						
 
 					htmlContent += "</div>";
 
@@ -295,9 +311,11 @@
 			
 				// Constructing the HTML content using the firm_details object
 				if (responseObject !== 'not_found') { 
-					var htmlContent = "Note : This Sample Code : " + sample_code + " is attached with the Packer ID : "+ responseObject.customer_id  +" ( "+ responseObject.firm_name +" )";
+					var htmlContent = "Packer is Attached";
 				}else{
-					htmlContent = 'Note: Before Proceeding , Please attach this Sample Code with Packer ID from the DropDown';
+					htmlContent = '<p>Note: Before proceeding, please ensure that you attach the provided' + "<br>" + 
+					'sample code to the corresponding Packer ID selected from the dropdown menu.</p>';
+
 				}
 				
 				// Setting the HTML content of the div

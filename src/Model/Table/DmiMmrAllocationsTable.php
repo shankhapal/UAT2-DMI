@@ -8,18 +8,19 @@ class DmiMmrAllocationsTable extends Table{
 	
 	var $name = "DmiMmrAllocations";
 	
-	public function saveAllocationDetails($customer_id,$sample_code,$current_level,$level_1,$level_2) {
+	public function saveAllocationDetails($customer_id,$sample_code,$mo_user_id,$available_to) {
 
 		// Common MO/SMO allocation logs, dirrentiate with allocation type nos
 		$allocation_logs_entity = $this->newEntity(array(
 
 			'customer_id'	=>	$customer_id,
 			'sample_code'	=>	$sample_code,
-			'current_level'	=>	$current_level,
+			'current_level'	=>	$_SESSION['username'],
 			'created'	=>	date('Y-m-d H:i:s'),
 			'modified'	=>	date('Y-m-d H:i:s'),
-			'level_1'	=>	$level_1,
-			'level_3'	=>	$level_2
+			'level_1'	=>	$mo_user_id,
+			'level_3'	=>	$_SESSION['username'],
+			'available_to' => $available_to
 
 		));
 

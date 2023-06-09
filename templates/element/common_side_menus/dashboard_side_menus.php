@@ -305,6 +305,18 @@
 											</a>
 										</li>
 
+										<li class="nav-item">
+											<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/list_of_suspended_firms/" class="bg-cyan nav-link">
+												<i class="far fa-dot-circle nav-icon"></i>
+												<p class="nav-icon-p"><b>Suspended Applications</b></p>
+											</a>
+										</li>
+										<li class="nav-item">
+											<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/list_of_cancelled_firms/" class="bg-cyan nav-link">
+												<i class="far fa-dot-circle nav-icon"></i>
+												<p class="nav-icon-p"><b>Cancelled Applications</b></p>
+											</a>
+										</li>
 									</li>
 								</ul>
 							</li>

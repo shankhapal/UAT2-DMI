@@ -590,6 +590,7 @@ class BeforepageloadComponent extends Component {
 						
 		}
 
+
 		$this->Controller->set(compact('InprocessMsg','InprocessApplId'));
 		$this->Controller->set('IsApproved',$IsApproved);
 		$this->Controller->set('show_renewal_btn',$show_renewal_btn);
@@ -609,7 +610,7 @@ class BeforepageloadComponent extends Component {
 				
 		//commented on 02-04-2021 as esign services was blocked on response
 		
-		/*	$validHostName = array('10.158.81.78','esignservice.cdac.in');
+		/*	$validHostName = array('agmarkonline.dmi.gov.in','esignservice.cdac.in');
 			$hostName = $_SERVER['HTTP_HOST'];
 			if(!in_array($hostName,$validHostName)){
 				$this->Controller->customAlertPage("Something went wrong. ");

@@ -1,37 +1,24 @@
-$(document).ready(function() {
-	$('.table').DataTable(); // For DataTable initialization
-	
-	// Hide scrutinized_report_table on page load
-	$('#scrutinized_report_table').hide();
-	
-	// Show pending_report_table by default
-	$('#pending_report_table').show();
+$(document).ready(function(){
 
-	// Hide allocated_report_table on page load
-	$('#allocated_report_table').hide();
-	
-		// Handle change event for radio buttons
-		$('input[name="report_type"]').change(function() {
-			var selectedValue = $(this).attr('id');
-
-			if (selectedValue === 'pending_report') {
-
-				$('#pending_report_table').show();
-				$('#scrutinized_report_table').hide();
-				$('#allocated_report_table').hide();
-
-			} else if (selectedValue === 'scrutinized_report') {
-
-				$('#pending_report_table').hide();
-				$('#scrutinized_report_table').show();
-				$('#allocated_report_table').hide();
-
-			} else if (selectedValue === 'allocate_report') {
-
-				$('#pending_report_table').hide();
-				$('#scrutinized_report_table').hide();
-				$('#allocated_report_table').show();
-
-			}
-		});
+	$('#pending_report_table').DataTable();
+	$('#scrutinized_report_table').DataTable();
 });
+  
+  $("#B_list").hide();
+  $("#A_list").show();
+  
+  $('.type').change(function(){
+  
+	  var type=$(".type:checked").val();
+	  if(type=='A')
+	  {
+		$("#B_list").hide();
+		$("#A_list").show();
+  
+	  }else if(type=='B'){
+
+		$("#A_list").hide();
+		$("#B_list").show();
+	  }
+  });
+  

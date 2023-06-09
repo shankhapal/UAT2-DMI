@@ -6,8 +6,7 @@
 				<tr>
 					<th>Date</th>
 					<th>Comment</th>
-					<th>Reply Date</th>
-					<th>Reply Comment</th>
+					<th>From</th>
 				</tr>	
 			</thead>
 			<tbody>
@@ -22,6 +21,19 @@
 						<tr>
 						<td><?php echo $comment_detail['comment_date']; ?></td>
 						<td><?php echo $comment_detail['comment']; ?></td>
+						<td>
+							<?php
+								if ($comment_detail['from_user'] == 'applicant') {
+									echo 'Applicant';
+								}
+
+								if($comment_detail['from_user'] == 'ro'){
+									echo 'Agmark';
+								}
+								
+							
+							?>
+						</td>
 						</tr>
 
 				<?php } } } else { ?>
@@ -33,7 +45,8 @@
 	<div class="card-body row">
 		<div class="col-sm-6" id="comment_box_with_btn">
 			<div class="remark-current comment_bx_body">
-				<?php echo $this->Form->control('reffered_back_comment', array('type'=>'textarea', 'id'=>'reffered_back_comment_bx', 'escape'=>false, 'class'=>'cvOn cvReq form-control comment_bx', 'label'=>false, 'placeholder'=>'Write Your Referred Back Comment For Applicant Here')); ?>
+				<?php 
+				echo $this->Form->control('reffered_back_comment', array('type'=>'textarea', 'id'=>'reffered_back_comment_bx', 'escape'=>false, 'class'=>'cvOn cvReq form-control comment_bx', 'label'=>false, 'placeholder'=>'Write Your Referred Back Comment For Applicant Here')); ?>
 				<div class="err_cv"></div>
 			</div>
 		</div>

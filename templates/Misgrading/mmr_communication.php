@@ -53,33 +53,45 @@
 				<div id="comment_box_with_btn">
 					<div id="commentBox">
 						<div class="row">
-							<div class="col-sm-6">
-								<div class="remark-current">
-									<label>Current Comment : </label>
-									<?php echo $this->Form->control('comment', array('type'=>'textarea', 'id'=>'check_save_reply', 'class'=>'form-control','escape'=>false, 'label'=>false, )); ?>
-									<div id="error_save_reply"></div>
-								</div>
-							</div>
-							<div class="col-sm-6">
-								<div id="comment_to">
-									<label>Comment To : </label>
-									<?php
-										if($commentWindow=='ro'){
+						
+							<?php 
+							if ($isAllocatd == 'yes') { 
+			
+									if ($_SESSION['application_mode'] == 'edit') { ?>
 										
-											$options=array('mo'=>' Scrutiny Officer');
-											$attributes=array('legend'=>false, 'id'=>'comment_to', 'value'=>'mo', 'label'=>true,);
-											echo $this->Form->radio('comment_to',$options,$attributes);
+										<div class="col-sm-6">
+										<div class="remark-current">
+											<label>Current Comment : </label>
+											<?php echo $this->Form->control('comment', array('type'=>'textarea', 'id'=>'check_save_reply', 'class'=>'form-control','escape'=>false, 'label'=>false, )); ?>
+											<div id="error_save_reply"></div>
+										</div>
+									</div>
 
-										}else{
+									<div class="col-sm-6">
+										<div id="comment_to">
+											<label>Comment To : </label>
+											<?php
+												if($commentWindow=='ro'){
+												
+													$options=array('mo'=>' Scrutiny Officer');
+													$attributes=array('legend'=>false, 'id'=>'comment_to', 'value'=>'mo', 'label'=>true,);
+													echo $this->Form->radio('comment_to',$options,$attributes);
 
-											$options=array('ro'=>' Regional officer');
-											$attributes=array('legend'=>false, 'id'=>'comment_to', 'value'=>'ro', 'label'=>true,);
-											echo $this->Form->radio('comment_to',$options,$attributes);
-										}
-									?>
-									<div id="error_mo_allocation"></div>
-								</div>
-							</div>
+												}else{
+
+													$options=array('ro'=>' Regional officer');
+													$attributes=array('legend'=>false, 'id'=>'comment_to', 'value'=>'ro', 'label'=>true,);
+													echo $this->Form->radio('comment_to',$options,$attributes);
+												}
+											?>
+											<div id="error_mo_allocation"></div>
+										</div>
+									</div>
+
+								<?php } } ?>
+						
+						
+							
 						</div>
 					</div>
 				</div>

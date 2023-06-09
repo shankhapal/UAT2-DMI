@@ -32,7 +32,6 @@ class MisgradingController extends AppController{
 		$this->loadModel('DmiFirms');
 		$this->loadModel('DmiRoOffices');
 		$this->loadModel('DmiUserRoles');
-		$this->loadModel('SampleInward');
 		$this->loadModel('Workflow');
 		$this->loadModel('MSampleAllocate');
 		$this->loadModel('DmiStates');
@@ -52,89 +51,81 @@ class MisgradingController extends AppController{
 
 	public function reportListingForAllocation(){
 
+
+		//Below all the Session Delete setfor the MMR Application - Akash [06-06-2023]
+		$this->Session->Delete('alloc_user_by');
+		$this->Session->Delete('allocation_to');
+		$this->Session->Delete('sample_code');
+		$this->Session->Delete('pdf_file_name');
+		$this->Session->Delete('application_mode');
+		$this->Session->Delete('current_level');
+
 		// Get the default database connection
 		$con = ConnectionManager::get('default');
 
 		// Get the posted office ID for the current user
 		$loc_id = $this->DmiUsers->getPostedOffId($_SESSION['username']);
 
-		// Fetch the org_sample_codes from the workflow table
-		$query = "SELECT org_sample_code 
-				FROM workflow 
-				WHERE src_loc_id = '$loc_id' 
-				GROUP BY org_sample_code";
-		$orgSampleCodes = $con->execute($query)->fetchAll('assoc');
+		// Fetch the final grading reports
+		$query = "SELECT w.org_sample_code,	w.tran_date, mcc.category_name, 
+						mc.commodity_name, mst.sample_type_desc, 
+						mc.commodity_code, si.report_pdf, 
+						si.report_status,si.packer_id
+				FROM workflow w
+				INNER JOIN sample_inward si ON si.org_sample_code = w.org_sample_code
+				INNER JOIN m_commodity_category mcc ON mcc.category_code = si.category_code
+				INNER JOIN m_commodity mc ON mc.commodity_code = si.commodity_code
+				INNER JOIN m_sample_type mst ON mst.sample_type_code = si.sample_type_code
+				WHERE si.status_flag != 'junked' 
+					AND w.stage_smpl_flag = 'FG' 
+					AND w.org_sample_code IN (
+						SELECT org_sample_code 
+						FROM workflow 
+						WHERE src_loc_id = :loc_id 
+						GROUP BY org_sample_code
+					)
+				ORDER BY w.tran_date DESC";
 
+		$finalGrading = $con->execute($query, ['loc_id' => $loc_id])->fetchAll('assoc');
+		
+	
 		$finalReports = [];
+		foreach ($finalGrading as $row) {
 
-		if (!empty($orgSampleCodes)) {
-			foreach ($orgSampleCodes as $orgSampleCode) {
-
-				$sampleCode = $orgSampleCode['org_sample_code'];
-				
-				$query = "SELECT w.stage_smpl_cd, w.tran_date, mcc.category_name, 
-								mc.commodity_name, mst.sample_type_desc, 
-								mc.commodity_code, si.report_pdf, w.org_sample_code,
-								si.packer_attached,si.action_final_submit,si.scrutiny_status,si.packer_id
-			
-						FROM workflow w
-						INNER JOIN sample_inward si ON si.org_sample_code = w.org_sample_code
-						INNER JOIN m_commodity_category mcc ON mcc.category_code = si.category_code
-						INNER JOIN m_commodity mc ON mc.commodity_code = si.commodity_code
-						INNER JOIN m_sample_type mst ON mst.sample_type_code = si.sample_type_code
-						WHERE si.status_flag != 'junked' 
-						AND w.stage_smpl_flag = 'FG' 
-						AND w.org_sample_code = '$sampleCode' 
-						AND si.action_final_submit IS NULL
-						ORDER BY w.tran_date DESC";
-				$finalGrading = $con->execute($query)->fetchAll('assoc');
-		
-				if (!empty($finalGrading)) {
-					$finalReports = array_merge($finalReports, $finalGrading);
-				}
+			// Check if either 'scrutiny_status' or 'action_final_submit' contains 'Yes'
+			if ($row['report_status'] === 'Scrutinized' || $row['report_status'] === 'Action Submit') {
+				continue; // Skip the iteration
 			}
+
+			$finalReports[] = $row;
 		}
 
-		
-		//To get the allocated Report to the current user
-		$this->loadModel('DmiMmrAllocations');
-		$resultIds = $this->DmiMmrAllocations->find('list',array('fields'=>array('customer_id','id'=>'max(id)'),'order'=>array('id DESC'),'group'=>'customer_id'))->toArray();	
-		if(!empty($resultIds)){
-			$get_allocations = $this->DmiMmrAllocations->find('all',array('conditions' => array('id IN'=>$resultIds, 'level_1 = current_level','level_1 IS'=>$_SESSION['username'])))->toArray();
-		}else{ 
-			$get_allocations = array(); 
-		}
-		
 
-		//to get the scrutinized report for the current user
-		$this->loadModel('DmiMmrFinalSubmits');
-
-		$scrutinizedReports = $this->DmiMmrFinalSubmits->find('all');
+		$scrutinizedReports = $this->DmiMmrFinalSubmits->find('all')->where(['scrutiny' => 'done'])->order('id DESC')->toArray();
 	
 		$scrutinyDone = [];
 
-		foreach ($finalReports as $orgSampleCode) {
-
-			$sampleCode = $orgSampleCode['org_sample_code'];
+		// Check if the stage_smpl_cd is present in scrutinizedReports and scrutiny is done
+		foreach ($scrutinizedReports as $report) {
 			
-			// Check if the stage_smpl_cd is present in scrutinizedReports and scrutiny is done
-			foreach ($scrutinizedReports as $report) {
-				
-				if ($report->org_sample_code === $sampleCode && $report->scrutiny === 'Y') {
-					$scrutinyDone[] = [
-						'customer_id' => $report->customer_id,
-						'stage_smpl_cd' => $report->stage_smpl_cd,
-						// Add other details from another table here
-					];
-					break; // Break the loop if the match is found
-				}
+			if ($report->scrutiny === 'done') {
+				$scrutinyDone[] = [
+					'customer_id' => $report->customer_id,
+					'sample_code' => $report->sample_code,
+					'date' => $report->modified
+					// Add other details from another table here
+				];
+				break; // Break the loop if the match is found
 			}
 		}
+	
+	
+	
 
 		$this->set('scrutinyDone',$scrutinyDone);
-		$this->set('get_allocations',$get_allocations);
 		$this->set('final_reports', $finalReports);
 
+		
 		
 	}
 
@@ -177,7 +168,7 @@ class MisgradingController extends AppController{
 			$this->Session->write('allocation_to',$allocation['level_1']);
 		}
 
-
+		
 		$this->loadModel('DmiUserRoles'); 
 		$this->loadModel('DmiSmsEmailTemplates'); 
 		
@@ -190,7 +181,7 @@ class MisgradingController extends AppController{
 				$commentWindow = 'ro';
 			}	
 		}
-
+		
 		$this->set('commentWindow',$commentWindow);
 
 		$from_user = $commentWindow;
@@ -271,7 +262,6 @@ class MisgradingController extends AppController{
 				$isSampleAllocated = array();
 			}
 
-				
 			$this->set('isSampleAllocated',$isSampleAllocated);
 			$this->set('isAlreadyExist',$isAlreadyExist);
 			$this->set('isSampleSaved',$isSampleSaved);
@@ -281,7 +271,7 @@ class MisgradingController extends AppController{
 			$this->set('sample_type',$sample_type);
 			$this->set('customer_list',$customer_list);
 			$this->set('commodity_code',$sampleInfo['commodity_code']);
-				
+			
 		}
 
 		//To Save The Data
@@ -291,7 +281,15 @@ class MisgradingController extends AppController{
 			if($this->DmiMmrFinalSubmits->saveData($this->request->getData())){
 
 				$message_theme = 'success';
-				$message = 'The details for this report have been saved. You can now allocate this report to a scrutinizer or you can scrutinize the report.';
+				$message = 
+				'	
+					The Details for the Sample Code and the Packer are Saved Successfully.
+					Now, You can choose any of these options based on the requirements and circumstances surrounding the report.: <br>
+					1.Allocate the report: Assign the report to a scrutinizer who will review and analyze it further.<br>
+					2.Scrutinize the report: Personally review and examine the report for any discrepancies or issues.<br>
+					3.Take action against the packer: If necessary, initiate appropriate actions or follow-up steps in response to the report findings.
+					
+				';
 				$redirect_to = 'allocate_report';
 			}
 
@@ -300,37 +298,45 @@ class MisgradingController extends AppController{
 			//html encoding post data before saving
 			$htmlencoded_comment = htmlentities($this->request->getData('comment'), ENT_QUOTES);
 			$comment_to = $this->request->getData('comment_to');
-			
+			$customer_id = $isSampleAllocated['customer_id'];
+			$comment_by = $this->Session->read('username');
+
 			if(!empty($comment_to) && !empty($htmlencoded_comment)){	
 				
-				if($comment_to == 'ro'){	
+				if($comment_to == 'ro'){
+
 					$comment_to_email_id = $allocation_deatils['level_3'];
 					$comment_to_level = 'level_3';
+					$available_to = 'ro';
+
 				}elseif($comment_to == 'mo'){
+
 					$comment_to_email_id = $allocation_deatils['level_1'];
 					$comment_to_level = 'level_1';
+					$available_to = 'mo';
 				}
-
-			
 
 				if(!empty($comment_to_email_id)){
 					
-					$saveComments = $this->DmiMmrRoMoComments->saveCommentDetails($sample_code,$isSampleAllocated['customer_id'],
-																				$username,$comment_to_email_id,$htmlencoded_comment,
-																				$from_user);
+					$saveComments = $this->DmiMmrRoMoComments->saveCommentDetails($customer_id,$sample_code,$comment_by,$comment_to_email_id,$htmlencoded_comment,$available_to);
 					
 					if($saveComments==true){
 						
 						//update allocation current level
-						$this->DmiMmrAllocations->updateAll(array('current_level' => "$comment_to_email_id"),array('sample_code IS' => $sample_code));
+						$this->DmiMmrAllocations->updateAll(array('current_level' => "$comment_to_email_id",'available_to' => "$available_to"),array('sample_code IS' => $sample_code));
 						
+						//Update the sample inward table report status 
+						$this->SampleInward->updateAll(
+							['report_status' => 'MO Replied', 'packer_id' => $customer_id],
+							['org_sample_code' => $sample_code]
+						);
+
 						//call custom function from Model with message id
 						//$this->DmiSmsEmailTemplates->sendMessage($sms_id,$customer_id);
-						$this->Session->write('application_mode','view');
-						
+			
 						$message = 'Your Comment is successfully sent';
 						$message_theme = 'success';
-						$redirect_to = '../misgrading/allocate_report';
+						$redirect_to = '../misgrading/allocated_reports_for_mo';
 					}
 				}
 
@@ -342,7 +348,7 @@ class MisgradingController extends AppController{
 
 		} elseif (null!==($this->request->getData('scrutiny'))){
 
-			$current_level = 'level_1'; //forced to save the entry as from level_1, but done by RO
+			$current_level = 'level_3'; //forced to save the entry as from level_1, but done by RO
 
 	
 			$list_id = $this->DmiMmrFinalSubmits->find('list', array('valueField'=>'id', 'conditions'=>array('sample_code IS'=>$sample_code)))->toArray();
@@ -351,7 +357,10 @@ class MisgradingController extends AppController{
 			$fetch_id = $max_id['id'];
 			$last_user_email_id = $_SESSION['username'];
 			$last_record_id = $fetch_id;
-			$customer_id = $isSampleAllocated['customer_id'];
+
+			$getCustomerId = $this->DmiMmrSamplePackerLogs->find()->select(['customer_id'])->where(['sample_code IS' => $sample_code])->order('id DESC')->first();
+			$customer_id = $getCustomerId['customer_id'];
+			
 			// calling custome method from model for accepted
 			$form_accepted_result = $this->DmiMmrFinalSubmits->reportScrutinized($customer_id,$sample_code,$last_user_email_id,$current_level);
 	
@@ -361,7 +370,7 @@ class MisgradingController extends AppController{
 				$this->Customfunctions->saveActionPoint('Report Scrutinized', 'Success');
 				$message = "Report is scrutinized and verified successfully";
 				$message_theme = "success";
-				$redirect_to =  '../misgrading/allocate_report';
+				$redirect_to =  '../misgrading/report_listing_for_allocation';
 
 			}
 		}
@@ -391,6 +400,7 @@ class MisgradingController extends AppController{
 		
 		$userPostedOffice = $this->DmiUsers->getPostedOffId($_SESSION['username']);
 
+		//pr($userName); exit;
 		$roDistricts = $this->DmiRoOffices->find('list', array('fields' => array('id'), 'conditions' => array('ro_email_id' => $userName)))->toArray();
 
 		
@@ -1220,7 +1230,7 @@ class MisgradingController extends AppController{
 			//store link only after esign done.
 			//ajax condition added on 23-01-2023  By Shreya 
 			if($this->request->is('ajax')){
-				$pdf_path = '/writereaddata/LIMS/reports/'.$test_report_name;
+				$pdf_path = '/testdocs/LIMS/reports/'.$test_report_name;
 				$this->SampleInward->updateAll(array('report_pdf'=>"$pdf_path"),array('org_sample_code'=>$Sample_code));
 			}
 
@@ -1303,7 +1313,7 @@ class MisgradingController extends AppController{
 			if($file_name == null){
 				$file_name = '';
 			}
-			$file_path = $_SERVER["DOCUMENT_ROOT"].'writereaddata/LIMS/reports/'.$file_name;
+			$file_path = $_SERVER["DOCUMENT_ROOT"].'testdocs/LIMS/reports/'.$file_name;
 
 			//Close and output PDF document
 			$pdf->my_output($file_path, $mode);
@@ -1428,6 +1438,15 @@ class MisgradingController extends AppController{
 		//Save the Entity 
 		$result = $this->DmiMmrSamplePackerLogs->attachSampleWithPacker($saveArray);
 		
+		//Add the entry of the sample attched in the sample inward table
+		if ($result) {
+			
+			$this->SampleInward->updateAll(
+				['report_status' => 'Packer Attached', 'packer_id' => $customer_id],
+				['org_sample_code' => $sample_code]
+			);
+		}
+
 		echo '~' . $result . '~';
 		exit;
 
@@ -1460,7 +1479,14 @@ class MisgradingController extends AppController{
 		$result = $this->DmiMmrSamplePackerLogs->removeSampleWithPacker($samplePackerData);
 
 		if ($result) {
+
 			$this->updateFinalSubmitDetails($customer_id, $sample_code);
+
+			//Remove the entry of the sample attched in the sample inward table
+			$this->SampleInward->updateAll(
+				['report_status' => null, 'packer_id' => null],
+				['org_sample_code' => $sample_code]
+			);
 		}
 
 		echo '~' . $result . '~';
@@ -1507,10 +1533,11 @@ class MisgradingController extends AppController{
 
 		//Get the Sample Details from the Smaple code 
 		$getAllocationDetails = $this->DmiMmrFinalSubmits->find()->where(['sample_code IS' => $sample_code])->order('id DESC')->first();
+	
 		$customer_id = $getAllocationDetails['customer_id'];
 		$status = $getAllocationDetails['status'];
 		$allocted_status = $getAllocationDetails['allocted'];
-		if ($allocted_status !== null) {
+		if ($allocted_status == null) {
 			$allocted = 'not_allocated';
 		}else{
 			$allocted = 'allocated';
@@ -1530,9 +1557,7 @@ class MisgradingController extends AppController{
 		$DashboardController = new DashboardController();
 		$mo_users_list = $DashboardController->userNameList($mo_users_list);
 
-		$comm_with = null;
-
-		$this->set(compact('customer_id','sample_code','mo_users_list','status','allocted','comm_with'));
+		$this->set(compact('customer_id','sample_code','mo_users_list','status','allocted'));
 		$this->render('popupForScrutiny');
 	
 	
@@ -1570,12 +1595,28 @@ class MisgradingController extends AppController{
 		$mo_office = $this->DmiRoOffices->find('all',array('conditions'=>array('id IS'=>$mo_posted_id)))->first();
 		$mo_office = $mo_office['ro_office'];
 
-		//Save Array of the allocation table
-		$saveAllocationDetails = $this->DmiMmrAllocations->saveAllocationDetails($customer_id,$sample_code,$current_level,$mo_user_id,$username);
 	
+		//Check the current level
+		if ($this->Session->read('current_level') == 'level_3') {
+			$comment_by = $this->Session->read('alloc_user_by');
+			$comment_to = $this->Session->read('allocation_to');
+			$comment = null;
+			$available_to = 'mo';
+		} else {
+			
+		}
+		
+		//Save Array of the allocation table
+		$saveAllocationDetails = $this->DmiMmrAllocations->saveAllocationDetails($customer_id,$sample_code,$mo_user_id,$available_to);
+			
 		if($saveAllocationDetails == true){
 
-			$this->DmiMmrRoMoComments->saveCommentDetails($customer_id,$username,$sample_code,$mo_user_id);
+			//Save the entry in the comments table
+			//$this->DmiMmrRoMoComments->saveCommentDetails($customer_id,$sample_code,$comment_by,$comment_to,null,$available_to);
+
+			//Update the entry in the sample inward table for the sample that it is allocated
+			$this->SampleInward->updateAll(['report_status' => 'Allocated'],['org_sample_code' => $sample_code]);
+
 		}
 			
 		#SMS: Allocation
@@ -1611,7 +1652,12 @@ class MisgradingController extends AppController{
 
 	public function allocatedReportsForMo(){
 
-		$this->Session->write('current_level','level_2');
+
+		//Below all the Session Delete setfor the MMR Application - Akash [06-06-2023]
+		$this->Session->Delete('alloc_user_by');
+		$this->Session->Delete('allocation_to');
+		$this->Session->Delete('sample_code');
+		$this->Session->Delete('application_mode');
 
 		$this->loadModel('DmiMmrAllocations');
 		$this->loadModel('DmiFirms');
@@ -1620,27 +1666,17 @@ class MisgradingController extends AppController{
 		$allocationDetails = $this->DmiMmrAllocations
 		->find()
 		->select([
-			'customer_id',
-			'DmiMmrAllocations.id', // Specify the table alias for id column
-			'sample_code',
-			'current_level',
-			'created',
-			'modified',
-			'level_1',
-			'level_3',
-			'DmiUsers.f_name',
-			'DmiUsers.l_name'
+			'customer_id','DmiMmrAllocations.id','sample_code','current_level','created','modified',
+			'level_1','level_3','available_to','DmiUsers.f_name','DmiUsers.l_name'
 		])
 		->distinct(['customer_id'])
 		->order(['customer_id', 'DmiMmrAllocations.id DESC']) // Specify the table alias for id column
-		->leftJoin(
-			['DmiUsers' => 'dmi_users'],
-			['DmiUsers.email = DmiMmrAllocations.level_3']
-		)
+		->leftJoin(['DmiUsers' => 'dmi_users'],['DmiUsers.email = DmiMmrAllocations.level_3'])
+		->where(['level_1' => $this->Session->read('username')])
 		->toArray();
 		
 		$this->set('allocationDetails',$allocationDetails);
-
+		
 	}
 
 
