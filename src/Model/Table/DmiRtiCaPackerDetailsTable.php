@@ -29,51 +29,42 @@ class DmiRtiCaPackerDetailsTable extends Table{
 	Name of person : shankhpal shende
 	Date: 11-05-2023
 */
-	public function sectionFormDetails($customer_id)
-	{
+	public function sectionFormDetails($customer_id){
+
+		// select record for customer has approved or not
+		$DmiRtiFinalReports = TableRegistry::getTableLocator()->get('DmiRtiFinalReports');
+		$DmiRtiAllocations = TableRegistry::getTableLocator()->get('DmiRtiAllocations');
+		$CustomersController = new CustomersController;
+			
+		$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
 		
-			// select record for customer has approved or not
-			$DmiRtiFinalReports = TableRegistry::getTableLocator()->get('DmiRtiFinalReports');
-			$DmiRtiAllocations = TableRegistry::getTableLocator()->get('DmiRtiAllocations');
-
-			$CustomersController = new CustomersController;
+		$added_sample_details = [];
+		// get approve record
+		$approved_record = $DmiRtiFinalReports->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id desc'))->first();
 			
-			$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+		if(!empty($approved_record)){
+			$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'date(created) > '=>$approved_record['created']),'order'=>'id desc'))->first();
+				
+		}
+		if(!empty($approved_record) && !empty($allocated_record)){
+			
+			$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
 		
-			$added_sample_details = [];
-			// get approve record
-			$approved_record = $DmiRtiFinalReports->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id desc'))->first();
-			
-			if(!empty($approved_record)){
-				
-				$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'date(created) > '=>$approved_record['created']),'order'=>'id desc'))->first();
-				
-			}
-			
-			if(!empty($approved_record) && !empty($allocated_record)){
-				
-				$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
-			
-				$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();
+			$last_report_details = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'version'=>$current_version)))->first();
 
-				// $Dmi_check_samples = TableRegistry::getTableLocator()->get('DmiCheckSamples');
-				// $sample_details = $Dmi_check_samples->RoutineInspectionSampleDetails();	
-				// $added_sample_details = [];
-
-				if(!empty($last_report_details)){
-					$form_fields_details = $last_report_details;
-				}else{
-					$latest_id = false;
-				}
-				
+			if(!empty($last_report_details)){
+				$form_fields_details = $last_report_details;
+			}else{
+				$latest_id = false;
 			}
-			if($latest_id != null){
-				
-				$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();
-				$form_fields_details = $report_fields;
-				
-			}
-			else{	
+			
+		}
+		if($latest_id != null){
+			
+			$report_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();
+			$form_fields_details = $report_fields;
+			
+		}else{	
 					
 				$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
 				$version2 = $current_version - 1;
@@ -101,98 +92,86 @@ class DmiRtiCaPackerDetailsTable extends Table{
 					
 			}
 		
-			$Dmi_grant_certificates_pdfs = TableRegistry::getTableLocator()->get('DmiGrantCertificatesPdfs');
+		$Dmi_grant_certificates_pdfs = TableRegistry::getTableLocator()->get('DmiGrantCertificatesPdfs');
 			
-			$get_last_grant_date = $Dmi_grant_certificates_pdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>array('id desc')))->first();
+		$get_last_grant_date = $Dmi_grant_certificates_pdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>array('id desc')))->first();
 		
-			$last_grant_date = $get_last_grant_date['date'];
+		$last_grant_date = $get_last_grant_date['date'];
 
-			$CustomersController = new CustomersController;
-			$certificate_valid_upto = $CustomersController->Customfunctions->getCertificateValidUptoDate($customer_id,$last_grant_date);
+		$CustomersController = new CustomersController;
+		$certificate_valid_upto = $CustomersController->Customfunctions->getCertificateValidUptoDate($customer_id,$last_grant_date);
 		
-			$DmiCaPpLabMapings = TableRegistry::getTableLocator()->get('DmiCaPpLabMapings');
-			$attached_lab = $DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'lab_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id asc'))->toList();
+		$DmiCaPpLabMapings = TableRegistry::getTableLocator()->get('DmiCaPpLabMapings');
+		$attached_lab = $DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'lab_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id asc'))->toList();
 
-			$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
-			$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
+		$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+		$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
 		
-			$added_firms = $DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->toArray();		
-			$added_firm_field = $added_firms[0];			
+		$added_firms = $DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->toArray();		
+		$added_firm_field = $added_firms[0];			
 		
-			//taking id of multiple sub commodities	to show names in list	
-			$sub_comm_id = explode(',',(string) $added_firm_field['sub_commodity']); #For Deprecations
-			$sub_commodity_value = $MCommodity->find('list',array('valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
+		//taking id of multiple sub commodities	to show names in list	
+		$sub_comm_id = explode(',',(string) $added_firm_field['sub_commodity']); #For Deprecations
+		$sub_commodity_value = $MCommodity->find('list',array('valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
 	
-			$Dmi_check_samples = TableRegistry::getTableLocator()->get('DmiCheckSamples');
+		$Dmi_check_samples = TableRegistry::getTableLocator()->get('DmiCheckSamples');
 
-			$sample_details = $Dmi_check_samples->RoutineInspectionSampleDetails();	
-			$added_sample_details = $sample_details[1];
+		$sample_details = $Dmi_check_samples->RoutineInspectionSampleDetails();	
+		$added_sample_details = $sample_details[1];
 
-			// if !empty($approved_record) && !empty($allocated_record) then added_sample_details set empty array
-			// if($added_sample_details != null){
-			// }
-
-			$DmiCaPpLabMapings = TableRegistry::getTableLocator()->get('DmiCaPpLabMapings');
-			$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+		$DmiCaPpLabMapings = TableRegistry::getTableLocator()->get('DmiCaPpLabMapings');
+		$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
 		
-			// added by Amol on 21-10-2022 as per replica controller
-
-			$attached_lab = $DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'lab_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id asc'))->toList();
+		// added by Amol on 21-10-2022 as per replica controller
+		$attached_lab = $DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'lab_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id asc'))->toList();
 			
-			//get printing list
-			// lab_list query updated list->all method are use -> shankhpal shende 12-05-2023
-			$lab_list = [];	
-			if(!empty($attached_lab)){
-				$lab_list = $DmiFirms->find('all',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/3/'.'%','delete_status IS NULL','id IN'=>$attached_lab),'order'=>'firm_name asc'))->toArray();
-			}
+		//get printing list
+		// lab_list query updated list->all method are use -> shankhpal shende 12-05-2023
+		$lab_list = [];	
+		if(!empty($attached_lab)){
+			$lab_list = $DmiFirms->find('all',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/3/'.'%','delete_status IS NULL','id IN'=>$attached_lab),'order'=>'firm_name asc'))->toArray();
+		}
 			
-			$attached_pp = $DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'pp_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id asc'))->toList();    
+		$attached_pp = $DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'pp_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id asc'))->toList();    
 			
-			// printers_list query updated list->all method are use -> shankhpal shende 12-05-2023
-			$printers_list = [];
-			if(!empty($attached_pp)){
+		// printers_list query updated list->all method are use -> shankhpal shende 12-05-2023
+		$printers_list = [];
+		if(!empty($attached_pp)){
 			$printers_list = $DmiFirms->find('all',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/2/'.'%','delete_status IS Null','id IN'=>$attached_pp),'order'=>'firm_name asc'))->toArray();
-			}
+		}
 		
-			$DmiChemistRegistrations = TableRegistry::getTableLocator()->get('DmiChemistRegistrations');
+		$DmiChemistRegistrations = TableRegistry::getTableLocator()->get('DmiChemistRegistrations');
 
-			$self_registered_chemist = $DmiChemistRegistrations->find('all',array('conditions'=>array('created_by IS'=>$customer_id)))->toArray();
+		$self_registered_chemist = $DmiChemistRegistrations->find('all',array('conditions'=>array('created_by IS'=>$customer_id)))->toArray();
       
-			$check_if_exist = $this->find()->select(['enumerate_briefly_suggestions'])->where(['customer_id IS' => $customer_id])->order('id desc')->first();
+		$check_if_exist = $this->find()->select(['enumerate_briefly_suggestions'])->where(['customer_id IS' => $customer_id])->order('id desc')->first();
      
-			$total_approved = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'current_level'=>'level_3')))->toArray();
+		$total_approved = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'current_level'=>'level_3')))->toArray();
 			
-			$total_suggestions = array();
+		$total_suggestions = array();
 
-			$DmiRoOffices = TableRegistry::getTableLocator()->get('DmiRoOffices');
-			$DmiUsers = TableRegistry::getTableLocator()->get('DmiUsers');
+		$DmiRoOffices = TableRegistry::getTableLocator()->get('DmiRoOffices');
+		$DmiUsers = TableRegistry::getTableLocator()->get('DmiUsers');
 
-			foreach ($total_approved as $approved) {
-					$approved_date = $approved['approved_date'];
+		foreach ($total_approved as $approved) {
+			$approved_date = $approved['approved_date'];
+			$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
 					
-					$allocated_record = $DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
-					
-					foreach ($allocated_record as $each_alloc) {
-							$io_email_id = $each_alloc['current_level'];
-					}
-				
-
-					$find_user_belongs = $DmiUsers->find('all',array('conditions'=>array('email IN'=>$io_email_id,'status'=>'active')))->first();
-					$io_user_name = $find_user_belongs['f_name'].' '.$find_user_belongs['l_name'];
-					
-					$split_created = explode(' ', (string) $approved_date); // Convert into array 
-					$date = $split_created[0]; // Hold only the date 
-
-					$total_suggestions[] = array(
-							'io_user_name'=>$io_user_name,
-							'enumerate_briefly_suggestions' => $approved->enumerate_briefly_suggestions,
-							'approved_date' => $date,
-							
-					);
+			foreach ($allocated_record as $each_alloc) {
+				$io_email_id = $each_alloc['current_level'];
 			}
-			
-
-			return array($form_fields_details,$added_sample_details,$certificate_valid_upto,$sub_commodity_value,$lab_list,$printers_list,$self_registered_chemist,$total_suggestions);			
+			$find_user_belongs = $DmiUsers->find('all',array('conditions'=>array('email IN'=>$io_email_id,'status'=>'active')))->first();
+			$io_user_name = $find_user_belongs['f_name'].' '.$find_user_belongs['l_name'];
+			$split_created = explode(' ', (string) $approved_date); // Convert into array 
+			$date = $split_created[0]; // Hold only the date 
+			$total_suggestions[] = array(
+					'io_user_name'=>$io_user_name,
+					'enumerate_briefly_suggestions' => $approved->enumerate_briefly_suggestions,
+					'approved_date' => $date,
+					
+			);
+		}
+		return array($form_fields_details,$added_sample_details,$certificate_valid_upto,$sub_commodity_value,$lab_list,$printers_list,$self_registered_chemist,$total_suggestions);			
 	}
 	
 	/* Comment

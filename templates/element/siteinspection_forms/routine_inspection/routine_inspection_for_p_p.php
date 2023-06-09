@@ -428,7 +428,55 @@
                                     <div class="card-body">
                                         <div class="row">
                                             <div class="col-md-6">
-                                                      <label for="inputEmail3" class="col-sm col-form-label">Suggestions given during the last inspection, if any & whether corrective action taken<span class="cRed">*</span></label>
+                                                <label for="inputEmail3" class="col-sm col-form-label">Suggestions given during the last inspection, if any & whether corrective action taken<span class="cRed">*</span></label>
+                                                <button class="m-3" id="last-sugeesion-popup">Get all previous suggestions</button>
+                                                <!-- pop up for display last suggestions -->
+                                                <section class="popup">
+                                                    <div class="popup__content">
+                                                        <div class="close">
+                                                        <span></span>
+                                                        <span></span>
+                                                        </div>
+                                                    <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                        <th scope="col">#</th>
+                                                        <th scope="col">IO Users</th>
+                                                        <th scope="col">suggestions</th>
+                                                        <th scope="col">Date</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php $total_suggestions = $section_form_details[8];
+                                                        
+                                                        $sr=1;
+                                                        if(!empty($total_suggestions)){
+                                                        foreach ($total_suggestions as $each_sugg){?>
+                                                        <tr>
+                                                            <th scope="row"><?php echo $sr; ?></th>
+                                                            <td class="text-center"><?php echo $each_sugg['io_user_name']; ?></td>
+                                                            <td class="text-center"><?php
+                                                                if (empty($each_sugg['last_insp_suggestion'])) {
+                                                                    echo "NA";
+                                                                } else {
+                                                                    echo $each_sugg['last_insp_suggestion'];
+                                                                }
+                                                                ?></td>
+                                                            <td class="text-center"><?php 
+                                                                if(empty($each_sugg['approved_date'])){
+                                                                    echo "NA";
+                                                                }else{
+                                                                    echo $each_sugg['approved_date'];
+                                                                }
+                                                            ?></td>
+                                                        </tr>
+                                                        <?php $sr++; }}else{
+                                                             echo "<tr><td colspan='4' class='text-center'>No suggestions found.</td></tr>";
+                                                        } ?>
+                                                    </tbody>
+                                                    </table>
+                                                    </div>
+                                                </section>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group row">
@@ -476,6 +524,7 @@
                                                             <div class="col-md-6">
                                                                 <div class="form-group row">
                                                                     <label for="inputEmail3" class="col-sm col-form-label">Shortcomings observed during the present Inspection.<span class="cRed"> * </span></label>
+                                                        
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-6">
@@ -598,5 +647,6 @@
 	echo $this->Html->script('routininspection/routin_inspection');
     echo $this->Html->script('routininspection/routine_inspection_add_more_pp');
     echo $this->Html->script('routininspection/rti_file_uploads_validation');
+    echo $this->Html->css('RoutineInspection/routine_inspection_style');
 ?>
 

@@ -19,6 +19,10 @@
 				}else{
 					$customer_id = $_SESSION['username'];
 				}
+
+				$CustomersController = new CustomersController;
+				$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
+				
 				
 				if(isset($_SESSION['edit_sample_id'])){ 
 					
@@ -29,9 +33,9 @@
 					$edit_id = '';
 				}
 
-				$added_sample_details = $this->find('all', array('conditions'=>array('OR'=>$hide_edit_id, 'customer_id IS'=>$customer_id,'delete_status IS NULL'),'order'=>'id'))->toArray();
+				$added_sample_details = $this->find('all', array('conditions'=>array('OR'=>$hide_edit_id, 'customer_id IS'=>$customer_id,'delete_status IS NULL','version'=>$current_version),'order'=>'id'))->toArray();
 				
-				$find_sample_details = $this->find('all',array('conditions'=>array('id IS'=>$edit_id)))->first();
+				$find_sample_details = $this->find('all',array('conditions'=>array('id IS'=>$edit_id,'version'=>$current_version)))->first();
 			
 				return array($find_sample_details,$added_sample_details);
 

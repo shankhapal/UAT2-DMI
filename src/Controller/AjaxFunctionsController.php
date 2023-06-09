@@ -2148,13 +2148,17 @@ class AjaxFunctionsController extends AppController{
 
 		$customer_id = $this->Customfunctions->sessionCustomerID();
 
+		$CustomersController = new CustomersController;
+		// added version for inserting version in this table by shankhpal on 08/06/2023
+		$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
+
 		$packer_id = htmlentities($_POST['packer_id'], ENT_QUOTES);
 		$indent = htmlentities($_POST['indent'], ENT_QUOTES);
 		$supplied = htmlentities($_POST['supplied'], ENT_QUOTES);
 		$balance = htmlentities($_POST['balance'], ENT_QUOTES);
 		$tbl_name = htmlentities($_POST['tbl_name'], ENT_QUOTES);
 
-		$save_details_result = $this->DmiRtiPackerDetails->savePackageingDetails($packer_id,$indent,$supplied,$balance,$tbl_name);// call custome method from model
+		$save_details_result = $this->DmiRtiPackerDetails->savePackageingDetails($packer_id,$indent,$supplied,$balance,$tbl_name,$current_version);// call custome method from model
 		$added_packaging_details = $this->DmiRtiPackerDetails->packagingDetails();
 
 		$this->Set('section_form_details',$added_packaging_details);

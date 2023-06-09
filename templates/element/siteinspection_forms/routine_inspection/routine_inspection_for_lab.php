@@ -4,7 +4,7 @@
 	    Name of person : shankhpal shende
 	    Date: 24-05-2023
 */ -->
-<?php 
+<?php //pr($section_form_details);die;
 echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-data', 'id'=>$section)); ?>
 <section id="form_outer_main" class="content form-middle">
 <div class="container-fluid">
@@ -520,6 +520,60 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
             <div class="col-md-6">
                 <div class="form-group row">
                     <label for="inputEmail3" class="col-sm col-form-label">Suggestions given during last <span class="cRed">*</span></label>
+                     <button class="m-3" id="last-sugeesion-popup">Get all previous suggestions</button>
+                    <!-- pop up for display last suggestions -->
+                    <section class="popup">
+                        <div class="popup__content">
+                            <div class="close">
+                            <span></span>
+                            <span></span>
+                            </div>
+                        <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">IO Users</th>
+                            <th scope="col">suggestions</th>
+                            <th scope="col">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                                $total_suggestions = $section_form_details[3];
+                                $sr = 1;
+                                if (!empty($total_suggestions)) {
+                                    foreach ($total_suggestions as $each_sugg) {
+                                        ?>
+                                        <tr>
+                                            <th scope="row"><?php echo $sr; ?></th>
+                                            <td class="text-center"><?php echo $each_sugg['io_user_name']; ?></td>
+                                            <td class="text-center"><?php
+                                                if (empty($each_sugg['enumerate_briefly_suggestions'])) {
+                                                    echo "NA";
+                                                } else {
+                                                    echo $each_sugg['enumerate_briefly_suggestions'];
+                                                }
+                                                ?></td>
+                                            <td class="text-center"><?php
+                                                if (empty($each_sugg['approved_date'])) {
+                                                    echo "NA";
+                                                } else {
+                                                    echo $each_sugg['approved_date'];
+                                                }
+                                                ?></td>
+                                        </tr>
+                                        <?php
+                                        $sr++;
+                                    }
+                                } else {
+                                    echo "<tr><td colspan='4' class='text-center'>No suggestions found.</td></tr>";
+                                }
+                                ?>
+
+                        </tbody>
+                        </table>
+                        </div>
+                    </section>
                 </div>
             </div>
             <div class="col-md-6">
@@ -719,5 +773,6 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
 <?php echo $this->Html->script('routininspection/routin_inspection'); 
       echo $this->Html->script('routininspection/want_to_edit_rti'); 
       echo $this->Html->script('routininspection/rti_file_uploads_validation');
+      echo $this->Html->css('RoutineInspection/routine_inspection_style');
 ?>
 

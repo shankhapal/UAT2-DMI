@@ -765,6 +765,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                                                         <?php $total_suggestions = $section_form_details[7];
                                                         
                                                         $sr=1;
+                                                        if(!empty($total_suggestions)){
                                                         foreach ($total_suggestions as $each_sugg){?>
                                                         <tr>
                                                             <th scope="row"><?php echo $sr; ?></th>
@@ -778,7 +779,9 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                                                                 ?></td>
                                                              <td class="text-center"><?php echo $each_sugg['approved_date']; ?></td>
                                                         </tr>
-                                                        <?php $sr++; } ?>
+                                                        <?php $sr++; }}else{
+                                                             echo "<tr><td colspan='4' class='text-center'>No suggestions found.</td></tr>";
+                                                        } ?>
                                                     </tbody>
                                                     </table>
                                                     </div>
