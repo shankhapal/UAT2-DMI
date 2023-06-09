@@ -207,7 +207,20 @@
 				
 				$pao_id = $DmiDistricts->find('all',array('fields'=>'pao_id','conditions'=>array('id IS'=>$district_id)))->first();
 				if(!empty($pao_id['pao_id'])){
-					$pao_to_whom_payment = $pao_alias_name[$pao_id['pao_id']];
+
+					//get DDO office and Name, added on 01-06-2023 by Amol
+					$getDDOUserID = $DmiPaoDetails->find('all',array('fields'=>'pao_user_id','conditions'=>array('id IS'=>$pao_id['pao_id'])))->first();
+					//get user name and office id of DDO, on 01-06-2023 by Amol
+					$DmiUsers = TableRegistry::getTableLocator()->get('DmiUsers');
+					$getUserName = $DmiUsers->find('all',array('fields'=>array('f_name','l_name','posted_ro_office'),'conditions'=>array('id IS'=>$getDDOUserID['pao_user_id'])))->first();
+					//get Office Name of DDO user, on 01-06-2023 by Amol
+					$DmiRoOffices = TableRegistry::getTableLocator()->get('DmiRoOffices');
+					$getOfficeName = $DmiRoOffices->find('all',array('fields'=>'ro_office','conditions'=>array('id IS'=>$getUserName['posted_ro_office'])))->first();
+
+					//$pao_to_whom_payment = $pao_alias_name[$pao_id['pao_id']];
+					//updated above line by attaching extra DDO details, on 01-06-2023 by Amol
+					$pao_to_whom_payment = $getUserName['f_name'].' '.$getUserName['l_name'].' - '. $pao_alias_name[$pao_id['pao_id']].' - '.$getOfficeName['ro_office'];
+
 				}else{
 					$pao_to_whom_payment = null;
 				}
@@ -231,9 +244,20 @@
 					$payment_receipt_docs = $payment_confirmation['payment_receipt_docs'];
 					$reason_list_comment = $payment_confirmation['reason_option_comment'];
 					$reason_comment = $payment_confirmation['reason_comment'];
-					$pao_to_whom_payment = $pao_alias_name[$payment_confirmation['pao_id']];
 					
-					$selected_pao = $DmiPaoDetails->find('all',array('fields'=>'pao_alias_name','conditions'=>array('id IS'=>$payment_confirmation['pao_id'])))->first();
+					
+					//get DDO office and Name, added on 01-06-2023 by Amol
+					$selected_pao = $DmiPaoDetails->find('all',array('fields'=>array('pao_user_id','pao_alias_name'),'conditions'=>array('id IS'=>$payment_confirmation['pao_id'])))->first();
+					//get user name and office id of DDO, on 01-06-2023 by Amol
+					$DmiUsers = TableRegistry::getTableLocator()->get('DmiUsers');
+					$getUserName = $DmiUsers->find('all',array('fields'=>array('f_name','l_name','posted_ro_office'),'conditions'=>array('id IS'=>$selected_pao['pao_user_id'])))->first();
+					//get Office Name of DDO user, on 01-06-2023 by Amol
+					$DmiRoOffices = TableRegistry::getTableLocator()->get('DmiRoOffices');
+					$getOfficeName = $DmiRoOffices->find('all',array('fields'=>'ro_office','conditions'=>array('id IS'=>$getUserName['posted_ro_office'])))->first();
+
+					//updated this line with extra DDO details, on 01-06-2023 by Amol
+					$pao_to_whom_payment = $getUserName['f_name'].' '.$getUserName['l_name'].' - '. $pao_alias_name[$payment_confirmation['pao_id']].' - '.$getOfficeName['ro_office'];
+
 					$selected_pao_alias_name = $selected_pao['pao_alias_name'];
 					$this->Controller->set('bharatkosh_payment_done',$bharatkosh_payment_done);
 					$this->Controller->set('payment_amount',$payment_amount);

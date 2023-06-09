@@ -653,9 +653,13 @@
 							  rsct.to_user ='ro' and fsr.current_level !='level_3'";	
 				$tradate = "rsct.modified as tradate";				
 			}
-			elseif($for_status == 'replied'){						
+			elseif($for_status == 'replied'){
+				//added OR condition "(rsct.to_user ='mo' AND rsct.comment_to = '$username')", on 06-06-2023 by Amol
+				
+				//updated condition with "fsr.current_level !='level_3'" new cond. to hide records after grant from "with reg. office" tab
+				//on 06-05-2023 by Amol
 				$conditions = "al.level_3 = '$username' and cp.current_user_email_id = '$username' and al.level_4_ro IS NOT NULL AND rsct.from_user ='ro' and 
-							  rsct.to_user ='so' and fsr.status ='approved' and cp.current_level ='level_3'";
+							  rsct.to_user ='so' and fsr.status ='approved' and fsr.current_level !='level_3' and cp.current_level ='level_3' OR (rsct.to_user ='mo' AND rsct.comment_to = '$username')";
 				$tradate = "rsct.modified as tradate";
 				
 			}elseif($for_status == 'approved'){
@@ -670,6 +674,7 @@
 			$conn = ConnectionManager::get('default');
 			
 			if(!empty($conditions)){
+				//added new field "rsc.comment_to" in join with $roSoCommentsTable, on 06-06-2023 by Amol
 				$stmt = $conn->execute("select al.*,$tradate from $allocationTable as al 		
 										inner join(
 											select fss.customer_id, fss.status , fss.current_level, fss.modified
@@ -681,7 +686,7 @@
 											) as fs on fs.customer_id = fss.customer_id and fs.id = fss.id
 										) as fsr on fsr.customer_id = al.customer_id										
 										LEFT join(
-											select rsc.customer_id, rsc.to_user,rsc.from_user,rsc.modified
+											select rsc.customer_id, rsc.to_user,rsc.from_user,rsc.modified,rsc.comment_to
 											from $roSoCommentsTable as rsc
 											inner join (
 												select max(id) id,customer_id
