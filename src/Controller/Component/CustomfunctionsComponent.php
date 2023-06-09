@@ -542,7 +542,8 @@ class CustomfunctionsComponent extends Component {
 		$return_value = 1; // if all section "saved"
 		$form_save_count = 0;
 		$form_approve_count = 0;
-
+        //variable set to check chemist training alredy done or not by laxmi on 17-01-2023
+        $registeredChemist = "";						
 
 		foreach ($sections as $each_section) {
 
@@ -574,6 +575,12 @@ class CustomfunctionsComponent extends Component {
 				$return_value = 0;
 			}
 		}
+			//if chemist training($_SESSION['is_training_completed']) already done payment section hidden and return saved form value as 1 in application side added by laxmi on 17-01-2023 
+		if((!empty($_SESSION['is_training_completed']) && $_SESSION['is_training_completed'] =='yes') && $section_form_status == 'saved'){
+			$return_value = 1;
+			$registeredChemist =1;
+		   }
+	   
 
 		if ($form_approve_count == count($sections)) { $return_value = 2; }
 
@@ -936,6 +943,12 @@ class CustomfunctionsComponent extends Component {
 	// This function check, is application have export unit?
 	public function checkApplicantExportUnit($customer_id) {
 
+	//condition to set customer id in variable added by laxmi B. on 9-1-2023
+		if(!empty($_SESSION['application_type']) && !empty($_SESSION['packer_id'])){
+          if($_SESSION['application_type'] == 4 && $_SESSION['packer_id']){
+             $customer_id = $_SESSION['packer_id'];
+          }
+		}
 		$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
 
 		$check_application_type = $DmiFirms->find('all',array('fields'=>'export_unit','conditions'=>array('customer_id IS'=>$customer_id)))->first();
@@ -3260,6 +3273,67 @@ class CustomfunctionsComponent extends Component {
 		$self_registered_chemist = $DmiChemistRegistrations->find('all',array('conditions'=>array('created_by IS' => $customer_id)))->toArray();
 		$this->Controller->set('self_registered_chemist',$self_registered_chemist);
 
+		//view letter from Ro forwarded to Ral added by laxmi B on 29-12-22
+		
+		$i = 0;
+		$chemistRoforwardedLetter = array();
+		$reliving_pdf = array();
+		$cetificatePdf = array();
+		$ro_side_schedule_letter = array();
+		$ral_trainingCom_letter = array();
+		foreach($self_registered_chemist as $chemistList){
+           $chemistId = $DmiChemistRegistrations->find('all',array('fields'=>'chemist_id','conditions'=>array('created_by IS' => $customer_id)))->toArray();
+           $chemistIds[$i] = $chemistId[$i]['chemist_id']; 
+           $DmiChemistRalToRoLogs = TableRegistry::getTableLocator()->get('DmiChemistRalToRoLogs');
+           $chemistRalLetterData = $DmiChemistRalToRoLogs->find('all')->where(array('chemist_id'=>$chemistIds[$i], 'training_completed IS'=>NULL, 'reshedule_status IS'=>'confirm' ))->first(); 
+        
+		   if(!empty($chemistRalLetterData)){
+		     $chemistRoforwardedLetter[$i] = $chemistRalLetterData['reshedule_pdf'];
+		    }
+          
+          //ro side reliving letter show to packer id added by laxmi on 03-1-2023 
+          $DmiChemistTrainingAtRo = TableRegistry::getTableLocator()->get('DmiChemistTrainingAtRo');
+          $reliving_pdfs = $DmiChemistTrainingAtRo->find('all', array('fields'=>'pdf_file'))->where(array('chemist_id'=>$chemistIds[$i] , 'training_completed IS NOT'=>NULL))->first();
+           if(!empty($reliving_pdfs)){
+           
+            $reliving_pdf[$i] = $reliving_pdfs['pdf_file'];
+           } 
+
+           //grant certificate added by laxmi on 05-01-2023
+           $DmiChemistGrantCertificatePdfs = TableRegistry::getTableLocator()->get('DmiChemistGrantCertificatePdfs');
+           $cetificatePdfs = $DmiChemistGrantCertificatePdfs->find('all', array('fields'=>'pdf_file'))->where(array('customer_id'=>$chemistIds[$i]))->first();
+
+            if(!empty($cetificatePdfs)){
+           
+             $cetificatePdf[$i] = $cetificatePdfs['pdf_file'];
+            } 
+            
+            //RO side training schedule letter added by laxmi on 05-01-2023
+			$DmiChemistRoTRal = TableRegistry::getTableLocator()->get('DmiChemistRoToRalLogs');
+            $trainingScheduleLetterFromRo = $DmiChemistRoTRal->find('all', array('fields'=>'ro_schedule_letter'))->where(array('chemist_id'=>$chemistIds[$i]))->last();
+
+          if(!empty($trainingScheduleLetterFromRo)){
+           
+             $ro_side_schedule_letter[$i] = $trainingScheduleLetterFromRo['ro_schedule_letter'];
+            } 
+			
+           //get and view Ral side training completed letter by laxmi on 05-01-2023 for chemist_training
+              
+             $raltrainingComLetter = $DmiChemistRalToRoLogs->find('all', ['conditions'=>['chemist_id IS'=>$chemistIds[$i], 'training_completed IS NOT'=>NULL]])->last();
+			 
+            if(!empty($raltrainingComLetter)){
+                $ral_trainingCom_letter[$i] = $raltrainingComLetter['pdf_file'];
+			}
+           $i++;
+
+		}
+		 
+		 $this->Controller->set('viewLetterFromRo',$chemistRoforwardedLetter);
+		 $this->Controller->set('reliving_pdf',$reliving_pdf);
+		 $this->Controller->set('cetificatePdf',$cetificatePdf);
+		 $this->Controller->set('ro_side_schedule_letter',$ro_side_schedule_letter);
+		 $this->Controller->set('ral_trainingCom_letter',$ral_trainingCom_letter);
+		 //end Laxmi B.															
 	}
 
 

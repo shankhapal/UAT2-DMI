@@ -137,6 +137,14 @@
 					<a class="btn btn-secondary float-right mr-2" id="next_btn" href="<?php echo $this->request->getAttribute('webroot');?><?php echo $controller; ?>/section/<?php echo $nextbtnid; ?>" >Next Section</a>
 				
 				<?php } ?>
+			     <!-- for chemist after all section approved forword to RAL show title procceds at Ral else show button added by laxmi b. on 21-12-2022 -->
+				<?php if($_SESSION['application_type'] == 4 && !empty($_SESSION['is_training_completed']) && $_SESSION['is_training_completed']== 'no' && $is_forwordedtoral == 'no' && $all_section_status == 2){
+                      ?>
+                       
+                	    <a href="<?php echo $this->request->getAttribute('webroot').'chemist/forward_applicationto_ral';?> " class="btn btn-success float-right"> Schedule Training</a>
+
+               	         <!-- check if training completed at ro then proceeds at RAL no appeared show added by  laxmi on 04-01-2023 -->
+                <?php } ?>			
 		
 		<?php } ?>
 	</div>  

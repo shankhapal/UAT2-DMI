@@ -695,11 +695,26 @@ use App\Network\Response\Response;
 						$appl_type = 'BackLog';
 					}*/
 					
+		            //for chemist to get packer id added condtion by laxmi B. on 29-05-2023
+
+					if(!empty($appl_type_id) && $appl_type_id == 4){
+						$chemist_id = $customer_id;
+                        $customer_id = $this->Session->read('packer_id');
+
+					}
+
+
 					//get firm details table id
 					$this->loadModel('DmiFirms');
 					$get_firm_id = $this->DmiFirms->find('all',array('fields'=>array('id','firm_name'),'conditions'=>array('customer_id'=>$customer_id)))->first();
 					$f_id = $get_firm_id['id'];
 					
+                    // to get chemist id  from chemist_registration table for view application added by laxmi B on 29-05-2023
+					if(!empty($appl_type_id) && $appl_type_id == 4){
+						$this->loadModel('DmiChemistRegistrations');
+						$get_chemist_id = $this->DmiChemistRegistrations->find('all',array('fields'=>array('id'),'conditions'=>array('chemist_id'=>$chemist_id)))->first();
+					    $f_id = $get_chemist_id['id'];
+					}
 					//get application form link
 					$appl_form = '../scrutiny/form_scrutiny_fetch_id/'.$f_id.'/view/'.$appl_type_id;
 					$report_form = '../inspections/inspection_report_fetch_id/'.$f_id.'/view/'.$appl_type_id;
@@ -718,6 +733,12 @@ use App\Network\Response\Response;
 					}
 					
 					
+                    //get revert back chemist id as customer id to aapear as application id added by laxmi on 29-05-2023
+
+					if(!empty($appl_type_id) && $appl_type_id == 4){
+						$customer_id = $chemist_id;
+					}
+						
 					//get application pdf links
 					
 					$appl_pdf = $appl_type_id;//set default to reload page if blank
@@ -779,13 +800,17 @@ use App\Network\Response\Response;
 					//else{
 						$this->loadModel('DmiGrantProvCertificateLogs');
 						$getStatus = $this->DmiGrantProvCertificateLogs->find('all',array('fields'=>array('id','status'),'conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc'))->first();
+	                    $appl_array[$i]['status'] = null;//set default value to null on 26-05-2023 by Amol
 						if(!empty($getStatus) && $getStatus['status']==null){
 							$appl_array[$i]['show_esign_btn'] = 'yes';
-							
+							$appl_array[$i]['status'] = $getStatus['status'];//this line is moved inside condition, on 26-05-2023 by Amol
+						//added else condition on 29-05-2023 by Amol
+						}elseif(!empty($getStatus)){
+							$appl_array[$i]['status'] = $getStatus['status'];//this line is moved inside condition, on 26-05-2023 by Amol
 						}
 					//}	
 						
-						$appl_array[$i]['status'] = $getStatus['status'];
+						
 						//This condition block is added to provide message if the SO Office is not having the role of so_pp_grant - Akash [18-01-2023]
 						//updated below conditions on 24-01-2023 by Amol
 						//for PP application

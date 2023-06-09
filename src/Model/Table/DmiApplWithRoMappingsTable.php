@@ -27,6 +27,30 @@ class DmiApplWithRoMappingsTable extends Table{
 
 	//This function is used to get RO office shortcode from application Id
 	public function getOfficeDetails($customer_id){
+  //to fetch  ro office after payment confirm set session packer id who register the chemist //added by laxmi B. on 16-12-2022
+     
+			if((!empty($_SESSION['application_type']) && $_SESSION['application_type'] == 4 ) || (!empty($_SESSION['ap_id']) && $_SESSION['ap_id'] == 4)){ 
+			    
+				if(!empty($_SESSION['ap_id']) && $_SESSION['ap_id'] == 4){
+					$app_type = $_SESSION['ap_id'];
+					$_SESSION['application_type'] = $app_type;
+				}
+
+				$DmiChemistRegistrations = TableRegistry::getTableLocator()->get('DmiChemistRegistrations');
+				$chemistdetails = $DmiChemistRegistrations->find('all', array( 'conditions'=>array('chemist_id'=>$customer_id)))->first();
+				
+				if(isset($chemistdetails['created_by'])){
+				$customer_id = $chemistdetails['created_by'];
+				$_SESSION['packer_id'] = $customer_id;
+				
+
+				// check export unit appliation
+				$Dmifirm = TableRegistry::getTableLocator()->get('DmiFirms');
+				$firmData = $Dmifirm->find('all')->where(['customer_id IS'=>$customer_id])->first();
+				$_SESSION['export_unit'] = $firmData['export_unit'];
+				}
+
+			}
 
 		$DmiRoOffices = TableRegistry::getTableLocator()->get('DmiRoOffices');
 
@@ -36,6 +60,15 @@ class DmiApplWithRoMappingsTable extends Table{
 		//get office details from office table
 		$office_details = $DmiRoOffices->find('all',array('conditions'=>array('id IS'=>$office_id['office_id'],'OR'=>array('delete_status IS NULL','delete_status'=>'no'))))->first();
 
+
+		// condition for export unit to RAL and Ro mumbai for application added by laxmi on 9-1-23
+		if(!empty($_SESSION['application_type']) && !empty($_SESSION['export_unit'])){
+
+		    if($_SESSION['application_type'] == 4 && $_SESSION['export_unit'] == 'yes'){
+
+		       $office_details = $DmiRoOffices->find('all',array('conditions'=>array('ro_office IS'=>'Mumbai','OR'=>array('delete_status IS NULL','delete_status'=>'no'))))->first();
+		     } 
+        }						
 		return $office_details;
 	}
 
