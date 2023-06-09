@@ -228,7 +228,6 @@ class DmiRtiLaboratoryDetailsTable extends Table{
       }
     
     }
-
 	
     $htmlentities_date_last_inspection = htmlentities($forms_data['date_last_inspection'],ENT_QUOTES);
     $htmlentities_date_p_inspection =  htmlentities($forms_data['date_p_inspection'],ENT_QUOTES);

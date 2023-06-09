@@ -1562,7 +1562,7 @@ class OthermodulesController extends AppController{
 
 		$customer_id = $this->Session->read('customer_id');
 		
-			$get_period = $conn->execute("SELECT pp.*
+		$get_period = $conn->execute("SELECT pp.*
 											   FROM dmi_routine_inspection_period AS pp
 												")->fetchAll('assoc');
 
@@ -1589,6 +1589,7 @@ class OthermodulesController extends AppController{
 	
 		// to get array list for allocated lab application 
 		$list_array_lab = $this->DmiRtiAllocations->find('list',array('keyField'=>'id','valueField'=>'customer_id','conditions'=>array('customer_id like'=>'%'.'/3/'.'%',array('date(created) >=' => $from_date_lab, 'date(created) <=' =>$to_date)),'order'=>'id desc'))->toArray();
+		
 		//added by shankhpal for approved list of ca 16/05/2023
 		$get_rti_approved_list_for_ca = [];
 		if(!empty($list_array_ca)){
@@ -1695,7 +1696,7 @@ class OthermodulesController extends AppController{
 			$customer_id = $each['customer_id'];
 		
 				$form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
-
+				
 				$report_pdf_field = 'pdf_file';
 				$get_report_pdf = $this->DmiRtiReportPdfRecords->find('all',array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc'))->first();
 				

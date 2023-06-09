@@ -112,8 +112,9 @@ class DmiRtiCaPackerDetailsTable extends Table{
 		
 		//taking id of multiple sub commodities	to show names in list	
 		$sub_comm_id = explode(',',(string) $added_firm_field['sub_commodity']); #For Deprecations
+		
 		$sub_commodity_value = $MCommodity->find('list',array('valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
-	
+			
 		$Dmi_check_samples = TableRegistry::getTableLocator()->get('DmiCheckSamples');
 
 		$sample_details = $Dmi_check_samples->RoutineInspectionSampleDetails();	
@@ -171,7 +172,36 @@ class DmiRtiCaPackerDetailsTable extends Table{
 					
 			);
 		}
-		return array($form_fields_details,$added_sample_details,$certificate_valid_upto,$sub_commodity_value,$lab_list,$printers_list,$self_registered_chemist,$total_suggestions);			
+
+		//get commodity list added on 09/06/2023 by shankhpal
+		$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+		$firm_details = $DmiFirms->firmDetails($customer_id);
+		
+		$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
+		$MCommodityCategory = TableRegistry::getTableLocator()->get('MCommodityCategory');
+		
+
+		$sub_commodity_array = explode(',',(string) $firm_details['sub_commodity']); #For Deprecations
+		
+		if (!empty($firm_details['sub_commodity'])) {
+			
+			$i=0;
+			foreach ($sub_commodity_array as $sub_commodity_id)
+			{
+				$fetch_commodity_id = $MCommodity->find('all',array('conditions'=>array('commodity_code IS'=>$sub_commodity_id)))->first();
+				$commodity_id[$i] = $fetch_commodity_id['category_code'];
+				$sub_commodity_data[$i] =  $fetch_commodity_id;
+				$i=$i+1;
+			}
+
+			$unique_commodity_id = array_unique($commodity_id);
+
+			$commodity_name_list = $MCommodityCategory->find('all',array('conditions'=>array('category_code IN'=>$unique_commodity_id, 'display'=>'Y')))->toArray();
+			
+		}
+
+		
+		return array($form_fields_details,$added_sample_details,$certificate_valid_upto,$sub_commodity_value,$lab_list,$printers_list,$self_registered_chemist,$total_suggestions,$sub_commodity_data);			
 	}
 	
 	/* Comment

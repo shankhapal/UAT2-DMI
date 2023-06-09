@@ -22,39 +22,39 @@
 	
       <tr>
           <td style="padding:10px; vertical-align:top;">Date of Last Inspection :</td>
-          <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['date_last_inspection'])?$rti_pp_data['date_last_inspection']:"Nill"; ?></td>
+          <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['date_last_inspection'])?$rti_pp_data['date_last_inspection']:"NA"; ?></td>
       </tr>
       <tr>
           <td style="padding:10px; vertical-align:top;">Date & Time of present Inspection :</td>
-          <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['date_p_inspection'])?$rti_pp_data['date_p_inspection']:"Nill"; ?></td>
+          <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['date_p_inspection'])?$rti_pp_data['date_p_inspection']:"NA"; ?></td>
       </tr>
       <tr>
           <td style="padding:10px; vertical-align:top;">1. Name of the Printing Press :</td>
-          <td style="padding:10px; vertical-align:top;"><?php echo isset($firm_details['firm_name'])?$firm_details['firm_name']:"Nill"; ?></td>
+          <td style="padding:10px; vertical-align:top;"><?php echo isset($firm_details['firm_name'])?$firm_details['firm_name']:"NA"; ?></td>
       </tr>
       <tr>
           <td style="padding:10px; vertical-align:top;">2. Full address with Telephone nos. and e-mail etc. :</td>
-          <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['street_address'])?$rti_pp_data['street_address']:"Nill"; ?></td>
+          <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['street_address'])?$rti_pp_data['street_address']:"NA"; ?></td>
       </tr>
       <tr>
           <td style="padding:10px; vertical-align:top;">Email Id:</td>
-          <td style="padding:10px; vertical-align:top;"><?php echo base64_decode(isset($firm_details['email'])?$firm_details['email']:"Nill"); ?></td>
+          <td style="padding:10px; vertical-align:top;"><?php echo base64_decode(isset($firm_details['email'])?$firm_details['email']:"NA"); ?></td>
       </tr>
       <tr>
           <td style="padding:10px; vertical-align:top;">Mobile No :</td>
-          <td style="padding:10px; vertical-align:top;"><?php echo base64_decode(isset($firm_details['mobile_no'])?$firm_details['mobile_no']:"Nill"); ?></td>
+          <td style="padding:10px; vertical-align:top;"><?php echo base64_decode(isset($firm_details['mobile_no'])?$firm_details['mobile_no']:"NA"); ?></td>
       </tr>
       <tr>
           <td style="padding:10px; vertical-align:top;">a) Registered Office :</td>
-          <td style="padding:10px; vertical-align:top;"><?php echo isset($registered_office_address)?$registered_office_address:"Nill"; ?></td>
+          <td style="padding:10px; vertical-align:top;"><?php echo isset($registered_office_address)?$registered_office_address:"NA"; ?></td>
       </tr>
       <tr>
           <td style="padding:10px; vertical-align:top;">b) Printing Press premises. :</td>
-          <td style="padding:10px; vertical-align:top;"><?php echo isset($printing_premises_address)?$printing_premises_address:"Nill"; ?></td>
+          <td style="padding:10px; vertical-align:top;"><?php echo isset($printing_premises_address)?$printing_premises_address:"NA"; ?></td>
       </tr>
       <tr>
           <td style="padding:10px; vertical-align:top;">3. Permission valid upto :</td>
-          <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['valid_upto'])?$rti_pp_data['valid_upto']:"Nill"; ?></td>
+          <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['valid_upto'])?$rti_pp_data['valid_upto']:"NA"; ?></td>
       </tr>
 
       <tr>
@@ -126,31 +126,31 @@
 <table width="100%" border="1">
      <tr>
         <td style="padding:10px; vertical-align:top;">7. Whether the printed material as in column 6 above is in order as per physical check :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['physical_check'])?$rti_pp_data['physical_check']:"Nill"; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['physical_check'])?$rti_pp_data['physical_check']:"NA"; ?></td>
 		</tr>
      <tr>
         <td style="padding:10px; vertical-align:top;">8. Whether the printing press is printing </td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['is_printing'])?$rti_pp_data['is_printing']:"Nill"; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['is_printing'])?$rti_pp_data['is_printing']:"NA"; ?></td>
 		</tr>
     <tr>
         <td style="padding:10px; vertical-align:top;">9. Details of in - house storage facilities for security and safe custody of printing and printed material.</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['storage_facilities'])?$rti_pp_data['storage_facilities']:"Nill"; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['storage_facilities'])?$rti_pp_data['storage_facilities']:"NA"; ?></td>
 		</tr>
      <tr>
         <td style="padding:10px; vertical-align:top;">10. Whether the printing press maintains proper accounts for printing orders received, executed and send monthly invoice records to concerned RO/SO. </td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['maintains_proper'])?$rti_pp_data['maintains_proper']:"Nill"; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['maintains_proper'])?$rti_pp_data['maintains_proper']:"NA"; ?></td>
 		</tr>
      <tr>
         <td style="padding:10px; vertical-align:top;">11. Whether press is using right quality of printing ink and food grade packaging material. (Check Certificates)</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['right_quality_of_printing'])?$rti_pp_data['right_quality_of_printing']:"Nill"; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['right_quality_of_printing'])?$rti_pp_data['right_quality_of_printing']:"NA"; ?></td>
 		</tr>
     <tr>
         <td style="padding:10px; vertical-align:top;">12. Whether the printing press is marking logo of printing unit on packaging material.</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['press_is_marking_logo'])?$rti_pp_data['press_is_marking_logo']:"Nill"; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['press_is_marking_logo'])?$rti_pp_data['press_is_marking_logo']:"NA"; ?></td>
 		</tr>
      <tr>
         <td style="padding:10px; vertical-align:top;">13. Suggestions given during the last inspection, if any & whether corrective action taken</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['suggestions_last_ins_yes_no'])?$rti_pp_data['suggestions_last_ins_yes_no']:"Nill"; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['suggestions_last_ins_yes_no'])?$rti_pp_data['suggestions_last_ins_yes_no']:"NA"; ?></td>
         
 		</tr>
     <?php if($rti_pp_data['suggestions_last_ins_yes_no'] == "yes"){ ?>
@@ -160,7 +160,7 @@
      <?php } ?>
      <tr>
         <td style="padding:10px; vertical-align:top;">14. Shortcomings observed during the present Inspection.</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['shortcomings_noticed'])?$rti_pp_data['shortcomings_noticed']:"Nill"; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['shortcomings_noticed'])?$rti_pp_data['shortcomings_noticed']:"NA"; ?></td>
 		</tr>
     <tr>
         <td style="padding:10px; vertical-align:top;">Shortcomings noticed Docs</td>
@@ -170,7 +170,7 @@
 		</tr>
     <tr>
         <td style="padding:10px; vertical-align:top;">15. Suggestions, if any</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['if_any_sugg'])?$rti_pp_data['if_any_sugg']:"Nill"; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['if_any_sugg'])?$rti_pp_data['if_any_sugg']:"NA"; ?></td>
 		</tr>
 </table>
  <table width="100%" border="1">
@@ -181,7 +181,7 @@
   <table width="100%" border="1">
      <tr>
         <td style="padding:10px; vertical-align:top;">Name of the authorized person Officer of the printing press or any representative</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['name_of_inspecting_officer'])?$rti_pp_data['name_of_inspecting_officer']:"Nill"; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_pp_data['name_of_inspecting_officer'])?$rti_pp_data['name_of_inspecting_officer']:"NA"; ?></td>
 		</tr>
      <tr>
         <td style="padding:10px; vertical-align:top;">Signature of Inspection with official Stamp</td>

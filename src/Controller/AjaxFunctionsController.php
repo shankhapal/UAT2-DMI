@@ -2201,6 +2201,7 @@ class AjaxFunctionsController extends AppController{
 			if (!empty($edit_sample_id)) {
 
 				$find_sample_details = $this->DmiCheckSamples->find('all',array('conditions'=>array('id IS'=>$edit_sample_id)))->first();
+				
 				$this->set('find_sample_details',$find_sample_details);
 			}
 		}
