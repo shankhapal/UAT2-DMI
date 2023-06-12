@@ -197,7 +197,8 @@ class DmiRtiLaboratoryDetailsTable extends Table{
 					
 			);
 		}
-		return array($form_fields_details,$sub_commodity_value,$chemist_full_name,$list_of_packer);			
+    
+		return array($form_fields_details,$sub_commodity_value,$chemist_full_name,$list_of_packer,$total_suggestions);			
 	}
 	
 	

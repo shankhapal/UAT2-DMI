@@ -539,7 +539,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                         </thead>
                         <tbody>
                             <?php
-                                $total_suggestions = $section_form_details[3];
+                                $total_suggestions = $section_form_details[4];
                                 $sr = 1;
                                 if (!empty($total_suggestions)) {
                                     foreach ($total_suggestions as $each_sugg) {

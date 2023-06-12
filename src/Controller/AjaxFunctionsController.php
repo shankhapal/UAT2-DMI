@@ -2197,14 +2197,18 @@ class AjaxFunctionsController extends AppController{
 		}
 
 		if ($this->Session->read('edit_sample_id') != null) {
-
 			if (!empty($edit_sample_id)) {
-
-				$find_sample_details = $this->DmiCheckSamples->find('all',array('conditions'=>array('id IS'=>$edit_sample_id)))->first();
-				
-				$this->set('find_sample_details',$find_sample_details);
+					$find_sample_details = $this->DmiCheckSamples->find('all', array('conditions' => array('id' => $edit_sample_id)))->first();
+					$this->set('find_sample_details', $find_sample_details);
 			}
 		}
+
+		$sub_commodity_array = [];
+		if (isset($sub_commodity_value) && is_array($sub_commodity_value)) {
+				foreach ($sub_commodity_value as $sub_commodity) {
+						$sub_commodity_array[$sub_commodity] = $sub_commodity;
+				}
+		}	
 
 		if (!empty($save_sample_id)) {
 
@@ -2375,6 +2379,47 @@ class AjaxFunctionsController extends AppController{
 
 	}
 
+	// GET Updated Option of Commodity for Collection of check samples table for module RTI
+	// @AUTHOR : SHANKHPAL SHENDE
+	// DESC : created for Routine Inspection flow  (RTI)
+	// DATE : 12/06/2023 
+	public function getUpdatedComodity(){
+
+		$this->autoRender = false;
+		$this->loadModel('MCommodity');
+		$this->loadModel('MCommodityCategory');
+		$this->loadModel('DmiFirms');
+		
+		$customer_id = $this->Customfunctions->sessionCustomerID();
+		$firm_details = $this->DmiFirms->firmDetails($customer_id);
+		$sub_commodity_array = explode(',', (string) $firm_details['sub_commodity']);
+
+		$options_html = "<option value=''>Select Commodity</option>"; // Add the default option
+
+		foreach ($sub_commodity_array as $category_id) {
+			$commodities = $this->MCommodity->find('all', array(
+					'fields' => array('commodity_code', 'commodity_name'),
+					'conditions' => array('commodity_code IN' => [$category_id], 'display' => 'Y'),
+					'order' => array('commodity_name ASC')
+			))->toArray();
+
+			
+			foreach ($commodities as $commodity) {
+					$commodity_code = $commodity['commodity_code'];
+					$commodity_name = $commodity['commodity_name'];
+					$selected = isset($selected_commodity) && $commodity_name == $selected_commodity ? 'selected' : ''; // Check if current commodity is selected
+					$options_html .= "<option value='$commodity_name' $selected>$commodity_name</option>";
+			}
+		}
+		
+
+		// Return the HTML code for the options
+		echo $options_html;
+
+		// Return the HTML code for the options
+	}
+
+	
 	
 
 }

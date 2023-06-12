@@ -14,7 +14,7 @@
                            <div id="sample_details_each_row">
                             	<?php 
 								            $i=1; 
-								 
+                    
                               foreach($section_form_details[1] as $sample_detail){ 
                                
                                 ?>
@@ -41,8 +41,32 @@
                                <td></td>
                                 <td>
                                   
+                                     <?php
+                                     $sub_commodity_array = [];
+
+                                      if (isset($sub_commodity_value) && is_array($sub_commodity_value)) {
+                                          foreach ($sub_commodity_value as $sub_commodity) {
+                                            
+                                              $sub_commodity_array[$sub_commodity] = $sub_commodity;
+                                          }
+
+                                      }
+                                      
+                                     echo $this->Form->control('commodity_name', [
+                                      'type' => 'select',
+                                      'escape' => false,
+                                      'options' => $sub_commodity_array,
+                                      'label' => false,
+                                      'class' => 'form-control',
+                                      'empty' => 'Select Commodity',
+                                      'id' => 'commodity_name',
+                                      'value' => isset($find_sample_details['commodity_name']) ? $find_sample_details['commodity_name'] : ''
+                                  ]);
+                                                                                
+                                      ?>
+
                                     <?php 
-                                    echo $this->Form->control('commodity_name', array('type'=>'text', 'value'=>isset($find_sample_details['commodity_name'])?$find_sample_details['commodity_name']:"", 'escape'=>false,  'label'=>false, 'id'=>'commodity_name', 'class'=>'form-control input-field')); ?>
+                                  // == echo $this->Form->control('commodity_name', array('type'=>'select', 'value'=>isset($find_sample_details['commodity_name'])?$find_sample_details['commodity_name']:"", 'escape'=>false,  'label'=>false, 'id'=>'commodity_name', 'class'=>'form-control input-field')); ?>
 																		<span id="" class="error invalid-feedback"></span>
                                 </td>
                                 <td>
@@ -79,15 +103,12 @@
                                         <?php
                                          $sub_commodity_array = [];
 
-                                        if (isset($section_form_details[8])) {
-                                            $sub_commodity_value = $section_form_details[8];
-
-                                            foreach ($sub_commodity_value as $sub_commodity) {
-                                                $commodity_name = $sub_commodity['commodity_name'];
-                                                $sub_commodity_array[$commodity_name] = $sub_commodity['commodity_name'];
-                                            }
-                                        }
-
+                                          if (isset($sub_commodity_value) && is_array($sub_commodity_value)) {
+                                              foreach ($sub_commodity_value as $sub_commodity) {
+                                                  $commodity_name =  $sub_commodity;
+                                                  $sub_commodity_array[$commodity_name] = $sub_commodity;
+                                              }
+                                          }
                                         echo $this->Form->control('commodity_name', array(
                                             'type' => 'select',
                                             'escape' => false,

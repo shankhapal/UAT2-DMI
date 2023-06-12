@@ -1,40 +1,40 @@
-// added data table on 09/06/2023 by shankhpal shende
+// updated file by shankhpal on 12/06/2023
 $(document).ready(function () {
   $(function () {
+    var dataTable = null;
+
     $("#ca_pdf_table").hide();
     $("#pp_pdf_table").hide();
     $("#lab_pdf_table").hide();
-    $("input:radio[name=pdf]").change(function () {
-      if ($(this).attr("value") == "ca") {
-        var dataTablepp = $("#pp_pdf_table").DataTable();
-        var dataTablelab = $("#lab_pdf_table").DataTable();
-        dataTablepp.destroy();
-        dataTablelab.destroy();
 
-        $("#ca_pdf_table").DataTable();
+    $("input:radio[name=pdf]").change(function () {
+      var value = $(this).attr("value");
+
+      $("#ca_pdf_table").hide();
+      $("#pp_pdf_table").hide();
+      $("#lab_pdf_table").hide();
+
+      if (value == "ca") {
         $("#ca_pdf_table").show();
-        $("#pp_pdf_table").hide();
-        $("#lab_pdf_table").hide();
-      }
-      if ($(this).attr("value") == "pp") {
-        var dataTableca = $("#ca_pdf_table").DataTable();
-        var dataTablelab = $("#lab_pdf_table").DataTable();
-        dataTableca.destroy();
-        dataTablelab.destroy();
-        $("#pp_pdf_table").DataTable();
+        if (!dataTable) {
+          dataTable = $("#ca_pdf_table").DataTable();
+        } else {
+          dataTable.draw();
+        }
+      } else if (value == "pp") {
         $("#pp_pdf_table").show();
-        $("#ca_pdf_table").hide();
-        $("#lab_pdf_table").hide();
-      }
-      if ($(this).attr("value") == "lab") {
-        var dataTableca = $("#ca_pdf_table").DataTable();
-        var dataTablepp = $("#pp_pdf_table").DataTable();
-        dataTableca.destroy();
-        dataTablepp.destroy();
-        $("#lab_pdf_table").DataTable();
+        if (!dataTable) {
+          dataTable = $("#pp_pdf_table").DataTable();
+        } else {
+          dataTable.draw();
+        }
+      } else if (value == "lab") {
         $("#lab_pdf_table").show();
-        $("#pp_pdf_table").hide();
-        $("#ca_pdf_table").hide();
+        if (!dataTable) {
+          dataTable = $("#lab_pdf_table").DataTable();
+        } else {
+          dataTable.draw();
+        }
       }
     });
   });

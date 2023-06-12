@@ -192,7 +192,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                                                                     <td><?php echo $value['firm_name']; ?></td>
                                                                 </tr>
                                                             <?php $i++; }}else{ ?>
-                                                            <div class="colorWarning margin5 header-text">Grading laboratory must by mapped by CA on the System</div>
+                                                            <div class="colorWarning margin5 header-text">Grading laboratory must mapped by CA on the System</div>
                                                      <?php } ?>    
                                                         </tbody>
                                                     </table>
