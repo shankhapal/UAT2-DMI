@@ -2732,7 +2732,12 @@ class DashboardController extends AppController{
 		
 		//using core joins due issue in cakephp 3.8 joins format
 		$conn = ConnectionManager::get('default');
-		$stmt = $conn->execute("select id,ro_office from dmi_ro_offices where office_type='$office_type' AND delete_status IS NULL");
+		//commented below query on 12-06-2023 by Amo, to solve SO to Ro transfer of PP appl for single officer
+		//$stmt = $conn->execute("select id,ro_office from dmi_ro_offices where office_type='$office_type' AND delete_status IS NULL");
+		
+		//added below query without office type condition on 12-06-2023 by Amol,to solve SO to Ro transfer of PP appl for single officer
+		$stmt = $conn->execute("select id,ro_office from dmi_ro_offices where delete_status IS NULL");
+
 		$appl_list = $stmt ->fetchAll('assoc');
 
 		echo '~'.json_encode($appl_list).'~';
