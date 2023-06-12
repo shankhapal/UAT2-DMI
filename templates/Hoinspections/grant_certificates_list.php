@@ -76,8 +76,11 @@
 										<?php echo 'Pdf'; ?>
 									</a>
 								</td>
-
-								<td><?php $report_pdf_path = explode("/",$each['report_pdf']);
+								<td>
+								
+								<!-- added below condtion for chemist appl_type 4 to show report N/A by laxmi on 29-05-2023  -->
+								<?php if( $appl_type != 'Chemist Approval') { ?>
+								<?php $report_pdf_path = explode("/",$each['report_pdf']);
 										$report_pdf_name = $report_pdf_path[count($report_pdf_path) - 1]; ?>
 									<?php #this below conditin block is added to hide the repoert links if the report isnt filed - Akash[03-02-2023]
 									if ($each['report_pdf'] == '1' || $appl_type == 'Surrender') {
@@ -91,7 +94,13 @@
 											<?php echo 'Pdf'; ?>
 										</a>
 									<?php } ?>
-								</td>
+									
+			                        <?php }else {?>
+										<p>N/A</p>
+									<?php }?>
+										<!-- End Laxmi B. -->		   
+										
+								    </td>
 
 								<?php } elseif ($appl_type == 'Renewal') {
 										if ($each['show_esign_btn']=='yes') { ?> 
