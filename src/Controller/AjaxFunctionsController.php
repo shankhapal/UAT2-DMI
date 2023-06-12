@@ -1399,17 +1399,20 @@ class AjaxFunctionsController extends AppController{
 		if (!empty($last_ren_date)) {
 
 			//get old application renewal details
+			//commented below query on 09-06-2023 by Amol, not required
 			//$get_old_renewal_details = $this->DmiOldApplicationCertificateDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
 			
+			//added below query on 09-06-2023 by Amol, as required to get last renewal date
 			$this->loadModel('DmiOldApplicationRenewalDates');
 			$get_old_renewal_details = $this->DmiOldApplicationRenewalDates->find('all',array('conditions'=>array('customer_id' => $customer_id),'order'=>'id DESC'))->first();
-			//print_r($get_old_renewal_details);exit;
+
 			$previous_last_ren_date = $get_old_renewal_details['renewal_date'];
 
 			$last_ren_date = $this->Customfunctions->dateFormatCheck($last_ren_date);
 			
 
 			//to update last renewal grant date
+			//updated query condition for id value on 09-06-2023 by Amol 
 			$this->DmiOldApplicationRenewalDates->updateAll(array('renewal_date' => "$last_ren_date"),array('customer_id' => $customer_id,'id'=>$get_old_renewal_details['id']));
 		}
 
@@ -1417,7 +1420,7 @@ class AjaxFunctionsController extends AppController{
 		//to update grant date
 		$this->DmiOldApplicationCertificateDetails->updateAll(array('date_of_grant' => "$grant_date"),array('customer_id' => $customer_id), array('order'=>'id DESC'));
 
-		//below lines added on 07-06-2023 by AMol, to save proper dates
+		//below lines added on 09-06-2023 by AMol, to save proper dates
 		$previous_grant_date = $this->Customfunctions->dateFormatCheck($previous_grant_date);
 		$previous_last_ren_date = $this->Customfunctions->dateFormatCheck($previous_last_ren_date);
 		$valid_upto_date = $this->Customfunctions->dateFormatCheck($valid_upto_date);
@@ -1434,7 +1437,7 @@ class AjaxFunctionsController extends AppController{
 			'new_last_renewal_date'=>$last_ren_date,
 			'reason_to_update'=>$reason_to_update,
 			'valid_upto_date'=>$valid_upto_date,
-			'created'=>date('Y-m-d H:i:s'), //added on 07-06-2023 by Amol
+			'created'=>date('Y-m-d H:i:s'), //added on 09-06-2023 by Amol
 
 		));
 		$this->DmiOldCertDateUpdateLogs->save($DmiOldCertDateUpdateLogsEntity);
