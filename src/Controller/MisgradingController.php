@@ -93,7 +93,7 @@ class MisgradingController extends AppController{
 		foreach ($finalGrading as $row) {
 
 			// Check if either 'scrutiny_status' or 'action_final_submit' contains 'Yes'
-			if ($row['report_status'] === 'Scrutinized' || $row['report_status'] === 'Action Submit') {
+			if ($row['report_status'] === 'Scrutinized' || $row['report_status'] === 'Action Taken') {
 				continue; // Skip the iteration
 			}
 
@@ -1544,15 +1544,11 @@ class MisgradingController extends AppController{
 		}
 
 		$current_level = $this->Session->read('current_level');
-		if($current_level=='level_4'){
-			$mo_field_name = 'ho_mo_smo';
-		}else{
-			$mo_field_name = 'mo_smo_inspection';
-		}
+		
 
 		$this->loadModel('DmiUserRoles');
-		$mo_users_list = $this->DmiUserRoles->find('list',array('keyField'=>'user_email_id','valueField'=>'user_email_id','conditions'=>array($mo_field_name=>'yes')))->toArray();
-		
+		$mo_users_list = $this->DmiUserRoles->find('list',array('keyField'=>'user_email_id','valueField'=>'user_email_id','conditions'=>array('allocate_lims_report'=>'yes')))->toArray();
+
 		//function to get first & last name wise list
 		$DashboardController = new DashboardController();
 		$mo_users_list = $DashboardController->userNameList($mo_users_list);
@@ -1586,11 +1582,11 @@ class MisgradingController extends AppController{
 		//get allocating officer user details
 		$get_user_id = $this->DmiUsers->find('all',array('fields'=>'id','conditions'=>array('email IS'=>$username)))->first();
 		$user_id = $get_user_id['id'];
-	
+		
 		//get MO/SMO user details
 		$user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$mo_user_id)))->first();
 		$mo_posted_id = $user_details['posted_ro_office'];
-	
+		
 		//get MO/SMO posted office
 		$mo_office = $this->DmiRoOffices->find('all',array('conditions'=>array('id IS'=>$mo_posted_id)))->first();
 		$mo_office = $mo_office['ro_office'];

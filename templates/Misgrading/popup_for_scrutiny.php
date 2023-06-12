@@ -1,4 +1,6 @@
-<?php echo $this->Html->css('dashboard/allocation-common-tabs-css'); ?>
+<?php 
+echo $this->Html->css('dashboard/allocation-common-tabs-css'); 
+?>
 
 <div id="scrutiny_alloction_Modal" class="modal">
 	<div class="modal-dialog modal-dialog-centered">
@@ -12,6 +14,8 @@
 				<button type="button" class="close" data-dismiss="modal">&times;</button>
 			</div>
 			<div class="modal-body">
+			<p class="text-light bg-dark">Note: If your scrutinizer does not have the role permission "Allocation of LIMS Reports," it will not appear in the dropdown. In such a case, please contact the administrator and request the appropriate role assignment.</p>
+
 				<?php echo $this->Form->create(null,array('id'=>'common_scrutiny_allocation_form')); ?>
 					<table id="scrutiny-alloc-table" class="table table-striped table-bordered wd100">
 						<thead>

@@ -1,4 +1,9 @@
 	$(document).ready(function () {
+
+		$(document).on('click', '.close', function(event) {
+			$("#scrutiny_alloction_Modal").hide();
+		});
+		
 		/*
 		//Check if the sample is scrutinized or allocated
 		var statusArray = $('#statusArray_id').val();
@@ -190,13 +195,6 @@
 							window.location.href = '../misgrading/report_listing_for_allocation';
 						}
 					});
-					/*
-					//to reload list after allocation
-					if(allocation_by=='nodal' || allocation_by=='dy_ama'){
-						$('#for_scrutiny_allocation_tab').click();
-					}else if(allocation_by=='level_4_ro'){
-						$('#for_scrutiny_of_so_appl_tab').click();
-					}*/
 				}
 			});
 		});	
@@ -426,4 +424,4 @@
 
 
 
-	
+
