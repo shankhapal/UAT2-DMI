@@ -81,4 +81,3 @@
 	</table>
 </div>
 <?php echo $this->Form->end(); ?>
-<?php echo $this->Html->script('element/misgrade_elements/list_of_firms');?>

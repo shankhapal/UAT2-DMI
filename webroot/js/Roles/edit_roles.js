@@ -59,7 +59,7 @@ $(document).ready(function() {
 
 				$.alert({
 					title: "Alert!",
-					content: 'The role of Dy. AMA (QC) is already asigned to '+atob(dyama_set_role_detail)+'. Only one user ID can be allocated the role of Dy. AMA (QC)',
+					content: 'The role of Dy. AMA (QC) is already asigned to <b>'+atob(dyama_set_role_detail)+'</b>. Only one user ID can be allocated the role of Dy. AMA (QC)',
 					type: 'red',
 					icon: 'fa fa-warning',
 					columnClass: 'medium',
@@ -101,7 +101,7 @@ $(document).ready(function() {
 
 				$.alert({
 					title: "Alert!",
-					content: 'The role of Jt. AMA is already asigned to '+atob(jtama_set_role_detail)+'. Only one user ID can be allocated the role of Jt. AMA',
+					content: 'The role of Jt. AMA is already asigned to <b>'+atob(jtama_set_role_detail)+'</b>. Only one user ID can be allocated the role of Jt. AMA',
 					type: 'red',
 					icon: 'fa fa-warning',
 					columnClass: 'medium',
@@ -139,7 +139,7 @@ $(document).ready(function() {
 				
 				$.alert({
 					title: "Alert!",
-					content: 'The role of AMA is already asigned to '+atob(ama_set_role_detail)+'. Only one user ID can be allocated the role of AMA',
+					content: 'The role of AMA is already asigned to <b>'+atob(ama_set_role_detail)+'</b>. Only one user ID can be allocated the role of AMA',
 					type: 'red',
 					icon: 'fa fa-warning',
 					columnClass: 'medium',
@@ -186,7 +186,7 @@ $(document).ready(function() {
 
 				$.alert({
 					title: "Alert!",
-					content: 'Currently this id '+atob(user_id)+' have RO In-charge of '+ro_office+'. The role of RO In-charge cannot be removed unless new RO In-charge is re-allocated.',
+					content: 'Currently this id <b>'+atob(user_id)+'</b> have RO In-charge of '+ro_office+'. The role of RO In-charge cannot be removed unless new RO In-charge is re-allocated.',
 					type: 'red',
 					icon: 'fa fa-warning',
 					columnClass: 'medium',
@@ -252,7 +252,7 @@ $(document).ready(function() {
 
 				$.alert({
 					title: "Alert!",
-					content: 'Currently this id '+atob(user_id)+' have SO In-charge of '+so_office+'. The role of SO In-charge cannot be removed unless new SO In-charge is re-allocated.',
+					content: 'Currently this id <b>'+atob(user_id)+'</b> have SO In-charge of '+so_office+'. The role of SO In-charge cannot be removed unless new SO In-charge is re-allocated.',
 					type: 'red',
 					icon: 'fa fa-warning',
 					columnClass: 'medium',
@@ -322,19 +322,19 @@ $(document).ready(function() {
 					columnClass : 'l',
 					content: 'Currently, this ID <b>' + atob(user_id) + '</b> has some applications assigned. The role of Scrutiny Officer cannot be removed unless all the assigned applications are re-allocated. The list of all such applications is shown below.',
 					buttons: {
-						confirm: function () {
+						Okay: function () {
 							// User clicked "OK" in the alert dialog
 							$(this).prop('checked', true);
 							$("#mo_allocated_list").show();
 						}
 					}
 				});
-				
 			}
 		}
 	});
 
 
+	//For Inspection
 	var io_allocated_running_application_list = $('#io_allocated_running_application_list').val();
 	var io_renewal_allocated_running_application_list = $('#io_renewal_allocated_running_application_list').val();
 
@@ -343,17 +343,23 @@ $(document).ready(function() {
 
 		if ($(this).prop('checked') == false) {
 
-		if(io_allocated_running_application_list == '' || io_allocated_running_application_list == null) { io_allocated_running_application_list = null; }
+			if(io_allocated_running_application_list == '' || io_allocated_running_application_list == null) { io_allocated_running_application_list = null; }
 
-		if(io_renewal_allocated_running_application_list == '' || io_renewal_allocated_running_application_list == null) { io_renewal_allocated_running_application_list = null; }
+			if(io_renewal_allocated_running_application_list == '' || io_renewal_allocated_running_application_list == null) { io_renewal_allocated_running_application_list = null; }
 
-		if(io_allocated_running_application_list != null || io_renewal_allocated_running_application_list != null) {
-
-				if (!alert('Currently this id '+user_id+' has some applications assigned. The role of Inspection officer cannot be removed unless all the applications assigned are re-allocated. List of all  such applications is shown below')) {
-
-					$(this).prop('checked',true);
-					$("#io_allocated_list").show();
-				}
+			if(io_allocated_running_application_list != null || io_renewal_allocated_running_application_list != null) {
+				
+				$.alert({
+					columnClass : 'l',
+					content: 'Currently this id <b>'+atob(user_id)+'</b> has some applications assigned. The role of Inspection officer cannot be removed unless all the applications assigned are re-allocated. List of all  such applications is shown below',
+					buttons: {
+						Okay: function () {
+							// User clicked "OK" in the alert dialog
+							$(this).prop('checked',true);
+							$("#io_allocated_list").show();
+						}
+					}
+				});
 			}
 		}
 	});
@@ -370,11 +376,17 @@ $(document).ready(function() {
 
 				if (ho_mo_allocated_running_application_list != null) {
 
-					if (!alert('Currently this id '+user_id+' has some applications assigned. The role of HO Scrutiny Officer cannot be removed unless all the applications assigned are re-allocated. List of all  such applications is shown below')) {
-
-						$(this).prop('checked',true);
-						$("#ho_mo_allocated_list").show();
-					}
+					$.alert({
+						columnClass : 'l',
+						content: 'Currently this id <b>'+atob(user_id)+'</b> has some applications assigned. The role of HO Scrutiny Officer cannot be removed unless all the applications assigned are re-allocated. List of all  such applications is shown below',
+						buttons: {
+							Okay: function () {
+								// User clicked "OK" in the alert dialog
+								$(this).prop('checked',true);
+								$("#ho_mo_allocated_list").show();
+							}
+						}
+					});
 				}
 			}
 

@@ -1334,6 +1334,12 @@ class MisgradingController extends AppController{
 		//PostData
 		$customer_id = $this->request->getData('customer_id');
 		$sample_code = $this->request->getData('sample_code');
+		
+		//if the customer id is blank 
+		if (empty($customer_id)) {
+			$customer_id_view = $this->DmiMmrSamplePackerLogs->find()->select(['customer_id'])->where(['sample_code' => $sample_code])->order('id DESC')->first();
+			$customer_id = $customer_id_view['customer_id'];
+		}
 
 		//Get the firm details
 		$firm_details = $this->DmiFirms->firmDetails(trim($customer_id));

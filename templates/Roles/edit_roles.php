@@ -459,11 +459,11 @@
 										<!--check user id in allocation and renewal allocation table and application grant table before remove MO/SMO role from user
 										Done by pravin 02-09-2017-->
 										<div id="mo_allocated_list">
-											<div class=""><h3 class="card-title-new">Applications in which the user <?php echo $user_name.' ('. $user_id .')'; ?> has taken part for Scrutiny</h3></div>
+											<h3 class="card-title-new">Applications in which the user <?php echo $user_name.' ('. base64_decode($user_id) .')'; ?> has taken part for Scrutiny</h3>
 											<div class="form-horizontal">
 												<div class="card-body">
-													<table class="table b1s" id="mo_allocated_list_table">
-														<thead>
+													<table class="table b1s table-bordered table-sm" id="mo_allocated_list_table">
+														<thead class="tableHead">
 															<tr>
 																<th>Sr.No</th>
 																<th>Appl. Type</th>
@@ -483,7 +483,7 @@
 																<td><?php echo 	$i+1; ?></td>
 																<td><?php echo 	$type; ?></td>
 																<td><?php echo 	$application_id; ?></td>
-																<td><?php echo  base64_decode($ro_id);?></td>
+																<td><?php echo  base64_decode($ro_id); ?></td>
 																<td><?php echo 	$ro_office; ?></td>
 															</tr>
 															<?php break;}break;}break;}$i =$i+1; $j =$j+1; $k =$k+1;} ?>
@@ -497,11 +497,11 @@
 										<!--check user id in allocation and renewal allocation table and application grant table before remove inspection office role from user
 										Done by pravin 02-09-2017-->
 										<div id="io_allocated_list">
-											<div class="card-header"><h3 class="card-title-new">Applications in which the user <?php echo $user_name.' ('. $user_id .')'; ?>has taken part for Site Inspection</h3></div>
+											<h3 class="card-title-new">Applications in which the user <?php echo $user_name.' ('. base64_decode($user_id) .')'; ?>has taken part for Site Inspection</h3>
 											<div class="form-horizontal">
 												<div class="card-body">
-													<table class="table" id="io_allocated_list_table">
-														<thead>
+													<table class="table b1s table-bordered table-sm" id="io_allocated_list_table">
+														<thead class="tableHead">
 															<tr>
 																<th>Sr.No</th>
 																<th>Appl. Type</th>
@@ -521,7 +521,7 @@
 																<td><?php echo 	$i+1; ?></td>
 																<td><?php echo 	$type; ?></td>
 																<td><?php echo 	$application_id; ?></td>
-																<td><?php echo  $ro_id;?></td>
+																<td><?php echo  base64_decode($ro_id); ?></td>
 																<td><?php echo 	$ro_office; ?></td>
 															</tr>
 															<?php break;}break;}break;}$i =$i+1; $j =$j+1; $k =$k+1;} ?>
@@ -534,37 +534,40 @@
 										<!--check user id in allocation and renewal allocation table and application grant table before remove HO MO/SMO role from user
 										Done by pravin 04-09-2017-->
 										<div id="ho_mo_allocated_list">
-											<div><h5>Applications in which the user <?php echo $user_name.' ('. $user_id .')'; ?>has taken part for scrutiny (HO-QC)<h5></div>
+											<h3>Applications in which the user <?php echo $user_name.' ('. base64_decode($user_id) .')'; ?>has taken part for scrutiny (HO-QC)</h3>
+											<div class="form-horizontal">
+												<div class="card-body">
+													<table class="table" id="ho_mo_allocated_list_table">
+														<thead>
+															<tr>
+																<th>Sr.No</th>
+																<th>Appl. Type</th>
+																<th>Application ID</th>
+																<th>DY.AMA Name</th>
+																<th>DY.AMA ID</th>
+															</tr>
+														</thead>
 
-											<table class="table" id="ho_mo_allocated_list_table">
-												<thead>
-													<tr>
-														<th>Sr.No</th>
-														<th>Appl. Type</th>
-														<th>Application ID</th>
-														<th>DY.AMA Name</th>
-														<th>DY.AMA ID</th>
-													</tr>
-												</thead>
+														<tbody>
+															<?php
+															$i = 0;$j = 0;$k = 0;
+															foreach($ho_mo_allocated_running_application_list as $application_id) {
+															foreach($ho_mo_allocated_dy_ama_list as $dyama_name) {
+															foreach($ho_mo_allocated_to_under_dy_ama as $dyama_id) {
+															foreach($ho_mo_appl_type as $type) { ?>
 
-												<tbody>
-													<?php
-													$i = 0;$j = 0;$k = 0;
-													foreach($ho_mo_allocated_running_application_list as $application_id) {
-													foreach($ho_mo_allocated_dy_ama_list as $dyama_name) {
-													foreach($ho_mo_allocated_to_under_dy_ama as $dyama_id) {
-													foreach($ho_mo_appl_type as $type) { ?>
-
-													<tr>
-														<td><?php echo 	$i+1; ?></td>
-														<td><?php echo 	$type; ?></td>
-														<td><?php echo 	$application_id; ?></td>
-														<td><?php echo  $dyama_name;?></td>
-														<td><?php echo 	$dyama_id; ?></td>
-													</tr>
-													<?php break;}break;}break;}$i =$i+1; $j =$j+1; $k =$k+1;} ?>
-												</tbody>
-											</table>
+															<tr>
+																<td><?php echo 	$i+1; ?></td>
+																<td><?php echo 	$type; ?></td>
+																<td><?php echo 	$application_id; ?></td>
+																<td><?php echo  $dyama_name;?></td>
+																<td><?php echo 	$dyama_id; ?></td>
+															</tr>
+															<?php break;}break;}break;}$i =$i+1; $j =$j+1; $k =$k+1;} ?>
+														</tbody>
+													</table>
+												</div>
+											</div>
 										</div>
 									</div>
 								</div>

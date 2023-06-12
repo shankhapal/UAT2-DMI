@@ -1,4 +1,4 @@
-
+alert("hi");
 
 var status_id = $('#status_id').val();
 if (status_id == 'submmitted') {

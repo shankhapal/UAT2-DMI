@@ -26,7 +26,7 @@ class DmiMmrSamplePackerLogsTable  extends Table{
 			
 			$DmiUsers = TableRegistry::getTableLocator()->get('DmiUsers');
 			$userDetails = $DmiUsers->getDetailsByEmail($existingRecord['attached_by']);
-
+			
 			$statusArray = array(
 				'customer_id' => $existingRecord['customer_id'],
 				'firm_name' => $firm_details['firm_name'],

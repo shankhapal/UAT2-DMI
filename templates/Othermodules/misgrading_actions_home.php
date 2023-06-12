@@ -183,7 +183,8 @@
 <input type="hidden" id="misActId_val" value="<?php echo $misActId; ?>">
 <input type="hidden" id="misLvlId_val" value="<?php echo $misLvlId; ?>">
 <input type="hidden" id="periodId_val" value="<?php echo $periodId; ?>">
+
 <?php 
-	echo $this->Html->script('othermodules/dropdown_validations'); 
 	echo $this->Html->script('othermodules/misgrading_actions_home'); 
+	echo $this->Html->script('othermodules/dropdown_validations'); 
 ?>
