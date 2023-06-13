@@ -42,8 +42,10 @@
 		
 
 <!-- below all certificates letters display on chemist dashboard by laxmi B. on 26-05-2023 -->
-<div class="clearfix">&nbsp;</div>
-<table class="table table-bordered">
+<!-- if chemist training not completed then table and reject button show else not by laxmi 13-06-2023 -->
+  <?php if($_SESSION['is_training_completed'] == 'no'){ ?>
+	<div class="clearfix">&nbsp;</div>
+	<table class="table table-bordered">
     <thead>
      <tr>
       <th scope="col">#</th>
@@ -144,6 +146,7 @@
  </div>
 </div> 
 	</div>
+<?php } ?>	
 
 <?php echo $this->Html->css('chemist/reject_application');?>
 <?php echo $this->Html->Script('withdraw_application');?>
