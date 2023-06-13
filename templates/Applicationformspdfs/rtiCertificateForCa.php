@@ -200,7 +200,7 @@
             foreach($added_sample_details as $sample_detail){ ?>    
         <tr>
             <td align="center" style="padding:5px;"><?php echo $i; ?></td>
-            <td align="center" style="padding:5px;"><?php echo $sample_detail['commodity_name'];?></td>
+            <td align="center" style="padding:5px;"><?php echo isset($sub_commodity_value[$sample_detail['commodity_name']])?$sub_commodity_value[$sample_detail['commodity_name']]:"-"; ?></td>
             <td align="center" style="padding:5px;"><?php echo $sample_detail['pack_size'];?></td>
             <td align="center" style="padding:5px;"><?php echo $sample_detail['lot_no'];?></td>
             <td align="center" style="padding:5px;"><?php echo $sample_detail['date_of_packing'];?></td>

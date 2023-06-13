@@ -2102,6 +2102,8 @@ class AjaxFunctionsController extends AppController{
 	// @AUTHOR : SHANKHPAL SHENDE
 	// Description : For adding the sample details created for Routine Inspection flow  (RTI)
 	// DATE : 21/12/2022
+
+	// function updated on 13/06/2023 by shankhpal shende
   
 	public function addSampleDetails() {
 		
@@ -2109,23 +2111,21 @@ class AjaxFunctionsController extends AppController{
 		$this->loadModel('DmiCheckSamples');
 		// call customes Controller 
 		$CustomersController = new CustomersController;
-		
 		$customer_id = $this->Customfunctions->sessionCustomerID();
 		// added version for inserting version in this table by shankhpal on 08/06/2023
 		$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
 		
 		$firm_type = $this->Customfunctions->firmType($customer_id);
-
-		$commodity_name = htmlentities($_POST['commodity_name'], ENT_QUOTES);
+		// change name
+		$commodity_code = htmlentities($_POST['commodity_name'], ENT_QUOTES);
+		
 		$pack_size = htmlentities($_POST['pack_size'], ENT_QUOTES);
 		$lot_no = htmlentities($_POST['lot_no'], ENT_QUOTES);
 		$date_of_packing = htmlentities($_POST['date_of_packing'], ENT_QUOTES);
 		$best_before = htmlentities($_POST['best_before'], ENT_QUOTES);
 		$replica_si_no = htmlentities($_POST['replica_si_no'], ENT_QUOTES);
 
-
-
-		$save_details_result = $this->DmiCheckSamples->saveSampleDetails($commodity_name,$pack_size,$lot_no,$date_of_packing,$best_before,$replica_si_no,$current_version);// call custome method from model
+		$save_details_result = $this->DmiCheckSamples->saveSampleDetails($commodity_code,$pack_size,$lot_no,$date_of_packing,$best_before,$replica_si_no,$current_version);// call custome method from model
 		
 		$added_sample_details = $this->DmiCheckSamples->RoutineInspectionSampleDetails();
 		
@@ -2197,18 +2197,14 @@ class AjaxFunctionsController extends AppController{
 		}
 
 		if ($this->Session->read('edit_sample_id') != null) {
+
 			if (!empty($edit_sample_id)) {
-					$find_sample_details = $this->DmiCheckSamples->find('all', array('conditions' => array('id' => $edit_sample_id)))->first();
-					$this->set('find_sample_details', $find_sample_details);
+
+				$find_sample_details = $this->DmiCheckSamples->find('all',array('conditions'=>array('id IS'=>$edit_sample_id)))->first();
+				
+				$this->set('find_sample_details',$find_sample_details);
 			}
 		}
-
-		$sub_commodity_array = [];
-		if (isset($sub_commodity_value) && is_array($sub_commodity_value)) {
-				foreach ($sub_commodity_value as $sub_commodity) {
-						$sub_commodity_array[$sub_commodity] = $sub_commodity;
-				}
-		}	
 
 		if (!empty($save_sample_id)) {
 
@@ -2378,49 +2374,6 @@ class AjaxFunctionsController extends AppController{
 		exit;
 
 	}
-
-	// GET Updated Option of Commodity for Collection of check samples table for module RTI
-	// @AUTHOR : SHANKHPAL SHENDE
-	// DESC : created for Routine Inspection flow  (RTI)
-	// DATE : 12/06/2023 
-	public function getUpdatedComodity(){
-
-		$this->autoRender = false;
-		$this->loadModel('MCommodity');
-		$this->loadModel('MCommodityCategory');
-		$this->loadModel('DmiFirms');
-		
-		$customer_id = $this->Customfunctions->sessionCustomerID();
-		$firm_details = $this->DmiFirms->firmDetails($customer_id);
-		$sub_commodity_array = explode(',', (string) $firm_details['sub_commodity']);
-
-		$options_html = "<option value=''>Select Commodity</option>"; // Add the default option
-
-		foreach ($sub_commodity_array as $category_id) {
-			$commodities = $this->MCommodity->find('all', array(
-					'fields' => array('commodity_code', 'commodity_name'),
-					'conditions' => array('commodity_code IN' => [$category_id], 'display' => 'Y'),
-					'order' => array('commodity_name ASC')
-			))->toArray();
-
-			
-			foreach ($commodities as $commodity) {
-					$commodity_code = $commodity['commodity_code'];
-					$commodity_name = $commodity['commodity_name'];
-					$selected = isset($selected_commodity) && $commodity_name == $selected_commodity ? 'selected' : ''; // Check if current commodity is selected
-					$options_html .= "<option value='$commodity_name' $selected>$commodity_name</option>";
-			}
-		}
-		
-
-		// Return the HTML code for the options
-		echo $options_html;
-
-		// Return the HTML code for the options
-	}
-
-	
-	
 
 }
 ?>

@@ -64,6 +64,7 @@ $(document).ready(function () {
           success: function (response) {
             $("#sample_table").html(response);
             $("#sample_table :input[type='text']").val("");
+            $('select[name="commodity_name"]').val("");
             add_function();
             edit_function();
             delete_function();
@@ -94,7 +95,6 @@ $(document).ready(function () {
         },
         success: function (response) {
           $("#sample_table").html(response);
-
           add_function();
           edit_function();
           delete_function();
@@ -176,6 +176,7 @@ $(document).ready(function () {
           success: function (response) {
             $("#sample_table").html(response);
             $("#sample_table :input[type='text']").val("");
+            $('select[name="commodity_name"]').val("");
 
             add_function();
             edit_function();

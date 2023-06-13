@@ -172,6 +172,7 @@ class DmiRtiCaPackerDetailsTable extends Table{
 					
 			);
 		}
+
 		
 		return array($form_fields_details,$added_sample_details,$certificate_valid_upto,$sub_commodity_value,$lab_list,$printers_list,$self_registered_chemist,$total_suggestions);			
 	}

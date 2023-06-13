@@ -3666,7 +3666,7 @@ class CustomfunctionsComponent extends Component {
 		public function monthcalForRti($createdDate){
 			
 			$currentDate = date("d/m/Y"); // current date
-			//$currentDate = "02/09/2023";
+			//$currentDate = "02/08/2023";
 			$date1 = Chronos::createFromFormat('d/m/Y', $createdDate); // Start date
 			$date2 = Chronos::createFromFormat('d/m/Y', $currentDate); // End date
 

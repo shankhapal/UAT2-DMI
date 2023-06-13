@@ -1682,7 +1682,7 @@ class OthermodulesController extends AppController{
 			
 			$report_pdf_field = 'pdf_file';
 			$get_report_pdf = $this->DmiRtiReportPdfRecords->find('all',array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc'))->first();
-
+			
 					
 			$report_pdf = '';
 			$pdf_version_ca = '';
