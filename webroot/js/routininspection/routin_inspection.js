@@ -72,15 +72,6 @@ $(document).ready(function () {
               format: "dd/mm/yyyy",
               autoclose: true,
             });
-
-            $.ajax({
-              type: "GET",
-              url: "../AjaxFunctions/getUpdatedComodity",
-              success: function (options) {
-                // Replace the options of the select box with the updated options
-                $("#commodity_name").html(options);
-              },
-            });
           },
         });
       }
@@ -110,19 +101,6 @@ $(document).ready(function () {
           save_function();
         },
       });
-
-      $.ajax({
-        type: "GET",
-        url: "../AjaxFunctions/getUpdatedComodity",
-        success: function (options) {
-          // Replace the options of the select box with the updated options
-          $("#commodity_name").html(options);
-          // Set the selected value if needed
-          $("#commodity_name").val(
-            "<?= $find_sample_details['commodity_name'] ?>"
-          );
-        },
-      });
     });
   }
   function delete_function() {
@@ -149,14 +127,6 @@ $(document).ready(function () {
           edit_function();
           delete_function();
           save_function();
-        },
-      });
-      $.ajax({
-        type: "GET",
-        url: "../AjaxFunctions/getUpdatedComodity",
-        success: function (options) {
-          // Replace the options of the select box with the updated options
-          $("#commodity_name").html(options);
         },
       });
     });

@@ -33,36 +33,10 @@
 					$edit_id = '';
 				}
 
-				//get commodity list added on 09/06/2023 by shankhpal
-				$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
-				$firm_details = $DmiFirms->firmDetails($customer_id);
-				$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
-				$MCommodityCategory = TableRegistry::getTableLocator()->get('MCommodityCategory');
-		
-
-				$sub_commodity_array = explode(',',(string) $firm_details['sub_commodity']); #For Deprecations
-		
-				if (!empty($firm_details['sub_commodity'])) {
-					
-					$i=0;
-					foreach ($sub_commodity_array as $sub_commodity_id)
-					{
-						$fetch_commodity_id = $MCommodity->find('all',array('conditions'=>array('commodity_code IS'=>$sub_commodity_id)))->first();
-						$commodity_id[$i] = $fetch_commodity_id['category_code'];
-						$sub_commodity_data[$i] =  $fetch_commodity_id;
-						$i=$i+1;
-					}
-
-					$unique_commodity_id = array_unique($commodity_id);
-
-					$commodity_name_list = $MCommodityCategory->find('all',array('conditions'=>array('category_code IN'=>$unique_commodity_id, 'display'=>'Y')))->toArray();
-					
-				}
-
 				$added_sample_details = $this->find('all', array('conditions'=>array('OR'=>$hide_edit_id, 'customer_id IS'=>$customer_id,'delete_status IS NULL','version'=>$current_version),'order'=>'id'))->toArray();
 				
 				$find_sample_details = $this->find('all',array('conditions'=>array('id IS'=>$edit_id,'version'=>$current_version)))->first();				
-				return array($find_sample_details,$added_sample_details,$sub_commodity_array);
+				return array($find_sample_details,$added_sample_details);
 
 		}
 

@@ -678,6 +678,38 @@ class InspectionsController extends AppController{
 		// }
 		
 		//exit;
+
+		$this->loadModel('MCommodity');
+		$this->loadModel('MCommodityCategory');
+		$this->loadModel('DmiFirms');
+
+		$customer_id = $this->Customfunctions->sessionCustomerID();
+		$firm_details = $this->DmiFirms->firmDetails($customer_id);
+		$sub_commodity_array = explode(',', (string) $firm_details['sub_commodity']);
+
+		$sub_commodity_array = explode(',',(string) $firm_details['sub_commodity']); #For Deprecations
+		
+		if (!empty($firm_details['sub_commodity'])) {
+					
+					$i=0;
+					foreach ($sub_commodity_array as $sub_commodity_id)
+					{
+						$fetch_commodity_id = $this->MCommodity->find('all',array('conditions'=>array('commodity_code IS'=>$sub_commodity_id)))->first();
+						$commodity_id[$i] = $fetch_commodity_id['category_code'];
+						$sub_commodity_data[$i] =  $fetch_commodity_id;
+						$i=$i+1;
+					}
+
+					$unique_commodity_id = array_unique($commodity_id);
+
+					$commodity_name_list = $this->MCommodityCategory->find('all',array('conditions'=>array('category_code IN'=>$unique_commodity_id, 'display'=>'Y')))->toArray();
+
+					$this->set('commodity_name_list',$commodity_name_list);
+
+					$this->set('sub_commodity_data',$sub_commodity_data);
+				}
+
+
 	}
 	
 	// Call this function after esign of final submitted report.

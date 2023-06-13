@@ -14,7 +14,7 @@
                            <div id="sample_details_each_row">
                             	<?php 
 								            $i=1; 
-                    
+								 
                               foreach($section_form_details[1] as $sample_detail){ 
                                
                                 ?>
@@ -40,53 +40,27 @@
                              <tr>
                                <td></td>
                                 <td>
-                                  
-                                     <?php
-                                     $sub_commodity_array = [];
-
-                                      if (isset($sub_commodity_value) && is_array($sub_commodity_value)) {
-                                          foreach ($sub_commodity_value as $sub_commodity) {
-                                            
-                                              $sub_commodity_array[$sub_commodity] = $sub_commodity;
-                                          }
-
-                                      }
-                                      
-                                     echo $this->Form->control('commodity_name', [
-                                      'type' => 'select',
-                                      'escape' => false,
-                                      'options' => $sub_commodity_array,
-                                      'label' => false,
-                                      'class' => 'form-control',
-                                      'empty' => 'Select Commodity',
-                                      'id' => 'commodity_name',
-                                      'value' => isset($find_sample_details['commodity_name']) ? $find_sample_details['commodity_name'] : ''
-                                  ]);
-                                                                                
-                                      ?>
-
-                                    <?php 
-                                  // == echo $this->Form->control('commodity_name', array('type'=>'select', 'value'=>isset($find_sample_details['commodity_name'])?$find_sample_details['commodity_name']:"", 'escape'=>false,  'label'=>false, 'id'=>'commodity_name', 'class'=>'form-control input-field')); ?>
+                                    <?php echo $this->Form->control('commodity_name', array('type'=>'text', 'value'=>$find_sample_details['commodity_name'], 'escape'=>false,  'label'=>false, 'id'=>'commodity_name', 'class'=>'form-control input-field')); ?>
 																		<span id="" class="error invalid-feedback"></span>
                                 </td>
                                 <td>
-                                    <?php echo $this->Form->control('pack_size', array('type'=>'text', 'value'=>isset($find_sample_details['pack_size'])?$find_sample_details['pack_size']:"", 'escape'=>false,  'label'=>false, 'id'=>'pack_size', 'class'=>'form-control input-field')); ?>
+                                    <?php echo $this->Form->control('pack_size', array('type'=>'text', 'value'=>$find_sample_details['pack_size'], 'escape'=>false,  'label'=>false, 'id'=>'pack_size', 'class'=>'form-control input-field')); ?>
 																		<span id="" class="error invalid-feedback"></span>
                                 </td>
                                 <td>
-                                    <?php echo $this->Form->control('lot_no', array('type'=>'text', 'value'=>isset($find_sample_details['lot_no'])?$find_sample_details['lot_no']:"", 'escape'=>false,  'label'=>false, 'id'=>'lot_no', 'class'=>'form-control input-field')); ?>
+                                    <?php echo $this->Form->control('lot_no', array('type'=>'text', 'value'=>$find_sample_details['lot_no'], 'escape'=>false,  'label'=>false, 'id'=>'lot_no', 'class'=>'form-control input-field')); ?>
 																		<span id="" class="error invalid-feedback"></span>
                                 </td>
                                 <td>
-                                    <?php echo $this->Form->control('date_of_packing', array('type'=>'text', 'value'=>isset($find_sample_details['date_of_packing'])?$find_sample_details['date_of_packing']:"",'placeholder'=>'Enter DD/MM/YYYY', 'escape'=>false,  'label'=>false, 'id'=>'date_of_packing', 'class'=>'form-control input-field')); ?>
+                                    <?php echo $this->Form->control('date_of_packing', array('type'=>'text', 'value'=>$find_sample_details['date_of_packing'],'placeholder'=>'Enter DD/MM/YYYY', 'escape'=>false,  'label'=>false, 'id'=>'date_of_packing', 'class'=>'form-control input-field')); ?>
 																		<span id="" class="error invalid-feedback"></span>
                                 </td>
                                 <td>
-                                    <?php echo $this->Form->control('best_before', array('type'=>'text', 'value'=>isset($find_sample_details['best_before'])?$find_sample_details['best_before']:"", 'escape'=>false,  'label'=>false, 'id'=>'best_before', 'class'=>'form-control input-field')); ?>
+                                    <?php echo $this->Form->control('best_before', array('type'=>'text', 'value'=>$find_sample_details['best_before'], 'escape'=>false,  'label'=>false, 'id'=>'best_before', 'class'=>'form-control input-field')); ?>
 																		<span id="" class="error invalid-feedback"></span>
                                 </td>
                                 <td>
-                                    <?php echo $this->Form->control('replica_si_no', array('type'=>'text', 'value'=>isset($find_sample_details['replica_si_no'])?$find_sample_details['replica_si_no']:"", 'escape'=>false,  'label'=>false, 'id'=>'replica_si_no', 'class'=>'form-control input-field')); ?>
+                                    <?php echo $this->Form->control('replica_si_no', array('type'=>'text', 'value'=>$find_sample_details['replica_si_no'], 'escape'=>false,  'label'=>false, 'id'=>'replica_si_no', 'class'=>'form-control input-field')); ?>
 																		<span id="" class="error invalid-feedback"></span>
                                 </td>
                                 
@@ -100,24 +74,7 @@
                                 	<tr>
                                       <td></td>
                                       <td>
-                                        <?php
-                                         $sub_commodity_array = [];
-
-                                          if (isset($sub_commodity_value) && is_array($sub_commodity_value)) {
-                                              foreach ($sub_commodity_value as $sub_commodity) {
-                                                  $commodity_name =  $sub_commodity;
-                                                  $sub_commodity_array[$commodity_name] = $sub_commodity;
-                                              }
-                                          }
-                                        echo $this->Form->control('commodity_name', array(
-                                            'type' => 'select',
-                                            'escape' => false,
-                                            'options' => $sub_commodity_array,
-                                            'label' => false,
-                                            'class' => 'form-control',
-                                            'empty' => 'Select Commodity',
-                                            'id' => 'commodity_name'
-                                        ));?>
+                                          <?php echo $this->Form->control('commodity_name', array('type'=>'text', 'escape'=>false,  'label'=>false,'placeholder'=>'Enter Commodity Name', 'id'=>'commodity_name', 'value'=>'', 'class'=>'form-control wd100')); ?>
 																		      <span id="error_commodity_name_addmore" class="error invalid-feedback"></span>
                                       </td>
                                       <td>
