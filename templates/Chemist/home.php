@@ -18,7 +18,7 @@
 					<p class="blink_me ">Your application for registration has been successfully verified. Thankyou</p>
 				</div>
 			</div>
-!-- added withdraw or rejected application condition with anding by Laxmi on 29-05-2023  -->
+    <!-- added withdraw or rejected application condition with anding by Laxmi on 29-05-2023  -->
 	<?php } elseif ($final_submit_status == '' && empty($rejectEntry)) { ?>
 
 		<div class="col-lg-8">
