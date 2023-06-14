@@ -145,6 +145,12 @@
 
                	         <!-- check if training completed at ro then proceeds at RAL no appeared show added by  laxmi on 04-01-2023 -->
                 <?php } ?>			
+				
+				<!-- added final grant button on 09-06-2023 by Amol, to grant chemist application after training completed -->
+				<?php if ($final_granted_btn == 'yes'&& empty($allocation_deatils['level_2'])) {
+							echo $this->Form->submit('Final Grant', array('name'=>'final_granted', 'id'=>'final_granted_btn', 'class'=>'dnone btn btn-success float-left', 'label'=>false));
+						}
+				?>
 		
 		<?php } ?>
 	</div>  
