@@ -50,129 +50,73 @@
 										</div>
 									</div>
 								</div>
+								<?php
+								$pdf_tables = array(
 
-								<table id = "ca_pdf_table" class="table table-hover table-bordered table-striped">
-									<thead class="tablehead">
-										<tr>
-											<th>Sr. No.</th>
-											<th>Applicant Id</th>
-											<th>Approved Date</th>
-											<th>Report. | Pdf</th>
-											<th>Version</th>
-										</tr>
-									</thead>
-									<tbody>
-										<?php 
-											$i=0;
-											if (!empty($appl_array_ca)) {
+									'ca' => array(
+											'id' => 'ca_pdf_table',
+											'appl_array' => $appl_array_ca,
+									),
+									'pp' => array(
+											'id' => 'pp_pdf_table',
+											'appl_array' => $appl_array_pp,
+									),
+									'lab' => array(
+											'id' => 'lab_pdf_table',
+											'appl_array' => $appl_array_lab,
+									),
 
-											foreach ($appl_array_ca as $each) { ?>
-						
-												<tr>
-													<td><?php echo $i+1;?></td>
-													<td id="customer_id<?php echo $i; ?>"><?php echo $each['customer_id'];?></td>
-													<td id="customer_id<?php echo $i; ?>"><?php echo $each['on_date'];?></td>
-													<td><?php $report_pdf_path = explode("/",$each['report_pdf']);
-															$report_pdf_name = $report_pdf_path[count($report_pdf_path) - 1]; ?>
+                );
+								foreach ($pdf_tables as $pdf_type => $pdf_table) {
+									$table_id = $pdf_table['id'];
+									$appl_array = $pdf_table['appl_array'];		
+										
+									if (!empty($appl_array)) {
+										echo '<table id="' . $table_id . '" class="table table-hover table-bordered table-striped">';
+										echo '<thead class="tablehead">';
+										echo '<tr>';
+										echo '<th>Sr. No.</th>';
+										echo '<th>Applicant Id</th>';
+										echo '<th>Approved Date</th>';
+										echo '<th>Report. | Pdf</th>';
+										echo '<th>Version</th>';
+										echo '</tr>';
+										echo '</thead>';
+										echo '<tbody>';
 
-														<a target="_blank" href="<?php echo $each['report_link']; ?>">
-															<?php echo 'View'; ?>
-														</a>
-														|
-														<a target="_blank" href="<?php echo $each['report_pdf']; ?>">
-															<?php echo 'Pdf'; ?>
-														</a>
-													</td>
-													<td><?php echo $each['pdf_version']; ?></td>
-												</tr>
-											<?php	$i=$i+1; } } ?>
-									</tbody>
-								</table>
+										$i = 0;
+										foreach ($appl_array as $each) {
+											echo '<tr>';
+											echo '<td>' . ($i + 1) . '</td>';
+											echo '<td id="customer_id' . $i . '">' . $each['customer_id'] . '</td>';
+											echo '<td id="customer_id' . $i . '">' . $each['on_date'] . '</td>';
 
-								<table id = "pp_pdf_table" class="table table-hover table-bordered table-striped">
-									<thead class="tablehead">
-										<tr>
-											<th>Sr. No.</th>
-											<th>Applicant Id</th>
-											<th>Approved Date</th>
-											<th>Report. | Pdf</th>
-											<th>Version</th>
-										</tr>
-									</thead>
-									<tbody>
-										<?php 
-											$i=0;
-											if (!empty($appl_array_pp)) {
+											$report_pdf_path = explode("/", $each['report_pdf']);
+											$report_pdf_name = $report_pdf_path[count($report_pdf_path) - 1];
 
-												foreach ($appl_array_pp as $each) { ?>
+											echo '<td>';
+											echo '<a target="_blank" href="' . $each['report_link'] . '">View</a>';
+											echo ' | ';
+											echo '<a target="_blank" href="' . $each['report_pdf'] . '">Pdf</a>';
+											echo '</td>';
 
-												<tr>
-													<td><?php echo $i+1;?></td>
-													<td id="customer_id<?php echo $i; ?>"><?php echo $each['customer_id'];?></td>
-													<td id="customer_id<?php echo $i; ?>"><?php echo $each['on_date'];?></td>
-													<td><?php $report_pdf_path = explode("/",$each['report_pdf']);
-															$report_pdf_name = $report_pdf_path[count($report_pdf_path) - 1]; ?>
+											echo '<td>' . $each['pdf_version'] . '</td>';
+											echo '</tr>';
 
-														<a target="_blank" href="<?php echo $each['report_link']; ?>">
-															<?php echo 'View'; ?>
-														</a>
-														|
-														<a target="_blank" href="<?php echo $each['report_pdf']; ?>">
-															<?php echo 'Pdf'; ?>
-														</a>
-													</td>
-													<td><?php echo $each['pdf_version']; ?></td>
-												</tr>
-											<?php	$i=$i+1; } } ?>
-									</tbody>
-								</table>
+											$i++;
+   									}
 
-								<table id = "lab_pdf_table" class="table table-hover table-bordered table-striped">
-									<thead class="tablehead">
-										<tr>
-											<th>Sr. No.</th>
-											<th>Applicant Id</th>
-											<th>Approved Date</th>
-											<th>Report. | Pdf</th>
-											<th>Version</th>
-										</tr>
-									</thead>
-									<tbody>
-										<?php 
-											$i=0;
-											if (!empty($appl_array_lab)) {
-
-												foreach ($appl_array_lab as $each) { ?>
-
-												<tr>
-													<td><?php echo $i+1;?></td>
-													<td id="customer_id<?php echo $i; ?>"><?php echo $each['customer_id'];?></td>
-													<td id="customer_id<?php echo $i; ?>"><?php echo $each['on_date'];?></td>
-													<td><?php $report_pdf_path = explode("/",$each['report_pdf']);
-															$report_pdf_name = $report_pdf_path[count($report_pdf_path) - 1]; ?>
-
-														<a target="_blank" href="<?php echo $each['report_link']; ?>">
-															<?php echo 'View'; ?>
-														</a>
-														|
-														<a target="_blank" href="<?php echo $each['report_pdf']; ?>">
-															<?php echo 'Pdf'; ?>
-														</a>
-													</td>
-													<td><?php echo $each['pdf_version']; ?></td>
-												</tr>
-										<?php	$i=$i+1; } } ?>
-									</tbody>
-								</table>
-							</div>
-						</div>
+										echo '</tbody>';
+										echo '</table>';
+									}
+								}							
+								?>
+								
 					<?php echo $this->Form->end(); ?>
 				</section>
 			</div>
 		</div>
 	</section>
 </div>
-
-
 <?php echo $this->Form->end(); ?>
 <?php echo $this->Html->script('othermodules/application_pdf_rti'); ?>

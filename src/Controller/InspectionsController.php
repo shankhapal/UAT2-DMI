@@ -108,7 +108,7 @@ class InspectionsController extends AppController{
 		$this->set('customer_id',$customer_id);
 		
 		$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id);
-					//print_r($grantDateCondition); exit;
+		
 
 		$form_final_submit_details = $this->Customfunctions->finalSubmitDetails($customer_id,'application_form');
 		
@@ -245,7 +245,8 @@ class InspectionsController extends AppController{
 		$added_directors_details = $this->DmiAllDirectorsDetails->allDirectorsDetail($customer_id);	
 		$this->set('added_directors_details',$added_directors_details);
 					
-		$final_submit_status = $this->Customfunctions->finalSubmitDetails($customer_id,'inspection_report');			
+		$final_submit_status = $this->Customfunctions->finalSubmitDetails($customer_id,'inspection_report');	
+				
 		$this->set('final_submit_status',$final_submit_status);
 		
 		//added on 13-05-2021 by Amol, to be used in view side
@@ -660,21 +661,6 @@ class InspectionsController extends AppController{
 		$this->set('message',$message);
 		$this->set('redirect_to',$redirect_to);	
 		$this->set('firm_type',$firm_type);  # to set the firm_type for validation in RTI MOdule added by shankhpal on 25/05/2023
-	
-		// Comment: Added for checking if report is final submit then want to re-applay
-		// Reason : As per the comment and suggestions of UAT
-		// Name of person : Shankhpal Shende
-		// Date: 29/05/2023
-					
-		// if($application_type == 10){
-		
-		// 	$form_type = "RTI";
-		// 	$this->loadModel('DmiRtiFinalReports');  
-		// 	$checkIfgrant = $this->DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
-
-		// 	$report_status = $checkIfgrant->toArray()['status'];
-   	//   $this->set('report_status', $report_status);
-		// }
 		
 		//exit;
 	}

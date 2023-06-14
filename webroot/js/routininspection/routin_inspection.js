@@ -64,6 +64,7 @@ $(document).ready(function () {
           success: function (response) {
             $("#sample_table").html(response);
             $("#sample_table :input[type='text']").val("");
+            $('select[name="commodity_name"]').val("");
             add_function();
             edit_function();
             delete_function();
@@ -94,7 +95,6 @@ $(document).ready(function () {
         },
         success: function (response) {
           $("#sample_table").html(response);
-
           add_function();
           edit_function();
           delete_function();
@@ -176,6 +176,7 @@ $(document).ready(function () {
           success: function (response) {
             $("#sample_table").html(response);
             $("#sample_table :input[type='text']").val("");
+            $('select[name="commodity_name"]').val("");
 
             add_function();
             edit_function();
@@ -199,20 +200,25 @@ $(document).ready(function () {
     if (charLength < minLength) {
       $("#error_shortcomings_noticed")
         .show()
-        .text("Length is short, minimum " + minLength + " required.");
+        .text("Length is short, minimum " + minLength + " required.")
+        .css("color", "blue");
       setTimeout(function () {
         $("#error_shortcomings_noticed").fadeOut();
       }, 8000);
     } else if (charLength > maxLength) {
       $("#error_shortcomings_noticed")
         .show()
-        .text("Length is not valid, maximum " + maxLength + " allowed.");
+        .text("Length is not valid, maximum " + maxLength + " allowed.")
+        .css("color", "blue");
       setTimeout(function () {
         $("#error_shortcomings_noticed").fadeOut();
       }, 8000);
       $(this).val(char.substring(0, maxLength));
     } else {
-      $("#error_shortcomings_noticed").show().text("Length is valid");
+      $("#error_shortcomings_noticed")
+        .show()
+        .text("Length is valid")
+        .css("color", "blue");
       setTimeout(function () {
         $("#error_shortcomings_noticed").fadeOut();
       }, 8000);
@@ -819,18 +825,18 @@ function routineInspectionFormValidation() {
       });
       value_return = "false";
     }
-    if (approved_chemist == "") {
-      $("#error_approved_chemist").show().text("Please Enter Commodities");
-      setTimeout(function () {
-        $("#error_approved_chemist").fadeOut();
-      }, 8000);
-      $("#approved_chemist").addClass("is-invalid");
-      $("#approved_chemist").click(function () {
-        $("#error_approved_chemist").hide().text;
-        $("#approved_chemist").removeClass("is-invalid");
-      });
-      value_return = "false";
-    }
+    // if (approved_chemist == "") {
+    //   $("#error_approved_chemist").show().text("Please Enter Commodities");
+    //   setTimeout(function () {
+    //     $("#error_approved_chemist").fadeOut();
+    //   }, 8000);
+    //   $("#approved_chemist").addClass("is-invalid");
+    //   $("#approved_chemist").click(function () {
+    //     $("#error_approved_chemist").hide().text;
+    //     $("#approved_chemist").removeClass("is-invalid");
+    //   });
+    //   value_return = "false";
+    // }
     if (ach_present == "") {
       $("#error_ach_present")
         .show()
@@ -1246,18 +1252,18 @@ function routineInspectionFormValidation() {
 
     const name_of_packers = $("#name_of_packers").val();
 
-    if (name_of_packers == "") {
-      $("#error_name_of_packers").show().text("Please select packer name");
-      setTimeout(function () {
-        $("#error_name_of_packers").fadeOut();
-      }, 8000);
-      $("#name_of_packers").addClass("is-invalid");
-      $("#name_of_packers").click(function () {
-        $("#error_name_of_packers").hide().text;
-        $("#name_of_packers").removeClass("is-invalid");
-      });
-      value_return = "false";
-    }
+    // if (name_of_packers == "") {
+    //   $("#error_name_of_packers").show().text("Please select packer name");
+    //   setTimeout(function () {
+    //     $("#error_name_of_packers").fadeOut();
+    //   }, 8000);
+    //   $("#name_of_packers").addClass("is-invalid");
+    //   $("#name_of_packers").click(function () {
+    //     $("#error_name_of_packers").hide().text;
+    //     $("#name_of_packers").removeClass("is-invalid");
+    //   });
+    //   value_return = "false";
+    // }
 
     // Change Condition for validation and error message by shankhpal 23-05-2023
     if ($("#signnature_of_inspecting_officer_docs_value").text() == "") {
@@ -1413,18 +1419,18 @@ function routineInspectionFormValidation() {
       value_return = "false";
     }
 
-    if (approved_chemist == "") {
-      $("#error_approved_chemist").show().text("Please select chemist");
-      setTimeout(function () {
-        $("#error_approved_chemist").fadeOut();
-      }, 8000);
-      $("#approved_chemist").addClass("is-invalid");
-      $("#approved_chemist").click(function () {
-        $("#error_approved_chemist").hide().text;
-        $("#approved_chemist").removeClass("is-invalid");
-      });
-      value_return = "false";
-    }
+    // if (approved_chemist == "") {
+    //   $("#error_approved_chemist").show().text("Please select chemist");
+    //   setTimeout(function () {
+    //     $("#error_approved_chemist").fadeOut();
+    //   }, 8000);
+    //   $("#approved_chemist").addClass("is-invalid");
+    //   $("#approved_chemist").click(function () {
+    //     $("#error_approved_chemist").hide().text;
+    //     $("#approved_chemist").removeClass("is-invalid");
+    //   });
+    //   value_return = "false";
+    // }
 
     if (last_lot_no == "") {
       $("#error_last_lot_no").show().text("Please Enter last lot no");
@@ -1740,5 +1746,14 @@ $(document).ready(function () {
   });
   $("#e_briefly_suggestions_radio-no").on("click", function () {
     enumerate_briefly_suggestions.hide();
+  });
+
+  $("#last-sugeesion-popup").on("click", function (e) {
+    $(".popup").fadeIn(500);
+    e.preventDefault();
+  });
+
+  $(".close").click(function () {
+    $(".popup").fadeOut(500);
   });
 });

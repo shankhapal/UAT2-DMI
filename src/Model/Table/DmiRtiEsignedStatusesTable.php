@@ -11,8 +11,15 @@
 	
 	public function getEsignedStatus($customer_id,$current_level){
 		
+		// added applivation type to get application type of RTI module by shankhpal on 30/05/2023
+		// $application_type = $this->Session->read('application_type');
 		$CustomersController = new CustomersController;
-		$grantDateCondition = $CustomersController->Customfunctions->returnGrantDateCondition($customer_id);
+
+		$DmiRtiCaPackerDetails = TableRegistry::getTableLocator()->get('DmiRtiCaPackerDetails');
+
+		// pass argument for application type = 10 
+		// added by shankhpal shende on 30/05/2023
+		$grantDateCondition = $CustomersController->Customfunctions->returnGrantDateCondition($customer_id,10);
 		
 		//create other model objects
 		$Dmi_firm = TableRegistry::getTableLocator()->get('DmiFirms');
@@ -23,9 +30,10 @@
 		
 		$inspection_report_table = $Dmi_flow_wise_tables_list->getFlowWiseTableDetails($_SESSION['application_type'],'inspection_report');
 		$Dmi_siteinspection_final_report = TableRegistry::getTableLocator()->get($inspection_report_table);
-				
+			
 		//check application type new/old 
 		$get_type = $Dmi_firm->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+			
 		if($get_type['is_already_granted']=='yes'){			
 			$type = 'old';
 		}else{
@@ -61,13 +69,14 @@
 			$query_conditions = array('customer_id'=>$customer_id, 'application_type'=>$type, 'application_status'=>$status ,$grantDateCondition);
 		}else{
 			$query_conditions = array('customer_id'=>$customer_id, 'application_type'=>$type, $grantDateCondition);
+			
 		}
+		// condition added for cheking esign status added on 07/06/2023 by shankhpal
+		$get_esign_details = $this->find('all',array('conditions'=>$query_conditions,'order'=>'id desc'))->first();
 		
-		$get_esign_details = $this->find('all',array('conditions'=>$query_conditions))->first();		
 		$esign_status = 'no';
 		
 		if(!empty($get_esign_details)){
-		
 			if($current_level == 'applicant'){
 				
 				if($get_esign_details['application_esigned']=='yes'){
@@ -79,7 +88,8 @@
 				
 				if($get_esign_details['report_esigned']=='yes'){
 					
-					$esign_status = 'yes';
+						$esign_status = 'yes';
+					
 				}
 			}
 			elseif($current_level == 'level_3' || $current_level == 'level_4'){
@@ -104,8 +114,9 @@
 			$customer_id = $_SESSION['username'];
 		}
 		
+		
 		$CustomersController = new CustomersController;
-		$grantDateCondition = $CustomersController->Customfunctions->returnGrantDateCondition($customer_id);
+		$grantDateCondition = $CustomersController->Customfunctions->returnGrantDateCondition($customer_id,10);
 		
 		$current_level = $_SESSION['current_level'];
 		

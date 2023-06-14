@@ -4,14 +4,15 @@
 	    Name of person : shankhpal shende
 	    Date: 13-05-2023
 */ -->
-<?php echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-data', 'id'=>$section)); ?>
+<?php //pr($section_form_details[7]);die;
+echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-data', 'id'=>$section)); ?>
 <section id="form_outer_main" class="content form-middle">
-    <div class="container-fluid">
+    <div class="container-fluid" id="form_outer_main">
         <h5 class="mt-1 mb-2">Routine Inspection Report (CA-Packer)</h5>
             <div id='form_inner_main'>
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="card card-success" id="form_outer_main">
+                        <div class="card card-success" >
                             <!-- Initial Details -->
                             <div class="card-header sub-card-header-firm"><h3 class="card-title">Initial Details</h3></div>
                                 <div class="form-horizontal">
@@ -69,7 +70,7 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group row">
-                                                     <label for="inputEmail3" class="col-sm col-form-label">Address <span class="cRed">*</span></label>
+                                                     <label for="inputEmail3" class="col-sm col-form-label">Address </label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -118,7 +119,7 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group row">
-                                                     <label for="inputEmail3" class="col-sm col-form-label">Certificate No.<span class="cRed">*</span></label>
+                                                     <label for="inputEmail3" class="col-sm col-form-label">Certificate No.</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -133,7 +134,7 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group row">
-                                                     <label for="inputEmail3" class="col-sm col-form-label">Valid Upto.<span class="cRed">*</span></label>
+                                                     <label for="inputEmail3" class="col-sm col-form-label">Valid Upto.</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -153,7 +154,7 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group row">
-                                                     <label for="inputEmail3" class="col-sm col-form-label">Commodities<span class="cRed">*</span></label>
+                                                     <label for="inputEmail3" class="col-sm col-form-label">Commodities</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -170,7 +171,7 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group row">
-                                                     <label for="inputEmail3" class="col-sm col-form-label">Grading laboratory<span class="cRed">*</span></label>
+                                                     <label for="inputEmail3" class="col-sm col-form-label">Grading laboratory</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -191,7 +192,7 @@
                                                                     <td><?php echo $value['firm_name']; ?></td>
                                                                 </tr>
                                                             <?php $i++; }}else{ ?>
-                                                            <div class="colorWarning margin5 header-text">Grading laboratory must by mapped by CA on the System</div>
+                                                            <div class="colorWarning margin5 header-text">Grading laboratory must mapped by CA on the System</div>
                                                      <?php } ?>    
                                                         </tbody>
                                                     </table>
@@ -210,7 +211,7 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group row">
-                                                     <label for="inputEmail3" class="col-sm col-form-label">Approved Printing press <span class="cRed">*</span></label>
+                                                     <label for="inputEmail3" class="col-sm col-form-label">Approved Printing press</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -292,7 +293,7 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group row">
-                                                       <label for="inputEmail3" class="col-sm col-form-label">Chemist Incharge<span class="cRed">*</span></label>
+                                                       <label for="inputEmail3" class="col-sm col-form-label">Chemist Incharge</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -573,7 +574,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group row">
                                             <div class="col-sm">
-                                                <?php echo $this->Form->control('analytical_results', array('type'=>'text', 'id'=>'analytical_results', 'class'=>'form-control', 'placeholder'=>'Type here..','value '=>isset($section_form_details[0]['analytical_results'])?$section_form_details[0]['analytical_results']:"", 'label'=>false)); ?>
+                                                <?php echo $this->Form->control('analytical_results', array('type'=>'text', 'id'=>'analytical_results', 'class'=>'form-control', 'placeholder'=>'Enter Analytical Results','value '=>isset($section_form_details[0]['analytical_results'])?$section_form_details[0]['analytical_results']:"", 'label'=>false)); ?>
                                                 <span id="error_analytical_results" class="error invalid-feedback"></span>
                                             </div> 
                                         </div>
@@ -742,8 +743,50 @@
                                     <div class="card-body">
                                         <div class="row">
                                             <div class="col-md-6">
-                                                      <label for="inputEmail3" class="col-sm col-form-label">Enumerate briefly suggestions given during last inspection and state, if carried out<span class="cRed">*</span></label>
-                                            </div>
+                                                <label for="inputEmail3" class="col-sm col-form-label">Enumerate briefly suggestions given during last inspection and state, if carried out<span class="cRed">*</span></label>
+                                                <button class="m-3" id="last-sugeesion-popup">Get all previous suggestions</button>
+                                                    <!-- pop up for display last suggestions -->
+                                                <section class="popup">
+                                                    <div class="popup__content">
+                                                        <div class="close">
+                                                        <span></span>
+                                                        <span></span>
+                                                        </div>
+                                                    <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                        <th scope="col">#</th>
+                                                        <th scope="col">IO Users</th>
+                                                        <th scope="col">suggestions</th>
+                                                        <th scope="col">Date</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php $total_suggestions = $section_form_details[7];
+                                                        
+                                                        $sr=1;
+                                                        if(!empty($total_suggestions)){
+                                                        foreach ($total_suggestions as $each_sugg){?>
+                                                        <tr>
+                                                            <th scope="row"><?php echo $sr; ?></th>
+                                                            <td class="text-center"><?php echo $each_sugg['io_user_name']; ?></td>
+                                                            <td class="text-center"><?php
+                                                                if (empty($each_sugg['enumerate_briefly_suggestions'])) {
+                                                                    echo "NA";
+                                                                } else {
+                                                                    echo $each_sugg['enumerate_briefly_suggestions'];
+                                                                }
+                                                                ?></td>
+                                                             <td class="text-center"><?php echo $each_sugg['approved_date']; ?></td>
+                                                        </tr>
+                                                        <?php $sr++; }}else{
+                                                             echo "<tr><td colspan='4' class='text-center'>No suggestions found.</td></tr>";
+                                                        } ?>
+                                                    </tbody>
+                                                    </table>
+                                                    </div>
+                                                </section>
+                                                </div>
                                             <div class="col-md-6">
                                                 <div class="form-group row">
                                                          <?php
@@ -821,7 +864,7 @@
                                                          <input type="file" name="shortcomings_noticed_docs" class="form-control" id="shortcomings_noticed_docs" multiple='multiple'>
                                                          <span id="error_shortcomings_noticed_docs" class="error invalid-feedback"></span>
                                                          <span id="error_type_shortcomings_noticed_docs" class="error invalid-feedback"></span>
-                                                         <span id="error_size_shortcomings_noticed_docs" class="error invalid-feedback"></span>
+                                                         <span id="error_size_shortcomings_noticed_docs" class="error warning"></span>
                                                      </div>
                                                 </div> 
                                                  <p class="lab_form_note float-right mt-3"><i class="fa fa-info-circle"></i> File type: PDF, jpg &amp; max size upto 2 MB</p>
@@ -977,8 +1020,16 @@
 <input type="hidden" id="current_level" value="<?php echo $_SESSION['current_level']; ?>">
 <input type="hidden" id="application_type_id" value="<?php echo $_SESSION['application_type']; ?>">
 <input type="hidden" id="firm_type" value="<?php echo $firm_type; ?>">
+
+<!-- allocated_record_rti -->
+
 <!-- //firm type is use to validate form fields added by shankhpal on 25/05/023 -->
 <?php 
 echo $this->Html->css('RoutineInspection/routine_inspection_style');
-echo $this->Html->script('routininspection/routin_inspection');?>
+echo $this->Html->script('routininspection/routin_inspection');
+echo $this->Html->script('routininspection/rti_file_uploads_validation');
+
+?>
+
+
 

@@ -2096,7 +2096,6 @@ class AjaxFunctionsController extends AppController{
 		//$this->autoRender = false;
 		// taking editmode data in Session variables
 		$this->Session->write('adpupdatemode','yes');
-		$this->Session->write('rtiupdatemode','yes');   // create session variable for RTI module added by shankhpal on 29/05/2023
 		echo 'yes';
 		exit;
 			
@@ -2135,24 +2134,30 @@ class AjaxFunctionsController extends AppController{
 	// @AUTHOR : SHANKHPAL SHENDE
 	// Description : For adding the sample details created for Routine Inspection flow  (RTI)
 	// DATE : 21/12/2022
+
+	// function updated on 13/06/2023 by shankhpal shende
   
 	public function addSampleDetails() {
 		
 		$this->autoRender = false;
 		$this->loadModel('DmiCheckSamples');
-
+		// call customes Controller 
+		$CustomersController = new CustomersController;
 		$customer_id = $this->Customfunctions->sessionCustomerID();
+		// added version for inserting version in this table by shankhpal on 08/06/2023
+		$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
 		
 		$firm_type = $this->Customfunctions->firmType($customer_id);
-
-		$commodity_name = htmlentities($_POST['commodity_name'], ENT_QUOTES);
+		// change name
+		$commodity_code = htmlentities($_POST['commodity_name'], ENT_QUOTES);
+		
 		$pack_size = htmlentities($_POST['pack_size'], ENT_QUOTES);
 		$lot_no = htmlentities($_POST['lot_no'], ENT_QUOTES);
 		$date_of_packing = htmlentities($_POST['date_of_packing'], ENT_QUOTES);
 		$best_before = htmlentities($_POST['best_before'], ENT_QUOTES);
 		$replica_si_no = htmlentities($_POST['replica_si_no'], ENT_QUOTES);
 
-		$save_details_result = $this->DmiCheckSamples->saveSampleDetails($commodity_name,$pack_size,$lot_no,$date_of_packing,$best_before,$replica_si_no);// call custome method from model
+		$save_details_result = $this->DmiCheckSamples->saveSampleDetails($commodity_code,$pack_size,$lot_no,$date_of_packing,$best_before,$replica_si_no,$current_version);// call custome method from model
 		
 		$added_sample_details = $this->DmiCheckSamples->RoutineInspectionSampleDetails();
 		
@@ -2175,13 +2180,17 @@ class AjaxFunctionsController extends AppController{
 
 		$customer_id = $this->Customfunctions->sessionCustomerID();
 
+		$CustomersController = new CustomersController;
+		// added version for inserting version in this table by shankhpal on 08/06/2023
+		$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
+
 		$packer_id = htmlentities($_POST['packer_id'], ENT_QUOTES);
 		$indent = htmlentities($_POST['indent'], ENT_QUOTES);
 		$supplied = htmlentities($_POST['supplied'], ENT_QUOTES);
 		$balance = htmlentities($_POST['balance'], ENT_QUOTES);
 		$tbl_name = htmlentities($_POST['tbl_name'], ENT_QUOTES);
 
-		$save_details_result = $this->DmiRtiPackerDetails->savePackageingDetails($packer_id,$indent,$supplied,$balance,$tbl_name);// call custome method from model
+		$save_details_result = $this->DmiRtiPackerDetails->savePackageingDetails($packer_id,$indent,$supplied,$balance,$tbl_name,$current_version);// call custome method from model
 		$added_packaging_details = $this->DmiRtiPackerDetails->packagingDetails();
 
 		$this->Set('section_form_details',$added_packaging_details);
@@ -2224,6 +2233,7 @@ class AjaxFunctionsController extends AppController{
 			if (!empty($edit_sample_id)) {
 
 				$find_sample_details = $this->DmiCheckSamples->find('all',array('conditions'=>array('id IS'=>$edit_sample_id)))->first();
+				
 				$this->set('find_sample_details',$find_sample_details);
 			}
 		}
@@ -2396,8 +2406,6 @@ class AjaxFunctionsController extends AppController{
 		exit;
 
 	}
-
-	
 
 }
 ?>

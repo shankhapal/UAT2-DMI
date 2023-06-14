@@ -1567,156 +1567,211 @@ class OthermodulesController extends AppController{
 	// Date : 08-02-2023
 	// Note : For Routine Inspection (RTI)
 
+	// Function updated on 12/06/2023 by shankhpal shende
 	public function routineInspectionList(){
 
 		$this->viewBuilder()->setLayout('admin_dashboard');
-		$userName = $this->Session->read('username');
 		$this->loadModel('DmiRtiAllocations');
 		$this->loadModel('DmiRtiFinalReports');
 		$this->loadModel('DmiRoutineInspectionPeriod');
 		$this->loadModel('DmiFirms');
 		$this->loadModel('DmiFlowWiseTablesLists');
-		
-		
-
+		$this->loadModel('DmiRoOffices');
 		$conn = ConnectionManager::get('default');
 
-		// $users = "SELECT
-		// tbl.customer_id, dff.firm_name,dff.sub_commodity,tbl.tbl_name
-		// FROM dmi_firms AS df
-		// INNER JOIN dmi_ca_pp_lab_mapings AS map ON map.pp_id=df.id::varchar
-		// INNER JOIN dmi_firms AS dff ON dff.customer_id = map.customer_id
-		// INNER JOIN dmi_all_tbls_details AS tbl ON tbl.customer_id = map.customer_id
-		// WHERE df.customer_id = '$customer_id'";
-
 		$this->Session->write('application_type',10);
-		
+		$username = $this->Session->read('username');
 		$application_type = $this->Session->read('application_type');
-
 		$customer_id = $this->Session->read('customer_id');
 		
-		$get_period = $conn->execute("SELECT pp.* FROM dmi_routine_inspection_period AS pp")->fetchAll('assoc');
+		$get_period = $conn->execute("SELECT periods.* FROM dmi_routine_inspection_period AS periods")->fetchAll('assoc');
 
-		$period_ca = $get_period[0]['period'];
-			
-		$period_lab = $get_period[1]['period'];
-			
-		$period_pp = $get_period[2]['period'];
+		$period_ca = null;
+		$period_lab = null;
+		$period_pp = null;
 
+		if (!empty($get_period[0]['period'])) {
+				$period_ca = $get_period[0]['period'];
+		}
+		if (!empty($get_period[1]['period'])) {
+				$period_lab = $get_period[1]['period'];
+		}
+		if (!empty($get_period[2]['period'])) {
+				$period_pp = $get_period[2]['period'];
+		}
+
+		$get_short_codes = $this->DmiRoOffices->find('list',array('valueField'=>'short_code','conditions'=>array('ro_email_id IS'=>$username)))->toArray(); //get RO/SO Incharge details
+	
+		$conditions = ['ca' => '','pp' => '','lab' => ''];
+
+		$n = 1;
+		foreach ($get_short_codes as $key => $value) {
+			if ($key != (count($get_short_codes) - 1)) {
+					$separator = ($n != 1) ? ' OR ' : '';
+					$conditions['ca'] .= $separator . "customer_id like '%/1/$value/%'";
+					$conditions['pp'] .= $separator . "customer_id like '%/2/$value/%'";
+					$conditions['lab'] .= $separator . "customer_id like '%/3/$value/%'";
+					$n++;
+			}
+		}
+		
+		$condition_ca = $conditions['ca'];
+		$condition_pp = $conditions['pp'];
+		$condition_lab = $conditions['lab'];
+		
+		$to_date = date('Y-m-d H:i:s');
 		//dates between to fetch records
 		$from_date_ca = date("Y-m-d H:i:s",strtotime("-$period_ca month"));
-
 		$from_date_pp = date("Y-m-d H:i:s",strtotime("-$period_pp month"));
-			
 		$from_date_lab = date("Y-m-d H:i:s",strtotime("-$period_lab month"));
 
-		$to_date = date('Y-m-d H:i:s');
+		$conditions = [
+				'OR' => [
+						$condition_ca,
+						$condition_pp,
+						$condition_lab,
+				],
+				'AND' => [
+						[
+								'OR' => [
+										'AND' => [
+												'date(created) >=' => $from_date_ca,
+												'date(created) <=' => $to_date,
+										],
+										'AND' => [
+												'date(created) >=' => $from_date_pp,
+												'date(created) <=' => $to_date,
+										],
+										'AND' => [
+												'date(created) >=' => $from_date_lab,
+												'date(created) <=' => $to_date,
+										],
+								],
+						],
+				],
+		];
+		
+		$results = $this->DmiRtiAllocations->find('list', [
+				'keyField' => 'id',
+				'valueField' => 'customer_id',
+				'conditions' => $conditions,
+				'order' => 'id desc',
+		])->toArray();
+
+		// Separate the results based on allocation type
+		$list_array_ca = [];
+		$list_array_pp = [];
+		$list_array_lab = [];
+			
+		foreach ($results as $key => $value) {
+			if (strpos($value, '/1/') !== false) {
+					$list_array_ca[$key] = $value;
+			} elseif (strpos($value, '/2/') !== false) {
+					$list_array_pp[$key] = $value;
+			} elseif (strpos($value, '/3/') !== false) {
+					$list_array_lab[$key] = $value;
+			}
+		}
 
 		// to get array list for allocated ca application 
-		$list_array_ca = $this->DmiRtiAllocations->find('list',array('keyField'=>'id','valueField'=>'customer_id','conditions'=>array('customer_id like'=>'%'.'/1/'.'%', array('date(created) >=' => $from_date_ca, 'date(created) <=' =>$to_date)),'order'=>'id desc'))->toArray();
+		$list_array_ca = $this->DmiRtiAllocations->find('list',array('keyField'=>'id','valueField'=>'customer_id','conditions'=>array($condition_ca, array('date(created) >=' => $from_date_ca, 'date(created) <=' =>$to_date)),'order'=>'id desc'))->toArray();
 		
 		// to get array list for allocated pp application 
-		$list_array_pp = $this->DmiRtiAllocations->find('list',array('keyField'=>'id','valueField'=>'customer_id','conditions'=>array('customer_id like'=>'%'.'/2/'.'%',array('date(created) >=' => $from_date_pp, 'date(created) <=' =>$to_date)),'order'=>'id desc'))->toArray();
-	
+		$list_array_pp = $this->DmiRtiAllocations->find('list',array('keyField'=>'id','valueField'=>'customer_id','conditions'=>array($condition_pp,array('date(created) >=' => $from_date_pp, 'date(created) <=' =>$to_date)),'order'=>'id desc'))->toArray();
+		
 		// to get array list for allocated lab application 
-		$list_array_lab = $this->DmiRtiAllocations->find('list',array('keyField'=>'id','valueField'=>'customer_id','conditions'=>array('customer_id like'=>'%'.'/3/'.'%',array('date(created) >=' => $from_date_lab, 'date(created) <=' =>$to_date)),'order'=>'id desc'))->toArray();
+		$list_array_lab = $this->DmiRtiAllocations->find('list',array('keyField'=>'id','valueField'=>'customer_id','conditions'=>array($condition_lab,array('date(created) >=' => $from_date_lab, 'date(created) <=' =>$to_date)),'order'=>'id desc'))->toArray();
+
+		
+			
 		//added by shankhpal for approved list of ca 16/05/2023
 		$get_rti_approved_list_for_ca = [];
 		if(!empty($list_array_ca)){
 					$get_rti_approved_list_for_ca = $this->DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IN'=>$list_array_ca,'status IN'=>'approved','current_level'=>'level_3'),'order'=>'id desc'))->toArray();
 		}
-		//added by shankhpal for approved list of pp 16/05/2023
+		
 		$get_rti_approved_list_for_pp = [];
+
 		if(!empty($list_array_pp)){
 			$get_rti_approved_list_for_pp = $this->DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IN'=>$list_array_pp,'status IN'=>'approved','current_level'=>'level_3'),'order'=>'id desc'))->toArray();
 		}
+
 		//added by shankhpal for approved list of lab 16/05/2023
 		$get_rti_approved_list_for_lab = [];
 		if(!empty($list_array_lab)){
-			$get_rti_approved_list_for_lab = $this->DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IN'=>$list_array_lab,'status IN'=>'approved','current_level'=>'level_3'),'order'=>'id desc'))->toArray();
+				$get_rti_approved_list_for_lab = $this->DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IN'=>$list_array_lab,'status IN'=>'approved','current_level'=>'level_3'),'order'=>'id desc'))->toArray();
 		}
 
-			$flow_wise_table = $this->DmiFlowWiseTablesLists->find('all',array('conditions'=>array('application_type IS'=>$application_type)))->first();
-
+		$flow_wise_table = $this->DmiFlowWiseTablesLists->find('all',array('conditions'=>array('application_type IS'=>$application_type)))->first();
+	
 		$report_pdf_table = $flow_wise_table['DmiRtiReportPdfRecords'];
 		$this->loadModel('DmiRtiReportPdfRecords');
-
-	
+			
 		$appl_array_ca = array();
 		$i=0;
 		foreach($get_rti_approved_list_for_ca as $each){	
 			
 			$customer_id = $each['customer_id'];
-		
-				$form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
+			$form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
 			
-				$report_pdf_field = 'pdf_file';
-				$get_report_pdf = $this->DmiRtiReportPdfRecords->find('all',array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc'))->first();
-				
+			$report_pdf_field = 'pdf_file';
+			$get_report_pdf = $this->DmiRtiReportPdfRecords->find('all',array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc'))->first();
+			
 					
-					$report_pdf = '';
-					$pdf_version_ca = '';
-				if(!empty($get_report_pdf)){
-					$report_pdf = $get_report_pdf[$report_pdf_field];
-					$pdf_version_ca = $get_report_pdf['pdf_version'];
-				}
+			$report_pdf = '';
+			$pdf_version_ca = '';
+			if(!empty($get_report_pdf)){
+				$report_pdf = $get_report_pdf[$report_pdf_field];
+				$pdf_version_ca = $get_report_pdf['pdf_version'];
+			}
+			//get firm details
+			$firm_details = $this->DmiFirms->firmDetails($customer_id);
+			$firm_name = $firm_details['firm_name'];					
+			$firm_table_id = $firm_details['id'];
 
-				
+			$report_link = '../inspections/routine_inspection_report_fetch_id/'.$firm_details['id'].'/view/'.$application_type.'/yes';
 
-				//get firm details
-				$firm_details = $this->DmiFirms->firmDetails($customer_id);
-				$firm_name = $firm_details['firm_name'];					
-				$firm_table_id = $firm_details['id'];
-
-				$report_link = '../inspections/routine_inspection_report_fetch_id/'.$firm_details['id'].'/view/'.$application_type.'/yes';
+			$appl_array_ca[$i]['customer_id'] = $customer_id.'-'.$form_type;
+			$appl_array_ca[$i]['firm_name'] = $firm_name;
+			$appl_array_ca[$i]['on_date'] = $each['created'];
+			$appl_array_ca[$i]['report_pdf'] = $report_pdf;
+			$appl_array_ca[$i]['report_link'] = $report_link;
+			$appl_array_ca[$i]['pdf_version'] = $pdf_version_ca;
 			
-				$appl_array_ca[$i]['customer_id'] = $customer_id.'-'.$form_type;
-				$appl_array_ca[$i]['firm_name'] = $firm_name;
-				$appl_array_ca[$i]['on_date'] = $each['created'];
-				$appl_array_ca[$i]['report_pdf'] = $report_pdf;
-				$appl_array_ca[$i]['report_link'] = $report_link;
-				$appl_array_ca[$i]['pdf_version'] = $pdf_version_ca;
-				
-				$i=$i+1;
-			//}
+			$i=$i+1;
 		}
-
+			
 		$appl_array_pp = array();
 		$i=0;
-			
+		
 		foreach($get_rti_approved_list_for_pp as $each){	
 			
 			$customer_id = $each['customer_id'];
-		
-				$form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
-			
-				$report_pdf_field = 'pdf_file';
-				$get_report_pdf = $this->DmiRtiReportPdfRecords->find('all',array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc'))->first();
+			$form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
+			$report_pdf_field = 'pdf_file';
+			$get_report_pdf = $this->DmiRtiReportPdfRecords->find('all',array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc'))->first();
+					
+			$pdf_version_pp = '';
+			$report_pdf = '';
+			if(!empty($get_report_pdf)){
+				$report_pdf = $get_report_pdf[$report_pdf_field];
+				$pdf_version_pp = $get_report_pdf['pdf_version'];
 				
-				$pdf_version_pp = '';
-				$report_pdf = '';
-				if(!empty($get_report_pdf)){
-					$report_pdf = $get_report_pdf[$report_pdf_field];
-						$pdf_version_pp = $get_report_pdf['pdf_version'];
-						
-				}
+			}
+			//get firm details
+			$firm_details = $this->DmiFirms->firmDetails($customer_id);
+			$firm_name = $firm_details['firm_name'];					
+			$firm_table_id = $firm_details['id'];
 
-				//get firm details
-				$firm_details = $this->DmiFirms->firmDetails($customer_id);
-				$firm_name = $firm_details['firm_name'];					
-				$firm_table_id = $firm_details['id'];
+			$report_link = '../inspections/routine_inspection_report_fetch_id/'.$firm_details['id'].'/view/'.$application_type.'/yes';
 
-				$report_link = '../inspections/routine_inspection_report_fetch_id/'.$firm_details['id'].'/view/'.$application_type.'/yes';
-
-				$appl_array_pp[$i]['customer_id'] = $customer_id.'-'.$form_type;
-				$appl_array_pp[$i]['firm_name'] = $firm_name;
-				$appl_array_pp[$i]['on_date'] = $each['created'];
-				$appl_array_pp[$i]['report_pdf'] = $report_pdf;
-				$appl_array_pp[$i]['report_link'] = $report_link;
-				$appl_array_pp[$i]['pdf_version'] = $pdf_version_pp;
-				
-				$i=$i+1;
-			//}
+			$appl_array_pp[$i]['customer_id'] = $customer_id.'-'.$form_type;
+			$appl_array_pp[$i]['firm_name'] = $firm_name;
+			$appl_array_pp[$i]['on_date'] = $each['created'];
+			$appl_array_pp[$i]['report_pdf'] = $report_pdf;
+			$appl_array_pp[$i]['report_link'] = $report_link;
+			$appl_array_pp[$i]['pdf_version'] = $pdf_version_pp;
+			$i=$i+1;
 		}
 
 		$appl_array_lab = array();
@@ -1724,49 +1779,40 @@ class OthermodulesController extends AppController{
 		foreach($get_rti_approved_list_for_lab as $each){	
 			
 			$customer_id = $each['customer_id'];
-		
-				$form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
+			$form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
 
-				$report_pdf_field = 'pdf_file';
-				$get_report_pdf = $this->DmiRtiReportPdfRecords->find('all',array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc'))->first();
+			$report_pdf_field = 'pdf_file';
+			$get_report_pdf = $this->DmiRtiReportPdfRecords->find('all',array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc'))->first();
+					
+			$report_pdf = '';
+			$pdf_version_lab = '';
+			if(!empty($get_report_pdf)){
+				$report_pdf = $get_report_pdf[$report_pdf_field];
+				$pdf_version_lab= $get_report_pdf['pdf_version'];
+			}
 				
-				$report_pdf = '';
-				$pdf_version_lab = '';
-				if(!empty($get_report_pdf)){
-					$report_pdf = $get_report_pdf[$report_pdf_field];
-					$pdf_version_lab= $get_report_pdf['pdf_version'];
-				}
+			//get firm details
+			$firm_details = $this->DmiFirms->firmDetails($customer_id);
+			$firm_name = $firm_details['firm_name'];					
+			$firm_table_id = $firm_details['id'];
+
+			$report_link = '../inspections/routine_inspection_report_fetch_id/'.$firm_details['id'].'/view/'.$application_type.'/yes';
+
+
+			$appl_array_lab[$i]['customer_id'] = $customer_id.'-'.$form_type;
+			$appl_array_lab[$i]['firm_name'] = $firm_name;
+			$appl_array_lab[$i]['on_date'] = $each['created'];
+			$appl_array_lab[$i]['report_pdf'] = $report_pdf;
+			$appl_array_lab[$i]['report_link'] = $report_link;
+			$appl_array_lab[$i]['pdf_version'] = $pdf_version_lab;
 			
-				//get firm details
-				$firm_details = $this->DmiFirms->firmDetails($customer_id);
-				$firm_name = $firm_details['firm_name'];					
-				$firm_table_id = $firm_details['id'];
-
-				$report_link = '../inspections/routine_inspection_report_fetch_id/'.$firm_details['id'].'/view/'.$application_type.'/yes';
-
-
-				$appl_array_lab[$i]['customer_id'] = $customer_id.'-'.$form_type;
-				$appl_array_lab[$i]['firm_name'] = $firm_name;
-				$appl_array_lab[$i]['on_date'] = $each['created'];
-				$appl_array_lab[$i]['report_pdf'] = $report_pdf;
-				$appl_array_lab[$i]['report_link'] = $report_link;
-				$appl_array_lab[$i]['pdf_version'] = $pdf_version_lab;
-				
-				$i=$i+1;
-			//}
+			$i=$i+1;
 		}
-
-
-	
-
-		// $report_pdf_path = $this->DmiRtiReportPdfRecords->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
-		// $report_link = '/inspections/inspection_report_fetch_id/'.$firm_details['id'].'/view/'.$application_type.'/yes';
-		// $this->redirect($report_link);
-
+			
 		$this->set('appl_array_ca',$appl_array_ca);
 		$this->set('appl_array_pp',$appl_array_pp);
 		$this->set('appl_array_lab',$appl_array_lab);
-	
+			
 	}
 
 

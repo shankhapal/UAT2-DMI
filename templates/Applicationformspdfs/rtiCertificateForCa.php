@@ -29,27 +29,27 @@
 	
 		<tr>
 			  <td style="padding:10px; vertical-align:top;">Date of Last Inspection :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_ca_data['date_last_inspection'])?$rti_ca_data['date_last_inspection']:"Nill"; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_ca_data['date_last_inspection'])?$rti_ca_data['date_last_inspection']:"NA"; ?></td>
 		</tr>
     <tr>
 			  <td style="padding:10px; vertical-align:top;">Date & Time of present Inspection :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_ca_data['date_p_inspection'])?$rti_ca_data['date_p_inspection']:"Nill"; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_ca_data['date_p_inspection'])?$rti_ca_data['date_p_inspection']:"NA"; ?></td>
 		</tr>
     <tr>
         <td style="padding:10px; vertical-align:top;">1. Name of Authorized Packer :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo isset($firm_details['firm_name'])?$firm_details['firm_name']:"Nill"; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($firm_details['firm_name'])?$firm_details['firm_name']:"NA"; ?></td>
 		</tr>
     <tr>
         <td style="padding:10px; vertical-align:top;">2. Address of the Authorized Premises :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo isset($firm_details['street_address'])?$firm_details['street_address']:"Nill"; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($firm_details['street_address'])?$firm_details['street_address']:"NA"; ?></td>
 		</tr>
     <tr>
         <td style="padding:10px; vertical-align:top;">3. Contact details of the packer Mobile:</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo 'Mobile :'. base64_decode(isset($firm_details['mobile_no'])?$firm_details['mobile_no']:"Nill")." , ".'Email ID :'.base64_decode(isset($firm_details['email'])?$firm_details['email']:"Nill"); ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo 'Mobile :'. base64_decode(isset($firm_details['mobile_no'])?$firm_details['mobile_no']:"NA")." , ".'Email ID :'.base64_decode(isset($firm_details['email'])?$firm_details['email']:"NA"); ?></td>
 		</tr>
     <tr>
         <td style="padding:10px; vertical-align:top;">4. Certificate of Authorization No and valid upto :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo 'Certificate No :'. isset($firm_details['customer_id'])?$firm_details['customer_id']:"Nill".',','valid upto :'. isset($certificate_valid_upto)?$certificate_valid_upto:"Nill"; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo 'Certificate No :'. isset($firm_details['customer_id'])?$firm_details['customer_id']:"NA".',','valid upto :'. isset($certificate_valid_upto)?$certificate_valid_upto:"NA"; ?></td>
 		</tr>
     
     <tr>
@@ -64,7 +64,7 @@
               $i++;
           } 
         }else{
-          echo "Nill";
+          echo "NA";
         }
         ?>
       </td>
@@ -81,7 +81,7 @@
                   $i++;
                 }
               }else{
-                echo "Nill";
+                echo "NA";
               }
               ?>
       </td>
@@ -98,7 +98,7 @@
                   $i++;
                 }
               } else {
-                echo "Nill";
+                echo "NA";
               }
               ?>
           </td>
@@ -113,7 +113,7 @@
            if(!empty($self_registered_chemist)){
                echo $self_registered_chemist[0]['chemist_fname']." ".$self_registered_chemist[0]['chemist_lname'];
            }else{
-            echo "Nill";
+            echo "NA";
            }
       ?></td>
 		</tr>
@@ -200,7 +200,7 @@
             foreach($added_sample_details as $sample_detail){ ?>    
         <tr>
             <td align="center" style="padding:5px;"><?php echo $i; ?></td>
-            <td align="center" style="padding:5px;"><?php echo $sample_detail['commodity_name'];?></td>
+            <td align="center" style="padding:5px;"><?php echo isset($sub_commodity_value[$sample_detail['commodity_name']])?$sub_commodity_value[$sample_detail['commodity_name']]:"-"; ?></td>
             <td align="center" style="padding:5px;"><?php echo $sample_detail['pack_size'];?></td>
             <td align="center" style="padding:5px;"><?php echo $sample_detail['lot_no'];?></td>
             <td align="center" style="padding:5px;"><?php echo $sample_detail['date_of_packing'];?></td>

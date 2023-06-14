@@ -3556,7 +3556,7 @@ class ApplicationformspdfsController extends AppController{
 
 		$sub_commodity_value = $this->MCommodity->find('list',array('valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
 		$this->set('sub_commodity_value',$sub_commodity_value);
-
+		
 		$attached_lab = $this->DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'lab_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id asc'))->toList();
 		
 		$lab_list = [];
@@ -3578,8 +3578,11 @@ class ApplicationformspdfsController extends AppController{
 		$self_registered_chemist = $this->DmiChemistRegistrations->find('all',array('conditions'=>array('created_by IS'=>$customer_id)))->toArray();
 		$this->set('self_registered_chemist',$self_registered_chemist);
 
+		//get current version
+		$current_version = $CustomersController->Customfunctions->currentVersion($customer_id);
+
 		// to get added check sample table details
-		$added_sample_details = $this->DmiCheckSamples->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'delete_status IS NULL'),'order'=>'id'))->toArray();
+		$added_sample_details = $this->DmiCheckSamples->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'delete_status IS NULL','version'=>$current_version),'order'=>'id'))->toArray();
 		$this->set('added_sample_details',$added_sample_details);
 
 		$this->generateReportPdf('/Applicationformspdfs/rtiCertificateForCa');

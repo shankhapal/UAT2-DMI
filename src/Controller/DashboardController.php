@@ -11,6 +11,7 @@ use App\Network\Response\Response;
 use Cake\Datasource\ConnectionManager;
 use Cake\Event\EventInterface;
 
+
 class DashboardController extends AppController{
 
 		var $name = 'Dashboard';
@@ -1046,152 +1047,119 @@ class DashboardController extends AppController{
 							$i=$i+1;
 							}
 
-						} 
-						//added by shankhpal shende on 06/12/2022
-						elseif($sub_tab=='routine_inspection_allocation_tab'){
+						}elseif($sub_tab=='routine_inspection_allocation_tab'){ //Routine Inspection For CA, PP, Lab added by shankhpal shende on 06/12/2022
 
 							if($each_flow['application_type']=='10'){
-								
+								//load models
 								$this->loadModel('DmiGrantCertificatesPdfs');
 								$this->loadModel('DmiRtiFinalReports');
 								$this->loadModel('DmiRoutineInspectionLabReports');
 								$this->loadModel('DmiRoOffices');
 								$this->loadModel('DmiRoutineInspectionPeriod');
+								$this->loadModel('DmiSiteinspectionFinalReports');
+								$this->loadModel('DmiUsers'); //get Nodal officer details
+								$this->loadModel('DmiRtiAllocations');
 
 								$username = $this->Session->read('username');
-								
-								//get RO/SO Incharge details
-								
-								$get_short_codes = $this->DmiRoOffices->find('list',array('valueField'=>'short_code','conditions'=>array('ro_email_id IS'=>$username)))->toArray();
-						   
-							  
-								//$conditionsArr = null;
+								$get_short_codes = $this->DmiRoOffices->find('list',array('valueField'=>'short_code','conditions'=>array('ro_email_id IS'=>$username)))->toArray(); //get RO/SO Incharge details
 								$condition = '';
 								$n = 1;
-								foreach($get_short_codes as $key => $value)
-								{
-										//$conditionsArr .= $value;
+								foreach($get_short_codes as $key => $value){
 									
-										if($key != (count($get_short_codes) - 1))
-										{
-												//$conditionsArr .=',';
-												$seprator = ($n!=1)?' OR ':'';
-												$condition .= $seprator."customer_id like '%/$value/%'";  // dynamic condition
-												$n++;	
-										}
-								}
-								
-								$this->loadModel('DmiSiteinspectionFinalReports');
-							
-								// fetched record conditionaly 
-								$grant_record_list =  $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array($condition)), array('order'=>'id desc'))->distinct('customer_id')->toArray();
-				  
-								if(!empty($grant_record_list))
-								{
-								
-									foreach($grant_record_list as $each_alloc){
+									if($key != (count($get_short_codes) - 1)){
+										$seprator = ($n!=1)?' OR ':'';
+										$condition .= $seprator."customer_id like '%/$value/%'";  // dynamic condition to get short code of login users
+										$n++;	
+									}
 
+								}
+								$grant_record_list =  $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array($condition)), array('order'=>'id desc'))->distinct('customer_id')->toArray(); // fetched record conditionaly 
+				  
+								if(!empty($grant_record_list)){
+
+									foreach($grant_record_list as $each_alloc){
 											
 										$creat_array='';//clear variable each time
 										$customer_id = $each_alloc['customer_id'];
-								  
 										$split_secondary_id				= 	explode('/',(string) $customer_id);
-				   
 										$splited_secondary_id_value		= 	$split_secondary_id[1];  // splited type of id like 1,2,3
-										
 										$routin_inspection_period = $this->DmiRoutineInspectionPeriod->find('all',array('conditions'=>array('firm_type IS'=>$splited_secondary_id_value)))->first();
-									
 										$period = $routin_inspection_period['period'];
-									
 										$inspection = 'no'; //by default
-
 										$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id);
-									
-										//check final submit status for level 2 & 3 and approved for each allocated id
-										$routine_inspection = $this->DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'pending'),array('order'=>'id desc')))->first();
-																	 
+										//get result all approved applications for routine inspection
+										$all_approved_record = $this->DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),array('order'=>'id desc')))->first();
 										$created = ''; // by default blank 
-										//if routine_inspection not empty 
-										if(!empty($routine_inspection)){
-											$created = $routine_inspection['created']; // hold created date
+										
+										if(!empty($all_approved_record)){
+											$created = $all_approved_record['created']; // hold created date
 										}else{
-											 // if routine_inspection empty 
+											// if $all_approved_record array are empty
+											// then other application available for routine inspection from DmiSiteinspectionFinalReports table
 											$site_inspection = $this->DmiSiteinspectionFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'pending'),array('order'=>'id desc')))->first();
 										
 											if(!empty($site_inspection)){
-					  
 												$created = $site_inspection['created'];		// hold created date											
 											}
 											 
 										}
-										 // when created date not empty 
-										 if(!empty($created)) {
-											 
-											$split_created	= 	explode(' ',(string) $created); //conver into array 
-												
-											$date1 = $split_created[0]; //hold only date 
-										
-											$date2 = date("Y/m/d"); // current date
-						
-											//calculate difference 
-											$diff = abs(strtotime(str_replace('/','-',$date2)) - strtotime(str_replace('/','-',$date1)));
-
-											$years = floor($diff / (365*12*60*60*24)); // retrun years
+										 // when created date not empty  pass any one
+										if(!empty($created)){
 											
-											$months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24)); // return month
-										
-											//check conditionally if month greter to period then do inspection yes
-											if($months > $period){
+											$split_created	= 	explode(' ',(string) $created); 
+											$date1 = $split_created[0]; //hold only date 
+											$monthRTIApproved = $this->Customfunctions->monthcalForRti($date1); // pass all the approved date to monthcalForRti function in customfunction components to return calculated month to till date
+											//Note : $period are set from dmi_routine_inspection_period table
+											//compaire if monthRTIApproved are greter than period
+											if($monthRTIApproved > $period){
 												$inspection = 'yes';
 											}
-										 
+										
+										}else{ // if condition not satisfiy then the approved application is not available for the inspection pass 'no'
+											 $inspection = 'no';
 										 }
-										 else{ // if created date is empty do inspection yes
-											 $inspection = 'yes';
-										 }
-										 
-										 
+										
+										// if inspection yes then approved application are available to routine inspection 
 										if($inspection == 'yes'){
 
 											$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id);
-											//get_form_type
-											$form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
-											
-											//get firm details
-											$firm_details = $this->DmiFirms->firmDetails($customer_id);
-											
+											$form_type = $this->Customfunctions->checkApplicantFormType($customer_id); //get_form_type
+											$firm_details = $this->DmiFirms->firmDetails($customer_id); //get firm details
 											$firm_name = $firm_details['firm_name'];
 											$firm_table_id = $firm_details['id'];
 											$appl_type_id = $each_flow['application_type'];
 											$appl_view_link = '../scrutiny/form_scrutiny_fetch_id/'.$firm_table_id.'/view/'.$appl_type_id;
 
-											//get Nodal officer details
-											$this->loadModel('DmiUsers');
-											$this->loadModel('DmiRtiAllocations');
+											$approved_record = $this->DmiRtiFinalReports->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id desc'))->first();
 										
-											$get_allocations = $this->DmiRtiAllocations->find('all',array('conditions' => array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
-						
-											if(!empty($get_allocations))
-											{
-												$mo_user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$get_allocations['level_2'])))->first();
+											if(!empty($approved_record)){
+												
+												$get_allocations = $this->DmiRtiAllocations->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'date(created) > '=>$approved_record['created']),'order'=>'id desc'))->first();
 											
-												$comm_with = $mo_user_details['f_name'].' '.$mo_user_details['l_name'];
+												if(!empty($get_allocations)){
+													$mo_user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$get_allocations['level_2'])))->first();
+													$comm_with = $mo_user_details['f_name'].' '.$mo_user_details['l_name'];
+												}else{
+													$comm_with='Not Allocated';
+												}
 
-											}else{
-												
-												$comm_with='Not Allocated';
 											}
-						
+											if(!empty($site_inspection)){
 												
+												$get_allocations = $this->DmiRtiAllocations->find('all',array('conditions' => array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+
+												if(!empty($get_allocations)){
+													$mo_user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$get_allocations['level_2'])))->first();
+													$comm_with = $mo_user_details['f_name'].' '.$mo_user_details['l_name'];
+												}else{
+													$comm_with='Not Allocated';
+												}
+												
+											}
 											$creat_array = true;
-											
-										
-											
 										}
-				   
 										//creating array to list records with respect to above conditions
 										if($creat_array==true){
-
 											$appl_list_array[$i]['appl_type'] = 'Routine Inspection';
 											$appl_list_array[$i]['customer_id'] = $customer_id.'-'.$form_type;
 											$appl_list_array[$i]['firm_name'] = $firm_name;
@@ -1199,20 +1167,14 @@ class DashboardController extends AppController{
 											$appl_list_array[$i]['appl_view_link'] = $appl_view_link;
 											$appl_list_array[$i]['appl_edit_link'] = '';
 											$appl_list_array[$i]['alloc_sub_tab']='routine_inspection_allocation_tab';
-					   
 										}
-
 										$i=$i+1;
 									}
-									
 								}
-							
 							}
-             
 						}
 					}
-					//for HO level scrutiny allocations
-					elseif($for_level=='level_4'){
+					elseif($for_level=='level_4'){ //for HO level scrutiny allocations
 
 						if($sub_tab=='scrutiny_allocation_tab'){
 
@@ -3180,6 +3142,8 @@ class DashboardController extends AppController{
 			exit;
 
 	}
+
+	
 
 }
 

@@ -7,6 +7,7 @@ use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
 use Cake\Datasource\EntityInterface;
 use QRcode;
+use Cake\Chronos\Chronos;  // Chronos library is use for DateTime by shankhpal on 08/06/2023 
 use Cake\Datasource\ConnectionManager;
 
 
@@ -591,24 +592,25 @@ class CustomfunctionsComponent extends Component {
 	// Get application final submit details
 	public function finalSubmitDetails($customer_id,$field_name,$application_type=null) {
 
-		$grantDateCondition = $this->returnGrantDateCondition($customer_id);
-
 		if ($application_type==null) {
 
 			$application_type = $this->Session->read('application_type');
 		}
-
+		// added application id by shankhpal on 31-05-2023
+		$grantDateCondition = $this->returnGrantDateCondition($customer_id,$application_type);
+		
 		$Dmi_flow_wise_tables_list = TableRegistry::getTableLocator()->get('DmiFlowWiseTablesLists');
 		$Dmi_final_submit_tb = $Dmi_flow_wise_tables_list->find('all',array('conditions'=>array('application_type IS'=>$application_type)))->first();
 		$Dmi_final_submit = TableRegistry::getTableLocator()->get($Dmi_final_submit_tb[$field_name]);
+	
 		$final_submit_deatil = $Dmi_final_submit->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,$grantDateCondition),'order'=>'id DESC'))->first();
-
+		
 		if (!empty($final_submit_deatil)) {
 			$final_submit_deatils = $final_submit_deatil;
 		} else {
 			$final_submit_deatils = "";
 		}
-
+		
 		return $final_submit_deatils;
 	}
 
@@ -1167,7 +1169,7 @@ class CustomfunctionsComponent extends Component {
 
 		//check final report status
 		$final_report_list_ids = $Dmi_report_final_submit_table->find('list', array('valueField'=>array('id'),'conditions' => array('customer_id IS'=>$customer_id, $grantDateCondition)))->toArray();
-
+		
 		if (empty($final_report_list_ids)) {
 
 			if ($this->commonSiteinspectionFormsFinalReport($customer_id,$allSectionDetails) == 1) {
@@ -1184,7 +1186,7 @@ class CustomfunctionsComponent extends Component {
 			}
 
 		} else {
-
+			
 			$Dmi_report_final_submit_table_Entity = $Dmi_report_final_submit_table->newEntity(array('customer_id'=>$customer_id,
 																									'status'=>'replied',
 																									'current_level'=>'level_3',
@@ -2808,20 +2810,20 @@ class CustomfunctionsComponent extends Component {
 
 	// Return Grant Date Condition
 	public function returnGrantDateCondition($customer_id,$application_type=null) {//new argument added on 13-04-2023 "$application_type"
-
+		
 		//condition added on 17-03-2023, to get application type from argument
 		if(empty($application_type)){
 			$application_type = $this->Session->read('application_type');
 		}
 		
 		$advancepayment = $this->Session->read('advancepayment');
-
+		
 
 		$DmiGrantCertificatesPdfs = TableRegistry::getTableLocator()->get('DmiGrantCertificatesPdfs');
 		$DmiAdvPaymentDetails = TableRegistry::getTableLocator()->get('DmiAdvPaymentDetails');
 
 		$grantDate = $DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'pdf_version >'=>'1'),'order'=>'id DESC'))->first();
-
+		
 		if ($application_type == 3) {
 
 			$DmiGrantCertificatesPdfs = TableRegistry::getTableLocator()->get('DmiChangeGrantCertificatesPdfs');
@@ -2831,7 +2833,14 @@ class CustomfunctionsComponent extends Component {
 
 			$DmiGrantCertificatesPdfs = TableRegistry::getTableLocator()->get('DmiAdpGrantCertificatePdfs');
 			$grantDate = $DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
-		}
+		
+		}	
+		 elseif ($application_type == 10) { //added on 30-05-2023 by shankhpal to get RTI grant date
+		 	// For application type = 10 then fetch grant date from DmiRtiFinalReports
+		 	$DmiRtiFinalReports = TableRegistry::getTableLocator()->get('DmiRtiFinalReports');
+		 	$grantDate = $DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id DESC'))->first();
+
+		 }
 
 
 		if ($advancepayment == 'yes') {
@@ -3739,6 +3748,37 @@ class CustomfunctionsComponent extends Component {
     }
 
 
+		//currentVersion
+		//Description: Returns current version.
+		//@Author : shankhpal shende
+		//Date : 02/06/2023
+		public function currentVersion($customer_id){
+			$DmiRtiFinalReports = TableRegistry::getTableLocator()->get('DmiRtiFinalReports');
+			// fetch packer approve data
+			$approved_record = $DmiRtiFinalReports->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id desc'))->toArray();
+			
+			return count($approved_record) + 1;
+			
+		}
+
+		//month calculation
+		//Description: Returns month of given date.
+		//@Author : shankhpal shende
+		//Date : 08/06/2023
+
+		public function monthcalForRti($createdDate){
+			
+			$currentDate = date("d/m/Y"); // current date
+			//$currentDate = "02/08/2023";
+			$date1 = Chronos::createFromFormat('d/m/Y', $createdDate); // Start date
+			$date2 = Chronos::createFromFormat('d/m/Y', $currentDate); // End date
+
+			$monthsDifference = $date1->diffInMonths($date2); // Calculate the month difference
+
+			return $monthsDifference;
+		
+	}
+	
 
 	// Description : To get the Comma Sepearated Values for the Commodites for any Firm 
 	// Author : Akash Thakre
@@ -3873,6 +3913,5 @@ class CustomfunctionsComponent extends Component {
 		return $isCancelled;
 	}
 	
-
 }
 ?>
