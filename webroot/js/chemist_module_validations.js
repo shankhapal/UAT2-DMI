@@ -83,7 +83,8 @@
 			var email = $("#email").val();
 			var mobile = $("#mobile").val();
 			var dob = $("#dob").val();
-
+			//variable set by laxmi for chemist_training completed or not radio 
+            var is_training_completed = $("#approved").val();
 			var value_return = 'true';
 
 
@@ -147,8 +148,8 @@
 					value_return = 'false';
 				}
 
-				//first valid no. for mob.no, applid on 16-02-2021 by Amol
-				var validfirstno = ['7','8','9'];
+				//In this array added '6' as suggested by Tarun Sir on 26-04-2023 - Akash [27-04-2023]
+				var validfirstno = ['6','7','8','9'];
 				//get first character of mobile no.
 				var f_m_no = mobile.charAt(0);
 				if($.inArray(f_m_no,validfirstno) != -1){
@@ -175,6 +176,15 @@
 
 			}
 
+			//to select chemist alredy approved for training or not radio button added by laxmi B on 16-12-2022
+			if(is_training_completed == ""){
+
+				$("#error_is_training_completed").show().text("Please Select any option");
+				$("#approved").addClass("is-invalid");
+				$("#approved").click(function(){$("#error_is_training_completed").hide().text;$("#approved").removeClass("is-invalid");});
+				value_return = 'false';
+			}
+			   
 			if(value_return == 'false'){
 				var msg = "Please check some fields are missing or not proper.";
 				renderToast('error', msg);

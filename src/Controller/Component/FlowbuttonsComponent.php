@@ -260,6 +260,9 @@ class FlowbuttonsComponent extends Component {
 		
 		$ForwarBtn = null;
 
+		 // to fetch all section of chemist application status(if 2 is approved) added by laxmi on 12-01-2023
+         $allSectionStatus = $this->Customfunctions->formStatusValue($allSectionDetails,$customerId);
+		
 		// pravin bhakare 28-09-2021
 		if($applicationType != 4 ){
 
@@ -293,6 +296,10 @@ class FlowbuttonsComponent extends Component {
 					}if($inspection == 'no' && $firm_type ==2){
 						
 						$ForwarBtn = 'RO';
+						
+					//to check if CA with BEVO then forward to RO, added on 24-05-2023 by Amol
+					}if($inspection == 'no' && $firm_type ==1 && $ca_bevo_applicant == 'yes'){
+						$ForwarBtn = 'RO';										
 					}
 					
 				}elseif($office_type == 'RO'){
@@ -355,7 +362,9 @@ class FlowbuttonsComponent extends Component {
 	public function ShowNodalLevelGrantBtnAfterScru($customerId,$applicationType,$sectionDetails,$allSectionDetails){
 		
 		$GrantBtn = null;
-		
+		//fetch all section details status (if 2 is approved) added by laxmi On 12-01-23
+        $allSectionStatus = $this->Customfunctions->formStatusValue($allSectionDetails,$customerId);
+
 		// pravin bhakare 28-09-2021
 		if($applicationType != 4 ){
 		
@@ -397,7 +406,8 @@ class FlowbuttonsComponent extends Component {
 				
 				if($office_type == 'SO'){
 					
-					if($inspection == 'no' && $firm_type ==1 ){
+					//added CA Bevo condition on 24-05-2023 by Amol
+					if($inspection == 'no' && $firm_type ==1 && $ca_bevo_applicant != 'yes'){
 						
 						$GrantBtn = 'yes';
 					}
@@ -436,7 +446,31 @@ class FlowbuttonsComponent extends Component {
 			
 			}
 
-		}
+		//else condtion added by laxmi to show grant btn after ro side training completed on 12-01-23
+		}elseif((!empty($_SESSION['is_training_completed']) && !empty($_SESSION['trainingCompleteAtRo'])) && ($applicationType == 4 && $allSectionStatus == 2 && $_SESSION['is_training_completed'] == 'no' && $_SESSION['trainingCompleteAtRo'] == 1)){
+
+			$firm_type = $this->Customfunctions->firmType($customerId); 
+			$office_type = $this->Customfunctions->getApplDistrictOffice($customerId);
+	
+			$inspection = $this->Customfunctions->inspRequiredForChangeApp($customerId,$applicationType);
+
+			if($office_type == 'RO'){
+					
+				if($inspection == 'no' && $firm_type ==1){
+					
+					$GrantBtn = 'yes';
+				}
+					
+			}elseif($office_type = 'SO'){
+	 
+				if($inspection == 'no' && $firm_type ==1){
+					
+					$GrantBtn = 'yes';
+				}
+	 
+			}
+        }
+		
 		return $GrantBtn;
 	}
 	

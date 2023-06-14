@@ -6,6 +6,7 @@ use App\Network\Email\Email;
 use App\Network\Request\Request;
 use App\Network\Response\Response;
 use Cake\ORM\TableRegistry;
+use Cake\Collection\Collection;
 
 class ApplicationController extends AppController{
 
@@ -25,6 +26,8 @@ class ApplicationController extends AppController{
 		$this->loadComponent('Flowbuttons');
 		$this->loadComponent('Randomfunctions');
 		$this->loadModel('DmiSmsEmailTemplates');
+		//load chemist payment details model for chemist application by laxmi on 03-05-2023
+		$this->loadModel('DmiChemistPaymentDetails');									   
 	
 
 		$this->viewBuilder()->setHelpers(['Form','Html','Time']);
@@ -97,6 +100,9 @@ class ApplicationController extends AppController{
 		$this->loadModel('DmiChangeSelectedFields');
 		$this->loadModel('DmiChangeFieldLists');
 
+		$this->loadComponent('Beforepageload');
+		$this->Beforepageload->showButtonOnSecondaryHome();
+
 		$customer_id = $this->Customfunctions->sessionCustomerID();
 		$form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
 		$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id);
@@ -106,7 +112,20 @@ class ApplicationController extends AppController{
 		$final_submit_details = $this->DmiChangeFinalSubmits->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'pending',$grantDateCondition),'order'=>'id DESC'))->first();
 		$this->set('final_submit_details',$final_submit_details);
 
-		$changeFieldsList = $this->DmiChangeFieldLists->find('list',array('keyField'=>'field_id','valueField'=>'change_field','conditions'=>array('form_type IS'=>'common'),'order'=>'field_id'))->toArray();
+		$firm_type = $this->Customfunctions->firmType($customer_id);
+		//commented the query on 15-05-2023, and added below code to restrict change fields options as per the CA,PP and Lab
+		//$changeFieldsList = $this->DmiChangeFieldLists->find('list',array('keyField'=>'field_id','valueField'=>'change_field','conditions'=>array('form_type IS'=>'common','firm_type IN'=>array('common',$firm_type),'OR'=>array('firm_type LIKE'=>'%'.$firm_type,'firm_type LIKE'=>$firm_type.'%')),'order'=>'field_id'))->toArray();
+	
+		//added new query on 15-05-2023 to get specific fields only as per the applicant CA,PP and Lab
+		$query = "SELECT field_id, change_field FROM dmi_change_field_lists WHERE form_type = 'common'
+        	AND (firm_type = 'common' OR firm_type = :firmType OR firm_type ILIKE '%' || :firmType || '%' OR firm_type ILIKE :firmType || '%')
+    		ORDER BY field_id";
+
+		$connection = $this->DmiChangeFieldLists->getConnection();
+		$results = $connection->execute($query, ['firmType' => $firm_type])->fetchAll('assoc');
+
+		$changeFieldsList = (new Collection($results))->combine('field_id', 'change_field')->toArray();
+	
 		$this->set('changeFieldsList',$changeFieldsList);
 
 		$selectedValues = $this->DmiChangeSelectedFields->selectedChangeFields();
@@ -225,7 +244,9 @@ class ApplicationController extends AppController{
 		$this->loadModel('DmiAllDirectorsDetails');
 		$this->loadModel('DmiFirms');
 		$this->loadModel('DmiChemistRegistrations');
-
+		//load chemist 	payment details table by laxmi.								   
+        $this->loadModel('DmiChemistPaymentDetails');
+		
 		$application_type = $this->Session->read('application_type');
 		$this->set('application_type',$application_type);
 		
@@ -246,6 +267,9 @@ class ApplicationController extends AppController{
 				$customer_id = $chemistDetails['created_by'];
 				$packer_id = $customer_id;
 				$this->Session->write('packer_id',$packer_id);
+				//for chemist training alredy done set isTrainingCompleted in session with yes by laxmi B on. 17-01-2023
+				$is_training_completed = $chemistDetails['is_training_completed'];
+				$this->Session->write('is_training_completed',$is_training_completed);																			  
 			}
 
 			$this->Session->write('application_dashboard','chemist');
@@ -481,7 +505,7 @@ class ApplicationController extends AppController{
 		if (null !== $this->request->getData('save')) {
 
 			$result = $this->$section_model->saveFormDetails($customer_id,$this->request->getData());
-
+			
 			if (is_array($result)=='') {
 				
 				if ($result == 1) {
@@ -504,7 +528,12 @@ class ApplicationController extends AppController{
 						}
 					}
 
-					$message = $firm_type_text.' - '.ucwords(str_replace('_',' ',$section_details['section_name'])).' section, '.$process_query.' successfully';
+					// This message is changed for the Surrender module (SOC) - Akash [12-05-2023]
+					if ($application_type == 9) {
+						$message = "Application of Surrender for ".$firm_type_text.' - '.ucwords(str_replace('_',' ',$section_details['section_name'])).' section, '.$process_query.' successfully';
+					}else{
+						$message = $firm_type_text.' - '.ucwords(str_replace('_',' ',$section_details['section_name'])).' section, '.$process_query.' successfully';
+					}
 
 					#Action: Application Section Saved
 					if ($application_type == 4) {
@@ -546,7 +575,14 @@ class ApplicationController extends AppController{
 				if ($final_submit_call_result == true) {
 
 					$this->Customfunctions->saveActionPoint('Application Final Submit', 'Success'); #Action
-					$message = $firm_type_text.' - Final submitted successfully ';
+
+					// This message is changed for the Surrender module (SOC) - Akash [12-05-2023]
+					if ($application_type == 9) {
+						$message = "Application of Surrender for ".$firm_type_text.' - Final submitted successfully ';
+					}else{
+						$message = $firm_type_text.' - Final submitted successfully ';
+					}
+
 					$message_theme = 'success';
 
 					//For Chemist i.e Apllication Type 4 then redirect to Chemist Home after Final Submit -> Akash [29-09-2021].
@@ -811,9 +847,21 @@ class ApplicationController extends AppController{
 			$this->set('progress_bar_status',$progress_bar_status);
 
 			//intensionally called from DMiChangeFirms, it will fetch record from dmi firms by default if not found from the function
+			//for chemist applicant save pod id with using customer id who register the chemist
+			//added by laxmi B. on 14-12-2022
+			if($application_type == 4){
+			 $customer_id = $this->Session->read('packer_id');
+			}
 			$firm_detail = $this->DmiChangeFirms->sectionFormDetails($customer_id);
 			$firm_details = $firm_detail[0];
 			$this->set('firm_details',$firm_details);
+				//for chemist applicant save pod id with using customer id who register the chemist
+			//added by laxmi B. on 14-12-2022
+			//revert above customer id to chemist id by laxmi B on 14-12-2022
+			if($application_type == 4){
+				$customer_id = $this->Session->read('username');
+			    $form_type='CHM';
+			}	
 
 			// Fetch submitted Payment Details and show // Done By pravin 13/10/2017
 			$this->Paymentdetails->applicantPaymentDetails($customer_id,$firm_details['district'],$payment_table);
@@ -960,9 +1008,24 @@ class ApplicationController extends AppController{
 						$this->DmiSmsEmailTemplates->sendMessage(5,$customer_id); #APPLICANT , RO , DDO
 						$this->DmiSmsEmailTemplates->sendMessage(6,$customer_id); #Applicant , RO , DDO
 						
-						$message = $firm_type_text.' - Final submitted successfully ';
+
+						// This message is changed for the Surrender module (SOC) - Akash [12-05-2023]
+						if ($application_type == 9) {
+							$message = "Application of Surrender for ".$firm_type_text.' - Final submitted successfully ';
+						}else{
+							$message = $firm_type_text.' - Final submitted successfully ';
+						}
+
 						$message_theme = 'success';
 						$redirect_to = '../applicationformspdfs/'.$section_details['forms_pdf'];
+
+                       //if application type 4 rediirect to chemist home after final submit-Laxmi[30-05-23]
+                        $appl_type = $this->Session->read('application_type');
+						if(!empty($appl_type) && $appl_type == 4){
+							$redirect_to = '../chemist/home';
+																	 
+						}
+
 
 						$this->viewBuilder()->setVar('message', $message);
 						$this->viewBuilder()->setVar('message_theme', $message_theme);
@@ -1082,9 +1145,24 @@ class ApplicationController extends AppController{
 		$final_submit_call_result =  $this->Customfunctions->applicationFinalSubmitCall($customer_id,$all_section_status);
 
 		if ($final_submit_call_result == true) {
-			$message = $firm_type_text.' - Final submitted successfully ';
+
+			// This message is changed for the Surrender module (SOC) - Akash [12-05-2023]
+			if ($application_type == 9) {
+				$message = "Application of Surrender for ".$firm_type_text.' - Final submitted successfully ';
+			}else{
+				$message = $firm_type_text.' - Final submitted successfully ';
+			}
+
 			$message_theme = 'success';
 			$redirect_to = '../applicationformspdfs/'.$section_details['forms_pdf'];
+			
+		     //After final submitted redirect to home not pdf added by laxmi B. on 30-05-2023
+			   $application_type = $this->Session->read('application_type');
+			   if(!empty($application_type) && $application_type == 4){
+			     $redirect_to = '../chemist/home';
+																  
+			    }
+		
 		} else {
 			$message = $firm_type_text.' - All Sections not filled, Please fill all Section and then Final Submit ';
 			$message_theme = 'failed';

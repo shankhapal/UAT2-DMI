@@ -12,14 +12,16 @@
 		font-size: 12pt;
 		font-family: times;
 	}
-				
+	.cRed{
+		color: red;
+	}
 </style>
 
 
 	<table width="100%" border="1">
 		<tr>
 			<td align="center" style="padding:5px;">		
-				<h4>Application for Approval for Surrender of Approval of Laboratory</h4>
+				<h4>Application for Approval of <b><span class="cRed">SURRENDER</span></b> of Approval of Laboratory</h4>
 			</td>
 		</tr>
 	</table>
@@ -59,7 +61,7 @@
 							echo $firm_state_name.', '; 
 							echo $firmData['postal_code']; 
 						?>  
-					seek approval for surrender the Approval of Laboratoryn of agricultural commodities for 
+					seek approval for surrender the Approval of Laboratory of agricultural commodities for 
 					<?php echo $firmData['firm_name']; ?> in accordance with the provision of agriculture produce (Grading and Marking) Act, 
 					1937 and rules made there under.
 			</td>

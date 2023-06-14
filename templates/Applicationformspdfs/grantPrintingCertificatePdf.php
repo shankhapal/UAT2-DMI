@@ -1,5 +1,5 @@
 
-	<?php ?>		
+<?php ?>		
 
 <style>
 	h4 {
@@ -7,7 +7,6 @@
 		font-family: times;
 		font-size: 12pt;	
 	}
-								
 
 	table{
 		padding: 5px;
@@ -25,7 +24,11 @@
 		<table width="100%" border="1">
 			<tr>
 				<td>
-					<h4 class="cRed">This Application is Surrendered on Date: <?php echo date('Y-m-d'); ?></h4>
+					<h4 class="cRed">
+						This Permission to Printing Press is cancelled by the competent authority dated <b> <?php echo date('d-m-Y'); ?> </b> 
+						Applicant should do the Submission of balance printed material and declaration that applicant will not print under Agmark.
+						If, violation is observed than action shall be taken as per APGM Act and GGM Rule.
+					</h4>
 				</td>
 			</tr>
 		</table>
@@ -322,17 +325,20 @@
 		
 		
 		<table width="100%" border="1" >
-				<tr>
-					<th style="padding:10px;" width="25%" cellspacing="50" align="left"><b>Date of Application</b></th>
-					<th style="padding:10px;" width="45%" cellspacing="50" align="left"><b>Details of the changes recorded</b></th>
-					<th style="padding:10px;" width="30%" cellspacing="50" align="left"><b>Signature & Designation of Authorised Officer</b></th>
-					
-				</tr>
+			<tr>
+				<th style="padding:10px;" width="25%" cellspacing="50" align="left"><b>Date of Application</b></th>
+				<th style="padding:10px;" width="45%" cellspacing="50" align="left"><b>Details of the changes recorded</b></th>
+				<th style="padding:10px;" width="30%" cellspacing="50" align="left"><b>Signature & Designation of Authorised Officer</b></th>
 				
-				<!-- element call to show change updates added on 02-01-2023-->
-				<?php echo $this->element('application_forms/change/elementChangeUpdatesOnCertificate'); ?>
-																		   
-																					   
+			</tr>
+				
+			<!-- element call to show change updates added on 02-01-2023-->
+			<?php
+				//condition added on 26-05-2023, to get changed details only when appl. is for change or already changed earlier 
+				if($_SESSION['application_type']==3 || !empty($getNoOfAppl)){
+					echo $this->element('application_forms/change/elementChangeUpdatesOnCertificate');
+				}
+			?>																   
 		 
 		
 		</table>

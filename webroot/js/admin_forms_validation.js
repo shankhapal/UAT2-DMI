@@ -96,8 +96,8 @@
 					value_return = 'false';
 				}
 
-				//first valid no. for mob.no, applid on 16-02-2021 by Amol
-				var validfirstno = ['7','8','9'];
+				//In this array added '6' as suggested by Tarun Sir on 26-04-2023 - Akash [27-04-2023]
+				var validfirstno = ['6','7','8','9'];
 				//get first character of mobile no.
 				var f_m_no = phone.charAt(0);
 				if($.inArray(f_m_no,validfirstno) != -1){
@@ -771,7 +771,7 @@
 
             var application_type = $('#application_type').val();
             var charge = $('#charge').val();
-			var application_type_id = $('#application_type_id').val();
+			var application_type_id = $('#application_type_id').val();				
 			var firm_type = $('#firm_type').val();
 
             if(application_type == ''){
@@ -821,6 +821,7 @@
 				value_return = 'false';
 			}
 		}
+
 
 		//For RO Offices
 		if(masterId == '10'){
@@ -1116,6 +1117,93 @@
 		}
 
 
+		//For Documents
+		if (masterId == '19') {
+
+			var document_name = $('#document_name').val();
+
+			if (document_name == '') {
+
+				$("#error_document_name").show().text("Please Enter Document Name");
+                $("#document_name").addClass("is-invalid");
+                $("#document_name").click(function(){$("#error_document_name").hide().text;$("#document_name").removeClass("is-invalid");});
+				value_return = 'false';
+			}
+		}
+
+
+		//For Misgrading Category- Akash [05-06-2023]
+		if (masterId == '21') {
+
+			var misgrade_category_name = $('#misgrade_category_name').val();
+			var misgrade_category_dscp = $('#misgrade_category_dscp').val();
+
+			if (misgrade_category_name == '') {
+
+				$("#error_misgrade_category_name").show().text("Please Enter Misgrading Category Name!");
+                $("#misgrade_category_name").addClass("is-invalid");
+                $("#misgrade_category_name").click(function(){$("#error_misgrade_category_name").hide().text;$("#misgrade_category_name").removeClass("is-invalid");});
+				value_return = 'false';
+			}
+
+			if (misgrade_category_dscp == '') {
+
+				$("#error_misgrade_category_dscp").show().text("Please Enter Description!");
+                $("#misgrade_category_dscp").addClass("is-invalid");
+                $("#misgrade_category_dscp").click(function(){$("#error_misgrade_category_dscp").hide().text;$("#misgrade_category_dscp").removeClass("is-invalid");});
+				value_return = 'false';
+			}
+		}
+
+
+		//For Misgrading Levels - Akash [05-06-2023]
+		if (masterId == '22') {
+
+			var misgrade_level_name = $('#misgrade_level_name').val();
+			var misgrade_level_dscp = $('#misgrade_level_dscp').val();
+
+			if (misgrade_level_name == '') {
+
+				$("#error_misgrade_level_name").show().text("Please Enter Misgrading Level Name!");
+                $("#misgrade_level_name").addClass("is-invalid");
+                $("#misgrade_level_name").click(function(){$("#error_misgrade_level_name").hide().text;$("#misgrade_level_name").removeClass("is-invalid");});
+				value_return = 'false';
+			}
+
+			if (misgrade_level_dscp == '') {
+
+				$("#error_misgrade_level_dscp").show().text("Please Enter Description!");
+                $("#misgrade_level_dscp").addClass("is-invalid");
+                $("#misgrade_level_dscp").click(function(){$("#error_misgrade_level_dscp").hide().text;$("#misgrade_level_dscp").removeClass("is-invalid");});
+				value_return = 'false';
+			}
+		}
+
+
+		//For Misgrading Actions- Akash [05-06-2023]
+		if (masterId == '23') {
+
+			var misgrade_action_name = $('#misgrade_action_name').val();
+			var misgrade_action_dscp = $('#misgrade_action_dscp').val();
+
+			if (misgrade_action_name == '') {
+
+				$("#error_misgrade_action_name").show().text("Please Enter Misgrading Action Name!");
+                $("#misgrade_action_name").addClass("is-invalid");
+                $("#misgrade_action_name").click(function(){$("#error_misgrade_action_name").hide().text;$("#misgrade_action_name").removeClass("is-invalid");});
+				value_return = 'false';
+			}
+
+			if (misgrade_action_dscp == '') {
+
+				$("#error_misgrade_action_dscp").show().text("Please Enter Misgrading Action Name!");
+                $("#misgrade_action_dscp").addClass("is-invalid");
+                $("#misgrade_action_dscp").click(function(){$("#error_misgrade_action_dscp").hide().text;$("#misgrade_action_dscp").removeClass("is-invalid");});
+				value_return = 'false';
+			}
+		}
+
+
         if(value_return == 'false'){
             var msg = "Please check some fields are missing or not proper.";
             renderToast('error', msg);
@@ -1129,6 +1217,7 @@
 				exit();
 			}
 		}
+	
 	}
 
 

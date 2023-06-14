@@ -2,7 +2,7 @@
 <!-- Create homepage title dynamic and change logo image url path // Done by pravin 28/04/2018 -->
 <div class="wrapper logo-title row">
 	<div class="col-md-3 col-xs-3 header-img1">
-		<img class="img-responsive" src="/writereaddata/logos/emblem.png">
+		<img class="img-responsive" src="/testdocs/logos/emblem.png">
 		<label class="uat_text">UAT Version</label>
 	</div>
 
@@ -13,7 +13,7 @@
 	</div>
 
 	<div class="col-md-3 col-xs-3 header-img2">
-		<img class="img-responsive" src="/writereaddata/logos/agmarklogo.png">
+		<img class="img-responsive" src="/testdocs/logos/agmarklogo.png">
 	</div>
 	<div class="clear"></div>
 </div>

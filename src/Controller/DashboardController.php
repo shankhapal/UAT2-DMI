@@ -55,6 +55,13 @@ class DashboardController extends AppController{
 			
 			#This below Sesion delete is added to unset the application_type session on click - Akash[05-12-2022]
 			$this->Session->Delete('application_type');
+
+			//Below all the Session Delete setfor the MMR Application - Akash [06-06-2023]
+			$this->Session->Delete('alloc_user_by');
+			$this->Session->Delete('allocation_to');
+			$this->Session->Delete('sample_code');
+			$this->Session->Delete('pdf_file_name');
+			$this->Session->Delete('application_mode');
 		}
 
 //phase 2 new code from here
@@ -97,6 +104,10 @@ class DashboardController extends AppController{
 				{
 					$this->Session->write('current_level','level_3');
 					$this->Session->write('level_3_for','RO');
+                  
+				    //Regional Office tab clicked added application dashboard in session- Laxmi [30-05-2023]
+					$this->Session->write('application_dashboard','ro');										 
+					
 					$status_title = 'Status of Applications in Regional Office';
 				}
 
@@ -670,12 +681,24 @@ class DashboardController extends AppController{
 
 			$find_ro_id = $this->DmiRoOffices->find('list',array('valueField'=>'id','conditions'=>array('ro_email_id IS'=>$username)))->toList();
 
+			//below updates are applied on 19-05-2023 as suggested by DMi through email.
+			//Because RO incharge wants the list of IO users from SO jurisdiction under it. as per application.
+			//get application jurisdiction
+			$this->loadModel('DmiApplWithRoMappings');
+			$appl_office_id = $this->DmiApplWithRoMappings->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+			//check first the application jurisdiction not same with current login user, else show as it is
+			//else show users from both jurisdictions
+			if(!in_array($appl_office_id['office_id'],$find_ro_id)){
+				$conditionCheck = array('OR'=>array('posted_ro_office IN'=>$find_ro_id,'posted_ro_office IS'=>$appl_office_id['office_id']),'status'=>'active');
+			}else{
+				$conditionCheck = array('posted_ro_office IN'=>$find_ro_id,'status'=>'active');
+			}
+
 			$io_users_list = array();
 			if(!empty($find_ro_id))
 			{
-				$ro_id = $find_ro_id;
-
-				$find_user_belongs = $this->DmiUsers->find('list',array('keyField'=>'id', 'valueField'=>'email','conditions'=>array('posted_ro_office IN'=>$ro_id,'status'=>'active')))->toList();
+				//condition variable "$conditionCheck" is applied in 19-05-2023 as per above updates
+				$find_user_belongs = $this->DmiUsers->find('list',array('keyField'=>'id', 'valueField'=>'email','conditions'=>$conditionCheck))->toList();
 
 				$io_users_list = $this->DmiUserRoles->find('list',array('keyField'=>'user_email_id','valueField'=>'user_email_id','conditions'=>array('user_email_id IN'=>$find_user_belongs,'io_inspection'=>'yes')))->toArray();
 
@@ -2671,7 +2694,12 @@ class DashboardController extends AppController{
 		
 		//using core joins due issue in cakephp 3.8 joins format
 		$conn = ConnectionManager::get('default');
-		$stmt = $conn->execute("select id,ro_office from dmi_ro_offices where office_type='$office_type' AND delete_status IS NULL");
+		//commented below query on 12-06-2023 by Amo, to solve SO to Ro transfer of PP appl for single officer
+		//$stmt = $conn->execute("select id,ro_office from dmi_ro_offices where office_type='$office_type' AND delete_status IS NULL");
+		
+		//added below query without office type condition on 12-06-2023 by Amol,to solve SO to Ro transfer of PP appl for single officer
+		$stmt = $conn->execute("select id,ro_office from dmi_ro_offices where delete_status IS NULL");
+
 		$appl_list = $stmt ->fetchAll('assoc');
 
 		echo '~'.json_encode($appl_list).'~';

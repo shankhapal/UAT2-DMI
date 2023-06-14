@@ -32,8 +32,8 @@ class DmiSurrenderFormsDetailsTable extends Table{
 											'required_document' => "", 
 											'is_surrender_published'=>"",
 											'is_surrender_published_docs'=>"",
-											'is_cabook_submitted'=>"",
-											'is_cabook_submitted_docs'=>"",
+											//'is_cabook_submitted'=>"", -> This field is not required as UAT Suggestion by DMI - Akash [12-05-2023]
+											//'is_cabook_submitted_docs'=>"" ,-> This field is not required as UAT Suggestion by DMI - Akash [12-05-2023]
 											'is_ca_have_replica'=>"",
 											'is_replica_submitted'=>"",
 											'is_replica_submitted_docs'=>"",
@@ -83,7 +83,9 @@ class DmiSurrenderFormsDetailsTable extends Table{
 			if ($firmType == 1) {
 
 				$is_surrender_published = htmlentities($forms_data['is_surrender_published'], ENT_QUOTES);
-				$is_cabook_submitted = htmlentities($forms_data['is_cabook_submitted'], ENT_QUOTES);
+				#This field is not required as UAT Suggestion by DMI - Akash [12-05-2023]
+				//$is_cabook_submitted = htmlentities($forms_data['is_cabook_submitted'], ENT_QUOTES);
+				
 				$is_ca_have_replica = htmlentities($forms_data['is_ca_have_replica'], ENT_QUOTES);
 
 			}elseif ($firmType == 2) {
@@ -132,22 +134,25 @@ class DmiSurrenderFormsDetailsTable extends Table{
 					$is_surrender_published_docs=null;
 				}
 			
-				#For CA Book Documents
-				if ($is_cabook_submitted=='yes') {
-					//file uploading					
-					if(!empty($forms_data['is_cabook_submitted_docs']->getClientFilename())){
-						
-						$file_name = $forms_data['is_cabook_submitted_docs']->getClientFilename();
-						$file_size = $forms_data['is_cabook_submitted_docs']->getSize();
-						$file_type = $forms_data['is_cabook_submitted_docs']->getClientMediaType();
-						$file_local_path = $forms_data['is_cabook_submitted_docs']->getStream()->getMetadata('uri');
-						$is_cabook_submitted_docs = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function
-									
-					} else { $is_cabook_submitted_docs = $section_form_details[0]['is_cabook_submitted_docs'];}
-				} else {
-					$is_cabook_submitted_docs = null;
-				}
-				
+				#For CA Book Documents -> #This field is not required as UAT Suggestion by DMI - Akash [12-05-2023]
+				/*
+					if ($is_cabook_submitted=='yes') {
+						//file uploading					
+						if(!empty($forms_data['is_cabook_submitted_docs']->getClientFilename())){
+							
+							$file_name = $forms_data['is_cabook_submitted_docs']->getClientFilename();
+							$file_size = $forms_data['is_cabook_submitted_docs']->getSize();
+							$file_type = $forms_data['is_cabook_submitted_docs']->getClientMediaType();
+							$file_local_path = $forms_data['is_cabook_submitted_docs']->getStream()->getMetadata('uri');
+							$is_cabook_submitted_docs = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function
+										
+						} else { $is_cabook_submitted_docs = $section_form_details[0]['is_cabook_submitted_docs'];}
+					} else {
+						$is_cabook_submitted_docs = null;
+					}
+				*/
+
+
 				#For Replica Documents
 				if ($is_ca_have_replica =='yes') {
 
@@ -175,8 +180,8 @@ class DmiSurrenderFormsDetailsTable extends Table{
 			}else{ 
 				$is_surrender_published = null;
 				$is_surrender_published_docs = null;
-				$is_cabook_submitted = null;
-				$is_cabook_submitted_docs = null;
+				//$is_cabook_submitted = null; -> #This field is not required as UAT Suggestion by DMI - Akash [12-05-2023]
+				//$is_cabook_submitted_docs = null; -> #This field is not required as UAT Suggestion by DMI - Akash [12-05-2023]
 				$is_ca_have_replica	 = null;
 				$is_replica_submitted = null;
 				$is_replica_submitted_docs = null;
@@ -335,8 +340,8 @@ class DmiSurrenderFormsDetailsTable extends Table{
 				'modified'=>date('Y-m-d H:i:s'),
 				'is_surrender_published'=>$is_surrender_published,
 				'is_surrender_published_docs'=>$is_surrender_published_docs,
-				'is_cabook_submitted'=>$is_cabook_submitted,
-				'is_cabook_submitted_docs'=>$is_cabook_submitted_docs,
+				//'is_cabook_submitted'=>$is_cabook_submitted, -> #This field is not required as UAT Suggestion by DMI - Akash [12-05-2023]
+				//'is_cabook_submitted_docs'=>$is_cabook_submitted_docs, -> #This field is not required as UAT Suggestion by DMI - Akash [12-05-2023]
 				'is_ca_have_replica'=>$is_ca_have_replica,
 				'is_replica_submitted'=>$is_replica_submitted,
 				'is_replica_submitted_docs'=>$is_replica_submitted_docs,
@@ -440,8 +445,8 @@ class DmiSurrenderFormsDetailsTable extends Table{
 			'modified'=>date('Y-m-d H:i:s'),
 			'is_surrender_published'=>$forms_data['is_surrender_published'],
 			'is_surrender_published_docs'=>$forms_data['is_surrender_published_docs'],
-			'is_cabook_submitted'=>$forms_data['is_cabook_submitted'],
-			'is_cabook_submitted_docs'=>$forms_data['is_cabook_submitted_docs'],
+			//'is_cabook_submitted'=>$forms_data['is_cabook_submitted'], -> #This field is not required as UAT Suggestion by DMI - Akash [12-05-2023]
+			//'is_cabook_submitted_docs'=>$forms_data['is_cabook_submitted_docs'], -> #This field is not required as UAT Suggestion by DMI - Akash [12-05-2023]
 			'is_ca_have_replica'=>$forms_data['is_ca_have_replica'],
 			'is_replica_submitted'=>$forms_data['is_replica_submitted'],
 			'is_replica_submitted_docs'=>$forms_data['is_replica_submitted_docs'],
@@ -482,7 +487,7 @@ class DmiSurrenderFormsDetailsTable extends Table{
 		
 		$returnValue = true;
 		$section_form_details = $this->sectionFormDetails($customer_id);
-
+	
 		$CustomersController = new CustomersController;
 		$firmType = $CustomersController->Customfunctions->firmType($customer_id);
 
@@ -491,20 +496,41 @@ class DmiSurrenderFormsDetailsTable extends Table{
 			if(empty($forms_data['required_document']->getClientFilename())){ $returnValue = null ; }
 			
 			if ($firmType == 1) {
-				if(empty($forms_data['is_surrender_published_docs']->getClientFilename())){ $returnValue = null ; }
-				if(empty($forms_data['is_cabook_submitted_docs']->getClientFilename())){ $returnValue = null ; }
-				if(empty($forms_data['is_replica_submitted_docs']->getClientFilename())){ $returnValue = null ; }
+
+				if ($forms_data['is_surrender_published'] == 'yes') {
+					if(empty($forms_data['is_surrender_published_docs']->getClientFilename())){ $returnValue = null ; }
+				}
+
+				#This field is not required as UAT Suggestion by DMI - Akash [12-05-2023]
+				//if(empty($forms_data['is_cabook_submitted_docs']->getClientFilename())){ $returnValue = null ; }
+
+
+				if ($forms_data['is_ca_have_replica'] == 'yes' && $forms_data['is_replica_submitted'] == 'yes') {
+					if(empty($forms_data['is_replica_submitted_docs']->getClientFilename())){ $returnValue = null ; }
+				}
 
 			}elseif($firmType == 2){
 
-				if(empty($forms_data['is_balance_printing_submitted_docs']->getClientFilename())){ $returnValue = null ; }
-				if(empty($forms_data['printing_declaration_docs']->getClientFilename())){ $returnValue = null ; }
-				if(empty($forms_data['is_packers_conveyed_docs']->getClientFilename())){ $returnValue = null ; }
+				if ($forms_data['is_balance_printing_submitted'] == 'yes') {
+					if(empty($forms_data['is_balance_printing_submitted_docs']->getClientFilename())){ $returnValue = null ; }
+				}
+				if ($forms_data['printing_declaration'] == 'yes') {
+					if(empty($forms_data['printing_declaration_docs']->getClientFilename())){ $returnValue = null ; }
+				}
+				if ($forms_data['is_packers_conveyed'] == 'yes') {
+					if(empty($forms_data['is_packers_conveyed_docs']->getClientFilename())){ $returnValue = null ; }
+				}
+				
 
 			}elseif($firmType == 3){
 
-				if(empty($forms_data['noc_for_lab_docs']->getClientFilename())){ $returnValue = null ; }
-				if(empty($forms_data['is_lab_packers_conveyed_docs']->getClientFilename())){ $returnValue = null ; }
+				if ($forms_data['noc_for_lab'] == 'yes') {
+					if(empty($forms_data['noc_for_lab_docs']->getClientFilename())){ $returnValue = null ; }
+				}
+				if ($forms_data['is_lab_packers_conveyed'] == 'yes') {
+					if(empty($forms_data['is_lab_packers_conveyed_docs']->getClientFilename())){ $returnValue = null ; }
+				}
+
 			}
 		}
 

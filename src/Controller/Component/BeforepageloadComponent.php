@@ -523,16 +523,75 @@ class BeforepageloadComponent extends Component {
 			$isAppSurrender = 'no';
 		}
 
-		#For Misgrade Actions
-		/*$DmiMisgradeActionFinalSubmits = TableRegistry::getTableLocator()->get('DmiMisgradeActionFinalSubmits');
-        $isActionTaken = $DmiMisgradeActionFinalSubmits->find('all')->where(['customer_id IS' => $customer_id])->order('id asc')->first();
-		if (!empty($isActionTaken)) {
-			$isActionTaken = 'yes';
+		#For Suspension
+		$currentDate = date('Y-m-d H:i:s'); 
+		$DmiMmrSuspensions = TableRegistry::getTableLocator()->get('DmiMmrSuspensions');
+		$suspension_record = $DmiMmrSuspensions->find('all')->where(['customer_id IS' => $customer_id,'to_date >=' => $currentDate])->order('id DESC')->first();
+		if (!empty($suspension_record )) {
+			$isSuspended = 'yes';
 		}else{
-			$isActionTaken = 'no';
+			$isSuspended = 'no';
 		}
-		*/
 
+		#For Cancellation	
+		$DmiMmrCancelledFirms = TableRegistry::getTableLocator()->get('DmiMmrCancelledFirms');
+		$cancellation_record = $DmiMmrCancelledFirms->find('all')->where(['customer_id IS' => $customer_id])->order('id DESC')->first();
+		if (!empty($cancellation_record )) {
+			$isCancelled = 'yes';
+		}else{
+			$isCancelled = 'no';
+		}
+		
+		
+		//to check if any application is in process for this application
+		//to restrict applicant to apply any another appication, first need to grant or reject the in process one
+		//on 28-04-2023 by Amol
+		$DmiFlowWiseTablesLists = TableRegistry::getTableLocator()->get('DmiFlowWiseTablesLists');
+		$flow_wise_tables = $DmiFlowWiseTablesLists->find('all',array('fields'=>array('application_type','application_form','payment'),'conditions'=>array('application_type IN'=>$this->Session->read('applTypeArray')),'order'=>'id ASC'))->toArray();
+		$InprocessMsg = null;
+		$InprocessApplId = null;
+		foreach($flow_wise_tables as $eachflow){
+			
+			$checkFlag='';
+			//specific for advanced payment flow
+			if ($eachflow['application_type']==7) {
+				$paymentModel = $eachflow['payment'];
+				$paymentModel = TableRegistry::getTableLocator()->get($paymentModel);
+				//get advance payment status
+				$paymentStatus = $paymentModel->find('all', array('fields'=>'payment_confirmation','conditions' => array('customer_id IS' => $customer_id),'order'=>'id desc'))->first();
+				//get rejected status
+				$IsRejected = $this->Controller->Customfunctions->isApplicationRejected($customer_id,$eachflow['application_type']);
+				if (!empty($paymentStatus) && ($paymentStatus['payment_confirmation']=='confirmed' && empty($IsRejected))) {
+					$checkFlag = 'yes';
+				}
+				
+			}else{
+				$finalSubmitModel = $eachflow['application_form'];
+				$finalSubmitModel = TableRegistry::getTableLocator()->get($finalSubmitModel);
+				//get final status
+				$finalSubmitStatus = $finalSubmitModel->find('all', array('conditions' => array('customer_id IS' => $customer_id),'order'=>'id desc'))->first();
+				//get rejected status
+				$IsRejected = $this->Controller->Customfunctions->isApplicationRejected($customer_id,$eachflow['application_type']);
+				
+				if (!empty($finalSubmitStatus) && (!($finalSubmitStatus['status']=='approved' && $finalSubmitStatus['current_level']=='level_3') && empty($IsRejected))) {
+					$checkFlag = 'yes';
+				}
+			}
+			
+			if ($checkFlag=='yes') {
+				$DmiApplicationTypes = TableRegistry::getTableLocator()->get('DmiApplicationTypes');
+				$getApplTypeName = $DmiApplicationTypes->find('all',array('conditions'=>array('id IS'=>$eachflow['application_type'])))->first();
+				
+				$InprocessMsg = "Your Application is In-Process for Grant/Permission/Approval of ".$getApplTypeName['application_type']." Certificate.";
+				$InprocessApplId = $eachflow['application_type'];
+				break;	
+			}
+			
+						
+		}
+
+
+		$this->Controller->set(compact('InprocessMsg','InprocessApplId'));
 		$this->Controller->set('IsApproved',$IsApproved);
 		$this->Controller->set('show_renewal_btn',$show_renewal_btn);
 		$this->Controller->set('show_button', $show_button);
@@ -540,7 +599,8 @@ class BeforepageloadComponent extends Component {
 		$this->Controller->set('Is15DigitApproved',$Is15DigitApproved);
 		$this->Controller->set('IsECodeApproved',$IsECodeApproved);
 		$this->Controller->set('isAppSurrender',$isAppSurrender);
-		//$this->Controller->set('isActionTaken', $isActionTaken);
+		$this->Controller->set('isSuspended', $isSuspended);
+		$this->Controller->set('isCancelled', $isCancelled);
 
 
 	}
@@ -550,7 +610,7 @@ class BeforepageloadComponent extends Component {
 				
 		//commented on 02-04-2021 as esign services was blocked on response
 		
-		/*	$validHostName = array('10.158.81.78','esignservice.cdac.in');
+		/*	$validHostName = array('agmarkonline.dmi.gov.in','esignservice.cdac.in');
 			$hostName = $_SERVER['HTTP_HOST'];
 			if(!in_array($hostName,$validHostName)){
 				$this->Controller->customAlertPage("Something went wrong. ");

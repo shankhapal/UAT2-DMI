@@ -124,7 +124,11 @@
 						(!empty($check_valid_ro) && $to_user=='ro') ||
 
 						//Below condtion is added to when application is reffered back from Dy.AMA to RO and RO replied back to DY.AMA - Akash[04-05-2023]
-						($from_user=='ro' && $_SESSION['current_level']=='level_4')
+						($from_user=='ro' && $_SESSION['current_level']=='level_4') ||
+						
+						//on 15-05-2023 to resolved such issues, where application get stucked. when dyama allocated again to HO MO if already allocated
+						//and no comment to HO MO present
+						($curPosUser == $_SESSION['username'])
 					
 					){ ?> 
 

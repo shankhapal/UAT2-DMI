@@ -175,19 +175,36 @@ class RomoioapplicantcommunicationactionsComponent extends Component {
 					//condition added on 13-04-2023 by Amol, to avoid redirect after all section scrutinized
 					//FLOWS : Chemist , Surrender, Change
 					$office_type = $this->Customfunctions->getApplDistrictOffice($customer_id);
-					if($application_type==3 || $application_type==4 || $application_type==9){ 
+					if($application_type==3 || $application_type==4 || $application_type==9){
 					
-						if ($office_type=='RO' && $application_type==3) {
+						//added officetype =='SO' on 24-05-2023 by Amol, to stay on same page after scrutiny
+						if (($office_type=='RO' || $office_type=='SO') && $application_type==3) {
 							$changeInspection = $this->Customfunctions->inspRequiredForChangeApp($customer_id,$application_type);
 							if ($changeInspection=='no') {
 								return 2;
 							}
 							
 						} elseif ($application_type==4) {
+							//comment below line and fetch details from chemist registration details for chemist to find chemist is old or new added by laxmi on 02-05-2023
 							
-							$NewChemist = 'yes';
-							if ($NewChemist=='yes') {return 2;}
+							//$NewChemist = 'yes';
+							//if ($NewChemist=='yes') {return 2;}
 							
+					    // to fetch chemist is alredy registerd or new chemist added by laxmi on 21-12-22
+						$DmiChemistRegistrations = TableRegistry::getTableLocator()->get('DmiChemistRegistrations');	
+						$chemistdetails = $DmiChemistRegistrations->find('list', array('valueField'=>'is_training_completed', 'conditions'=>array('chemist_id IS'=>$customer_id)))->first();
+                           
+						// set in session variable for chemist training completed or not
+						 if(!empty($chemistdetails)){
+                          $this->Session->write('is_training_completed', $chemistdetails);
+                          
+						 }
+
+						if ((!empty($chemistdetails) && $chemistdetails=='no') && ($office_type == 'RO' || $office_type == 'SO')) {
+							return 2;
+						}
+							
+						
 						} elseif ($office_type=='RO' && $application_type==9) {
 							return 2;
 						}

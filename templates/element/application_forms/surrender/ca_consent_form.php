@@ -165,47 +165,60 @@
 									</div>
 								</div>
 							</div>
-						
-							<div class="col-sm-12 mb-3"><p class="bg-info pl-2 p-1 rounded"><i class="fa fa-info-circle"></i> Is Packer Submitted CA Book? </p></div>
-							<div class="row">
-								<div class="col-sm-6 d-inline-block mb-3">
-									<?php $is_responsible = $section_form_details[0]['is_cabook_submitted'];
-										if($is_responsible == 'yes'){
-											$checked_yes = 'checked';
-											$checked_no = '';
-										} else {
-											$checked_yes = '';
-											$checked_no = 'checked';
-										}
-									?>
-									<div class="icheck-primary d-inline">
-										<input type="radio" name="is_cabook_submitted" checked="" id="is_cabook_submitted-yes" value="yes" <?php echo $checked_yes; ?>>
-										<label class="marginL9" for="is_cabook_submitted-yes">Yes</label>
-									</div>
-									<div class="icheck-primary d-inline">
-										<input type="radio" name="is_cabook_submitted" id="is_cabook_submitted-no" value="no" <?php  echo $checked_no; ?>>
-										<label class="marginL9" for="is_cabook_submitted-no">No</label>
-									</div>										
-									<span id="error_is_cabook_submitted" class="error invalid-feedback"></span>
-								</div>
-								<div class="col-sm-6 d-inline-block">
-									<div class="form-group row" id="is_cabook_submitted_docs_block">
-										<label for="inputEmail3" class="col-sm-3 col-form-label">Related Document: <span class="cRed">*</span>
-											<?php if(!empty($section_form_details[0]['is_cabook_submitted_docs'])){?>
-												<a id="is_cabook_submitted_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['is_cabook_submitted_docs']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['is_cabook_submitted_docs'])), -1))[0],23);?></a>
-											<?php } ?>
-										</label>
-										<div class="custom-file col-sm-9">
-											<input type="file" name="is_cabook_submitted_docs" class="custom-file-input" id="is_cabook_submitted_docs", multiple='multiple'>
-											<label class="custom-file-label" for="customFile">Choose file</label>
-											<span id="error_is_cabook_submitted_docs" class="error invalid-feedback"></span>
-											<span id="error_size_is_cabook_submitted_docs" class="error invalid-feedback"></span>
-											<span id="error_type_is_cabook_submitted_docs" class="error invalid-feedback"></span>
+							
+
+
+
+							<!-------------------------------------------------------------------------------------------------------------------------------------
+								The Below upload and radio button option is commented as the UAT Suggestion provided by the DMI .. That the CA book is irrelevant in 
+								Online system . So this options are hide.
+								- Akash [12-05-2023]
+								<div class="col-sm-12 mb-3"><p class="bg-info pl-2 p-1 rounded"><i class="fa fa-info-circle"></i> Is Packer Submitted CA Book? </p></div>
+								<div class="row">
+									<div class="col-sm-6 d-inline-block mb-3">
+										<?php
+										/* $is_responsible = $section_form_details[0]['is_cabook_submitted'];
+											if($is_responsible == 'yes'){
+												$checked_yes = 'checked';
+												$checked_no = '';
+											} else {
+												$checked_yes = '';
+												$checked_no = 'checked';
+											}
+										*/ 
+										?>
+										<div class="icheck-primary d-inline">
+											<input type="radio" name="is_cabook_submitted" checked="" id="is_cabook_submitted-yes" value="yes" <?php // echo $checked_yes; ?>>
+											<label class="marginL9" for="is_cabook_submitted-yes">Yes</label>
 										</div>
-										<p class="lab_form_note mt-3 lab_form_note float-right"><i class="fa fa-info-circle"></i> File type: PDF, jpg &amp; max size upto 2 MB</p>
+										<div class="icheck-primary d-inline">
+											<input type="radio" name="is_cabook_submitted" id="is_cabook_submitted-no" value="no" <?php //echo $checked_no; ?>>
+											<label class="marginL9" for="is_cabook_submitted-no">No</label>
+										</div>										
+										<span id="error_is_cabook_submitted" class="error invalid-feedback"></span>
+									</div>
+									<div class="col-sm-6 d-inline-block">
+										<div class="form-group row" id="is_cabook_submitted_docs_block">
+											<label for="inputEmail3" class="col-sm-3 col-form-label">Related Document: <span class="cRed">*</span>
+												<?php // if(!empty($section_form_details[0]['is_cabook_submitted_docs'])){ ?>
+													<a id="is_cabook_submitted_docs_value" target="blank" href="<?php //echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['is_cabook_submitted_docs']); ?>">
+													<? // =$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['is_cabook_submitted_docs'])), -1))[0],23); ?></a>
+												<?php //} ?>
+											</label>
+											<div class="custom-file col-sm-9">
+												<input type="file" name="is_cabook_submitted_docs" class="custom-file-input" id="is_cabook_submitted_docs", multiple='multiple'>
+												<label class="custom-file-label" for="customFile">Choose file</label>
+												<span id="error_is_cabook_submitted_docs" class="error invalid-feedback"></span>
+												<span id="error_size_is_cabook_submitted_docs" class="error invalid-feedback"></span>
+												<span id="error_type_is_cabook_submitted_docs" class="error invalid-feedback"></span>
+											</div>
+											<p class="lab_form_note mt-3 lab_form_note float-right"><i class="fa fa-info-circle"></i> File type: PDF, jpg &amp; max size upto 2 MB</p>
+										</div>
 									</div>
 								</div>
-							</div>
+							------------------------------------------------------------------------------------------------------------------------------------------------------>
+
+
 
 							<div class="col-sm-12 mb-3"><p class="bg-info pl-2 p-1 rounded"><i class="fa fa-info-circle"></i> Is Packer Have applied for the Replica ? </p></div>
 							<div class="col-sm-12">

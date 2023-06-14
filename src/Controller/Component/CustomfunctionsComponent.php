@@ -8,6 +8,8 @@ use Cake\ORM\TableRegistry;
 use Cake\Datasource\EntityInterface;
 use QRcode;
 use Cake\Chronos\Chronos;  // Chronos library is use for DateTime by shankhpal on 08/06/2023 
+use Cake\Datasource\ConnectionManager;
+
 
 class CustomfunctionsComponent extends Component {
 
@@ -541,7 +543,8 @@ class CustomfunctionsComponent extends Component {
 		$return_value = 1; // if all section "saved"
 		$form_save_count = 0;
 		$form_approve_count = 0;
-
+        //variable set to check chemist training alredy done or not by laxmi on 17-01-2023
+        $registeredChemist = "";						
 
 		foreach ($sections as $each_section) {
 
@@ -573,6 +576,12 @@ class CustomfunctionsComponent extends Component {
 				$return_value = 0;
 			}
 		}
+			//if chemist training($_SESSION['is_training_completed']) already done payment section hidden and return saved form value as 1 in application side added by laxmi on 17-01-2023 
+		if((!empty($_SESSION['is_training_completed']) && $_SESSION['is_training_completed'] =='yes') && $section_form_status == 'saved'){
+			$return_value = 1;
+			$registeredChemist =1;
+		   }
+	   
 
 		if ($form_approve_count == count($sections)) { $return_value = 2; }
 
@@ -936,6 +945,12 @@ class CustomfunctionsComponent extends Component {
 	// This function check, is application have export unit?
 	public function checkApplicantExportUnit($customer_id) {
 
+	//condition to set customer id in variable added by laxmi B. on 9-1-2023
+		if(!empty($_SESSION['application_type']) && !empty($_SESSION['packer_id'])){
+          if($_SESSION['application_type'] == 4 && $_SESSION['packer_id']){
+             $customer_id = $_SESSION['packer_id'];
+          }
+		}
 		$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
 
 		$check_application_type = $DmiFirms->find('all',array('fields'=>'export_unit','conditions'=>array('customer_id IS'=>$customer_id)))->first();
@@ -2081,10 +2096,18 @@ class CustomfunctionsComponent extends Component {
 				//as per new order by 01-04-2021 from DMI
 				//if lab is NABL accreditated then valid upto the NABL accreditation date
 				//applied on 29-09-2021 by Amol
-				$NablDate = $this->Randomfunctions->checkIfLabNablAccreditated($customer_id);
-				if ($NablDate != null) {
-					$NablDate = str_replace('/','-',$NablDate);//replaced / with -
-					$valid_upto_date = $NablDate;
+				
+				//only Lab export will have NABL date as validity date, No Domestic Lab either accredited or not
+				//updated applied as per the suugestion from DMI in Tarun Sir's Delhi Meeting in April 2023.
+				//updates applied on 19-05-2023 by Amol
+				$exportUnit = $this->checkApplicantExportUnit($customer_id);
+				//only for Lab export
+				if($exportUnit=='yes'){
+					$NablDate = $this->Randomfunctions->checkIfLabNablAccreditated($customer_id);
+					if ($NablDate != null) {
+						$NablDate = str_replace('/','-',$NablDate);//replaced / with -
+						$valid_upto_date = $NablDate;
+					}
 				}
 			}
 		}
@@ -3259,6 +3282,67 @@ class CustomfunctionsComponent extends Component {
 		$self_registered_chemist = $DmiChemistRegistrations->find('all',array('conditions'=>array('created_by IS' => $customer_id)))->toArray();
 		$this->Controller->set('self_registered_chemist',$self_registered_chemist);
 
+		//view letter from Ro forwarded to Ral added by laxmi B on 29-12-22
+		
+		$i = 0;
+		$chemistRoforwardedLetter = array();
+		$reliving_pdf = array();
+		$cetificatePdf = array();
+		$ro_side_schedule_letter = array();
+		$ral_trainingCom_letter = array();
+		foreach($self_registered_chemist as $chemistList){
+           $chemistId = $DmiChemistRegistrations->find('all',array('fields'=>'chemist_id','conditions'=>array('created_by IS' => $customer_id)))->toArray();
+           $chemistIds[$i] = $chemistId[$i]['chemist_id']; 
+           $DmiChemistRalToRoLogs = TableRegistry::getTableLocator()->get('DmiChemistRalToRoLogs');
+           $chemistRalLetterData = $DmiChemistRalToRoLogs->find('all')->where(array('chemist_id'=>$chemistIds[$i], 'training_completed IS'=>NULL, 'reshedule_status IS'=>'confirm' ))->first(); 
+        
+		   if(!empty($chemistRalLetterData)){
+		     $chemistRoforwardedLetter[$i] = $chemistRalLetterData['reshedule_pdf'];
+		    }
+          
+          //ro side reliving letter show to packer id added by laxmi on 03-1-2023 
+          $DmiChemistTrainingAtRo = TableRegistry::getTableLocator()->get('DmiChemistTrainingAtRo');
+          $reliving_pdfs = $DmiChemistTrainingAtRo->find('all', array('fields'=>'pdf_file'))->where(array('chemist_id'=>$chemistIds[$i] , 'training_completed IS NOT'=>NULL))->first();
+           if(!empty($reliving_pdfs)){
+           
+            $reliving_pdf[$i] = $reliving_pdfs['pdf_file'];
+           } 
+
+           //grant certificate added by laxmi on 05-01-2023
+           $DmiChemistGrantCertificatePdfs = TableRegistry::getTableLocator()->get('DmiChemistGrantCertificatePdfs');
+           $cetificatePdfs = $DmiChemistGrantCertificatePdfs->find('all', array('fields'=>'pdf_file'))->where(array('customer_id'=>$chemistIds[$i]))->first();
+
+            if(!empty($cetificatePdfs)){
+           
+             $cetificatePdf[$i] = $cetificatePdfs['pdf_file'];
+            } 
+            
+            //RO side training schedule letter added by laxmi on 05-01-2023
+			$DmiChemistRoTRal = TableRegistry::getTableLocator()->get('DmiChemistRoToRalLogs');
+            $trainingScheduleLetterFromRo = $DmiChemistRoTRal->find('all', array('fields'=>'ro_schedule_letter'))->where(array('chemist_id'=>$chemistIds[$i]))->last();
+
+          if(!empty($trainingScheduleLetterFromRo)){
+           
+             $ro_side_schedule_letter[$i] = $trainingScheduleLetterFromRo['ro_schedule_letter'];
+            } 
+			
+           //get and view Ral side training completed letter by laxmi on 05-01-2023 for chemist_training
+              
+             $raltrainingComLetter = $DmiChemistRalToRoLogs->find('all', ['conditions'=>['chemist_id IS'=>$chemistIds[$i], 'training_completed IS NOT'=>NULL]])->last();
+			 
+            if(!empty($raltrainingComLetter)){
+                $ral_trainingCom_letter[$i] = $raltrainingComLetter['pdf_file'];
+			}
+           $i++;
+
+		}
+		 
+		 $this->Controller->set('viewLetterFromRo',$chemistRoforwardedLetter);
+		 $this->Controller->set('reliving_pdf',$reliving_pdf);
+		 $this->Controller->set('cetificatePdf',$cetificatePdf);
+		 $this->Controller->set('ro_side_schedule_letter',$ro_side_schedule_letter);
+		 $this->Controller->set('ral_trainingCom_letter',$ral_trainingCom_letter);
+		 //end Laxmi B.															
 	}
 
 
@@ -3517,37 +3601,55 @@ class CustomfunctionsComponent extends Component {
 			$customer_id = $this->Session->read('username');
 		}
 
-		/*
-		if ($type =='CHM') {
-			
-			if(!empty($result[0])){
-
-				$tableRowData = $result[0];
-				$i=0;
-				$data1 = '';
-				$data2 = '';
-				$data3 = '';
-				foreach($tableRowData as $each){ 
-					$data1 .=  $each['commodity_name'].",";
-					$data2 .= $each['tbl_name'].",";
-					$data3 .= $each['printer_name'].",";
-				} 
-			}
-		}
-		*/
-
 
 		$DmiCertQrCodes = TableRegistry::getTableLocator()->get('DmiCertQrCodes'); //initialize model in component
 				
 		require_once(ROOT . DS .'vendor' . DS . 'phpqrcode' . DS . 'qrlib.php');
 		
-		if ($type == 'CHM') {
+		
+		if($type == 'SOC'){ # For Surrender Flow (SOC)
+		
+			$split_customer_id = explode('/',$result[0]); 
+			if ($split_customer_id[1] == 1) {
+				$data = "This Certificate of Authorisation is cancelled by the competent authority dated " . date('d-m-Y') . ".\n\n" .
+					"Therefore Applicant do not grade and mark " . $this->commodityNames($result[0]) . " commodity/ies under AGMARK.\n\n" .
+					"If violation is observed, action shall be taken as per APGM Act and GGM Rule.";
+			} elseif ($split_customer_id[1] == 2) {
+				$data = "This Permission to Printing Press is cancelled by the competent authority dated " . date('d-m-Y') . ".\n\n". 
+				"Applicant should do the Submission of balance printed material and declaration that applicant will not print under Agmark.\n\n" .
+				"If, violation is observed than action shall be taken as per APGM Act and GGM Rule.";
+			} elseif ($split_customer_id[1] == 3) {
+				$data = "This Approval of Laboratory is cancelled by the competent authority dated " . htmlspecialchars($isSurrender) . ".\n\n". 
+						"Laboratory should be issue NOC to associated packer to migrate to another Laboratory for commodity/ies under AGMARK.
+						If a violation is observed, action shall be taken as per APGM Act and GGM Rule.";
+			}
+
+		} elseif ($type == 'SPN') { # For Suspension Flow (SCN)
+			
+			$data = "This Certificate of Authorisation is Suspended by the competent authority dated " . date('d-m-Y') . ".\n\n" .
+					"Therefore Applicant do not grade and mark " . $this->commodityNames($result[0]) . " commodity/ies under AGMARK.\n\n" .
+					"If violation is observed, action shall be taken as per APGM Act and GGM Rule.";
+
+		} elseif ($type == 'CAN') {	# For Cancellation Flow (CAN)
+
+			$data = "This Certificate of Authorisation is Cancelled by the competent authority dated " . date('d-m-Y') . ".\n\n" .
+					"Therefore Applicant do not grade and mark " . $this->commodityNames($result[0]) . " commodity/ies under AGMARK.\n\n" .
+					"If violation is observed, action shall be taken as per APGM Act and GGM Rule.";
+
+		}elseif ($type == 'CHM') {	# For Chemist Flow (CHM)
+
 			$data = "Chemist Name :".$result[0]." ## "." CA ID :".$result[1]." CA Name : ".$result[2]."##"." Date : ".$result[3]."##"."Region : ".$result[4];
-		}elseif ($type=='FDC') {
+		
+		}elseif ($type=='FDC') {	# For 15 Digit Code Flow (FDC)
+
 			$data = "CA ID : ".$result[0]." ## "." CA Name : ".$result[1]."##"." Chemist Name : ".$result[2]."##"." Date : ".$result[3]."##"."Region : ".$result[4]."##".$result[5];		  
-		}elseif($type=='ECode'){
+		
+		}elseif($type=='ECode'){	# For  E Code Flow (EC)
+
 			$data = "CA ID : ".$result[0]." ## "." CA Name : ".$result[1]."##"." Chemist Name : ".$result[2]."##"." Date : ".$result[3]."##"." Region : ".$result[4];		  
+		
 		}else{
+
 			$data = "Certificate No :".$result[0]." ## "."Firm Name :".$result[3]." ## "."Grant Date :".$result[1]." ## "." Valid up to date: ".$result[2][max(array_keys($result[2]))];
 		}
 
@@ -3559,6 +3661,7 @@ class CustomfunctionsComponent extends Component {
 		
 		$file_name = $file_path;
 		
+
 		QRcode::png($data,$file_name);
 		
 		
@@ -3675,6 +3778,140 @@ class CustomfunctionsComponent extends Component {
 			return $monthsDifference;
 		
 	}
+	
+
+	// Description : To get the Comma Sepearated Values for the Commodites for any Firm 
+	// Author : Akash Thakre
+	// Date : 11-05-2023
+	// For : Surrender Module (SOC) / General Use
+
+	public function commodityNames($customer_id){
+
+		//Check if the firm type is 2 i.e Printing Press avoid this as there is no commodities for Priting Press
+		$firm_type = $this->firmType($customer_id);
+
+		if ($firm_type !== 2 ) {
+
+			$conn = ConnectionManager::get('default');
+
+			$commodities = $conn->execute("
+				SELECT commodity_name 
+				FROM m_commodity 
+				WHERE commodity_code IN (
+					SELECT regexp_split_to_table(sub_commodity, ',')::integer 
+					FROM dmi_firms 
+					WHERE customer_id = '$customer_id'
+				)
+			")->fetchAll('assoc');
+			
+	
+			$commodity_names = array_map(function($c) {return $c['commodity_name'];}, $commodities);
+			
 		
+			$commodity_names = implode(',',$commodity_names);
+		
+		} else {
+			$commodity_names = '';
+		}
+		
+		
+		return $commodity_names;
+	}
+
+
+
+
+	// Author : Akash Thakre
+	// Description : This will return QR code for Sample Test Report
+	// Date : 04-05-2023
+
+	public function getQrCodeSampleTestReport($Sample_code_as,$sample_forwarded_office,$test_report){
+				
+		$LimsReportsQrcodes = TableRegistry::getTableLocator()->get('LimsReportsQrcodes'); //initialize model in component
+		
+		require_once(ROOT . DS .'vendor' . DS . 'phpqrcode' . DS . 'qrlib.php');
+
+		//updated by shankhpal on 21/11/2022
+		$data = "Name of RO/SO:".$sample_forwarded_office[0]['user_flag'].",".$sample_forwarded_office[0]['ro_office']."##"."Address of RO/SO :".$sample_forwarded_office[0]['ro_office']."##"."Sample Code No :".$Sample_code_as."##"."Commodity :".$test_report[0]['commodity_name']."##"."Grade:".$test_report[0]['grade_desc'];
+
+		$qrimgname = rand();
+
+		$server_imagpath = '/testdocs/LIMS/QRCodes/'.$qrimgname.".png";
+
+		$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/LIMS/QRCodes/'.$qrimgname.".png";
+
+		$file_name = $file_path;
+
+		QRcode::png($data,$file_name);
+
+		$date = date('Y-m-d H:i:s');
+
+		$workflow = TableRegistry::getTableLocator()->get('workflow');
+
+		//$sample_code = $workflow->find('all',array(,'conditions'=>array('org_sample_code'=>$Sample_code_as),'order'=>'id asc'))->toArray();
+		$sample_code = $workflow->find('all',array('fields'=>'org_sample_code', 'conditions'=>array('stage_smpl_cd IS'=>$Sample_code_as)))->first();
+
+		$stage_smpl_code = $sample_code['org_sample_code'];
+
+		$SampleReportAdd = $LimsReportsQrcodes->newEntity([
+			'sample_code'=>$stage_smpl_code,
+			'qr_code_path'=>$server_imagpath,
+			'created'=>$date,
+			'modified'=>$date
+		]);
+
+		$LimsReportsQrcodes->save($SampleReportAdd);
+
+		$qrimage = $LimsReportsQrcodes->find('all',array('field'=>'qr_code_path','conditions'=>array('sample_code'=>$stage_smpl_code),'order'=>'id desc'))->first();
+
+		return $qrimage;
+	}
+
+
+	//Description: Returns the Suspension Status
+	//@Author : Akash Thakre
+	//Date : 09-06-2023
+	//For : MMR
+
+	public function isApplicationSuspended($username){
+
+		#For Suspension
+		$currentDate = date('Y-m-d H:i:s'); 
+		$DmiMmrSuspensions = TableRegistry::getTableLocator()->get('DmiMmrSuspensions');
+		$suspension_record = $DmiMmrSuspensions->find('all')->where(['customer_id IS' => $username,'to_date >=' => $currentDate])->order('id DESC')->first();
+		if (!empty($suspension_record)) {
+		
+			$date = $suspension_record['to_date'];
+			$dateTime = \DateTime::createFromFormat('d/m/Y H:i:s', $date);
+			$isSuspended = $dateTime->format('d/m/Y');
+		}else{
+			$isSuspended = null;
+		}
+
+		return $isSuspended;
+	}
+
+
+	//Description: Returns the Cancellation Status
+	//@Author : Akash Thakre
+	//Date : 09-06-2023
+	//For : MMR
+
+	public function isApplicationCancelled($username) {
+		// For Cancellation
+		$DmiMmrCancelledFirms = TableRegistry::getTableLocator()->get('DmiMmrCancelledFirms');
+		$cancellation_record = $DmiMmrCancelledFirms->find('all')->where(['customer_id IS' => $username])->order('id DESC')->first();
+		
+		if (!empty($cancellation_record)) {
+			$date = $cancellation_record['date'];
+			$dateTime = \DateTime::createFromFormat('d/m/Y H:i:s', $date);
+			$isCancelled = $dateTime->format('d/m/Y');
+		} else {
+			$isCancelled = null;
+		}
+	
+		return $isCancelled;
+	}
+	
 }
 ?>

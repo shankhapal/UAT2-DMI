@@ -27,6 +27,13 @@
 							<div class="form-horizontal">
 								<div class="card-body">
 									<div class="row">
+										<p>
+											<b>Please Note:</b><br>
+											1. The purpose of this module is to transfer application from One office to another completly.<br>
+											2. Please do not use this module for forwarding of application between RO/SO Incharge while communication.<br>
+											3. This module should be use when the application came to irrespective office, and need to process in another office.<br>
+											4. Transfering of application from here in between communication RO/SO will lead to missing of the same.<br>
+										</p>
 										<div class="col-sm-3">
 											<div class="form-group">
 												<label>Application type <span class="cRed">*</span></label>

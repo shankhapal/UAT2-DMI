@@ -111,13 +111,27 @@ class PaymentverificationsController extends AppController{
 			$this->loadModel($allocation_table);
 			$this->loadModel($all_applications_current_position);
 			$this->loadModel('DmiFirms');
-
+            //model load by laxmi on 09-01-23																	
+            $this->loadModel('DmiChemistRegistrations');											
 
 			$firm_name = $this->DmiFirms->find('all', array('fields'=>'firm_name', 'conditions' => array('customer_id IS'=>$customer_id)))->first();
 			$this->set('firm_name',$firm_name);
 			$this->set('customer_id',$customer_id);
 			$split_customer_id = explode('/',(string) $customer_id); #For Deprecations
 			$district_code = $split_customer_id[2];	//updated on 20-08-2018 by amol
+
+
+                //for export_unit yes then only application applying to RO And RAL mumbai added by laxmi B. ON 09-01-2023
+             if(!empty($appl_type) && $appl_type == 4){
+               
+               $packer_data_id = $this->DmiChemistRegistrations->find('all',array('fields'=>'created_by', 'conditions'=>array('chemist_id IS'=>$customer_id)))->first();
+                  //to set packer Id
+               $this->Session->write('packer_id', $packer_data_id['created_by']);
+
+                  // to set export unit
+               $export_unit = $this->Customfunctions->checkApplicantExportUnit($packer_data_id['created_by']);
+               $this->Session->write('export_unit',$export_unit);
+               }//End by laxmi.
 
 			//updated and added code to get Office table details from appl mapping Model
 			$this->loadModel('DmiApplWithRoMappings');
@@ -182,6 +196,15 @@ class PaymentverificationsController extends AppController{
 			$pao_user_id = $this->DmiPaoDetails->find('all',array('fields'=>'pao_user_id', 'conditions'=>array('id IS'=>$pao_id['pao_id'])))->first();
 			$pao_user_email_id = $this->DmiUsers->find('all',array('fields'=>'email', 'conditions'=>array('id IS'=>$pao_user_id['pao_user_id'])))->first();
 
+		  //find  RO office by ro_email_id for pop-up msg by laxmi B [31-05-2023]
+			  $ro_office = $this->$office_table->find('all', ['fields'=>array('ro_office'), 'conditions'=>array($field_name => $office_incharge_id)])->first();
+			  
+			  // for export application and application type 4 only Mumbai Ro office include [laxmi 1-06-23]
+			 
+             if($export_unit == 'yes' && $appl_type == 4){
+				$ro_office = $this->$office_table->find('all', ['fields'=>array('ro_office'), 'conditions'=>array($field_name => $office_incharge_id, 'ro_office'=>'Mumbai')])->first();
+			 }
+              
 
 			// Save payment details by applicant
 			if (null!==($this->request->getData('payment_verificatin_action'))) {
@@ -323,7 +346,8 @@ class PaymentverificationsController extends AppController{
 							$this->DmiSmsEmailTemplates->sendMessage(52,$customer_id); #RO
 
 							$this->Customfunctions->saveActionPoint('Payment Confirmed','Success'); #Action
-							$message = 'Payment Confirmed Successfully';
+							//added ro office and id whose forwarded application by laxmi
+							$message = 'Payment Confirmed Successfully. And Now application in '.$ro_office['ro_office'].' Office with email id '.base64_decode($office_incharge_id).' ';
 							$message_theme = 'success';
 							$redirect_to = $redirect_url;
 						}
