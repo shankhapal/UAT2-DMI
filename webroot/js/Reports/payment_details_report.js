@@ -54,6 +54,8 @@ $(document).ready(function () {
     },
     "slow"
   );
+
+  //added new js for click radio button in revenue reports by shankhpal shinde
   $('input[type="radio"]').click(function () {
     var inputValue = $(this).attr("value");
 

@@ -35,26 +35,27 @@
 							<div id="search_by_options" class="">
 								<div class="row report-filter pt-2">
 									<div class="col-sm-3">
-                    <div class="form-group">
-											<label>Report For</label>
-											<?php echo $this->form->input('report_for', array('type'=>'select', 'options'=>$report_for_array, 'label'=>false, 'id'=>'report_for','escape'=>false, 'class'=>'form-control form-control-sm')); ?>
+                    					<div class="form-group">
+											<!-- all lables are uncommented by shreeya-->
+											<label>Report For</label> 
+											<?php echo $this->form->input('report_for', array('type'=>'select', 'options'=>$report_for_array, 'label'=>false, 'id'=>'report_for', 'escape'=>false, 'class'=>'form-control form-control-sm')); ?>
 										</div>
 								  	</div>
 									<div class="col-sm-3" id="office_all">
                     					<div class="form-group">
-											<label>Application Type</label>
+											 <label>Application Type</label> 
 											<?php echo $this->form->input('application_type', array('type'=>'select', 'options'=>$all_application_type, 'label'=>false, 'empty'=>'All', 'escape'=>false, 'class'=>'form-control form-control-sm search_field')); ?>
 									  	</div>
 								  	</div>
 									<div class="col-sm-3">
                     					<div class="form-group">
-											<label>Office</label>
+											 <label>Office</label> 
 											<?php echo $this->form->input('office', array('type'=>'select', /*'value'=>$search_office,*/ 'options'=>$all_ro_office, 'label'=>false, 'id'=>'office', 'empty'=>'All', 'escape'=>false, 'class'=>'form-control form-control-sm search_field')); ?>
 									  	</div>
 								  	</div>
 									<div class="col-sm-3">
                     					<div class="form-group">
-											<label>State</label>
+											 <label>State</label>
 											<?php echo $this->form->input('state', array('type'=>'select', 'options'=>$all_states, 'label'=>false, 'id'=>'state', 'empty'=>'All', 'escape'=>false, 'class'=>'form-control form-control-sm search_field')); ?>
 									  	</div>
 								  	</div>
@@ -75,7 +76,7 @@
 								  	</div>
 									<div class="col-sm-3">
                     					<div class="form-group">
-											<label id="to_date_label">To Date</label>
+											<label id="to_date_label">To Date</label> 
 											<?php echo $this->form->input('to_date', array('type'=>'text', /*'value'=>$search_to_date,*/'label'=>false, 'id'=>'todate', 'empty'=>'select', 'escape'=>false, 'class'=>'form-control form-control-sm search_field', 'placeholder'=>'To Date')); ?>
 										</div>
 								  	</div>
@@ -99,20 +100,20 @@
       		</div>
     	</div>
   	<!-- </section> -->
-
+	<!-- added new section for shw list and count by shankhpal shinde -->
 		<div class="d-flex align-items-center justify-content-center">
-		<fieldset>
-				<legend>Please select your preferred method:</legend>
-				<div class="d-flex align-items-center justify-content-center">
-					<label class="radio-inline" style="">
-					<input type="radio" name="optradio" class="rep-option" checked="true" value="yes" id="radioList" ><span> List</span>
-					</label>
-					<label class="radio-inline" style="padding-left:15px;">
-					<input type="radio" name="optradio" class="rep-option" value="no" id="radioCount"><span> Count</span>
-					</label>
-				</div>
-  </fieldset>
-</div>
+			<fieldset>
+					<legend>Please select your preferred method:</legend>
+					<div class="d-flex align-items-center justify-content-center">
+						<label class="radio-inline" style="">
+						<input type="radio" name="optradio" class="rep-option" checked="true" value="yes" id="radioList" ><span> List</span>
+						</label>
+						<label class="radio-inline" style="padding-left:15px;">
+						<input type="radio" name="optradio" class="rep-option" value="no" id="radioCount"><span> Count</span>
+						</label>
+					</div>
+			</fieldset>
+		</div>
 
 
 	<div class="bg-bg">
@@ -170,6 +171,7 @@
     	</div>
 
 		<section class="content form-middle">
+		<!-- add new class reportlst by shankhpal shinde -->
 			<div class="container-fluid border rounded-lg border-light bg-light p-3 shadow reportlst">
 				<div class="row">
 					<div class="col-md-12">
@@ -193,19 +195,75 @@
 											<!-- <tr>
 												<td colspan="6" class="table-heading bg-dark">New Application Payment Details</td>
 											</tr> -->
-											<?php for ($i=0; $i<sizeof($firms_details); $i++) { ?>
-												<tr id="table_row" class="row-hover border border-light">
-                           <td><span class="badge title mb-1 borderless hover-border"><?php echo $i+1; ?></span></td>
-													<td><span class="badge title borderless"><?php $explode_date = explode(' ',$customer_payment_details[$i]['transaction_date']);
-											    echo $explode_date[0]; ?></span></td>
-													<td><span class="badge subtitle borderless"><?php echo $all_application_type[$firms_details[$i]['certification_type']]; ?></span></td>
-													 <td><span class="badge title mb-1 borderless hover-border"><?php echo $apl_type_res[$i]['application_type']; ?></span></td>
-													 <td><?php if(!empty($all_ro_office[$ro_id[$i]['ro_id']])) { ?> <span class="badge subtitle borderless"> <?php echo $all_ro_office[$ro_id[$i]['ro_id']]; } ?> </span></td>
-													 <td class="text-right"><span class="badge title borderless"><?php echo $all_states[$firms_details[$i]['state']]; ?></span></td>
-													 <td><span class="badge subtitle borderless"><?php echo $all_district[$firms_details[$i]['district']]; ?></span></td>
-													 <td><span class="badge subtitle borderless"><?php echo number_format($customer_payment_details[$i]['amount_paid'],2); ?></span></td>
-											  </tr>
-											<?php }} ?>
+										<?php for ($i=0; $i<sizeof($firms_details); $i++) { ?>
+									<tr id="table_row" class="row-hover border border-light">
+										<td><span class="badge title mb-1 borderless hover-border"><?php echo $i+1; ?></span></td>
+										<td><span class="badge title borderless"><?php $explode_date = explode(' ',$customer_payment_details[$i]['transaction_date']);
+											echo $explode_date[0]; ?></span></td>
+												<td>
+													
+													<!-- commented by shreeya on date [13-06-2023]-->
+													<?php //echo $all_application_type[$firms_details[$i]['certification_type']]; ?>
+													<!-- added if else according to record null or not by shreeya on date [13-06-2023]-->
+													<?php if (!empty($all_application_type[$firms_details[$i]['certification_type']])) { ?>
+														<span class="badge subtitle borderless">
+															<?php echo $all_application_type[$firms_details[$i]['certification_type']];
+													} else { ?>
+														</span>
+														<span class="badge subtitle borderless">
+															<?php echo '--';
+													} ?>
+													</span>
+
+												</td>
+												<td><span class="badge title mb-1 borderless hover-border"><?php echo $apl_type_res[$i]['application_type']; ?></span></td>
+												<td>
+													<!-- added if else according to record null or not by shreeya on date [13-06-2023]-->
+													<?php if (!empty($all_ro_office[$ro_id[$i]['ro_id']])) { ?>
+														<span class="badge subtitle borderless">
+															<?php echo $all_ro_office[$ro_id[$i]['ro_id']];
+													} else { ?>
+														</span>
+														<span class="badge subtitle borderless">
+															<?php echo '--';
+													} ?>
+													</span>
+	
+												</td>
+												<td class="text-right">
+
+													<!-- commented by shreeya on date [13-06-2023]-->
+													<!-- <span class="badge title borderless"><?php// echo $all_states[$firms_details[$i]['state']]; ?></span> -->
+													<!-- added if else according to record null or not by shreeya on date [13-06-2023]-->
+													<?php if (!empty($all_states[$firms_details[$i]['state']])) { ?>
+														<span class="badge subtitle borderless">
+															<?php echo $all_states[$firms_details[$i]['state']];
+													} else { ?>
+														</span>
+														<span class="badge subtitle borderless">
+															<?php echo '--';
+													} ?>
+													</span>
+
+													
+												</td>
+												<td>
+													<!-- commented by shreeya on date [13-06-2023]-->
+													<!-- <span class="badge subtitle borderless"><?php //echo $all_district[$firms_details[$i]['district']]; ?></span> -->
+													<!-- added if else according to record null or not by shreeya on date [13-06-2023]-->
+													<?php if (!empty($all_district[$firms_details[$i]['district']])) { ?>
+														<span class="badge subtitle borderless">
+															<?php echo $all_district[$firms_details[$i]['district']];
+													} else { ?>
+														</span>
+														<span class="badge subtitle borderless">
+															<?php echo '--';
+													} ?>
+													</span>
+												</td>
+										<td><span class="badge subtitle borderless"><?php echo number_format($customer_payment_details[$i]['amount_paid'],2); ?></span></td>
+									</tr>
+										<?php }} ?>
 								</tbody>
 							</table>
 						</div>
@@ -230,11 +288,11 @@
 									<thead>
 											<tr class="sm-text">
 												  <th><span class="table-heading">All Application Payment Details</span></th>
-											</tr>
+												</tr>
 									</thead>
 									<tbody>
 										
-										    <?php 
+									<?php
                         $report_for_array_new = array_values($report_for_array);
 											
 												$arrlength = count($report_for_array_new);
@@ -246,9 +304,9 @@
 																	<span class="glyphicon glyphicon-minus plusIcon" style="display:none"></span>
 																	<?php echo $report_for_array_new[$x]." "."Application Payment Details"; ?>
 																</td>  
-															</tr>
-															<?php
-															
+												</tr>
+									<?php
+
 															if($report_for_array_new[$x] == "New"){?>
 															<tr class="hidden">
 																	<td>
@@ -256,19 +314,19 @@
 																					<tr>
 																							<td><span class=""></span>New Certificate of Authorisation Payment Total :</td>
 																							<td><span class=""></span> <?php echo $new_ca_total ?></td>
-																					</tr>
-																					<tr>
+											</tr>
+													<tr>
 																							<td><span class=""></span>New Printing Applications Payment Total :</td>
 																							<td><span class=""></span> <?php echo $new_pp_total; ?> </td>
-																					</tr>
-																					<tr>
+													</tr>
+													<tr>
 																							<td><span class=""></span>New Laboratory Applications Payment Total :</td>
 																							<td><span class=""></span> <?php echo $new_lab_total; ?> </td>
-																					</tr>
-																					<tr>
+													</tr>
+													<tr>
 																							<td><span class=""></span>Grant Total :</td>
 																							<td><span class=""></span> <?php echo $total_new_ca_pp_lab; ?> </td>
-																					</tr>
+													</tr>
 																			</table>    
 																	</td>
 															 </tr>
@@ -315,7 +373,7 @@
 																							<td><span class=""></span>Grant Total :</td>
 																							<td><span class=""></span> <?php echo $total_change_ca_pp_lab; ?> </td>
 																					</tr>
-																					
+
 																			</table>    
 																	</td>
 															  </tr>
@@ -323,10 +381,10 @@
                                  <tr class="hidden">
                                     <td>
 																			<table class="table table-bordered">
-																					<tr>
+											<tr>
 																							<td><span class=""></span>Chemist Approval Applications Payment Total : </td>
 																							<td><span class=""></span> <?php echo $change_ca_total; ?></td>
-																					</tr>
+											</tr>
 																			</table>    
 																	</td>
 															  </tr>
@@ -399,14 +457,14 @@
 															<?php } ?>	
 
 											  <?php  }	?>
-									</tbody>
+								</tbody>
 							</table>
 						</div>
 					</div>
 				</div>
 			</div>
 		</section>
-		
+
 
 		<div class="ml-3 mt-3">
 			<h5><a href="<?php echo $this->request->getAttribute('webroot');?>reports/<?php echo $backAction; ?>" class="report-back-button btn back-btn" role="button">Back to All Reports</a>

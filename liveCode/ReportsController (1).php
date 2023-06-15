@@ -24,9 +24,8 @@ class ReportsController extends AppController {
 	var $name = 'Reports';
 
 	public function initialize(): void {
-		// ini_set('memory_limit', '1024M');
-		ini_set('memory_limit', '2G');
-		
+		ini_set('memory_limit', '1024M');
+
 
 
 		parent::initialize();
@@ -198,7 +197,7 @@ class ReportsController extends AppController {
 		$current_ro_id = '';
 
 		foreach ($rolist as $each_user) {
-			
+
 			if (!empty($user_role)) {
 
 				$current_ro_id = $each_user['id'];
@@ -206,10 +205,10 @@ class ReportsController extends AppController {
 
 			$ro_name_list[$each_user['id']] = $each_user['f_name']." ".$each_user['l_name']."  (".base64_decode($each_user['email']).") - (".$ro_office_list[$each_user['posted_ro_office']].")"; //for email encoding
 		}
-		
+
 		asort($ro_name_list);
 		$this->set('ro_name_list',$ro_name_list);
-		
+
 
 		$aqcms_statistics_report = null;
 
@@ -222,7 +221,7 @@ class ReportsController extends AppController {
 		}
 
 		if (null !== ($this->request->getData('search'))) {
-			
+
 			$aqcms_statistics_report = 1;
 
 			$this->Session->delete('ro_id');
@@ -267,7 +266,7 @@ class ReportsController extends AppController {
 			//set ro_office short code ro_office id from_date and to_date in session by laxmi B. on 15-02-2023
 			$this->Session->write('from_date',$from_date);
 			$this->Session->write('to_date',$to_date);
-			
+
 			
 			//Check Between Dates
 			if (!empty($from_date) && !empty($to_date) && !empty($ro_id)) {
@@ -388,14 +387,14 @@ class ReportsController extends AppController {
 
 
 			$application_processed_type = ['new_app_processed','renewal_app_processed','backlog_app_processed'];
-			
+
 
 			foreach ($application_processed_type as $each) {
 
 				$application_processed[] = $this->Reportstatistics->$each($searchPendingConditions, $from_date, $to_date);//from_date to_date added by laxmi on 13-20-2023
 				
 			}
-		
+
 
 			if (!empty($from_date) && !empty($to_date)) {
 
@@ -447,22 +446,22 @@ class ReportsController extends AppController {
 															->combine('id', 'customer_id')->toArray(); 
 
 															foreach($inprogress_with_ro as $each_record ){
-				
-																$result_status = $this->$key->find('all')->where(['customer_id' => $each_record, 'status' => 'approved', 'current_level' => 'level_3'])->toArray();
-																
-																//below condition commented by Shreeya 
-																/*if(empty($result_status)){
-																	$inprogress_app_with_ro[] = $each_record;
-																}*/
-																
-																if(empty($result_status)){
-																	//$each_record is not already in the array, it will be added to the $inprogress_app_with_ro array using the [] notation.By Shreeya on Date [02-06-2023]
-																	if(!in_array($each_record,$inprogress_app_with_ro)){
-																		$inprogress_app_with_ro[] = $each_record;
-																	}
-																}
+
+																$result_status = $this->$key->find('all')->where(['customer_id' => $each_record, 'status' => 'approved', 'current_level' => 'level_3'])->toArray(); 
+
+																				//below condition commented by Shreeya 
+																				/*if(empty($result_status)){
+																					$inprogress_app_with_ro[] = $each_record;
+																				}*/
+
+																				if(empty($result_status)){
+																					//$each_record is not already in the array, it will be added to the $inprogress_app_with_ro array using the [] notation.By Shreeya on Date [02-06-2023]
+																					if(!in_array($each_record,$inprogress_app_with_ro)){
+																					$inprogress_app_with_ro[] = $each_record;
+																					}
+																				}
 															}
-															
+
 															$inprogress_app_with_ro = array_unique($inprogress_app_with_ro);
 				}
 
@@ -526,7 +525,7 @@ class ReportsController extends AppController {
 						}
 					}
 				}
-				
+
 				$applicationEsigned = $this->DmiApplicationEsignedStatuses->find('all')->where($searchPendingConditions)->where(['application_esigned' => 'yes'])->toArray(); 
 
 				$inspectionReportEsigned = $this->DmiApplicationEsignedStatuses->find('all')->where($searchPendingConditions)->where(['report_esigned' => 'yes'])->toArray(); 
@@ -624,7 +623,7 @@ class ReportsController extends AppController {
 		$this->set('to_date',$to_date);
 
 		if (null !== $this->request->getData('download_report')) {
-		
+
 			$this->viewBuilder()->setLayout('pdf_layout');
 
 			$this->set('total_primary_user',$this->Session->read('total_primary_user'));
@@ -661,7 +660,7 @@ class ReportsController extends AppController {
 			$pdf = new ApplicationformspdfsController();
 			$pdf->callTcpdf($pdfHtml, 'D', '', '');
 		}
-	
+
 		if (!empty($user_role)) {
 			$this->view = 'ro_aqcms_statistics';
 		} else {
@@ -1704,7 +1703,7 @@ class ReportsController extends AppController {
 	// @Author : Pravin Bhakare
 	// #Contributer : Yash & Shreeya 
 	// Date : 24-05-2023
-	
+
 	/*=================== This Function Used for In_process New Application KPI's===========*/
 	public function pendingNewApplicationsReportForStats($cert_type,$appl_type) {	//newapp_id replace ->cert_type By Shreeya
 
@@ -1827,7 +1826,7 @@ class ReportsController extends AppController {
 		}
 
 		### -End- ###
-
+	
 		//variable set for session from in process  laxmi b on 16-02-2023
 		$static_pending_from_date = '';
 		$static_pending_to_date = '';
@@ -1835,7 +1834,7 @@ class ReportsController extends AppController {
 		$static_pending_ro_office_id ='';
 
 		$application_pending_days = $this->Session->read('pending_days');
-		
+
 		if (!empty($application_pending_days)) {
 			$report_name = 'Pending New Applications Report ( More than 15 Days)';
 		} else {
@@ -1845,9 +1844,9 @@ class ReportsController extends AppController {
 		$this->set('report_name',$report_name);
 
 		//$table = 'DmiAllApplicationsCurrentPositions';
-
-		$pending_application_type = 'new';
 		
+		$pending_application_type = 'new';
+
 		$application_type_xy = array('A'=>'CA (Form-A)', 'C'=>'Laboratory (Form-C)', 'E'=>'CA (Form-E)', 'B'=>'Printing Press (Form-B)', 'D'=>'Laboratory (Form-D)', 'F'=>'CA (Form-F)');
 		//newapp_id replace ->cert_type By Shreeya
 		if($cert_type=='CA')
@@ -1868,17 +1867,17 @@ class ReportsController extends AppController {
 		$this->set('application_type_xy',$application_type_xy);
 		//newapp_id replace ->cert_type By Shreeya
 		$this->set('cert_type',$cert_type);
-		
+
 		$user_roles_xy = array('RO/SO'=>'RO/SO','MO/SMO'=>'MO/SMO','IO'=>'IO','HO MO/SMO'=>'HO MO/SMO','DY.AMA'=>'DY.AMA','JT.AMA'=>'JT.AMA','AMA'=>'AMA');
-		
+
 		//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
 		asort($user_roles_xy);
 		$this->set('user_roles_xy',$user_roles_xy);
-		
+
 		$ro_office = $this->DmiRoOffices->find('all')->where(['office_type' => 'RO','delete_status IS NULL'])->order(['ro_office' => 'ASC'])->combine('id', 'ro_office')->toArray(); 
 		$this->set('ro_office',$ro_office);
 
-		
+
 
 		$search_application_type_id = $this->Session->read('search_application_type_id');
 		$search_user_role = $this->Session->read('search_user_role');
@@ -1928,7 +1927,7 @@ class ReportsController extends AppController {
 			if (!empty($this->request->getData('download_report'))) {
 				$download_report = 'yes';
 			}
-			
+
 			$search_application_type_id = $this->request->getData('application_type');
 			$search_user_role =  $this->request->getData('user_role');
 			$ro_office_id =  $this->request->getData('ro_office');
@@ -2011,11 +2010,11 @@ class ReportsController extends AppController {
 
 
 			$application_customer_id_list = $this->pendingApplicationSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days,$data_id );
-			
+
 			if (!empty($application_customer_id_list)) {
 
 				$current_users_details = $this->$table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->order(['id' => 'DESC'])->toArray(); 
-				
+
 				//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
 				if ($download_report == 'yes') {
 
@@ -2037,22 +2036,22 @@ class ReportsController extends AppController {
 			//$this->pendingApplicationReportResults($current_users_details,$pending_application_type,$table,$data_id);
 
 		} else {
-			
+
 		
 			$application_customer_id_list = $this->pendingApplicationSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days,$data_id);
-			
+
 			if (!empty($application_customer_id_list)) {
-			
+
 				$current_users_details = $this->$table->find('all')->where(['customer_id IN' => $application_customer_id_list])->order(['id' => 'DESC'])->toArray(); /*->limit(['100'])*/
 				
 				$this->set('current_users_details',$current_users_details);
-				
+
 				//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
 				if ($download_report == 'yes') {
 					$download_pending_application = $this->$table->find('all')->where(['customer_id' => $application_customer_id_list])->order(['id' => 'DESC'])->toArray(); 
 					$this->downloadPendingApplicationReport($download_pending_application,$pending_application_type,$table);
 				}
-				
+
 			} else {
 				$current_users_details = null;
 			}
@@ -2079,7 +2078,7 @@ class ReportsController extends AppController {
 
 		
 		if (!empty($application_pending_days)) {
-		 
+
 			$conditions = ['DATE(modified) <' => $modify_date]; 
 			
 			$date_conditions = ['date(modified) BETWEEN :start AND :end', 'DATE(created) <' => $modify_date]; 
@@ -2087,14 +2086,14 @@ class ReportsController extends AppController {
 			$date_conditions_1 = ['date(modified) BETWEEN :start AND :end', 'DATE(created) <' => $modify_date]; 
 		
 		} else {
-			
+
 			$conditions = [];
 			
 			$date_conditions = ['date(modified) BETWEEN :start AND :end']; 
 			
 			$date_conditions_1 = ['date(modified) BETWEEN :start AND :end', 'DATE(created) <' => $modify_date];  
 		}
-	
+
 		$final_customer_id_list = null;
 
 		if ($ro_office_id != '' && $search_user_role == 'RO/SO') {
@@ -2111,7 +2110,7 @@ class ReportsController extends AppController {
 		if ($search_application_type_id != '' && $search_user_role == '' && $search_from_date == '' && $search_to_date == '') {
 
 			$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
-			
+
 			$i=0;
 			foreach ($application_customer_id as $each_customer_id) {
 
@@ -2217,7 +2216,7 @@ class ReportsController extends AppController {
 			if ($search_application_type_id != '') {
 
 				$application_customer_id = $this->$table->find('all')->where($date_conditions)->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
-				
+
 				$i=0;
 				foreach ($application_customer_id as $each_customer_id) {
 					if (!empty($each_customer_id['customer_id'])) {
@@ -2236,15 +2235,15 @@ class ReportsController extends AppController {
 			}
 	
 		/*=====Start Yashwant 02/mar/2023 This function used for IN PRocess Report Count ======*/
-		 } elseif(!empty($data_id)) {
+		} elseif(!empty($data_id)) {
 
 			
-			$application_customer_id = $this->$table->find('all')->where($conditions)->toArray();
-
+			$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
+			
 			$i=0;
 			foreach ($application_customer_id as $each_customer_id) 
 			{
-				
+
 				if (!empty($each_customer_id['customer_id'])) 
 				{
 					$application_customer_type = $this->Reportsfunctions->newApplicantType($each_customer_id['customer_id']);
@@ -2259,10 +2258,10 @@ class ReportsController extends AppController {
 					
 				}
 			}
-			
+
 		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $level_1_2_3_office == '' && $search_from_date == '' && $search_to_date == '') 
 		{
-			
+
 			if ($search_application_type_id != '') {
 
 				$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
@@ -2299,7 +2298,7 @@ class ReportsController extends AppController {
 		
 		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $level_1_2_3_office != '' && $search_from_date == '' && $search_to_date == '' && $search_user_email_id =='') 
 		{
-	
+			
 			if ($search_application_type_id != '') {
 
 				$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
@@ -2308,7 +2307,7 @@ class ReportsController extends AppController {
 				foreach ($application_customer_id as $each_customer_id) {
 					if (!empty($each_customer_id['customer_id'])) {
 						$application_customer_type = $this->Customfunctions->checkApplicantFormType($each_customer_id['customer_id']);
-						
+
 						if (in_array($application_customer_type,$search_application_type_id)) {
 							$seach_application_customer_id_list[$i] = $each_customer_id['customer_id'];
 							$i=$i+1;
@@ -2317,7 +2316,7 @@ class ReportsController extends AppController {
 				}
 			
 				$application_current_levels = $this->$table->find('all')->where(['customer_id IN' => $seach_application_customer_id_list])->toArray(); 
-				
+			
 			} else {
 			
 				$application_current_levels = $this->$table->find('all')->where($conditions); 
@@ -2403,11 +2402,11 @@ class ReportsController extends AppController {
 
 		} elseif (($search_application_type_id == '' || $search_application_type_id != '') && $search_user_role != '' && $search_from_date != '' && $search_to_date != '' && $level_1_2_3_office !='' && ($search_user_email_id != '' || $search_user_email_id == '')) 
 		{
-		
+			
 			if ($search_application_type_id != '') {
 
 				$application_customer_id = $this->$table->find('all')->where($conditions)->toArray(); 
-			
+
 				$i=0;
 				foreach ($application_customer_id as $each_customer_id) {
 
@@ -2424,7 +2423,7 @@ class ReportsController extends AppController {
 				$application_current_levels = $this->$table->find('all')->where(['customer_id IN' => $seach_application_customer_id_list])
 					->where(['date(modified) BETWEEN :start AND :end'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
 				
-				} else {
+			} else {
 
 				$application_current_levels = $this->$table->find('all')->where($date_conditions)->bind(':start', $search_from_date, 'date')
 				->bind(':end', $search_to_date, 'date')->toArray();   
@@ -2443,7 +2442,7 @@ class ReportsController extends AppController {
 					}
 
 					$user_posted_office_id_xy = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IS' => $each_current_levels['current_user_email_id']])->first(); 
-					
+
 					if (!empty($user_posted_office_id_xy)) {
 						$user_posted_office_id_xyx = $user_posted_office_id_xy['posted_ro_office'];
 					} else {
@@ -2466,10 +2465,10 @@ class ReportsController extends AppController {
 					}
 				}
 			}
-			
+
 		} else {
 			$application_customer_id = $this->$table->find('all')->select(['customer_id'])->where($conditions)->extract('customer_id')->toArray();  
-		
+
 			// $i=0;
 			// foreach ($application_customer_id as $each_customer_id)
 			// {
@@ -2481,30 +2480,30 @@ class ReportsController extends AppController {
 		}
 
 		if (!empty($application_customer_id_list)) {
-			
+
 			$i=0;
 			if ($pending_application_type == 'new') {
 				foreach ($application_customer_id_list as $customer_id) {
 					$customer_id_list = $this->DmiGrantCertificatesPdfs->find('all')->where(['customer_id IS' => $customer_id])->first(); 
-				
+
 					if (empty($customer_id_list)) {
 						$final_customer_id_list[$i] = $customer_id;
 						$i=$i+1;
 					}
 				}
-			
+
 			} elseif ($pending_application_type == 'renewal') {
 
 				foreach ($application_customer_id_list as $customer_id ) {
 
 					$customer_id_list = $this->DmiRenewalFinalSubmits->find('all')->where(['customer_id IS' => $customer_id, 'status' => 'approved'])->first(); 
-					
+
 					if (empty($customer_id_list)) {
 						$final_customer_id_list[$i] = $customer_id;
 						$i=$i+1;
 					}
 				}
-				
+
 				$final_table = 'DmiRenewalFinalSubmits';
 			}
 
@@ -2560,7 +2559,7 @@ class ReportsController extends AppController {
 				$each_user_detail = $each_user;
 				$current_level = $each_user_detail['current_level'];
 				$application_form_type = $this->Customfunctions->checkApplicantFormType($each_user_detail['customer_id']);
-			
+
 				if ($application_form_type == 'A') {
 					$application_type[$i]='CA (Form-A)';
 				} elseif ($application_form_type == 'B') {
@@ -2887,20 +2886,18 @@ class ReportsController extends AppController {
 		$aqcms_ro_office_id = '';
 
 		$approved_application_type = $this->Session->read('approved_application_type');
-	
+
 		if ($approved_application_type == 'new' || $approved_application_type =='') {
 
 			$table = 'DmiFinalSubmits';
 			$report_heading = 'Approved New Applications Report';
 		
-		} 
-		// elseif ($approved_application_type == 'renewal') {
+		} elseif ($approved_application_type == 'renewal') {
 			
-		// 	$table = 'DmiRenewalFinalSubmits';
-		// 	$report_heading = 'Approved Renewal Applications Report';
+			$table = 'DmiRenewalFinalSubmits';
+			$report_heading = 'Approved Renewal Applications Report';
 
-		// }
-		elseif ($approved_application_type == 'all_reports') {
+		}elseif ($approved_application_type == 'all_reports') {
 			
 			$table = 'DmiGrantCertificatesPdfs';
 			$report_heading = 'All Approved Report';
@@ -3016,7 +3013,7 @@ class ReportsController extends AppController {
 					}
 
 					$explode = explode("/",$approved_application_result['customer_id']);
-					 
+
 					$approved_office_id = $this->DmiRoOffices->find('all')->select(['ro_email_id'])->where(['short_code' => $explode[2]])->first();  
 
 					$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email'=>$approved_office_id['ro_email_id']])->first(); 
@@ -3052,10 +3049,10 @@ class ReportsController extends AppController {
 
 					$date[$i] = $approved_application_result['created'];
 					$application_customer_id[$i] = $approved_application_result['customer_id'];
-				
+
 					//added by the akash on 13-11-2021
 					$firmDetails = $this->DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$approved_application_result['customer_id'])))->first();
-					
+
 					$name_of_the_firm[$i] = $firmDetails['firm_name'];
 					$address_of_the_firm[$i] = $firmDetails['street_address'];
 					$contact_details_of_the_firm[$i] = base64_decode($firmDetails['email']);
@@ -3117,7 +3114,7 @@ class ReportsController extends AppController {
 					$i=$i+1;
 				}
 			}
-			
+
 		
 
 		$this->set('date',$date);
@@ -3308,7 +3305,7 @@ class ReportsController extends AppController {
 			}
 
 			$this->approvedApplicationReportResults($approved_application_list, $approved_application_type);
-	
+		
 		} else {
 			
 			
@@ -3527,7 +3524,7 @@ class ReportsController extends AppController {
 		///===========================YAshwant 05-Apr-2023====================================
 		elseif ($search_application_type_id == '' && $application_approved_office == '' && $search_from_date !='' && $search_to_date != '') 
 		{
-			
+
 			$approved_application_customer_id = $this->DmiApplicationEsignedStatuses->find('all')->select(['customer_id'])->where(['application_status' =>"Granted"])->where(['date(modified) BETWEEN :start AND :end'])
 			->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->order(['created'=>'DESC'])->toArray();
 
@@ -3569,7 +3566,7 @@ class ReportsController extends AppController {
 
 		elseif ($search_application_type_id == '' && $application_approved_office != '' && $search_from_date =='' && $search_to_date == '' ) 
 		{
-			
+
 			//$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['status' => 'approved', 'current_level' => 'level_3'])->toArray();
 
 			$approved_application_customer_id = $this->DmiApplicationEsignedStatuses->find('all')->select(['customer_id'])->where(['application_status' =>"Granted"])->toArray();
@@ -3628,7 +3625,7 @@ class ReportsController extends AppController {
 
 		elseif (!empty($data_id)) 
 		{
-			
+
 			$approved_application_customer_id = $this->DmiApplicationEsignedStatuses->find('all')->select(['customer_id'])->where(['application_status' =>"Granted"])->toArray();
 
 			//$approved_application_customer_id = $this->DmiRenewalEsignedStatuses->find('all')->select(['customer_id'])->where(['application_status' =>"Granted"])->toArray();
@@ -3662,7 +3659,7 @@ class ReportsController extends AppController {
 
 		} elseif ($search_application_type_id == '' && $application_approved_office == '' && $search_from_date !='' && $search_to_date != '') 
 		{
-			
+
 			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['date(modified) BETWEEN :start AND :end'])
 			->where(['status' => 'approved', 'current_level' => 'level_3'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
 
@@ -3689,7 +3686,7 @@ class ReportsController extends AppController {
 		
 		} elseif ($search_application_type_id != '' && $application_approved_office != '' && $search_from_date =='' && $search_to_date == '' ) 
 		{
-			
+
 			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['status' => 'approved', 'current_level' => 'level_3'])->toArray(); 
 
 			$i=0;
@@ -3732,7 +3729,7 @@ class ReportsController extends AppController {
 		
 		
 		} elseif ($search_application_type_id != '' && $application_approved_office == '' && $search_from_date !='' && $search_to_date != '') {
-		
+
 			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['date(modified) BETWEEN :start AND :end'])
 			->where(['status' => 'approved', 'current_level' => 'level_3'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
 
@@ -3758,7 +3755,7 @@ class ReportsController extends AppController {
 			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
 		
 		} elseif ($search_application_type_id != '' && $application_approved_office != '' && $search_from_date !='' && $search_to_date != '') {
-			
+
 			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['date(modified) BETWEEN :start AND :end'])
 				->where(['status' => 'approved', 'current_level' => 'level_3'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
 
@@ -3795,7 +3792,7 @@ class ReportsController extends AppController {
 			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
 		
 		} elseif ($search_application_type_id == '' && $application_approved_office != '' && $search_from_date =='' && $search_to_date == '') {
-			
+
 			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['status' => 'approved', 'current_level' => 'level_3'])->toArray(); 
 
 			$i=0;
@@ -3831,7 +3828,7 @@ class ReportsController extends AppController {
 			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
 		
 		} elseif ($search_application_type_id == '' && $application_approved_office != '' && $search_from_date !='' && $search_to_date != '') {
-			
+
 			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['date(modified) BETWEEN :start AND :end', 'status' => 'approved',
 				'current_level' => 'level_3'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
 
@@ -3868,7 +3865,7 @@ class ReportsController extends AppController {
 			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
 
 		} elseif ($search_application_type_id == '' && $application_approved_office == '' && $search_from_date !='' && $search_to_date != '') {
-		
+
 			$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['date(modified) BETWEEN :start AND :end', 'status' => 'approved',
 				'current_level' => 'level_3'])->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')->toArray(); 
 
@@ -3890,7 +3887,7 @@ class ReportsController extends AppController {
 			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
 		
 		} else {
-		
+
 			if ($search_flag == 'on') {
 				$approved_application_customer_id = $this->$table->find('all')->select(['customer_id'])->where(['status' => 'approved', 'current_level' => 'level_3'])
 				->order(['created'=>'DESC'])->extract('customer_id')->toArray(0); 
@@ -3938,7 +3935,7 @@ class ReportsController extends AppController {
 	
 			$download_approved_application_list = $this->$table->find('all')->select(['customer_id'])->where($conditions)->order(['id' => 'DESC'])->toArray(); 
 		}
-	
+
 		return array($approved_application_list,$download_approved_application_list);
 	
 	}
@@ -5577,7 +5574,7 @@ class ReportsController extends AppController {
 	// Payment Details Report
 	// Description : ----
 	// @Author : Pravin Bhakare
-	// #Contributer : Ankur Jangid (Migration) 
+	// #Contributer : Ankur Jangid (Migration)
 	// Date : 27-07-2018  
 
 	// added new parameter for show application type by shreeya on date [07-06-2023]
@@ -5597,33 +5594,24 @@ class ReportsController extends AppController {
 		
 		
 		
-		
-		
+
 		$connection = ConnectionManager::get('default');
 		//load models
 		$this->loadModel('DmiApplicationTypes');
 		$this->loadModel('DmiFlowWiseTablesLists');
+		//$report_for_array = array('both'=>'BOTH (New,Renewal)','new'=>'New','renewal'=>'Renewal');
+
+		// as per the change request convert static array into daynamic array for applications
+		// added modified by shankhpal shende on 27/03/2023
 		
-		
-		$report_for_array;
-		//show the all application type added by shreeya on date 13-06-2023
 		$application_array = $this->DmiApplicationTypes->find('all')->select(['id', 'application_type'])->where(['delete_status IS NULL'])->order(['id'])->combine('id', 'application_type')->toArray();
-		//dynamically added application type by shreeya on date 14-06-2023
-		foreach($application_array as $key => $value){
+		array_unshift($application_array,"All");
+		// $indexedArray = array('apple', 'banana', 'orange');
+		$keys = array('All', 'New', 'Renewal', 'Change Request', 'Chemist Approval', 'Approval of FDC', 'E-Code', 'Advance Payment', 'Approval of DP', 'Routine Inspection', 'Biannually Grading Reports');
+		
+		$report_for_array = array_combine($keys, $application_array);
 
-			$report_for_array[$key] = $value ;
-			 
-		}
 
-		
-		
-
-		// array_unshift($application_array,"All");
-	
-		// $keys = array('All','New', 'Renewal', 'Change Request', 'Chemist Approval', 'Approval of FDC', 'E-Code', 'Advance Payment', 'Approval of DP','Surrender','Routine Inspection');
-		
-		// $report_for_array = array_combine($keys, $application_array);
-		
 		$all_states = $this->DmiStates->find('all')->select(['id', 'state_name'])->where(['OR' => [['delete_status IS NULL'] ,['delete_status ='=>'no']]])
 			->order(['state_name'])->combine('id', 'state_name')->toArray(); 
 
@@ -5638,7 +5626,7 @@ class ReportsController extends AppController {
 		
 		//added 'office_type'=>'RO' condition on 27-07-2018     
 		// Change on 5/11/2018, Add order by conditions , By Pravin Bhakare
-		
+
 		$all_ro_office = $this->DmiRoOffices->find('all')->select(['id', 'ro_office'])->where([['delete_status IS NULL'],'OR' => [['office_type' => 'RO'], ['office_type' => 'SO']]])
 			->order(['ro_office'])->combine('id', 'ro_office')->toArray(); 
 
@@ -5649,7 +5637,6 @@ class ReportsController extends AppController {
 		$this->set('all_district',$all_district);
 		$this->set('all_application_type',$all_application_type);
 
-		
 
 		// Change on 5/11/2018, set search_to_date value, By Pravin 5/11/2018
 		$application_type = '';
@@ -5686,7 +5673,7 @@ class ReportsController extends AppController {
 		$renewal_printing_payment = null; // $renewal_printing_payment = '';
 		$renewal_lab_payment = null; // $renewal_lab_payment = '';
 
-		
+
 		$i=1;
 		$new_ca_total = 0;  //default 0
 		$new_pp_total = 0;  //default 0
@@ -5718,9 +5705,8 @@ class ReportsController extends AppController {
 		if (null!==($this->request->getData('search_logs')))
 		{
 
-			$report_for_array = $this->request->getData('report_for_array');
-					
-			
+			$report_for = $this->request->getData('report_for');
+
 			$table = 'DmiStates';
 			
 			$post_input_request = $this->request->getData('state');
@@ -5801,52 +5787,52 @@ class ReportsController extends AppController {
 			{
 
 				if ($search_from_date != '' && $search_to_date != '') {
-					
+
 					$firm_customer_id_list = $this->DmiFirms->find('all')
-								->select(['id', 'customer_id'])
-								->join(['DmiDistricts' => ['table' => 'dmi_districts', 'type' => 'INNER',
-										'conditions' => ['DmiDistricts.id = DmiFirms.district::integer', $ro_office_not_empty]],
-										'DmiApplicantPaymentDetails' => ['table' => 'dmi_applicant_payment_details', 'type' => 'INNER',
-										'conditions' => ['DmiApplicantPaymentDetails.customer_id = DmiFirms.customer_id', $date_not_empty,'payment_confirmation' => 'confirmed']]])
-								->select(['id','customer_id'])
-								->where(array_merge($application_type_not_empty, $state_not_empty, $district_not_empty))
-								->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')
-								->combine('id', 'customer_id')
-								->toArray();
+															->select(['id', 'customer_id'])
+															->join(['DmiDistricts' => ['table' => 'dmi_districts', 'type' => 'INNER',
+																	'conditions' => ['DmiDistricts.id = DmiFirms.district::integer', $ro_office_not_empty]],
+																	'DmiApplicantPaymentDetails' => ['table' => 'dmi_applicant_payment_details', 'type' => 'INNER',
+																	'conditions' => ['DmiApplicantPaymentDetails.customer_id = DmiFirms.customer_id', $date_not_empty,'payment_confirmation' => 'confirmed']]])
+															->select(['id','customer_id'])
+															->where(array_merge($application_type_not_empty, $state_not_empty, $district_not_empty))
+															->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')
+															->combine('id', 'customer_id')
+															->toArray();
 
 					$renewal_firm_customer_id_list = $this->DmiFirms->find('all')
-										->select(['id', 'customer_id'])
-										->join(['DmiDistricts' => ['table' => 'dmi_districts', 'type' => 'INNER',
-												'conditions' => ['DmiDistricts.id = DmiFirms.district::integer', $ro_office_not_empty]],
-												'DmiRenewalApplicantPaymentDetails' => ['table' => 'dmi_renewal_applicant_payment_details', 'type' => 'INNER',
-												'conditions' => ['DmiRenewalApplicantPaymentDetails.customer_id = DmiFirms.customer_id',$renewal_date_not_empty, 'payment_confirmation' => 'confirmed']]])
-										->select(['id','customer_id'])
-										->where(array_merge($application_type_not_empty, $state_not_empty, $district_not_empty))
-										->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')
-										->combine('id', 'customer_id')
-										->toArray();
+																	->select(['id', 'customer_id'])
+																	->join(['DmiDistricts' => ['table' => 'dmi_districts', 'type' => 'INNER',
+																			'conditions' => ['DmiDistricts.id = DmiFirms.district::integer', $ro_office_not_empty]],
+																			'DmiRenewalApplicantPaymentDetails' => ['table' => 'dmi_renewal_applicant_payment_details', 'type' => 'INNER',
+																			'conditions' => ['DmiRenewalApplicantPaymentDetails.customer_id = DmiFirms.customer_id',$renewal_date_not_empty, 'payment_confirmation' => 'confirmed']]])
+																	->select(['id','customer_id'])
+																	->where(array_merge($application_type_not_empty, $state_not_empty, $district_not_empty))
+																	->bind(':start', $search_from_date, 'date')->bind(':end', $search_to_date, 'date')
+																	->combine('id', 'customer_id')
+																	->toArray();
 				} else {
-					
+
 					$firm_customer_id_list = $this->DmiFirms->find('all')
-										->select(['id', 'customer_id'])
-										->join(['DmiDistricts' => ['table' => 'dmi_districts', 'type' => 'INNER',
-												'conditions' => ['DmiDistricts.id = DmiFirms.district::integer', $ro_office_not_empty]],
-												'DmiApplicantPaymentDetails' => ['table' => 'dmi_applicant_payment_details', 'type' => 'INNER',
-												'conditions' => ['DmiApplicantPaymentDetails.customer_id = DmiFirms.customer_id','payment_confirmation' => 'confirmed']]])
-										->select(['id','customer_id'])
-										->where(array_merge($application_type_not_empty, $state_not_empty, $district_not_empty))
-										->combine('id', 'customer_id')->toArray();
+															->select(['id', 'customer_id'])
+															->join(['DmiDistricts' => ['table' => 'dmi_districts', 'type' => 'INNER',
+																	'conditions' => ['DmiDistricts.id = DmiFirms.district::integer', $ro_office_not_empty]],
+																	'DmiApplicantPaymentDetails' => ['table' => 'dmi_applicant_payment_details', 'type' => 'INNER',
+																	'conditions' => ['DmiApplicantPaymentDetails.customer_id = DmiFirms.customer_id','payment_confirmation' => 'confirmed']]])
+															->select(['id','customer_id'])
+															->where(array_merge($application_type_not_empty, $state_not_empty, $district_not_empty))
+															->combine('id', 'customer_id')->toArray();
 
 					$renewal_firm_customer_id_list = $this->DmiFirms->find('all')
-												->select(['id', 'customer_id'])
-												->join(['DmiDistricts' => ['table' => 'dmi_districts', 'type' => 'INNER',
-														'conditions' => ['DmiDistricts.id = DmiFirms.district::integer', $ro_office_not_empty]],
-														'DmiRenewalApplicantPaymentDetails' => ['table' => 'dmi_renewal_applicant_payment_details', 'type' => 'INNER',
-														'conditions' => ['DmiRenewalApplicantPaymentDetails.customer_id = DmiFirms.customer_id','payment_confirmation' => 'confirmed']]])
-												->select(['id','customer_id'])
-												->where(array_merge($application_type_not_empty, $state_not_empty, $district_not_empty))
-												->combine('id', 'customer_id')
-												->toArray();
+																	->select(['id', 'customer_id'])
+																	->join(['DmiDistricts' => ['table' => 'dmi_districts', 'type' => 'INNER',
+																			'conditions' => ['DmiDistricts.id = DmiFirms.district::integer', $ro_office_not_empty]],
+																			'DmiRenewalApplicantPaymentDetails' => ['table' => 'dmi_renewal_applicant_payment_details', 'type' => 'INNER',
+																			'conditions' => ['DmiRenewalApplicantPaymentDetails.customer_id = DmiFirms.customer_id','payment_confirmation' => 'confirmed']]])
+																	->select(['id','customer_id'])
+																	->where(array_merge($application_type_not_empty, $state_not_empty, $district_not_empty))
+																	->combine('id', 'customer_id')
+																	->toArray();
 				}
 
 				if ($firm_customer_id_list != null) {
@@ -5894,7 +5880,7 @@ class ReportsController extends AppController {
 						
 						$flowwise_table_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['payment IS NOT' =>NULL])->order(['id'])->toArray();
 						
-					 }
+		}
 
 				
 
@@ -5914,17 +5900,17 @@ class ReportsController extends AppController {
 						
 						$this->loadModel($payment_table);
 						$query_cil = $this->$payment_table->find('all');
-						
-						$customer_id_list = $query_cil->select(['customer_id', 'max' => $query_cil->func()->max('certificate_type')])
-									->distinct()->where($firm_customer_id_condition)
-									->group(['customer_id'])->order(['MAX(certificate_type)'])->toArray();
-									
 
-			
+						$customer_id_list = $query_cil->select(['customer_id', 'max' => $query_cil->func()->max('certificate_type')])
+										->distinct()->where($firm_customer_id_condition)
+										->group(['customer_id'])->order(['MAX(certificate_type)'])->toArray();
+
+
+		
 						foreach ($customer_id_list as $customer_id) {
-							
+
 							$customer_payment_id_list = $this->$payment_table->find('all')->select(['id'])->where(['customer_id' => $customer_id['customer_id'], 'payment_confirmation' => 'confirmed'])->toArray();
-						
+
 							if (!empty($customer_payment_id_list)) {
 								
 								$split_customer_id = explode('/',$customer_id['customer_id']);
@@ -6009,7 +5995,7 @@ class ReportsController extends AppController {
 			
 			}
 			//show listing of Renewal Application Added By Shreeya on Date [13-06-2023]
-			elseif($applicn_type  == 'Renewal'){
+			elseif($applicn_type  == 'Renewal' ){
 				
 				$report_for = 'Renewal';
 			
@@ -6051,24 +6037,24 @@ class ReportsController extends AppController {
 					$customer_id_list = $query_cil->select('customer_id')->where(['payment_confirmation' => 'confirmed'])->toArray();
 
 				
-					foreach ($customer_id_list as $customer_id) {
-						
+			foreach ($customer_id_list as $customer_id) {
+
 						$customer_payment_id_list = $this->$payment_table->find('all')->select(['id'])->where(['customer_id' => $customer_id['customer_id'], 'payment_confirmation' => 'confirmed'])->toArray();
-					
-						if (!empty($customer_payment_id_list)) {
+
+				if (!empty($customer_payment_id_list)) {
+
+					$split_customer_id = explode('/',$customer_id['customer_id']);
 							
-							$split_customer_id = explode('/',$customer_id['customer_id']);
-							
-							if ($split_customer_id[1] == 1) { $ca_application_payment_total[$i] = $i;}
-							elseif ($split_customer_id[1] == 2) { $printing_application_payment_total[$i] = $i;}
+					if ($split_customer_id[1] == 1) { $ca_application_payment_total[$i] = $i;}
+					elseif ($split_customer_id[1] == 2) { $printing_application_payment_total[$i] = $i;}
 							elseif ($split_customer_id[1] == 3) { $laboratory_application_payment_total[$i] = $i;}else{
 								$payment_max_id[$i] = $customer_payment_id_list[0]['id'];
 							}
 
-							$payment_max_id[$i] = $customer_payment_id_list[0]['id'];
-						
+					$payment_max_id[$i] = $customer_payment_id_list[0]['id'];
+
 							$customer_payment_details[$i] =  $this->$payment_table->find('all')->where(['id IN' => $customer_payment_id_list[0]['id']])->first();
-						
+
 							$firms_details[$i] = $this->DmiFirms->find('all')->where(['customer_id' => $customer_id['customer_id'],['delete_status IS NULL']])->first();
 
 							
@@ -6076,24 +6062,24 @@ class ReportsController extends AppController {
 							$apl_type_res[$i] =  $this->DmiApplicationTypes->find('all')->select(['application_type'])->where(['id' => $apl_type])->first();
 
 							if($firms_details[$i] != NULL){
-								$ro_id[$i] = $this->DmiDistricts->find('all')->select(['ro_id'])->where(['id' => $firms_details[$i]['district']])->first();
-								$i=$i+1;
-							}                                  
+					$ro_id[$i] = $this->DmiDistricts->find('all')->select(['ro_id'])->where(['id' => $firms_details[$i]['district']])->first();
+					$i=$i+1;
+				}
 					
-						}
+			}
 							
 					}
 
-					// below if-else check added by Ankur Jangid for empty IN query error check
-					if (!empty($customer_id_list)) {
-						$payment_max_id_condition = ['id IN' => $payment_max_id];
-					} else {
-						$payment_max_id_condition = ['id IS' => ''];
-					}
+			// below if-else check added by Ankur Jangid for empty IN query error check
+			if (!empty($customer_id_list)) {
+				$payment_max_id_condition = ['id IN' => $payment_max_id];
+			} else {
+				$payment_max_id_condition = ['id IS' => ''];
+			}
 
-				
 
-					$payment_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['payment IS NOT NULL'])->order(['id'])->toArray();
+
+					$payment_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['payment IS NOT' =>NULL])->order(['id'])->toArray();
 
 					//dates between to fetch records
 					$from_date = date("Y-m-d H:i:s",strtotime("-12 month"));
@@ -6113,7 +6099,7 @@ class ReportsController extends AppController {
 						
 						//$application_list_data[$j] = $this->$tbl_data->find('all')->select(['id','customer_id','certificate_type','amount_paid','payment_confirmation'])->where(['payment_confirmation' =>'confirmed'])->toArray(); 
 						$j++;
-					}
+			}
 					
 					// for renewal
 					foreach ($application_list_data[2] as $resultArr) {
@@ -6131,248 +6117,241 @@ class ReportsController extends AppController {
 						$renewal_lab_total = $renewal_lab_total + $resultArr['amount_paid'];  // store total amt of renewalLAB
 					}
 					$i++;
-					}
+		}
 
 
 
 				}
-				
+
 				
 			}
-			
 
 			 		
 		}
 
+		
 		$this->loadModel('DmiFlowWiseTablesLists');
 		
-			$apl_type_res = [];
-			$application_type_id = '';
-			
-			if ($report_for == 'All' || $report_for =='New' ||  $report_for == 'Renewal' ||  $report_for == 'Change Request' ||  $report_for == 'Chemist Approval' ||  $report_for == 'Approval of FDC' ||  $report_for == 'E-Code' ||  $report_for == 'Advance Payment' ||  $report_for == 'Approval of DP' ||  $report_for == 'Routine Inspection' ||  $report_for == 'Bianually Grading Reports' ) 
-			{
-				
-				$appl_type = $this->DmiApplicationTypes->find('all')->select(['id', 'application_type'])->where(['application_type'=>$report_for])->first();
+		$apl_type_res = [];
+		$application_type_id = '';
 		
-				if(!empty($appl_type)){
-					$application_type_id = $appl_type['id'];
-				}			
-						
-				if($report_for != 'All' && !empty($application_type_id)){
-					
-					$flowwise_table_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['application_type IS' =>$application_type_id])->toArray();
-				
-				}else{
-				
-					$flowwise_table_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['payment IS NOT NULL'])->order(['id'])->toArray();
-					
-					// ['payment IS NOT NULL','application_type IN'=>array('1','3')]
-				}
-						
-					
-				$i=0;
-				$total_payment_details = [];
-				$ca_payment = [];
-				$printing_payment = [];
-				$lab_payment = [];
-
-				foreach ($flowwise_table_data as $FlowWise_Tables){
-
-					$apl_type = $FlowWise_Tables['application_type'];
-				
-					$payment_table = $FlowWise_Tables['payment'];
-
-					$this->loadModel($payment_table);
-					$query_cil = $this->$payment_table->find('all');
-					
-					
-					//by default show all application recordes ..
-					//added if condition for show all renewal recored without group by condition
-					//By Shreeya on Date [13-06-2023]
-					if($report_for == 'Renewal' || $report_for == 'All' || $report_for == 'Advance Payment'){
-
-						//change the query remove group by on date 13-06-2023 by shreeya
-						$customer_id_list = $query_cil->select('customer_id')->where(['payment_confirmation' => 'confirmed'])->toArray();
-						
-					}else{
-						$customer_id_list = $query_cil->select(['customer_id', 'max' => $query_cil->func()->max('certificate_type')])
-										->distinct()->where($firm_customer_id_condition)
-										->group(['customer_id'])->order(['MAX(certificate_type)'])->toArray();
-					}
-					
-
-					foreach ($customer_id_list as $customer_id) {
-						
-						$customer_payment_id_list = $this->$payment_table->find('all')->select(['id'])->where(['customer_id' => $customer_id['customer_id'], 'payment_confirmation' => 'confirmed'])->toArray();
+		if ($report_for == 'All' || $report_for =='New' ||  $report_for == 'Renewal' ||  $report_for == 'Change Request' ||  $report_for == 'Chemist Approval' ||  $report_for == 'Approval of FDC' ||  $report_for == 'E-Code' ||  $report_for == 'Advance Payment' ||  $report_for == 'Approval of DP' ||  $report_for == 'Routine Inspection' ||  $report_for == 'Bianually Grading Reports' ) 
+		{
 			
-						if (!empty($customer_payment_id_list)) {
-							
-							$split_customer_id = explode('/',$customer_id['customer_id']);
-							
-							if ($split_customer_id[1] == 1) { $ca_application_payment_total[$i] = $i;}
-							elseif ($split_customer_id[1] == 2) { $printing_application_payment_total[$i] = $i;}
-							elseif ($split_customer_id[1] == 3) { $laboratory_application_payment_total[$i] = $i;}else{
-								$payment_max_id[$i] = $customer_payment_id_list[0]['id'];
-							}
-							
-							$payment_max_id[$i] = $customer_payment_id_list[0]['id'];
-						
-							$customer_payment_details[$i] =  $this->$payment_table->find('all')->where(['id IN' => $customer_payment_id_list[0]['id']])->first();
-							
-							$firms_details[$i] = $this->DmiFirms->find('all')->where(['customer_id' => $customer_id['customer_id'],['delete_status IS NULL']])->first();
-							
-							$this->loadModel('DmiApplicationTypes');
-							$apl_type_res[$i] =  $this->DmiApplicationTypes->find('all')->select(['application_type'])->where(['id' => $apl_type])->first();
-
-							if($firms_details[$i] != NULL){
-								$ro_id[$i] = $this->DmiDistricts->find('all')->select(['ro_id'])->where(['id' => $firms_details[$i]['district']])->first();
-								$i=$i+1;
-							}                                  
-							
-						}
-							
-					} 
-
+			$appl_type = $this->DmiApplicationTypes->find('all')->select(['id', 'application_type'])->where(['application_type'=>$report_for])->first();
+	
+			$application_type_id = $appl_type['id'];
 					
-					// below if-else check added by Ankur Jangid for empty IN query error check
-					if (!empty($customer_id_list)) {
-						$payment_max_id_condition = ['id IN' => $payment_max_id];
-					} else {
-						$payment_max_id_condition = ['id IS' => ''];
-					}
-
+			if($report_for != 'All'){
 				
-
-					$payment_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['payment IS NOT NULL'])->order(['id'])->toArray();
-
-					//dates between to fetch records
-					$from_date = date("Y-m-d H:i:s",strtotime("-12 month"));
-					
-					$to_date = date('Y-m-d H:i:s');//str_replace('/','-',$to_date);
-						
-					$j=1;
-					$application_list_data = [];
-					foreach ($payment_data as $payment_value) {
-
-					
-						$tbl_data = $payment_value['payment'];
-						$this->loadModel($tbl_data);
-
-						$application_list_data[$j] = $this->$tbl_data->find('all',array('conditions'=>array('payment_confirmation'=>'confirmed','and'=>array('date(created) >=' => $from_date, 'date(created) <=' =>$to_date)),'order'=>'id desc'))->toArray();
-
-						
-						//$application_list_data[$j] = $this->$tbl_data->find('all')->select(['id','customer_id','certificate_type','amount_paid','payment_confirmation'])->where(['payment_confirmation' =>'confirmed'])->toArray(); 
-						$j++;
-					}
-				
-					
-					
+				$flowwise_table_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['application_type IS' =>$application_type_id])->toArray();
 			
-					// for new
-					foreach ($application_list_data[1] as $resultArr) {
-							
-							$certiifctaetype = $resultArr['certificate_type'];
-						
-
-							if($certiifctaetype == 1){
-								$new_ca_total = $new_ca_total + $resultArr['amount_paid'];  // store total amt of newca
-							}
-							if($certiifctaetype == 2){
-								$new_pp_total = $new_pp_total + $resultArr['amount_paid'];  // store total amt of newpp
-							}
-							if($certiifctaetype == 3){
-								$new_lab_total = $new_lab_total + $resultArr['amount_paid'];  // store total amt of newlab
-							}
-							$i++;
-					}
-
-					// for renewal
-					foreach ($application_list_data[2] as $resultArr) {
-							
-							$certiifctaetype = $resultArr['certificate_type'];
-						
-
-							if($certiifctaetype == 1){
-								$renewal_ca_total = $renewal_ca_total + $resultArr['amount_paid'];  // store total amt of renewalCA
-							}
-							if($certiifctaetype == 2){
-								$renewal_pp_total = $renewal_pp_total + $resultArr['amount_paid'];  // store total amt of renewalPP
-							}
-							if($certiifctaetype == 3){
-								$renewal_lab_total = $renewal_lab_total + $resultArr['amount_paid'];  // store total amt of renewalLAB
-							}
-							$i++;
-					}
-
-					// for change
-					foreach ($application_list_data[3] as $resultArr) {
-							
-							$certiifctaetype = $resultArr['certificate_type'];
-						
-
-							if($certiifctaetype == 1){
-								$change_ca_total = $change_ca_total + $resultArr['amount_paid'];  // store total amt of ChangeCA
-							}
-							if($certiifctaetype == 2){
-								$change_pp_total = $change_pp_total + $resultArr['amount_paid'];  // store total amt of ChangePP
-							}
-							if($certiifctaetype == 3){
-								$change_lAB_total = $change_lAB_total + $resultArr['amount_paid'];  // store total amt of ChangeLAB
-							}
-							$i++;
-					}
-
-					// for chemist
-					foreach ($application_list_data[4] as $resultArr) {
-							
-							$chemist_total = $chemist_total + $resultArr['amount_paid'];
-							$i++;
-					}
-
-					// for 15digit
-					foreach ($application_list_data[5] as $resultArr) {
-							
-							$fiftin_digit_total = $fiftin_digit_total + $resultArr['amount_paid'];
-							$i++;
-					}
-
-					// for Ecode
-					foreach ($application_list_data[6] as $resultArr) {
-							
-							$ecode_total = $ecode_total + $resultArr['amount_paid'];
-							$i++;
-					}
-					
-					// for adv
-					foreach ($application_list_data[7] as $resultArr) {
-							
-							$adv_total = $adv_total + $resultArr['amount_paid'];
-							$i++;
-					}
-					// for adp
-					foreach ($application_list_data[8] as $resultArr) {
-							
-							$adp_total = $adp_total + $resultArr['amount_paid'];
-							$i++;
-					}
-					// for RTI
-					foreach ($application_list_data[9] as $resultArr) {
-							
-							$rti_total = $rti_total + $resultArr['amount_paid'];
-							$i++;
-					}
-					// for bgr
-					foreach ($application_list_data[10] as $resultArr) {
-							
-							$bgr_total = $bgr_total + $resultArr['amount_paid'];
-							$i++;
-					}
-
-				}
-
+			}else{
+			
+				$flowwise_table_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['payment IS NOT' =>NULL])->order(['id'])->toArray();
 				
 			}
+					
+
+			$i=0;
+			$total_payment_details = [];
+			$ca_payment = [];
+			$printing_payment = [];
+			$lab_payment = [];
+
+			foreach ($flowwise_table_data as $FlowWise_Tables){
+
+				$apl_type = $FlowWise_Tables['application_type'];
+
+				$payment_table = $FlowWise_Tables['payment'];
+
+				$this->loadModel($payment_table);
+				$query_cil = $this->$payment_table->find('all');
+
+
+				 //by default show all application recordes ..
+				 //added if condition for show all renewal recored without group by condition
+				 //By Shreeya on Date [13-06-2023]
+				if($report_for == 'Renewal' || $report_for == 'All'){
+
+					//change the query remove group by on date 13-06-2023 by shreeya
+					$customer_id_list = $query_cil->select('customer_id')->where(['payment_confirmation' => 'confirmed'])->toArray();
+
+				}else{
+					$customer_id_list = $query_cil->select(['customer_id', 'max' => $query_cil->func()->max('certificate_type')])
+									->distinct()->where($firm_customer_id_condition)
+									->group(['customer_id'])->order(['MAX(certificate_type)'])->toArray();
+				}
+				
+
+				foreach ($customer_id_list as $customer_id) {
+	
+					$customer_payment_id_list = $this->$payment_table->find('all')->select(['id'])->where(['customer_id' => $customer_id['customer_id'], 'payment_confirmation' => 'confirmed'])->toArray();
 		
+					if (!empty($customer_payment_id_list)) {
+						
+						$split_customer_id = explode('/',$customer_id['customer_id']);
+						
+						if ($split_customer_id[1] == 1) { $ca_application_payment_total[$i] = $i;}
+						elseif ($split_customer_id[1] == 2) { $printing_application_payment_total[$i] = $i;}
+						elseif ($split_customer_id[1] == 3) { $laboratory_application_payment_total[$i] = $i;}else{
+							$payment_max_id[$i] = $customer_payment_id_list[0]['id'];
+						}
+
+						$payment_max_id[$i] = $customer_payment_id_list[0]['id'];
+					
+						$customer_payment_details[$i] =  $this->$payment_table->find('all')->where(['id IN' => $customer_payment_id_list[0]['id']])->first();
+					
+						$firms_details[$i] = $this->DmiFirms->find('all')->where(['customer_id' => $customer_id['customer_id'],['delete_status IS NULL']])->first();
+				
+						$this->loadModel('DmiApplicationTypes');
+						$apl_type_res[$i] =  $this->DmiApplicationTypes->find('all')->select(['application_type'])->where(['id' => $apl_type])->first();
+
+						if($firms_details[$i] != NULL){
+							$ro_id[$i] = $this->DmiDistricts->find('all')->select(['ro_id'])->where(['id' => $firms_details[$i]['district']])->first();
+							$i=$i+1;
+						}
+				
+					}
+						
+				}
+
+			// below if-else check added by Ankur Jangid for empty IN query error check
+				if (!empty($customer_id_list)) {
+					$payment_max_id_condition = ['id IN' => $payment_max_id];
+			} else {
+					$payment_max_id_condition = ['id IS' => ''];
+			}
+
+
+
+				$payment_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['payment IS NOT' =>NULL])->order(['id'])->toArray();
+
+				//dates between to fetch records
+				$from_date = date("Y-m-d H:i:s",strtotime("-12 month"));
+				
+				$to_date = date('Y-m-d H:i:s');//str_replace('/','-',$to_date);
+					
+				$j=1;
+				$application_list_data = [];
+				foreach ($payment_data as $payment_value) {
+
+				
+					$tbl_data = $payment_value['payment'];
+					$this->loadModel($tbl_data);
+
+					$application_list_data[$j] = $this->$tbl_data->find('all',array('conditions'=>array('payment_confirmation'=>'confirmed','and'=>array('date(created) >=' => $from_date, 'date(created) <=' =>$to_date)),'order'=>'id desc'))->toArray();
+
+					
+					//$application_list_data[$j] = $this->$tbl_data->find('all')->select(['id','customer_id','certificate_type','amount_paid','payment_confirmation'])->where(['payment_confirmation' =>'confirmed'])->toArray(); 
+					$j++;
+				}
+			
+				
+				
+		
+				// for new
+				foreach ($application_list_data[1] as $resultArr) {
+						
+						$certiifctaetype = $resultArr['certificate_type'];
+					
+
+						if($certiifctaetype == 1){
+							$new_ca_total = $new_ca_total + $resultArr['amount_paid'];  // store total amt of newca
+			}
+						if($certiifctaetype == 2){
+							$new_pp_total = $new_pp_total + $resultArr['amount_paid'];  // store total amt of newpp
+						}
+						if($certiifctaetype == 3){
+							$new_lab_total = $new_lab_total + $resultArr['amount_paid'];  // store total amt of newlab
+						}
+						$i++;
+		}
+
+				// for renewal
+				foreach ($application_list_data[2] as $resultArr) {
+
+						$certiifctaetype = $resultArr['certificate_type'];
+					
+
+						if($certiifctaetype == 1){
+							$renewal_ca_total = $renewal_ca_total + $resultArr['amount_paid'];  // store total amt of renewalCA
+						}
+						if($certiifctaetype == 2){
+							$renewal_pp_total = $renewal_pp_total + $resultArr['amount_paid'];  // store total amt of renewalPP
+						}
+						if($certiifctaetype == 3){
+							$renewal_lab_total = $renewal_lab_total + $resultArr['amount_paid'];  // store total amt of renewalLAB
+						}
+						$i++;
+				}
+
+				// for change
+				foreach ($application_list_data[3] as $resultArr) {
+						
+						$certiifctaetype = $resultArr['certificate_type'];
+					
+
+						if($certiifctaetype == 1){
+							$change_ca_total = $change_ca_total + $resultArr['amount_paid'];  // store total amt of ChangeCA
+						}
+						if($certiifctaetype == 2){
+							$change_pp_total = $change_pp_total + $resultArr['amount_paid'];  // store total amt of ChangePP
+						}
+						if($certiifctaetype == 3){
+							$change_lAB_total = $change_lAB_total + $resultArr['amount_paid'];  // store total amt of ChangeLAB
+						}
+						$i++;
+				}
+
+				// for chemist
+				foreach ($application_list_data[4] as $resultArr) {
+						
+						$chemist_total = $chemist_total + $resultArr['amount_paid'];
+						$i++;
+				}
+
+				// for 15digit
+				foreach ($application_list_data[5] as $resultArr) {
+						
+						$fiftin_digit_total = $fiftin_digit_total + $resultArr['amount_paid'];
+						$i++;
+				}
+
+				// for Ecode
+				foreach ($application_list_data[6] as $resultArr) {
+						
+						$ecode_total = $ecode_total + $resultArr['amount_paid'];
+						$i++;
+				}
+				
+				// for adv
+				foreach ($application_list_data[7] as $resultArr) {
+						
+						$adv_total = $adv_total + $resultArr['amount_paid'];
+						$i++;
+				}
+				// for adp
+				foreach ($application_list_data[8] as $resultArr) {
+						
+						$adp_total = $adp_total + $resultArr['amount_paid'];
+						$i++;
+				}
+				// for RTI
+				foreach ($application_list_data[9] as $resultArr) {
+						
+						$rti_total = $rti_total + $resultArr['amount_paid'];
+						$i++;
+				}
+				// for bgr
+				foreach ($application_list_data[10] as $resultArr) {
+						
+						$bgr_total = $bgr_total + $resultArr['amount_paid'];
+						$i++;
+				}
+
+			}
+		}
 
 		
 	
@@ -6413,7 +6392,7 @@ class ReportsController extends AppController {
 		$this->set('ro_office',$ro_office); $this->set('state',$state);
 		$this->set('district',$district); $this->set('search_from_date',$search_from_date);
 		$this->set('search_to_date',$search_to_date);   // Change on 5/11/2018, set search_to_date value, By Pravin 5/11/2018
-	
+
 		
 	
 	}
@@ -6513,7 +6492,7 @@ class ReportsController extends AppController {
 
 	// Sent Email Report
 	// Description : This Function Developed For In-Process Report for Renewal Appln Showing Count & list
-	// @Author : Yashwant 
+	// @Author : Yashwant
 	// #Contributer : Shreeya
 	// Date : 03/Mar/2023
 
@@ -6638,11 +6617,11 @@ class ReportsController extends AppController {
 			$this->set('user_email_id',$user_email_id);
 			$this->set('application_id',$application_id);
 		}
-		
+
 		/*====(End)===*/
 
 
-
+		
 		$application_pending_days = $this->Session->read('pending_days');
 
 		if (!empty($application_pending_days)) {
@@ -7295,7 +7274,7 @@ class ReportsController extends AppController {
 		$appl_type=base64_decode($appl_type);
 		$cert_type=base64_decode($cert_type);
 		$data_id =array($cert_type);
-
+		
 		
 		if ($cert_type== 'CA') 
 		{
@@ -7433,7 +7412,7 @@ class ReportsController extends AppController {
 		$final_submit_result = $DmiFinalSubmits->find('all')->select(['customer_id'])->distinct(['customer_id'])->where(['customer_id IN' => $firm_result])->toArray();*/
 
 		//echo"<pre>";print_r($final_submit_result);exit;
-
+		
 
 		//$table = 'DmiRenewalAllCurrentPositions';
 		//$table = 'DmiFirms';
@@ -8032,8 +8011,7 @@ class ReportsController extends AppController {
 			$table = 'DmiFinalSubmits';
 			$report_heading = 'Approved New Applications Report';
 		}*/ 
-		if ($approved_application_type == 'renewal') {
-			
+		if ($approved_application_type == 'renewal' || $approved_application_type =='') {
 			$table = 'DmiRenewalFinalSubmits';
 			$report_heading = 'Approved Renewal Applications Report';
 
@@ -8041,7 +8019,7 @@ class ReportsController extends AppController {
 			
 			$table = 'DmiGrantCertificatesPdfs';
 			$report_heading = 'All Approved Report';
-
+			
 			
 			// this below code is added to show the deafult office by Akash on 16-06-2022
 			$posted_ro_office = $this->DmiUsers->find('all',array('fields'=>'posted_ro_office', 'conditions'=>array('email IS'=>$_SESSION['username'])))->first();
@@ -8080,7 +8058,7 @@ class ReportsController extends AppController {
 		$searchConditions = array();
 		$application_processed[] = $this->Reportstatistics->$processFunction($searchConditions,null,null,$cert_type,$approved_application_type);
 		$applListToShow = $application_processed[0][3];
-		
+	
 
 		$date=array();
 		$application_type=array();
@@ -8099,7 +8077,7 @@ class ReportsController extends AppController {
 		$i=0;
 			//applied array_unique function on 18-07-2019
 			foreach (array_unique($applListToShow) as $approved_application) {
-			
+
 				$approved_application_details = array(); //this line added on 18-07-2019
 
 				// THIS BELOW CONDITION IS ADDED FOR THE ALL REPORTS BY AKASH ON 16-06-2022
@@ -8110,19 +8088,16 @@ class ReportsController extends AppController {
 				} elseif ($approved_application_type == 'backlog') {
 					$approved_application_details = $this->DmiFinalSubmits->find('all')->where(['customer_id' => $approved_application,'status'=>'approved','current_level'=>'level_3'])->first(); 
 				} elseif ($approved_application_type == 'renewal') {
-					
 					$approved_application_detail = $this->DmiGrantCertificatesPdfs->find('all')->select(['id'])->where(['customer_id IS'=>$approved_application])->combine('id','id')->toArray(); 
-					//print_r($approved_application.'@'.$i.'@@');
 					//applied this condition on 27-04-2019
 					if (!empty($approved_application_detail)) {
 						$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['id IN'=> $approved_application_detail])->order(['id' => 'DESC'])->first(); 
-						
 					}
 				}
 
 				//this condition added on 18-07-2019
 				if (!empty($approved_application_details)) {
-		
+
 					$approved_application_result = $approved_application_details;
 
 					//to check if the application is old or not to print on the excel and for viewing part dont by Akash 07-04-2022
@@ -8137,9 +8112,9 @@ class ReportsController extends AppController {
 						} else {
 							$approved_application_type_text[$i] = "NEW";
 						}
-						
+
 					} else {
-						
+
 						if ($approved_application_type == 'renewal') {
 							$approved_application_type_text[$i] = "<b>RENEWAL</b>";
 						} elseif ($approved_application_result['user_email_id'] == 'old_application') {
@@ -8258,8 +8233,8 @@ class ReportsController extends AppController {
 					$i=$i+1;
 				}
 			}
-			
-			//exit;
+
+		
 
 		$this->set('date',$date);
 		$this->set('application_customer_id',$application_customer_id);
@@ -8283,8 +8258,8 @@ class ReportsController extends AppController {
 
 
 		//*****************End************************************
-
-
+		
+		
 		$this->set('table', $table);	// set table value ( Done by pravin 16-07-2018)
 		$this->set('report_heading', $report_heading);
 
@@ -8292,7 +8267,7 @@ class ReportsController extends AppController {
 		//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
 		asort($application_type_xy);
 		$this->set('application_type_xy', $application_type_xy);
-		// $newappId replace $cert_type by Shreeya date [26-05-2023]	
+		// $newappId replace $cert_type by Shreeya date [26-05-2023]
 		$this->set('cert_type',$cert_type);
 
 		// $newappId replace $cert_type by Shreeya date [26-05-2023]
@@ -9157,11 +9132,11 @@ class ReportsController extends AppController {
 
 
 		//*****************End************************************
-		
+
 		$this->set('table', $table);	// set table value ( Done by pravin 16-07-2018)
 		$this->set('report_heading', $report_heading);
 
-		
+
 		$application_type_xy = array('A'=>'CA (Form-A)','C'=>'Laboratory (Form-C)','E'=>'CA (Form-E)','B'=>'Printing Press (Form-B)','D'=>'Laboratory (Form-D)','F'=>'CA (Form-F)');
 		//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
 		asort($application_type_xy);
@@ -9178,7 +9153,7 @@ class ReportsController extends AppController {
 			$application_type_xy = array('C'=>'Laboratory (Form-C)','D'=>'Laboratory (Form-D)');
 		}
 
-		
+
 
 		//added 'office_type'=>'RO' condition on 27-07-2018   // Change on 3/11/2018 -  add order by condition - by Pravin Bhakare
 		$ro_office = $this->DmiRoOffices->find('all')->select(['id', 'ro_office'])->where(['office_type' => 'RO','delete_status IS NULL'])->order(['ro_office' => 'ASC'])->combine('id', 'ro_office')->toArray(); 
@@ -9884,7 +9859,7 @@ class ReportsController extends AppController {
 	{
 		$PenId=base64_decode($pending_id);
 		$data_id =$PenId;
-		
+
 		
 		$date = [];
 		$user_list = null;
@@ -9893,7 +9868,7 @@ class ReportsController extends AppController {
 		$user_office = array();
 		$user_email_id =null;
 		$application_id = null;
-		
+
 		
 
 		$applTypeArray = $this->Session->read('applTypeArray');
@@ -9916,7 +9891,7 @@ class ReportsController extends AppController {
 			$key = array_search ($each_table, $applications_current_positions_tables);
 			$this->loadModel($each_table);
 			$this->loadModel($key);
-			
+
 			//For Progress with MO
 			if ($data_id=='MO')
 			{
@@ -9934,7 +9909,7 @@ class ReportsController extends AppController {
 				$inprogress_with_mo = $this->$each_table->find('all')->select(['id', 'customer_id'])
 				->where($searchPendingConditions)->where(['current_level' => 'level_1'])
 				->where(function ($exp, $q) {return $exp->notEq('customer_id', '');})
-				->combine('id', 'customer_id')->toArray();
+				->combine('id', 'customer_id')->toArray(); 
 
 				
 				//this foreach loop added for show the existing result of total count
@@ -9959,35 +9934,35 @@ class ReportsController extends AppController {
 				{
 					// $i=0; commented by shreeya on [Date 01-06-2023]this increment is already use in front
 					foreach ($inprogress_mo_details as $each_user) 
-					{	
+					{
 	
-							$customer_id = $each_user['customer_id'];
-							$each_user_detail = $each_user;
-							$current_level = $each_user_detail['current_level'];
-							$application_form_type = $this->Customfunctions->checkApplicantFormType($each_user_detail['customer_id']);
-
+						$customer_id = $each_user['customer_id'];
+						$each_user_detail = $each_user;
+						$current_level = $each_user_detail['current_level'];
+						$application_form_type = $this->Customfunctions->checkApplicantFormType($each_user_detail['customer_id']);
+					
 							if ($application_form_type == 'A') 
 							{
-								$application_type[$i]='CA (Form-A)';
+							$application_type[$i]='CA (Form-A)';
 							}
 							elseif ($application_form_type == 'B') 
 							{
-								$application_type[$i]='Printing Press (Form-B)';
+							$application_type[$i]='Printing Press (Form-B)';
 							} elseif ($application_form_type == 'C') 
 							{
-								$application_type[$i]='Laboratory (Form-C)';
+							$application_type[$i]='Laboratory (Form-C)';
 							} elseif ($application_form_type == 'D') 
 							{
-								$application_type[$i]='Laboratory (Form-D)';
+							$application_type[$i]='Laboratory (Form-D)';
 							} elseif ($application_form_type == 'E') 
 							{
-								$application_type[$i]='CA (Form-E)';
+							$application_type[$i]='CA (Form-E)';
 							} elseif ($application_form_type == 'F') 
 							{
-								$application_type[$i]='CA (Form-F)';
-							}
+							$application_type[$i]='CA (Form-F)';
+						}
 
-							$date[$i] = $each_user_detail['modified'];
+						$date[$i] = $each_user_detail['modified'];
 							
 							// Added for show the list of userid(current_user_email_id) & pending with(current_level)
 							// By shreeya on Date : [16-05-2023]
@@ -10007,42 +9982,42 @@ class ReportsController extends AppController {
 							}
 							
 							
-							//$user_email_id[$i] = $each_user_detail['current_user_email_id'];
-							$application_id[$i] = $each_user_detail['customer_id'];
+						//$user_email_id[$i] = $each_user_detail['current_user_email_id'];
+						$application_id[$i] = $each_user_detail['customer_id'];
 
-							$user_posted_office_id=array();
+						$user_posted_office_id=array();
 							if (!empty($user_email_id[$i])) 
 							{
-								$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IN' => $user_email_id[$i]])->first(); 
-							}
-							if (!empty($user_posted_office_id)) 
-							{
+							$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IN' => $user_email_id[$i]])->first(); 
+						}
+						if (!empty($user_posted_office_id)) 
+						{
 								$user_office_details[$i] = $this->DmiRoOffices->find('all')->select(['ro_office'])->where(['id' => $user_posted_office_id['posted_ro_office']])->first(); 
-							}
-						
-							## uncommented this code for show the posted office [Date 16-05-2023 By Shreeya ]
+						}
+
+						## uncommented this code for show the posted office [Date 16-05-2023 By Shreeya ]
 							if (!empty($user_office_details[$i])) 
-							{
+						{
 								$user_office[$i] = $user_office_details[$i]['ro_office'];
-							} else 
-							{
-								$user_office[$i] = '--';
+						} else 
+						{
+							$user_office[$i] = '--';
 							}
 
-							$check_roles=array();
+						$check_roles=array();
 
-							if (!empty($user_email_id[$i])) 
-							{
-								$check_roles = $this->DmiUserRoles->find('all')->where(['user_email_id IN' => $user_email_id[$i]])->first(); 
-							}
+						if (!empty($user_email_id[$i])) 
+						{
+							$check_roles = $this->DmiUserRoles->find('all')->where(['user_email_id IN' => $user_email_id[$i]])->first(); 
+						}
 
-							if (!empty($check_roles)) 
-							{
-								$user_list[$i] = $check_roles;
-							} 
-							else {
-								$user_list[$i] = '---';
-							}
+						if (!empty($check_roles)) 
+						{
+							$user_list[$i] = $check_roles;
+						} 
+						else {
+							$user_list[$i] = '---';
+						}
 
 							//below condition change variable for show the users roles on listing  $each_user_detail -> $mo_user By Shreeya on Date [16-05-2023]
 							
@@ -10052,12 +10027,12 @@ class ReportsController extends AppController {
 								$user_roles[$i] = '--';
 							}
 							
-							$i=$i+1;
+						$i=$i+1;
 						
 					}
 					
 				}
-				
+			
 			} elseif($data_id=='IO') {
 
 				
@@ -10074,7 +10049,7 @@ class ReportsController extends AppController {
 					$pendingcount[$key] = $value ;
 					
 				}
-				
+
 				if (!empty($inprogress_with_io)) {
 					$inprogress_io_details = $this->DmiFirms->find('all')->where(['customer_id IN'=>$inprogress_with_io])->order(['id' => 'DESC'])->toArray(); 
 				} else {
@@ -10173,7 +10148,7 @@ class ReportsController extends AppController {
 				
 			//For Progress with HO
 			} elseif($data_id=='HO') {
-				
+
 				$report_heading ='Pending HO Applications Report';
 				$inprogress_with_ho = $this->$each_table->find('all')->select(['id', 'customer_id'])
 				->where($searchPendingConditions)->where(['current_level' => 'level_4'])
@@ -10259,7 +10234,7 @@ class ReportsController extends AppController {
 						{
 							$user_office_details[$i] = $this->DmiRoOffices->find('all')->select(['ro_office'])->where(['id' => $user_posted_office_id['posted_ro_office']])->first(); 
 						}
-					
+
 						## uncommented this code for show the posted office [Date 16-05-2023 By Shreeya ]
 						if (!empty($user_office_details[$i])) 
 						{
@@ -10297,12 +10272,12 @@ class ReportsController extends AppController {
 				}
 			
 			} elseif($data_id=='RO') {
-				
+
 				$report_heading ='Pending RO Applications Report';
 				//For Progress with RO
 				$inprogress_with_ro = $this->$each_table->find('all')->select(['id', 'customer_id'])
-														->where($searchPendingConditions)->where(['current_level' => 'level_3'])
-														->combine('id', 'customer_id')->toArray(); 
+				->where($searchPendingConditions)->where(['current_level' => 'level_3'])
+				->combine('id', 'customer_id')->toArray(); 
 
 				
 			
@@ -10319,7 +10294,7 @@ class ReportsController extends AppController {
 						}
 						
 					}
-				}	
+				}
 				//the $pending_with_ro_arr array is assigned to the $inprogress_app_with_ro array. This adds the array of pending records
 				//By Shreeya on Date [02-06-2023]
 				$inprogress_app_with_ro[] = $pending_with_ro_arr;
@@ -10329,7 +10304,7 @@ class ReportsController extends AppController {
 				//If $appl_type is not equal to 4, it queries the DmiFirms table using the customer_id from the $pending_with_ro_arr.
 				//By Shreeya on Date [02-06-2023]
 				if (!empty($pending_with_ro_arr)) {
-					
+
 					if($appl_type!=4){
 						$inprogress_ro_details = $this->DmiFirms->find('all')->where(['customer_id IN'=>$pending_with_ro_arr])->order(['id' => 'DESC'])->toArray(); 
 					}else{
@@ -10354,7 +10329,7 @@ class ReportsController extends AppController {
 						// the $customer_id variable. Otherwise, it assigns the value of $each_user['chemist_id'] to the $customer_id variable.
 						//By Shreeya on Date [02-06-2023]
 						if($appl_type!=4){
-							$customer_id = $each_user['customer_id'];
+						$customer_id = $each_user['customer_id'];
 						}else{
 							$customer_id = $each_user['chemist_id'];
 						}
@@ -10377,7 +10352,7 @@ class ReportsController extends AppController {
 						}
 
 						$application_form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
-						
+
 						if ($application_form_type == 'A') {
 							$application_type[$i] = 'CA (Form-A)';
 						} elseif ($application_form_type == 'B') {
@@ -10419,7 +10394,7 @@ class ReportsController extends AppController {
 
 						$user_posted_office_id = array();
 						if (!empty($user_email_id[$i])) {
-							$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IN' => $user_email_id[$i]])->first();
+							$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IN' => $user_email_id[$i]])->first(); 
 						}
 
 						if (!empty($user_posted_office_id)) {
@@ -10435,7 +10410,7 @@ class ReportsController extends AppController {
 
 						$check_roles = array();
 						if (!empty($user_email_id[$i])) {
-							$check_roles = $this->DmiUserRoles->find('all')->where(['user_email_id IN' => $user_email_id[$i]])->first();
+							$check_roles = $this->DmiUserRoles->find('all')->where(['user_email_id IN' => $user_email_id[$i]])->first(); 
 						}
 
 						if (!empty($check_roles)) {
@@ -10447,26 +10422,26 @@ class ReportsController extends AppController {
 						//below condition change variable $each_user_detail -> $mo_user By Shreeya on Date [16-05-2023]
 						if (!empty($mo_user)) {
 							$user_roles[$i] = $this->checkUserRoleFromCurrentLevel($mo_user['current_level'], $mo_user['current_user_email_id']);
-						}
+					}
 						else{
 						 	$user_roles[$i] = '3';
-						 }
-						 $i = $i + 1;
-					}
-					
-					
 				}
-			
+						 $i = $i + 1;
+			}
+					
+					
+		}
+		
 			}
 			
 			$appl_type++;
 		}
 		
-		//exit;
+		
 
 		$total_pending = $pendingCountForMo + $pendingCountForIo + $pendingCountForHo + count($inprogress_app_with_ro);
 		
-		
+
 
 		$this->set('report_heading',$report_heading);
 		$this->set('data_id',$data_id);
@@ -10770,7 +10745,7 @@ class ReportsController extends AppController {
 		$data_id =$EsignRenewId;
 		$searchPendingConditions =array();
 		$renewal_esign_list=array();
-		
+
 		$this->loadModel('DmiRenewalEsignedStatuses');
 		$renewalApplicationEsigned = $this->DmiRenewalEsignedStatuses->find('all')->where($searchPendingConditions)->where(['application_esigned' => 'yes'])->toArray();
 		$renewalInspectionReportEsigned = $this->DmiRenewalEsignedStatuses->find('all')->where($searchPendingConditions)->where(['report_esigned' => 'yes'])->toArray();
@@ -10783,7 +10758,7 @@ class ReportsController extends AppController {
 		->where(function ($exp, $q) {return $exp->notEq('customer_id', '');})->toArray();
 
 		
-					
+		
 		if($data_id =="APP"){
 			$i=0;
 			foreach ($renewalApplicationEsigned as $each) {
@@ -10791,7 +10766,7 @@ class ReportsController extends AppController {
 				$renewal_esign_list[$i] = $each['customer_id'];
 				$i=$i+1;
 			}
-			
+
 			$report_heading ="Esigned New Applications Reports";
 			$this->set('report_heading', $report_heading);
 			$this->esignRenewalApplnResults($renewal_esign_list,$data_id);
@@ -10865,7 +10840,7 @@ class ReportsController extends AppController {
 			{
 				
 				$esign_application_details = array(); 
-			
+
 				if ($data_id == 'APP') {
 					$esign_application_details = $this->DmiRenewalEsignedStatuses->find('all')->where(['customer_id' => $esigned_renew_application,'application_esigned' => 'yes'])->first(); 
 				
@@ -10881,7 +10856,7 @@ class ReportsController extends AppController {
 
 				//this condition added on 18-07-2019
 				if (!empty($esign_application_details)) {
-				
+
 					$approved_application_result = $esign_application_details;
 
 					if ($approved_application_result['user_email_id'] == 'old_application') {
