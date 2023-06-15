@@ -210,7 +210,7 @@
 	
 	function attachSamplePacker() {
 		
-		var customer_id = $('#packers_id').val(); alert(customer_id);
+		var customer_id = $('#packers_id').val(); 
 		var sample_code = $('#sample_code').val();
 		var application_mode = $('#application_mode_id').val();
 		if (customer_id !== '') {

@@ -1523,7 +1523,7 @@ class CustomersController extends AppController {
 				$this->set('showCauseNotice',null);
 			}
 			
-			
+	
 
 		//check if the applicant is commented on the showcause notice.
 		$this->loadModel('DmiMmrShowcauseLogs');

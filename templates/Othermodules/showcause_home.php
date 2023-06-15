@@ -29,11 +29,12 @@
 							<div class="card-header"><h3 class="card-title-new">Show Cause Notice</h3></div>
 							<?php 
 								echo $this->element('misgrade_elements/scn_user_form'); 
-							
+								
 								if (!empty($statusofscn)) {
-									echo $this->element('misgrade_elements/showcause_communication'); 
+									if(trim($statusofscn['status']) != 'saved' ){
+										echo $this->element('misgrade_elements/showcause_communication'); 
+									}
 								}
-						
 							?>
 							<div class="card-footer">
 								<?php echo $this->element('misgrade_elements/showcause_buttons'); ?>

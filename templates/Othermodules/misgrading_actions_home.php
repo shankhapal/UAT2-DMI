@@ -40,7 +40,7 @@
 										</div>
 									</div>
 									<?php
-										if ($status != 'submitted' && $status != 'final_submitted') { ?>
+										if (($status != 'submitted' && $status != 'final_submitted') || $re_action == 'yes') { ?>
 										
 										<div class="col-3 hide_det">
 											<div class="form-group">
@@ -75,6 +75,9 @@
 										<div class="card">
 											<div class="card-header bg-olive"><h3 class="card-title">Actions</h3></div>
 											<div class="card-body">
+												<?php if ($status !== 'final_submitted' || $re_action == 'yes') { ?>
+													<p>Note: If you want to update the action, please select all the dropdown options again. After making your selection, click on the update button.</p>
+												<?php } ?>
 												<dl class="row">
 													<dt class="col-sm-4">Firm ID: </dt>
 													<dd class="col-sm-8"><?php echo $customer_id; ?></dd>
@@ -95,7 +98,7 @@
 										</div>
 									</div>
 									
-									<?php if ($status != 'submitted' && $status != 'final_submitted') { ?>
+									<?php if (($status != 'submitted' && $status != 'final_submitted') || $re_action == 'yes') { ?>
 										<div class="col-6">
 											<div class="form-group">
 												<label class="col-form-label">Reason <span class="cRed">*</span></label>
@@ -115,7 +118,7 @@
 							<div class="card-footer cardFooterBackground">
 								<?php 
 									if (!empty($status)){
-										if ($status != 'submitted' && $status != 'final_submitted') {
+										if (($status != 'submitted' && $status != 'final_submitted') || $re_action == 'yes') {
 											echo $this->Form->submit('Update', array('name'=>'save_action','id'=>'save_action','label'=>false,'class'=>'float-left btn btn-success'));
 											echo $this->Form->control('Final Submit',array('type'=>'button','name'=>'take_action','class'=>'btn btn-primary ml-2 float-left', 'data-toggle'=>'modal','data-target'=>'#confirm_action','label'=>false));
 										} 
@@ -183,6 +186,7 @@
 <input type="hidden" id="misActId_val" value="<?php echo $misActId; ?>">
 <input type="hidden" id="misLvlId_val" value="<?php echo $misLvlId; ?>">
 <input type="hidden" id="periodId_val" value="<?php echo $periodId; ?>">
+<input type="hidden" id="re_action_val" value="<?php echo $re_action; ?>">
 
 <?php 
 	echo $this->Html->script('othermodules/misgrading_actions_home'); 

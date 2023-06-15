@@ -44,7 +44,7 @@
                                         ['class'=>'fas far fa-eye','title' => 'View']
                                     ); 
 
-                                } elseif ($showCauseNotice['status'] == 'saved' || $showCauseNotice['status'] == 'ref_back') {
+                                } elseif ($showCauseNotice['status'] == 'sent' || $showCauseNotice['status'] == 'ref_back') {
                                     echo $this->Html->link(
                                         '', 
                                         ['controller' => 'othermodules', 'action'=>'fetchIdFromScnAppl','?' => ['id' => $showCauseNotice['id'], 'customer_id' => $showCauseNotice['customer_id'],'sample_code' => $showCauseNotice['sample_code'],'scn_mode'=>'edit']],

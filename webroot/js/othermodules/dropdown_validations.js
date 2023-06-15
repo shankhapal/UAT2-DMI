@@ -58,7 +58,7 @@ $(document).ready(function() {
         if (selectedValue === "1") {
             action_description = "Suspension";
         } else if (selectedValue === "2") {
-            action_description = "Canellation";
+            action_description = "Cancellation";
         } else if (selectedValue === "3") {
             action_description = "Refer to Head Office.";
         } else if (selectedValue === "4") { 
@@ -266,7 +266,7 @@ $(document).ready(function() {
 
             $misgradeAction.append($('<option>', {
                 value: '2',
-                text: 'Canellation'
+                text: 'Cancellation'
             }));
         }
         
@@ -316,7 +316,7 @@ $(document).ready(function() {
 
             $misgradeAction.append($('<option>', {
                 value: '2',
-                text: 'Canellation'
+                text: 'Cancellation'
             }));
 
         }
@@ -436,9 +436,10 @@ $(document).ready(function() {
         }
 
         else if (selectedCategory === '2' && selectedLevel === '4' && selectedAction === '2') {
-
             $('#time_period_div').hide(); 
-        } 
+        } else if (selectedCategory === '2' && selectedLevel === '1' && selectedAction === '6') {
+            $('#time_period_div').hide(); 
+        }
 
 
         //For Category III

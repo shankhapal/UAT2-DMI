@@ -125,7 +125,7 @@ class DmiMmrShowcauseLogsTable extends Table{
 
 			//update the sample code in the sample_inward table for showcause notice sent
 			$SampleInward = TableRegistry::getTableLocator()->get('SampleInward');
-			$this->SampleInward->updateAll(['report_status' => 'Showcause', 'packer_id' => $customer_id],['org_sample_code' => $sample_code]);
+			$SampleInward->updateAll(['report_status' => 'Showcause', 'packer_id' => $customer_id],['org_sample_code' => $sample_code]);
 
 			//$DmiMmrShowcauseComments->saveCommentDetails($customer_id,$sample_code,$comment_by,$comment_to,$comment,$from_user,$to_user);
 			return true;

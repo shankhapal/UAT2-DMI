@@ -5,6 +5,11 @@
 			echo $this->Form->control('Send Notice',array('type'=>'button','name'=>'send_notice','class'=>'btn btn-primary ml-2 float-left', 'data-toggle'=>'modal','data-target'=>'#confirm_action','label'=>false));
 		} elseif($status == 'replied' && $_SESSION['whichUser'] == 'dmiuser') {
 			echo $this->Form->control('Reply to Applicant', array('name'=>'reply_to_applicant','type'=>'submit','id'=>'reply_to_applicant', 'class'=>'btn btn-success mr-5px btn_w_auto btn_save_remark float-left ml-2','label'=>false));
+			
+			echo $this->Html->link('Take Action',
+				['controller' => 'Othermodules','action' => 'fetchIdForAction','?' => ['id' => $_SESSION['action_table_id'],'customer_id' => $customer_id,'sample_code' => $_SESSION['sample_code']]],
+				['class' => 'ml-2 btn btn-outline-dark float-left']
+			);
 		}
 	} else {
 		echo $this->Form->submit('Save', array('name'=>'save_action','id'=>'save_action','label'=>false,'class'=>'float-left btn btn-success'));

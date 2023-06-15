@@ -437,6 +437,16 @@
 								<p class="nav-icon-p">Allocated Reports</p>
 							</a>
 						</li>
+					
+					<!--The Below Block is For module Management of Misgrading (MMR) - Refer to the Head Office Part Akash [12-06-2023]-->
+					<?php } if ($_SESSION['role'] == 'Head Office') { ?>
+
+						<li class="nav-item">
+							<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/referred_to_head_office/" class="nav-link">
+								<i class="fas fa-arrow-alt-circle-right nav-icon"></i>
+								<p class="nav-icon-p">Misgrade Refer to HO</p>
+							</a>
+						</li>
 
 					<?php } if ($current_user_roles['old_appln_data_entry'] == 'yes') { ?>
 

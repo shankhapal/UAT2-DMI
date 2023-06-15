@@ -39,6 +39,7 @@ class MisgradingController extends AppController{
 		$this->loadModel('DmiMmrFinalSubmits');
 		$this->loadModel('DmiMmrAllocations');
 		$this->loadModel('DmiMmrRoMoComments');
+		$this->loadModel('DmiMmrSmsTemplates');
 
 
 	}
@@ -100,6 +101,8 @@ class MisgradingController extends AppController{
 			$finalReports[] = $row;
 		}
 
+		//pr($finalReports); exit;
+
 
 		$scrutinizedReports = $this->DmiMmrFinalSubmits->find('all')->where(['scrutiny' => 'done'])->order('id DESC')->toArray();
 	
@@ -158,7 +161,6 @@ class MisgradingController extends AppController{
 		
 		$sample_code = $this->Session->read('sample_code');
 		
-	
 
 		//Check if the sample code is allocated
 		$allocation = $this->DmiMmrAllocations->find()->where(['sample_code' => $sample_code])->order('id DESC')->first();
@@ -280,6 +282,9 @@ class MisgradingController extends AppController{
 			//Save in the Database
 			if($this->DmiMmrFinalSubmits->saveData($this->request->getData())){
 
+				//SMS: Sample Attached
+				$this->DmiMmrSmsTemplates->sendMessage(5,$this->request->getData('packers_id'));
+
 				$message_theme = 'success';
 				$message = 
 				'	
@@ -306,14 +311,17 @@ class MisgradingController extends AppController{
 				if($comment_to == 'ro'){
 
 					$comment_to_email_id = $allocation_deatils['level_3'];
-					$comment_to_level = 'level_3';
 					$available_to = 'ro';
+					$sms_id = 3;
+					$redirect_to_path = '../misgrading/allocated_reports_for_mo';
 
 				}elseif($comment_to == 'mo'){
 
 					$comment_to_email_id = $allocation_deatils['level_1'];
-					$comment_to_level = 'level_1';
 					$available_to = 'mo';
+					$sms_id = 4;
+					$redirect_to_path = '../misgrading/report_listing_for_allocation';
+					
 				}
 
 				if(!empty($comment_to_email_id)){
@@ -325,25 +333,39 @@ class MisgradingController extends AppController{
 						//update allocation current level
 						$this->DmiMmrAllocations->updateAll(array('current_level' => "$comment_to_email_id",'available_to' => "$available_to"),array('sample_code IS' => $sample_code));
 						
-						//Update the sample inward table report status 
-						$this->SampleInward->updateAll(
-							['report_status' => 'MO Replied', 'packer_id' => $customer_id],
-							['org_sample_code' => $sample_code]
-						);
+						$last_ent =$this->DmiMmrAllocations->find()->select(['available_to'])->where(['sample_code IS' => $sample_code])->order(['id'=>'DESC'])->first();
+					
+						if ($last_ent['available_to'] == 'mo') {
+							//Update the sample inward table report status 
+							$this->SampleInward->updateAll(
+								['report_status' => 'RO Replied', 'packer_id' => $customer_id],
+								['org_sample_code' => $sample_code]
+							);
 
-						//call custom function from Model with message id
-						//$this->DmiSmsEmailTemplates->sendMessage($sms_id,$customer_id);
-			
+						}elseif ($last_ent['available_to'] == 'ro'){
+							//Update the sample inward table report status 
+							$this->SampleInward->updateAll(
+								['report_status' => 'MO Replied', 'packer_id' => $customer_id],
+								['org_sample_code' => $sample_code]
+							);
+						}
+						
+
+						//SMS: Communication
+						$this->DmiMmrSmsTemplates->sendMessage($sms_id,$customer_id);
+						
+
+
 						$message = 'Your Comment is successfully sent';
 						$message_theme = 'success';
-						$redirect_to = '../misgrading/allocated_reports_for_mo';
+						$redirect_to = $redirect_to_path;
 					}
 				}
 
 			} else{
 				$message = 'Sorry.. User not selected or Comment box is blank';
 				$message_theme = 'failed';
-				$redirect_to = '../rosocomments/ro_so_mo_comments';
+				$redirect_to = '../dashboard/home';
 			}
 
 		} elseif (null!==($this->request->getData('scrutiny'))){
@@ -368,6 +390,10 @@ class MisgradingController extends AppController{
 
 				//This below action call is added t save the action log for the user by AKASH on 19-08-2022
 				$this->Customfunctions->saveActionPoint('Report Scrutinized', 'Success');
+
+				//SMS: Communication
+				$this->DmiMmrSmsTemplates->sendMessage(6,$customer_id);
+
 				$message = "Report is scrutinized and verified successfully";
 				$message_theme = "success";
 				$redirect_to =  '../misgrading/report_listing_for_allocation';
@@ -1621,9 +1647,9 @@ class MisgradingController extends AppController{
 
 		}
 			
-		#SMS: Allocation
-		//$this->DmiSmsEmailTemplates->sendMessage($msg_id,$customer_id);
-		
+		#SMS: MMR Report Allocation
+		$this->DmiMmrSmsTemplates->sendMessage(1,$customer_id);
+		$this->DmiMmrSmsTemplates->sendMessage(2,$customer_id);
 
 		echo '~'. $get_user_id['f_name']." ".$get_user_id['l_name']. '~';
 		exit;
@@ -1669,14 +1695,15 @@ class MisgradingController extends AppController{
 		->find()
 		->select([
 			'customer_id','DmiMmrAllocations.id','sample_code','current_level','created','modified',
-			'level_1','level_3','available_to','DmiUsers.f_name','DmiUsers.l_name'
+			'level_1','level_3','available_to','DmiUsers.f_name','DmiUsers.l_name','SampleInward.report_status'
 		])
 		->distinct(['customer_id'])
 		->order(['customer_id', 'DmiMmrAllocations.id DESC']) // Specify the table alias for id column
 		->leftJoin(['DmiUsers' => 'dmi_users'],['DmiUsers.email = DmiMmrAllocations.level_3'])
+		->leftJoin(['SampleInward' => 'sample_inward'],['SampleInward.org_sample_code = DmiMmrAllocations.sample_code'])
 		->where(['level_1' => $this->Session->read('username')])
 		->toArray();
-		
+	
 		$this->set('allocationDetails',$allocationDetails);
 		
 	}

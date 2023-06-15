@@ -56,6 +56,8 @@
 														$status = 'Scrutinizer Replied on this Report.';
 													}elseif ($each['report_status'] == 'Showcause'){
 														$status = 'Showcause Notice Sent';
+													}elseif ($each['report_status'] == 'RO Replied') {
+														$status = 'Refferred Back to the Scrutinizer.';
 													}
 													else{
 														$status = 'N/A';
@@ -70,7 +72,12 @@
 													<td><?php echo $each['sample_type_desc']; ?></td>
 													<td><?php echo $status; ?></td>
 													<td><?php 
-															if ($each['report_status'] != 'Allocated' && $each['report_status'] != 'Scrutinized' && $each['report_status'] != 'Showcause') {
+															if (
+																$each['report_status'] != 'Allocated' && 
+																$each['report_status'] != 'Scrutinized' && 
+																$each['report_status'] != 'Showcause' && 
+																$each['report_status'] != 'RO Replied'
+															) {
 																echo $this->Html->link(
 																	'',
 																	['controller' => 'misgrading', 'action' => 'redirectToAllocate', $each['org_sample_code'], 'level_3', 'edit'],

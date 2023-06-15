@@ -8,58 +8,15 @@ use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
 use Cake\Filesystem\File;
 use Cake\Routing\Router;
-
+use Cake\Datasource\ConnectionManager;
 use Cake\Utility\Text;
 
-class DmiSmsEmailTemplatesTable extends Table{
+class DmiMmrSmsTemplatesTable extends Table{
 
-	var $name = "DmiSmsEmailTemplates";
-
-	public $validate = array(
-
-		'sms_message'=>array(
-
-					'rule' => 'notBlank',
-				),
-		'email_message'=>array(
-
-					'rule' => 'notBlank',
-				),
-		'description'=>array(
-
-				'rule' => 'notBlank',
-			),
-		'template_for'=>array(
-				'rule'=>array('maxLength',20),
-				'allowEmpty'=>false,
-			),
-		'email_subject'=>array(
-				'rule'=>array('maxLength',200),
-				'allowEmpty'=>false,
-			),
-
-	);
-
+	var $name = "DmiMmrSmsTemplatesTable";
 
 	public function sendMessage($message_id, $customer_id) {
-		
-		if (!isset($_SESSION['application_type'])){ 
-			$_SESSION['application_type']=null; 
-		}
-
-		$application_type = $_SESSION['application_type'];
 	
-		//This Session ID is Applied for the temporary Application Type is not present.
-		if(Router::getRequest()->getParam('controller') == 'Dashboard'){
-			if ($application_type == null) {
-				$application_type = $_SESSION['application_type_temp'];
-			}
-		}
-		
-		//Load Models
-		$DmiFlowWiseTablesLists = TableRegistry::getTableLocator()->get('DmiFlowWiseTablesLists');
-		$DmiFinalSubmitTable = $DmiFlowWiseTablesLists->find('all',array('conditions'=>array('application_type IS'=>$application_type)))->first();
-		
 		$DmiCustomers = TableRegistry::getTableLocator()->get('DmiCustomers');
 		$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
 		$DmiRoOffices = TableRegistry::getTableLocator()->get('DmiRoOffices');
@@ -72,16 +29,7 @@ class DmiSmsEmailTemplatesTable extends Table{
 
 		$find_message_record = $this->find('all',array('conditions'=>array('id IS'=>$message_id, 'status'=>'active')))->first();//'status'condition inserted on 24-07-2018
 
-		//Replica and Chemist Module
-		$_SESSION['chemistId'] = '';
-
-		if (preg_match("/^[CHM]+\/[0-9]+\/[0-9]+$/", $customer_id,$matches)==1) {
-
-			$get_packer_id = $DmiChemistRegistrations->find('all',array('fields'=>'created_by','conditions'=>array('chemist_id IS'=>$customer_id)))->first();
-			$packer_id = $get_packer_id['created_by'];
-			$_SESSION['chemistId'] = $customer_id;
-			$customer_id = $packer_id;
-		}
+		
 
 		$_SESSION['flow_table'] = '';
 		//added this if condition on 24-07-2018 by Amol
@@ -155,8 +103,8 @@ class DmiSmsEmailTemplatesTable extends Table{
 			//for MO/SMO (Nodal Officer)
 			if (in_array(1,$destination_array)) {
 
-				$DmiAllocations = TableRegistry::getTableLocator()->get($DmiFinalSubmitTable['allocation']);
-				$find_allocated_mo = $DmiAllocations->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'level_3 IS'=>$ro_email_id),'order' => array('id' => 'desc')))->first();
+				$DmiMmrAllocations = TableRegistry::getTableLocator()->get('DmiMmrAllocations');
+				$find_allocated_mo = $DmiMmrAllocations->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'level_3 IS'=>$ro_email_id),'order' => array('id' => 'desc')))->first();
 				$mo_email_id = $find_allocated_mo['level_1'];
 
 				//check if MO is allocated or not //added on 04-10-2017
@@ -181,39 +129,6 @@ class DmiSmsEmailTemplatesTable extends Table{
 				$e=$e+1;
 
 			}
-
-
-
-
-			//for IO
-			if (in_array(2,$destination_array)) {
-
-				$DmiAllocations = TableRegistry::getTableLocator()->get($DmiFinalSubmitTable['allocation']);
-				$find_allocated_io = $DmiAllocations->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'level_3 IS'=>$ro_email_id),'order' => array('id' => 'desc')))->first();
-				$io_email_id = $find_allocated_io['level_2'];
-
-				//check if IO is allocated or not //added on 04-10-2017
-				if (!empty($io_email_id)) {
-
-					$fetch_io_data = $DmiUsers->find('all',array('conditions'=>array('email IS'=>$io_email_id)))->first();
-					$io_mob_no = $fetch_io_data['phone'];
-
-					$destination_mob_nos[$m] = '91'.base64_decode($io_mob_no);//This is addded on 27-04-2021 for base64decoding by AKASH
-					$log_dest_mob_nos[$m] = '91'.$io_mob_no;
-					$destination_email_ids[$e] = base64_decode($io_email_id);//This is addded on 01-03-2022 for base64decoding by AKASH
-
-				} else {
-
-					$destination_mob_nos[$m] = null;
-					$log_dest_mob_nos[$m] = null;
-					$destination_email_ids[$e] = null;
-				}
-
-				$m=$m+1;
-				$e=$e+1;
-
-			}
-
 
 
 			//RO/SO
@@ -277,8 +192,8 @@ class DmiSmsEmailTemplatesTable extends Table{
 				$find_dy_ama_user = $DmiUserRoles->find('all',array('fields'=>'user_email_id','conditions'=>array('dy_ama'=>'yes')))->first();
 				$dy_ama_email_id = $find_dy_ama_user['user_email_id'];
 
-				$DmiHoAllocations = TableRegistry::getTableLocator()->get($DmiFinalSubmitTable['ho_level_allocation']);
-				$find_allocated_ho_mo = $DmiHoAllocations->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, 'dy_ama IS'=>$dy_ama_email_id),'order' => array('id' => 'desc')))->first();
+				$DmiMmrHoComments = TableRegistry::getTableLocator()->get('DmiMmrHoComments');
+				$find_allocated_ho_mo = $DmiMmrHoComments->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, 'dy_ama IS'=>$dy_ama_email_id),'order' => array('id' => 'desc')))->first();
 				$ho_mo_email_id = $find_allocated_ho_mo['ho_mo_smo'];
 
 				$fetch_ho_mo_data = $DmiUsers->find('all',array('conditions'=>array('email IS'=>$ho_mo_email_id)))->first();
@@ -315,32 +230,6 @@ class DmiSmsEmailTemplatesTable extends Table{
 			}
 
 
-
-			//for Accounts  (Done by pravin 20-07-2018)
-			if (in_array(8,$destination_array)) {
-
-				$DmiApplicantPaymentDetails = TableRegistry::getTableLocator()->get($DmiFinalSubmitTable['payment']);//added on 20-07-2017 by Pravin
-				$find_pao_id = $DmiApplicantPaymentDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order' => array('id' => 'desc')))->first();
-
-				$pao_id =  $find_pao_id['pao_id'];
-				$find_user_id =  $DmiPaoDetails->find('all',array('conditions'=>array('id IS'=>$pao_id)))->first();
-				$user_id =  $find_user_id['pao_user_id'];
-
-
-				$fetch_pao_data = $DmiUsers->find('all',array('conditions'=>array('id IS'=>$user_id)))->first();
-				$pao_mob_no = $fetch_pao_data['phone'];
-				$pao_email = $fetch_pao_data['email'];
-
-				$destination_mob_nos[$m] = '91'.base64_decode($pao_mob_no);//This is addded on 27-04-2021 for base64decoding by AKASH
-				$log_dest_mob_nos[$m] = '91'.$pao_mob_no;
-				$destination_email_ids[$e] = base64_decode($pao_email);//This is addded on 01-03-2022 for base64decoding by AKASH
-
-				$m=$m+1;
-				$e=$e+1;
-
-			}
-
-
 			//RO Incharge
 			if (in_array(9,$destination_array)) {
 
@@ -356,33 +245,6 @@ class DmiSmsEmailTemplatesTable extends Table{
 
 			}
 
-			//for Chemist User
-			if (in_array(10,$destination_array)) {
-
-				$find_chemist_user= $DmiChemistRegistrations->find('all',array('conditions'=>array('chemist_id IS'=>$_SESSION['chemistId']),'order'=>'id desc'))->first();
-
-				if (!empty($find_chemist_user)) {
-
-					$chemist_id =  $find_chemist_user['chemist_id'];
-					$chemist_mob_no = $find_chemist_user['mobile'];
-					$chemist_email = $find_chemist_user['email'];
-
-					$destination_mob_nos[$m] = '91'.base64_decode($chemist_mob_no);
-					$log_dest_mob_nos[$m] = '91'.$chemist_mob_no;
-					$destination_email_ids[$e] = base64_decode($chemist_email);
-
-				} else {
-
-					$destination_mob_nos[$m] = null;
-					$log_dest_mob_nos[$m] = null;
-					$destination_email_ids[$e] = null;
-				}
-
-				$m=$m+1;
-				$e=$e+1;
-			}
-
-			
 			
 			$sms_message = $find_message_record['sms_message'];
 			$destination_mob_nos_values = implode(',',$destination_mob_nos);
@@ -403,7 +265,7 @@ class DmiSmsEmailTemplatesTable extends Table{
 			
 
 
-			$textToAppend = "Text generated by the model.";  // Replace this with the text generated by the model
+			$textToAppend = $sms_message;  // Replace this with the text generated by the model
 			$filePath = 'D:/test_sms.txt';  // Replace this with the actual file path
 			// Open the file in append mode and write the text
 			$file = fopen($filePath, 'a');
@@ -551,11 +413,6 @@ class DmiSmsEmailTemplatesTable extends Table{
 						$message = str_replace("%%firm_name%%",(string) $this->getReplaceDynamicValues('firm_name',$customer_id),$message);
 						break;
 
-					case "amount":
-
-						$message = str_replace("%%amount%%",(string) $this->getReplaceDynamicValues('amount',$customer_id),$message);
-						break;
-
 					case "commodities":
 
 						$message = str_replace("%%commodities%%",(string) $this->getReplaceDynamicValues('commodities',$customer_id),$message);
@@ -636,26 +493,7 @@ class DmiSmsEmailTemplatesTable extends Table{
 						$message = str_replace("%%mo_email_id%%",(string) $this->getReplaceDynamicValues('mo_email_id',$customer_id),$message);
 						break;
 
-					case "io_name":
-
-						$message = str_replace("%%io_name%%",(string) $this->getReplaceDynamicValues('io_name',$customer_id),$message);
-						break;
-
-					case "io_mobile_no":
-
-						$message = str_replace("%%io_mobile_no%%",(string) $this->getReplaceDynamicValues('io_mobile_no',$customer_id),$message);
-						break;
-
-					case "io_office":
-
-						$message = str_replace("%%io_office%%",(string) $this->getReplaceDynamicValues('io_office',$customer_id),$message);
-						break;
-
-					case "io_email_id":
-
-						$message = str_replace("%%io_email_id%%",(string) $this->getReplaceDynamicValues('io_email_id',$customer_id),$message);
-						break;
-
+				
 					case "dyama_name":
 
 						$message = str_replace("%%dyama_name%%",(string) $this->getReplaceDynamicValues('dyama_name',$customer_id),$message);
@@ -701,30 +539,12 @@ class DmiSmsEmailTemplatesTable extends Table{
 						$message = str_replace("%%ama_email_id%%",(string) $this->getReplaceDynamicValues('ama_email_id',$customer_id),$message);
 						break;
 
-					case "io_scheduled_date":
-
-						$message = str_replace("%%io_scheduled_date%%",(string) $this->getReplaceDynamicValues('io_scheduled_date',$customer_id),$message);
-						break;
-
+				
 					case "applicant_email":
 
 						$message = str_replace("%%applicant_email%%",(string) $this->getReplaceDynamicValues('applicant_email',$customer_id),$message);
 						break;
 
-					case "pao_name":
-
-						$message = str_replace("%%pao_name%%",(string) $this->getReplaceDynamicValues('pao_name',$customer_id),$message);
-						break;
-
-					case "pao_email_id":
-
-						$message = str_replace("%%pao_email_id%%",(string) $this->getReplaceDynamicValues('pao_email_id',$customer_id),$message);
-						break;
-
-					case "pao_mobile_no":
-
-						$message = str_replace("%%pao_mobile_no%%",(string) $this->getReplaceDynamicValues('pao_mobile_no',$customer_id),$message);
-						break;
 
 					case "ho_mo_name":
 
@@ -741,47 +561,31 @@ class DmiSmsEmailTemplatesTable extends Table{
 						$message = str_replace("%%ho_mo_email_id%%", (string) $this->getReplaceDynamicValues('ho_mo_email_id',$customer_id),$message);
 						break;
 
-					case "home_link":
+					case "sample_code":
 
-						$message = str_replace("%%home_link%%",(string) $_SERVER['HTTP_HOST'],$message);
-						break;
-
-					//For Replica And Chemist Module
-					case "chemist_name":
-
-						$message = str_replace("%%chemist_name%%",(string) $this->getReplaceDynamicValues('chemist_name',$customer_id),$message);
-						break;
-
-					case "chemist_id":
-
-						$message = str_replace("%%chemist_id%%",(string) $this->getReplaceDynamicValues('chemist_id',$customer_id),$message);
-						break;
-
-					case "replica_commodities":
-
-						$message = str_replace("%%replica_commodities%%",(string) $this->getReplaceDynamicValues('replica_commodities',$customer_id),$message);
-						break;
-
-					case "application_type":
-
-						$message = str_replace("%%application_type%%",(string) $this->getReplaceDynamicValues('application_type',$customer_id),$message);
-						break;
-					
-					case "packer_name":
-
-						$message = str_replace("%%packer_name%%",(string) $this->getReplaceDynamicValues('packer_name',$customer_id),$message);
+						$message = str_replace("%%sample_code%%", (string) $this->getReplaceDynamicValues('sample_code',$customer_id),$message);
 						break;
 						
-					case "lab_name":
+					case "scn_date":
 
-						$message = str_replace("%%lab_name%%",(string) $this->getReplaceDynamicValues('lab_name',$customer_id),$message);
-						break;
-						
-					case "printerName":
-
-						$message = str_replace("%%printerName%%",(string) $this->getReplaceDynamicValues('printerName',$customer_id),$message);
+						$message = str_replace("%%scn_date%%", (string) $this->getReplaceDynamicValues('scn_date',$customer_id),$message);
 						break;
 
+					case "suspended_date":
+
+						$message = str_replace("%%suspended_date%%", (string) $this->getReplaceDynamicValues('suspended_date',$customer_id),$message);
+						break;
+
+					case "time_period":
+
+						$message = str_replace("%%time_period%%", (string) $this->getReplaceDynamicValues('time_period',$customer_id),$message);
+						break;
+
+					case "cancelled_date":
+
+						$message = str_replace("%%cancelled_date%%", (string) $this->getReplaceDynamicValues('cancelled_date',$customer_id),$message);
+						break;
+	
 					default:
 
 						$message = $this->replaceBetween($message, '%%', '%%', '');
@@ -809,81 +613,25 @@ class DmiSmsEmailTemplatesTable extends Table{
 	// Created By Pravin on 24-08-2017
 	public function getReplaceDynamicValues($replace_variable_value,$customer_id){
 
-	
-		if (!isset($_SESSION['application_type'])) { $_SESSION['application_type']=null; }
-
-		$application_type = $_SESSION['application_type'];
-
-		//This Session ID is Applied for the temporary Application Type is not present.
-		if(Router::getRequest()->getParam('controller') == 'Dashboard'){
-			if ($application_type == null) {
-				$application_type = $_SESSION['application_type_temp'];
-			}
-		}
-		
-	
 		//Load Models
-		$DmiApplicationTypes = TableRegistry::getTableLocator()->get('DmiApplicationTypes');
-		
-		#For Application Type Text
-		if ($application_type != null) {
-			#Added the type cast INT on below query to resolve the boolean problem - Akash[24-11-2022]
-			$get_application_type = $DmiApplicationTypes->find('all')->select(['application_type'])->where(['id IS'=>(int) $application_type,'delete_status IS NULL'])->first();
-			$application_type_text = $get_application_type['application_type'];
-		}else{
-			$application_type_text = '';
-		}
-
-
-		#For Replica
-		$chemist_name = null;
-		$chemist_id = null;
-		$replica_commodities = null;
-		
+	
 		$CustomersController = new CustomersController;
 
 		//Firm Type
 		$firmType = $CustomersController->Customfunctions->firmType($customer_id);
 		
 		//Below Application Type = 7 condtion is added to by pass if the SMS is for Advance Payment -  AKASH [31-10-2022]
-		$amount = '';
-		if (!empty($application_type) && $application_type != 7) {
-			
-			$DmiFlowWiseTablesLists = TableRegistry::getTableLocator()->get('DmiFlowWiseTablesLists');
-			$DmiFinalSubmitTable = $DmiFlowWiseTablesLists->find('all',array('conditions'=>array('application_type IS'=>$application_type)))->first();
-			
-			$DmiAllocations = TableRegistry::getTableLocator()->get($DmiFinalSubmitTable['allocation']);
-			$DmiHoAllocations = TableRegistry::getTableLocator()->get($DmiFinalSubmitTable['ho_level_allocation']);
-			$DmiFinalSubmits = TableRegistry::getTableLocator()->get($DmiFinalSubmitTable['application_form']);
-			$DmiGrantCertificatesPdfs = TableRegistry::getTableLocator()->get($DmiFinalSubmitTable['grant_pdf']);
-			$DmiApplicantPaymentDetails = TableRegistry::getTableLocator()->get($DmiFinalSubmitTable['payment']);//added on 20-07-2017 by Pravin
-			
-
-			#this query is added for varible amount - Akash[13-02-2023]
-			if($CustomersController->Customfunctions->isOldApplication($customer_id,$application_type) != 'yes'){
-				if($application_type != 8 && $application_type != 6 && $application_type != 5 && $application_type != 4){
-					$amount_paid = $DmiApplicantPaymentDetails->find()->select(['amount_paid'])->where([['customer_id IS' => $customer_id]])->order('id desc')->first();
-					$amount = $amount_paid['amount_paid'];
-				}
-				
-			}
-			
-
-		}
-
+		$DmiMmrAllocations = TableRegistry::getTableLocator()->get('DmiMmrAllocations');
+		$DmiMmrHoAllocations = TableRegistry::getTableLocator()->get('DmiMmrHoAllocations');
+		$DmiMmrHoComments = TableRegistry::getTableLocator()->get('DmiMmrHoComments');
+		$DmiMmrActionFinalSubmits = TableRegistry::getTableLocator()->get('DmiMmrActionFinalSubmits');
 		$DmiCustomers = TableRegistry::getTableLocator()->get('DmiCustomers');
 		$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
 		$DmiRoOffices = TableRegistry::getTableLocator()->get('DmiRoOffices');
 		$DmiUsers = TableRegistry::getTableLocator()->get('DmiUsers');
 		$DmiUserRoles = TableRegistry::getTableLocator()->get('DmiUserRoles');
 		$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
-		$DmiCertificateTypes = TableRegistry::getTableLocator()->get('DmiCertificateTypes');
-		$DmiPaoDetails = TableRegistry::getTableLocator()->get('DmiPaoDetails');//added on 20-07-2017 by Pravin
-		$DmiChemistRegistrations = TableRegistry::getTableLocator()->get('DmiChemistRegistrations');
-		$dmi_adv_payment_details = TableRegistry::getTableLocator()->get('DmiAdvPaymentDetails');
-		$dmi_ca_pp_lab_mapings = TableRegistry::getTableLocator()->get('DmiCaPpLabMapings');
-		$dmi_replica_allotment_details = TableRegistry::getTableLocator()->get('DmiReplicaAllotmentDetails');
-		$dmi_replica_allotment_pdfs = TableRegistry::getTableLocator()->get('DmiReplicaAllotmentPdfs');
+		$DmiMmrFinalSubmits = TableRegistry::getTableLocator()->get('DmiMmrFinalSubmits');
 
 
 		if (preg_match("/^[0-9]+\/[0-9]+$/",$customer_id,$matches)==1) {
@@ -898,10 +646,6 @@ class DmiSmsEmailTemplatesTable extends Table{
 
 			$get_commodity_id = explode(',',$fetch_firm_data['sub_commodity']);
 			$get_commodity_name = $MCommodity->find('list',array('keyField'=>'commodity_code','valueField'=>'commodity_name','conditions'=>array('commodity_code IN'=>$get_commodity_id)))->toArray();
-
-			$firm_certification_type_id = $firm_data['certification_type'];
-			$firm_certification_type = $DmiCertificateTypes->find('all',array('conditions'=>array('id IS'=>$firm_certification_type_id)))->first();
-
 
 			$split_customer_id = explode('/',$customer_id);
 			$district_ro_code = $split_customer_id[2];
@@ -943,237 +687,108 @@ class DmiSmsEmailTemplatesTable extends Table{
 			$ama_user_data = $DmiUsers->find('all',array('conditions'=>array('email IS'=>$ama_email_id)))->first();
 			$ama_user_data = $ama_user_data;
 
-			if (!empty($DmiFinalSubmitTable)) {
-
-				$final_submit_data = $DmiFinalSubmits->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, 'status'=>'pending'),'order' => array('id' => 'desc')))->first();
-				//Check empty condition (Done by pravin 13/2/2018)
-
-				if (!empty($final_submit_data)) {
-					$final_submit_data = $final_submit_data['created'];
-				} else {
-					$final_submit_data = null;
-				}
-
-				$find_allocated_mo = $DmiAllocations->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'level_3 IS'=>$ro_email_id),'order' => array('id' => 'desc')))->first();
-
-				if (!empty($find_allocated_mo)) {	
-
-					$mo_email_id = $find_allocated_mo['level_1'];
-					$mo_user_data = $DmiUsers->find('all',array('conditions'=>array('email IS'=>$mo_email_id)))->first();
-
-					if (!empty($mo_user_data)) {
-
-						$mo_user_data = $mo_user_data;
-
-					}
-				}
-
-
-				$find_allocated_io = $DmiAllocations->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'level_3 IS'=>$ro_email_id),'order' => array('id' => 'desc')))->first();
-
-				if (!empty($find_allocated_io)) {
-
-					$io_email_id = $find_allocated_io['level_2'];
-
-					$io_user_data = $DmiUsers->find('all',array('conditions'=>array('email IS'=>$io_email_id)))->first();
-
-					if (!empty($io_user_data)) {
-
-						$io_user_data = $io_user_data;
-
-					}
-
-				}
-
-				//Get ho_mo_details (Done by pravin 23-07-2018)
-				$find_allocated_ho_mo = $DmiHoAllocations->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, 'dy_ama IS'=>$dy_ama_email_id),'order' => array('id' => 'desc')))->first();
-
-				if (!empty($find_allocated_ho_mo)) {
-
-					$ho_mo_email_id = $find_allocated_ho_mo['ho_mo_smo'];
-
-					$fetch_ho_mo_data = $DmiUsers->find('all',array('conditions'=>array('email IS'=>$ho_mo_email_id)))->first();
-
-					if (!empty($fetch_ho_mo_data)) {
-
-						$ho_mo_mob_no = $fetch_ho_mo_data['phone'];
-
-						$ho_mo_name = $fetch_ho_mo_data['f_name']." ".$fetch_ho_mo_data['l_name'];
-
-					}
-
-				}
-
-
-				$get_io_scheduled_date = $DmiAllocations->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order' => array('id' => 'desc')))->first();
-
-					if (!empty($get_io_scheduled_date)) {//condition added on 11-10-2017 by Amol
-
-						$io_scheduled_date = $get_io_scheduled_date['io_scheduled_date'];
-
-					} else {
-
-						$io_scheduled_date = '---';
-					}
-
-
-				//get renewal valid upto date
-				//added on 05-02-2018 by Amol
-				$each_application_grant_list = $DmiGrantCertificatesPdfs->find('list',array('conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
-
-					if (!empty($each_application_grant_list)) {
-
-
-						$last_grant_details = $DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('id'=>max($each_application_grant_list))))->first();
-
-						$last_grant_date = $last_grant_details['date'];
-
-						//get certificate valid upto date
-
-						$certificate_valid_upto = $CustomersController->Customfunctions->getCertificateValidUptoDate($customer_id,$last_grant_date);
-
-					} else {
-
-						$certificate_valid_upto = '';
-					}
-
-				//Get pao_name and pao_email (Done by pravin 20-07-2018)
-				$find_pao_id = $DmiApplicantPaymentDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order' => array('id' => 'desc')))->first();
-
-					if (!empty($find_pao_id)) {
-
-						$pao_id =  $find_pao_id['pao_id'];
-
-						$find_user_id =  $DmiPaoDetails->find('all',array('conditions'=>array('id IS'=>$pao_id)))->first();
-
-						$user_id =  $find_user_id['pao_user_id'];
-
-						$fetch_pao_data = $DmiUsers->find('all',array('conditions'=>array('id IS'=>$user_id)))->first();
-
-						$pao_mobile_no = $fetch_pao_data['phone'];
-
-						$pao_email_id = $fetch_pao_data['email'];
-
-						$pao_name = $fetch_pao_data['f_name']." ".$fetch_pao_data['l_name'];
-
-					}
-
-			}
 			
-			
-			//[-- For Replica/E-Code/Fifteen --]
-			
-			$getUserType = $CustomersController->Customfunctions->getUserType($_SESSION['username']);
-			
-			#This Block is added to see if the varibles are for replica is valid or not - Akash[21-11-2022]
 
-			#CHEMIST
-			$get_chemist_name = $DmiChemistRegistrations->find('all',array('conditions'=>array('chemist_id IS'=>$_SESSION['chemistId'],'delete_status IS NULL'),'order'=>'id desc'))->first();
-					
-			if (!empty($get_chemist_name)) {
+
+
+            $DmiMmrAllocations = TableRegistry::getTableLocator()->get('DmiMmrAllocations');
+            $find_allocated_mo = $DmiMmrAllocations->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'level_3 IS'=>$ro_email_id),'order' => array('id' => 'desc')))->first();
+
+            if (!empty($find_allocated_mo)) {	
+
+                $mo_email_id = $find_allocated_mo['level_1'];
+                $mo_user_data = $DmiUsers->find('all',array('conditions'=>array('email IS'=>$mo_email_id)))->first();
+
+                if (!empty($mo_user_data)) {
+
+                    $mo_user_data = $mo_user_data;
+
+                }
+            }
+
+
 				
-				$get_chemist_name = $DmiChemistRegistrations->find('all',array('conditions'=>array('chemist_id IS'=>$_SESSION['chemistId'],'delete_status IS NULL'),'order'=>'id desc'))->first();
-				$chemist_name = $get_chemist_name['chemist_fname']." ".$get_chemist_name['chemist_lname']; 
-				$chemist_id = $get_chemist_name['chemist_id'];
-			
-			}else{
-				
-				$get_chemist_id = $dmi_replica_allotment_pdfs->find('all')->select(['chemist_id'])->where(['customer_id IS' => $customer_id])->first();
-				
-				if(!empty($get_chemist_id)){
-					$get_chemist_name = $DmiChemistRegistrations->find('all',array('conditions'=>array('chemist_id IS'=>$get_chemist_id['chemist_id'],'delete_status IS NULL'),'order'=>'id desc'))->first();
-					$chemist_name = $get_chemist_name['chemist_fname']." ".$get_chemist_name['chemist_lname']; 
-					$chemist_id = $get_chemist_name['chemist_id'];
-				}
-			}
+
+            //Get ho_mo_details (Done by pravin 23-07-2018)
+            $find_allocated_ho_mo = $DmiMmrHoAllocations->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, 'dy_ama IS'=>$dy_ama_email_id),'order' => array('id' => 'desc')))->first();
+
+            if (!empty($find_allocated_ho_mo)) {
+
+                $ho_mo_email_id = $find_allocated_ho_mo['ho_mo_smo'];
+
+                $fetch_ho_mo_data = $DmiUsers->find('all',array('conditions'=>array('email IS'=>$ho_mo_email_id)))->first();
+
+                if (!empty($fetch_ho_mo_data)) {
+
+                    $ho_mo_mob_no = $fetch_ho_mo_data['phone'];
+
+                    $ho_mo_name = $fetch_ho_mo_data['f_name']." ".$fetch_ho_mo_data['l_name'];
+
+                }
+
+            }
+
+			$details =	$DmiMmrFinalSubmits->find()->where(['customer_id' => $customer_id])->order('id DESC')->first();
 		
-			
-			#ADVANCE PAYMENT
-			if (!empty($application_type) && $application_type == 7) {
-				
-				$find_pao_id = $dmi_adv_payment_details->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order' => array('id' => 'desc')))->first();
-			
-				if (!empty($find_pao_id)) {
+			//sample code
+			$sample_code = $details['sample_code'];
 
-					$pao_id =  $find_pao_id['pao_id'];
-					$find_user_id =  $DmiPaoDetails->find('all',array('conditions'=>array('id IS'=>$pao_id)))->first();
-					$user_id =  $find_user_id['pao_user_id'];
-					$fetch_pao_data = $DmiUsers->find('all',array('conditions'=>array('id IS'=>$user_id)))->first();
-					$pao_mobile_no = $fetch_pao_data['phone'];
-					$pao_email_id = $fetch_pao_data['email'];
-					$pao_name = $fetch_pao_data['f_name']." ".$fetch_pao_data['l_name'];
-				}
-			}
-
-
-			#Replica COMMODITIES
-			$getReplicaCommodity = $dmi_replica_allotment_details->find('all')->select(['commodity'])->where(['customer_id IS' => $customer_id])->group('commodity')->toArray();
-			
-			if(empty($getReplicaCommodity)){
-				
-				$getTableID = $DmiFirms->find('all')->select(['id'])->where(['customer_id'=>$customer_id])->first();
-				
-				$get_packer_customer_id = $dmi_ca_pp_lab_mapings->find()->select(['customer_id'])->where(['OR' => [['pp_id' => $getTableID['id']], ['lab_id' => $getTableID['id']]]])->first();
-				
-				#Empty condition is added - Akash [24-11-2022]
-				if (!empty($get_packer_customer_id)) {
-					$getReplicaCommodity = $dmi_replica_allotment_details->find('all')->select(['commodity'])->where(['customer_id IS' => $get_packer_customer_id['customer_id']])->group('commodity')->toArray();
-				}
+			//Show Cause Notice 
+			$conn = ConnectionManager::get('default');
+			$showCauseNotice = $conn->execute("SELECT dsl.id,dsl.customer_id,dsl.reason,
+										dsl.date,dsl.end_date,dsnp.pdf_file,dsl.status,dsl.sample_code,dsl.modified
+										FROM dmi_mmr_showcause_logs AS dsl
+										INNER JOIN dmi_mmr_showcause_notice_pdfs AS dsnp ON dsnp.customer_id = dsl.customer_id
+										WHERE dsl.customer_id='$customer_id'")->fetchAll('assoc');
+			$lastRecord = null;
+			for ($i = count($showCauseNotice) - 1; $i >= 0; $i--) {
+				$lastRecord = $showCauseNotice[$i];
+				break;
 			}
 			
-			if(!empty($getReplicaCommodity)){
-				
-				$i=0;
-				$replica_commodities=array();
-			
-				foreach($getReplicaCommodity as $each){
-					$getCommodity = $MCommodity->find('all',array('conditions'=>array('commodity_code IS'=>$each['commodity'])))->first();
-					$replicacommodities[$i] = $getCommodity['commodity_name']; 
-					$i++;
-				}
-				
-				$replica_commodities = implode(", ", $replicacommodities);
+
+			//SCN DATE
+			if($lastRecord !== null){
+				$formattedDate = $lastRecord['date'];	
+				$dateTime = \DateTime::createFromFormat('d/m/Y H:i:s', $formattedDate);
+				$scn_date = $dateTime->format('d/m/Y');
 			}else{
-				$replica_commodities=null;
+				$scn_date = null;
 			}
-		
+			
+			//Suspension Details
+			$currentDate = date('Y-m-d H:i:s'); 
+			$DmiMmrSuspensions = TableRegistry::getTableLocator()->get('DmiMmrSuspensions');
+			$suspension_record = $DmiMmrSuspensions->find('all')->where(['customer_id IS' => $customer_id,'to_date >=' => $currentDate])->order('id DESC')->first();
+			
+			if (!empty($suspension_record)) {
 
-			$get_allotments = $dmi_ca_pp_lab_mapings->find('all')->where(['customer_id IS' => $customer_id])->toArray();
-			
-			/*
-			if ($firmType != 3) {
-				
-				if(empty($get_allotments)){
-					
-					$getTableID = $DmiFirms->find('all')->select(['id'])->where(['customer_id'=>$customer_id])->first();
-					$get_packer_customer_id = $dmi_ca_pp_lab_mapings->find()->select(['customer_id'])->where(['OR' => [['pp_id' => $getTableID['id']], ['lab_id' => $getTableID['id']]]])->first();
-					$get_allotments = $dmi_ca_pp_lab_mapings->find('all')->where(['customer_id IS' => $get_packer_customer_id['customer_id']])->toArray();
-				}
+				$formattedDate = $suspension_record['suspended_on'];
+				$dateTime = \DateTime::createFromFormat('d/m/Y H:i:s', $formattedDate);
+				$suspended_date = $dateTime->format('d/m/Y');
+
+				$time_period = $suspension_record['time_period'];
+
+			} else {
+				$suspended_date = null;
+				$time_period = null;
 			}
-			*/
 			
-			//For Printer Name and Lab Name
-			if(!empty($get_allotments)){
+
+			#For Cancellation	
+			$DmiMmrCancelledFirms = TableRegistry::getTableLocator()->get('DmiMmrCancelledFirms');
+			$cancellation_record = $DmiMmrCancelledFirms->find('all')->where(['customer_id IS' => $customer_id])->order('id DESC')->first();
+			if (!empty($cancellation_record)) {
 				
-				foreach($get_allotments as $each){
+				$formattedDate = $cancellation_record['date'];
+				$dateTime = \DateTime::createFromFormat('d/m/Y H:i:s', $formattedDate);
+				$cancelled_date = $dateTime->format('d/m/Y');
 				
-					#PRINTER
-					if($each['map_type'] == 'pp'){
-						$getPrinterName = $DmiFirms->find('all',array('conditions'=>array('id IS'=>$each['pp_id'])))->first();
-						$printerName = $getPrinterName['firm_name'];
-					}
-					
-					#LAB
-					if($each['map_type'] == 'lab'){
-						$getLabName = $DmiFirms->find('all',array('conditions'=>array('id IS'=>$each['lab_id'])))->first();
-						$lab_name = $getLabName['firm_name'];
-					}
-					
-					#PACKER
-					$get_packer_name = $DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$each['customer_id'])))->first();
-					$packer_name = $get_packer_name['firm_name'];
-				}
+			}else{
+				$cancelled_date = null;
 			}
+
+
 		}
 
 		switch ($replace_variable_value) {
@@ -1210,22 +825,12 @@ class DmiSmsEmailTemplatesTable extends Table{
 				return $firm_name;
 				break;
 
-			case "firm_certification_type":
-
-				return $firm_certification_type;
-				break;
-
+		
 			case "firm_email":
 
 				//This new truncate function is applied to the below line in order to trim down the charateer that exceeds the 34 Character - Akash [19-05-2023]
 				$firm_email = Text::truncate(base64_decode($firm_data['email']), 34, ['ellipsis' => '', 'exact' => true]);
 				return $firm_email;
-				break;
-
-			case "submission_date":
-
-				$submission_date = $final_submit_data;
-				return $submission_date;
 				break;
 
 			case "commodities":
@@ -1234,11 +839,7 @@ class DmiSmsEmailTemplatesTable extends Table{
 				return Text::truncate($get_commodity_name, 34, ['ellipsis' => '', 'exact' => true]);
 				break;
 
-			case "amount":
-
-				return $amount;
-				break;
-
+		
 			case "ro_name":
 
 				//This new truncate function is applied to the below line in order to trim down the charateer that exceeds the 34 Character - Akash [19-05-2023]
@@ -1289,31 +890,6 @@ class DmiSmsEmailTemplatesTable extends Table{
 				//This new truncate function is applied to the below line in order to trim down the charateer that exceeds the 34 Character - Akash [19-05-2023]
 				$mo_email_id = Text::truncate(base64_decode($mo_email_id), 34, ['ellipsis' => '', 'exact' => true]);
 				return $mo_email_id;
-				break;
-
-			case "io_name":
-				
-				//This new truncate function is applied to the below line in order to trim down the charateer that exceeds the 34 Character - Akash [19-05-2023]
-				$io_name = Text::truncate($io_user_data['f_name']." ".$io_user_data['l_name'], 34, ['ellipsis' => '', 'exact' => true]);
-				return $io_name;
-				break;
-
-			case "io_mobile_no":
-
-				$io_mobile_no = $io_user_data['phone'];
-				return $io_mobile_no;
-				break;
-
-			case "io_office":
-
-				$io_office = $find_ro_email_id['ro_office'];
-				return $io_office;
-				break;
-
-			case "io_email_id":
-				
-				$io_email_id = base64_decode($io_email_id);
-				return $io_email_id;
 				break;
 
 			case "dyama_name":
@@ -1367,15 +943,7 @@ class DmiSmsEmailTemplatesTable extends Table{
 				return $ama_email_id;
 				break;
 
-			case "io_scheduled_date":
-
-				return $io_scheduled_date;
-				break;
-
-			case "certificate_valid_upto"://added on 05-02-2018 by Amol
-
-				return $certificate_valid_upto;
-				break;
+	
 
 			case "applicant_email":  // Add new paramerter list (done by pravin 07-03-2018)
 
@@ -1383,20 +951,7 @@ class DmiSmsEmailTemplatesTable extends Table{
 				return $applicant_email;
 				break;
 
-			case "pao_name":  // Add new paramerter list (done by pravin 20-07-2018)
-
-				return $pao_name;
-				break;
-
-			case "pao_email_id":  // Add new paramerter list (done by pravin 20-07-2018)
-
-				return $pao_email_id;
-				break;
-
-			case "pao_mobile_no":  // Add new paramerter list (done by pravin 20-07-2018)
-
-				return $pao_mobile_no;
-				break;
+		
 
 			case "ho_mo_email_id":  // Add new paramerter list (done by pravin 23-07-2018)
 
@@ -1413,43 +968,32 @@ class DmiSmsEmailTemplatesTable extends Table{
 				return $ho_mo_name;
 				break;
 
-			//for replica
-			case "chemist_name":
+			case "sample_code":  
 
-				//This new truncate function is applied to the below line in order to trim down the charateer that exceeds the 34 Character - Akash [19-05-2023]
-				return Text::truncate($chemist_name, 34, ['ellipsis' => '', 'exact' => true]);
+				return $sample_code;
 				break;
 
-			case "chemist_id":
+			case "scn_date": 
 
-				return $chemist_id;
-				break;
-
-			case "replica_commodities":
-
-				//This new truncate function is applied to the below line in order to trim down the charateer that exceeds the 34 Character - Akash [19-05-2023]
-				return Text::truncate($replica_commodities, 34, ['ellipsis' => '', 'exact' => true]);
+				return $scn_date;
 				break;
 
-			case "application_type":
+			case "suspended_date": 
 
-				return $application_type_text;
+				return $suspended_date;
 				break;
-			
-			case "packer_name":
-				//This new truncate function is applied to the below line in order to trim down the charateer that exceeds the 34 Character - Akash [19-05-2023]
-				return Text::truncate($packer_name, 34, ['ellipsis' => '', 'exact' => true]);
+
+			case "time_period": 
+
+				return $time_period;
 				break;
-				
-			case "printerName":
-				//This new truncate function is applied to the below line in order to trim down the charateer that exceeds the 34 Character - Akash [19-05-2023]
-				return Text::truncate($printerName, 34, ['ellipsis' => '', 'exact' => true]);
+
+			case "cancelled_date": 
+
+				return $cancelled_date;
 				break;
-				
-			case "lab_name":
-				//This new truncate function is applied to the below line in order to trim down the charateer that exceeds the 34 Character - Akash [19-05-2023]
-				return Text::truncate($lab_name, 34, ['ellipsis' => '', 'exact' => true]);
-				break;
+
+
 				
 			default:
 
