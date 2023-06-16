@@ -1,8 +1,9 @@
-$('#loat').DataTable();
-$('#los').DataTable();
-$('#lof').DataTable();
+
 
  $(document).ready(function() {
+    
+
+
     $(".btn").click(function() {
         var val = parseInt($('#group').find('.badge').text());
         // Check for the button clicked

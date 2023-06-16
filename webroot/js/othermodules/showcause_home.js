@@ -16,11 +16,12 @@ if(whichUser == 'applicant' || status_id == 'sent'){
 $("#final_submit").click(function(){
 
     var customer_id = $("#customer_id_value").val();
+    var sample_code = $("#sample_code_id").val();
 
     $.ajax({
         type: "POST",
         url: "../othermodules/final_send_notice",
-        data: {customer_id:customer_id},
+        data: {customer_id:customer_id,sample_code:sample_code},
         beforeSend: function (xhr) {
             xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
         },

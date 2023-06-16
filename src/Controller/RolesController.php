@@ -94,7 +94,7 @@ class RolesController extends AppController{
 		if (!empty($user_email_list)) {
 			$find_available_user = $this->DmiUsers->find('list',array('keyfield'=>'id','valueField'=>'email','conditions'=>array('email IN'=>$user_email_list, 'status' => 'active')))->toArray();
 		}
-
+		
 		asort($find_available_user);//to sort array alphabeticaly
 
 		//added below loop //for email encoding
@@ -347,6 +347,13 @@ class RolesController extends AppController{
 				$i= $i + 1;
 			} else { $so_grant_pp = 'no'; }
 
+			//The New role is added for the allocation of lims reports need for the management of misgrading module - Akash [12-06-2023]
+			if ($postData['allocate_lims_report'] == 1) {
+				$allocate_lims_report = 'yes';
+				$user_roles_details[$i] = 'allocate_lims_report';
+				$i= $i + 1;
+			} else { $allocate_lims_report = 'no'; }
+
 
 			// Start LMIS Role List
 
@@ -502,6 +509,7 @@ class RolesController extends AppController{
 				'transfer_appl'=>$transfer_appl,
 				'inspection_pp'=>$site_inspection_pp, //new
 				'so_grant_pp'=>$so_grant_pp, //new
+				'allocate_lims_report' => $allocate_lims_report, // New role is added for the allocation of lims reports need for the management of misgrading module - Akash [12-06-2023]
 
 
 				// Start LMIS Role List
@@ -684,18 +692,26 @@ class RolesController extends AppController{
 			}
 		}
 
-		$find_available_user = $this->DmiUsers->find('list',array('valueField'=>'email','conditions'=>array('email IN'=>$user_email_list,'status' => 'active')))->toArray();
-		asort($find_available_user);//to sort array alphabeticaly
-
-		//added below loop //for email encoding
-		$i=1;
-		$newArray = array();
-		foreach ($find_available_user as $key => $emailId) {
+		//$find_available_user = $this->DmiUsers->find('list',array('valueField'=>'email','conditions'=>array('email IN'=>$user_email_list,'status' => 'active')))->toArray();
+		
+		//above Query is updated to produce the resulyt with the full name and email to show in the DROP DOWN - Akash [12-06-2023]
+		$find_available_user = $this->DmiUsers->find('list', array('valueField' => function ($row) {
+													return $row['f_name'] . ' ' . $row['l_name'] . ' (' . base64_decode($row['email']) . ')' . ' [' . $row['division'] . ']';},
+													'conditions' => array('email IN' => $user_email_list,'status' => 'active')))->toArray();
+		
+		/*foreach ($find_available_user as $key => $emailId) {
 
 			$newArray[$key] = base64_decode($emailId);
 			$i=$i+1;
 		}
-		$find_available_user = $newArray;
+		*/
+
+		//above foreach loop is updated to produce the result with the full name and email to show in the DROP DOWN - Akash [12-06-2023]
+		asort($find_available_user);
+		
+		$find_available_user;
+
+
 		//till here
 
 		//temp. showing blank
@@ -1029,6 +1045,13 @@ class RolesController extends AppController{
 				$i= $i + 1;
 			} else { $so_grant_pp = 'no'; }
 
+			//The New role is added for the allocation of lims reports need for the management of misgrading module - Akash [12-06-2023]
+			if ($this->request->getData('allocate_lims_report') == 1) {
+				$allocate_lims_report = 'yes';
+				$user_roles_details[$i] = 'allocate_lims_report';
+				$i= $i + 1;
+			} else { $allocate_lims_report = 'no'; }
+
 			//created new role for SMD inspection
 			// on 01-03-2018 by Amol
 			/*	if ($this->request->getData('smd_inspection') == 1) {
@@ -1234,6 +1257,7 @@ class RolesController extends AppController{
 					'transfer_appl'=>$transfer_appl,
 					'inspection_pp'=>$site_inspection_pp, //new
 					'so_grant_pp'=>$so_grant_pp, //new
+					'allocate_lims_report' => $allocate_lims_report,	//The New role is added for the allocation of lims reports need for the management of misgrading module - Akash [12-06-2023]
 
 
 					// Start LMIS Role List

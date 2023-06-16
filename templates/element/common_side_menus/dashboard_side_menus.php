@@ -406,7 +406,7 @@
 							</li>
 						</li>
 						
-						<!-- This Whole block is For the Management of Misgrading Module (MMR) / Actions / Suspensions / Cancellations -->
+						<!-- This Whole block is For the Management of Misgrading Module (MMR) / Actions / Suspensions / Cancellations - Akash [12-06-2023]-->
 						<li class="nav-item">
 							<li class="nav-item has-treeview">
 								<a href="#" class="nav-link">
@@ -420,12 +420,6 @@
 											<a href="<?php echo $this->request->getAttribute('webroot');?>misgrading/report_listing_for_allocation" class="bg-success nav-link">
 												<i class="fas fa-arrow-alt-circle-right nav-icon"></i>
 												<p class="nav-icon-p">LIMS Reports</p>
-											</a>
-										</li>
-										<li class="nav-item">
-											<a href="<?php echo $this->request->getAttribute('webroot');?>misgrading/allocated_reports_for_mo/" class="bg-success nav-link">
-												<i class="fas fa-arrow-alt-circle-right nav-icon"></i>
-												<p class="nav-icon-p">Allocated Reports</p>
 											</a>
 										</li>
 										<li class="nav-item">
@@ -445,7 +439,26 @@
 							</li>
 						</li>
 						<!-- End of Block -->
-									
+					
+					<!--The Below Block is For module Management of Misgrading (MMR) - Allocation of Report to Scruinizer Part Akash [12-06-2023]-->
+					<?php } if ($current_user_roles['allocate_lims_report'] == 'yes') { ?>
+
+						<li class="nav-item">
+							<a href="<?php echo $this->request->getAttribute('webroot');?>misgrading/allocated_reports_for_mo/" class="nav-link">
+								<i class="fas fa-arrow-alt-circle-right nav-icon"></i>
+								<p class="nav-icon-p">Allocated Reports</p>
+							</a>
+						</li>
+					
+					<!--The Below Block is For module Management of Misgrading (MMR) - Refer to the Head Office Part Akash [12-06-2023]-->
+					<?php } if ($_SESSION['role'] == 'Head Office') { ?>
+
+						<li class="nav-item">
+							<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/referred_to_head_office/" class="nav-link">
+								<i class="fas fa-arrow-alt-circle-right nav-icon"></i>
+								<p class="nav-icon-p">Misgrade Refer to HO</p>
+							</a>
+						</li>
 
 					<?php } if ($current_user_roles['old_appln_data_entry'] == 'yes') { ?>
 

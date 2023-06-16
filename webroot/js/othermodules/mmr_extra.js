@@ -179,7 +179,7 @@ function updateMisgradeActions() {
 
         $misgradeAction.append($('<option>', {
             value: '2',
-            text: 'Canellation'
+            text: 'Cancellation'
         }));
     }
     
@@ -218,7 +218,7 @@ function updateMisgradeActions() {
 
         $misgradeAction.append($('<option>', {
             value: '2',
-            text: 'Canellation'
+            text: 'Cancellation'
         }));
 
     }

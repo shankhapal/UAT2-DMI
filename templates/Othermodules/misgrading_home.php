@@ -28,18 +28,6 @@
 						   List of Firm
 						</a>
 					</li>
-					<!--<li class="nav-item">
-						<a class="nav-link" 
-						   id="custom-tabs-two-two-tab" 
-						   data-toggle="pill" 
-						   href="#custom-tabs-two-two" 
-						   role="tab" 
-						   aria-controls="custom-tabs-two-two" 
-						   aria-selected="false"
-						   title="This Is to List the all Firms List of sent notices">
-						   Show Cause Notice Sent	<span class="badge bg-danger"><?php echo $countForScn ?></span>
-						</a> 
-					</li>-->
 					<li class="nav-item">
 						<a class="nav-link" 
 						   id="custom-tabs-two-three-tab" 
@@ -59,9 +47,6 @@
 					<div class="tab-pane fade show active" id="custom-tabs-two-first" role="tabpanel" aria-labelledby="custom-tabs-two-first-tab">
 						<?php echo $this->element('misgrade_elements/list_of_firms'); ?>
 					</div>
-					<!--<div class="tab-pane fade" id="custom-tabs-two-two" role="tabpanel" aria-labelledby="custom-tabs-two-two-tab">
-						<?php //echo $this->element('misgrade_elements/list_of_showcause'); ?>
-					</div>-->
 					<div class="tab-pane fade" id="custom-tabs-two-three" role="tabpanel" aria-labelledby="custom-tabs-two-three-tab">
 						<?php echo $this->element('misgrade_elements/list_of_action_taken'); ?>
 					</div>

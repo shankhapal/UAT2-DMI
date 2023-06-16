@@ -1,8 +1,10 @@
 
+var status_id = $('#status_id').val(); 
 
-var status_id = $('#status_id').val();
-if (status_id == 'submmitted') {
+if (status_id == 'submmitted' || status_id == 'saved' || status_id == 'final_submitted') {
 	$('#actions_div').show();
+}else{
+	$('#actions_div').hide();
 }
 
 $('#save').on('shown.bs.modal', function () {
@@ -42,7 +44,7 @@ $("#final_submit").click(function(){
 
 				var action = '';
 				var redirect_to = '';
-				
+	
 				if (response == 'Suspension') {
 					action = 'suspension, this firm will be Suspended for a period of time. This will be now redirecting to the suspension module for consent and e-sign.';
 					redirect_to = '../othermodules/suspensionHome?customer_id=' + encodeURIComponent(customer_id) + '&sample_code=' + encodeURIComponent(sample_code) + '&for_module=' + encodeURIComponent(response);
@@ -51,6 +53,7 @@ $("#final_submit").click(function(){
 					redirect_to = '../othermodules/suspensionHome?customer_id=' + encodeURIComponent(customer_id) + '&sample_code=' + encodeURIComponent(sample_code) + '&for_module=' + encodeURIComponent(response);
 				} else if (response == 'Refer') {
 					action = 'This is now referring to Head Office';
+					redirect_to = '../othermodules/misgrading-home';
 					// No redirection needed
 				} else if (response == 'Showcause') {
 					action = 'Showcause Notice, The Show cause notice will be sent to the firm.';
@@ -64,7 +67,7 @@ $("#final_submit").click(function(){
 					type: 'blue',
 					content:"The Actions on Misgrading is final submitted as " + response + " for Packer ID: " + customer_id + " as selection for " + action + "",
 					buttons: {
-						Proceed: {
+						OKAY: {
 							btnClass: 'btn-green',
 							action: function(){
 

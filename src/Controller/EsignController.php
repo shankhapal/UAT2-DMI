@@ -868,10 +868,14 @@ public function renewalRequestReEsign(){
 				if ($for_module === 'Suspension') {
 					$url_to_redirect = 	$main_domain_url.'othermodules/list_of_suspended_firms'; //default sending to new granted list
 					$model = 'DmiMmrSuspendedFirmsLogs';
+					$sms_id_ro = 12;
+					$sms_id_for_firm = 14;
 
 				} elseif ($for_module === 'Cancellation') {
 					$url_to_redirect = 	$main_domain_url.'othermodules/list_of_cancelled_firms'; //default sending to new granted list
 					$model = 'DmiMmrCancelledFirms';
+					$sms_id_ro = 13;
+					$sms_id_for_firm = 15;
 				} 
 
 			} else {
@@ -914,6 +918,15 @@ public function renewalRequestReEsign(){
 			$objMoveFile = new ApplicationformspdfsController();//creating object for class of another controller
 			$objMoveFile->moveFile($pdf_file_name,$source,$destination);
 
+			//Sent SMS for MMR
+			if ($this->Session->check('for_module')) {
+				
+				$this->loadModel('DmiMmrSmsTemplates');
+				$this->DmiMmrSmsTemplates->sendMessage(11,$customer_id,$_SESSION['sample_code']);	#RO - Action Taken
+				$this->DmiMmrSmsTemplates->sendMessage($sms_id_ro,$customer_id,$_SESSION['sample_code']); #RO - Which Action
+				$this->DmiMmrSmsTemplates->sendMessage($sms_id_for_firm,$customer_id,$_SESSION['sample_code']); #Applicant
+			}
+			
 			$this->redirect($url_to_redirect);//updated on 31-05-2021 for Form Based Esign method by Amol
 
 		}

@@ -23,26 +23,46 @@ $(document).ready(function() {
 				success:function(res){	
 	
 					var res = res.match(/~([^']+)~/)[1];//getting data bitween ~..~ from response
+					
+					//This block is added to the response to check if cannot is sent from the controller
+					// By which it will check the if the firm is cancelled,surrender or suspended 
+					// And notify according to that and all the original functionallity are in else part.
+					//AKASH [15-06-2023]
 
-					if(res!=1){
-						$.confirm({
-							title: 'Note:',
-							content: "The incharge who granted this application has been changed, So application will forwarded to current in-charge <b>"+res+"</b> for re-esign.",
+					if (res.includes("cannot")) {
+
+						$.alert({
+							content: res,
 							columnClass: 'medium',
 							type: 'dark',
-							buttons: {
-								proceed: function () {
-									$("#add_reesign_form").submit();
-								},
-								cancel: function () {
-									$.alert("The application is not added for re-esign, as you have cancel the allocation");
-								}
+							onClose: function(){
+								location.reload();
 							}
 						});
-	
-					}else{
-						$("#add_reesign_form").submit();
+
+					} else {
+
+						if(res!=1){
+							$.confirm({
+								title: 'Note:',
+								content: "The incharge who granted this application has been changed, So application will forwarded to current in-charge <b>"+res+"</b> for re-esign.",
+								columnClass: 'medium',
+								type: 'dark',
+								buttons: {
+									proceed: function () {
+										$("#add_reesign_form").submit();
+									},
+									cancel: function () {
+										$.alert("The application is not added for re-esign, as you have cancel the allocation");
+									}
+								}
+							});
+		
+						}else{
+							$("#add_reesign_form").submit();
+						}
 					}
+
 				}
 			});
 		} else {

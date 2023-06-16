@@ -62,6 +62,13 @@ class DashboardController extends AppController{
 			$this->Session->Delete('sample_code');
 			$this->Session->Delete('pdf_file_name');
 			$this->Session->Delete('application_mode');
+			$this->Session->Delete('table_id');
+			$this->Session->Delete('firm_id');
+			$this->Session->Delete('action_table_id');
+			$this->Session->Delete('scn_mode');
+			$this->Session->Delete('customer_id');
+			$this->Session->Delete('for_module');
+			$this->Session->Delete('reason_to_re_esign');
 		}
 
 //phase 2 new code from here

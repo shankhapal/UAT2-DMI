@@ -1,4 +1,9 @@
 	$(document).ready(function () {
+
+		$(document).on('click', '.close', function(event) {
+			$("#scrutiny_alloction_Modal").hide();
+		});
+		
 		/*
 		//Check if the sample is scrutinized or allocated
 		var statusArray = $('#statusArray_id').val();
@@ -156,8 +161,11 @@
 			});
 		});
 
+
+
 		//for scrutiny allocation
 		$(document).on('click', '#scrutiny_allocate_btn', function(event) {
+
 			event.preventDefault(); 
 			
 			var sample_code = $("#sample_code").val();
@@ -180,23 +188,17 @@
 					$(".loader").hide();
 					$(".loadermsg").hide();
 					$("#scrutiny_alloction_Modal").hide();
-					var allocation_to = data.match(/~([^']+)~/)[1];
 
+					var responseObject = JSON.parse(data.replace(/~/g, ''));
+					
 					$.alert({
 						icon: "fas fa-exclamation-circle",
 						columnClass: 'm',
-						content: "The Sample Code / Report " + sample_code + " was successfully allocated for scrutiny to Scrutiny Officer. " + allocation_to + "",
+						content: "The Sample Code / Report Code " + sample_code + " has been successfully allocated to Scrutinizer	: " + responseObject.mo_name +" ("+responseObject.mo_email+")",
 						onClose: function(){
 							window.location.href = '../misgrading/report_listing_for_allocation';
 						}
 					});
-					/*
-					//to reload list after allocation
-					if(allocation_by=='nodal' || allocation_by=='dy_ama'){
-						$('#for_scrutiny_allocation_tab').click();
-					}else if(allocation_by=='level_4_ro'){
-						$('#for_scrutiny_of_so_appl_tab').click();
-					}*/
 				}
 			});
 		});	
@@ -212,7 +214,7 @@
 	
 	function attachSamplePacker() {
 		
-		var customer_id = $('#packers_id').val();
+		var customer_id = $('#packers_id').val(); 
 		var sample_code = $('#sample_code').val();
 		var application_mode = $('#application_mode_id').val();
 		if (customer_id !== '') {
@@ -394,8 +396,6 @@
 			success: function(response) {
 
 				var responseObject = JSON.parse(response.replace(/~/g, ''));
-				console.log(responseObject);
-				// Assuming you have a div element with the id "firm_details"
 				var responseDiv = document.getElementById("firm_details");
 
 				var htmlContent = 
@@ -426,4 +426,4 @@
 
 
 
-	
+

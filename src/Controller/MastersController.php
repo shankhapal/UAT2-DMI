@@ -1813,20 +1813,73 @@ class MastersController extends AppController {
 		$this->autoRender = false;
 		$customer_id = $_POST['customer_id'];
 		
-		//get In-charge user id of the user who granted last time
-		$this->loadModel('DmiGrantCertificatesPdfs');
-		$lastGrantBy = $this->DmiGrantCertificatesPdfs->find('all',array('fields'=>'user_email_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
-		
-		//get current In-charge
-		$this->loadModel('DmiRoOffices');
-		$splitId = explode('/',(string) $customer_id); #For Deprecations
-		$curIncharge = $this->DmiRoOffices->find('all',array('fields'=>'ro_email_id','conditions'=>array('short_code IS'=>$splitId[2])))->first();
+		//// This Foreach block is added to exclude the Cancelled / Suspended / Surrendred application from re-esign - Akash [15-06-2023] \\\\
 
-		if($curIncharge['ro_email_id'] != $lastGrantBy['user_email_id']){					
-			echo '~'.base64_decode($curIncharge['ro_email_id']).'~';
-		}else{				
-			echo '~1~';
-		}
+
+			#For Surrender
+			$this->loadModel('DmiSurrenderGrantCertificatePdfs');
+			$surrender_record = $this->DmiSurrenderGrantCertificatePdfs->find('all')->where(['customer_id IS ' => $customer_id])->first();
+			
+			#For Suspension
+			$this->loadModel('DmiMmrSuspensions');
+			$currentDate = date('Y-m-d H:i:s'); 
+			$suspension_record = $this->DmiMmrSuspensions->find('all')->where(['customer_id IS' => $customer_id,'to_date >=' => $currentDate])->order('id DESC')->first();
+		
+			#For Cancellation	
+			$this->loadModel('DmiMmrCancelledFirms');
+			$cancellation_record = $this->DmiMmrCancelledFirms->find('all')->where(['customer_id IS' => $customer_id])->order('id DESC')->first();
+
+			// Exclude the record if customer_id is present in either Cancelled / Surendered / Suspended table. And the else part will do the re esign add/
+			if ($surrender_record || $suspension_record || $cancellation_record) {
+				
+				if (!empty($surrender_record)) {
+
+						
+					$formattedDate = $surrender_record['date'];
+					$dateTime = \DateTime::createFromFormat('d/m/Y H:i:s', $formattedDate);
+					$surrender_date = $dateTime->format('d/m/Y');
+
+					$message = 'This firm is <b> Surrendered </b> on Date : '	.$surrender_date. '	therefore it cannot be added for Re-Esign.';
+
+				}elseif (!empty($suspension_record)) {
+
+					$formattedDate = $suspension_record['date'];
+					$dateTime = \DateTime::createFromFormat('d/m/Y H:i:s', $formattedDate);
+					$suspension_date = $dateTime->format('d/m/Y');
+
+					$message = 'This firm is <b> Suspended </b> on Date : '	.$suspension_date. '	therefore it cannot be added for Re-Esign.';
+
+				}elseif (!empty($cancellation_record)) {
+
+					$formattedDate = $cancellation_record['date'];
+					$dateTime = \DateTime::createFromFormat('d/m/Y H:i:s', $formattedDate);
+					$cancellation_date = $dateTime->format('d/m/Y');
+
+					$message = 'This firm is <b> Cancelled </b> on Date : '	.$cancellation_date. '	therefore it cannot be added for Re-Esign.';
+
+				}
+
+				echo '~'.$message.'~';
+
+			} else {
+
+				//get In-charge user id of the user who granted last time
+				$this->loadModel('DmiGrantCertificatesPdfs');
+				$lastGrantBy = $this->DmiGrantCertificatesPdfs->find('all',array('fields'=>'user_email_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+
+				//get current In-charge
+				$this->loadModel('DmiRoOffices');
+				$splitId = explode('/',(string) $customer_id); #For Deprecations
+				$curIncharge = $this->DmiRoOffices->find('all',array('fields'=>'ro_email_id','conditions'=>array('short_code IS'=>$splitId[2])))->first();
+
+				if($curIncharge['ro_email_id'] != $lastGrantBy['user_email_id']){					
+					echo '~'.base64_decode($curIncharge['ro_email_id']).'~';
+				}else{				
+					echo '~1~';
+				}
+			}
+
+		
 		exit;
 	}
 

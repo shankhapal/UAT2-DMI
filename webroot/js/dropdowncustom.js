@@ -15,9 +15,12 @@ function create_custom_dropdowns() {
 		}
 	});
 
-	$('.dropdown-select ul').before('<div class="dd-search"><input id="txtSearchValue" autocomplete="off" onkeyup="filter()" class="dd-searchbox" type="text"></div>');
+	$('.dropdown-select ul').before('<div class="dd-search"><input id="txtSearchValue" autocomplete="off"  class="dd-searchbox filter_search" type="text"></div>');
 }
 
+	$(document).on('keyup', '.filter_search', function () {
+		filter();
+	});
 
 
 

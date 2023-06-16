@@ -27,31 +27,39 @@ class DmiMmrActionFinalSubmitsTable extends Table{
 			$opt_for_showcause = 'No';
 		}
 
-		$finalSubmitEntity = $this->newEntity(array('customer_id'=>$postData['customer_id'],
-													'misgrade_category'=>$postData['misgrade_category'],
-													'misgrade_level'=>$postData['misgrade_level'],
-													'misgrade_action'=>$postData['misgrade_action'],
-													'time_period'=>$postData['time_period'],
-													'showcause'=>$postData['showcause'],
-													'by_user' => $_SESSION['username'],
-													'for_suspension' => $postData['for_suspension'],
-													'for_cancel' => $postData['for_cancel'],
-													'refer_to_ho' => $postData['refer_to_ho'],
-													'created'=>date('Y-m-d H:i:s'),
-													'modified'=>date('Y-m-d H:i:s'),
-													'status'=>'submitted',
-													'sample_code'=>$postData['sample_code'],
+		if($postData['refer_to_ho'] == 'Yes'){
+			$available_to = 'ho';
+		}else {
+			$available_to = null;
+		}
 
-												));
+		$finalSubmitEntity = $this->newEntity(array(
+
+			'customer_id'=>$postData['customer_id'],
+			'misgrade_category'=>$postData['misgrade_category'],
+			'misgrade_level'=>$postData['misgrade_level'],
+			'misgrade_action'=>$postData['misgrade_action'],
+			'time_period'=>$postData['time_period'],
+			'showcause'=>$postData['showcause'],
+			'by_user' => $_SESSION['username'],
+			'for_suspension' => $postData['for_suspension'],
+			'for_cancel' => $postData['for_cancel'],
+			'refer_to_ho' => $postData['refer_to_ho'],
+			'created'=>date('Y-m-d H:i:s'),
+			'modified'=>date('Y-m-d H:i:s'),
+			'status'=>'submitted',
+			'sample_code'=>$postData['sample_code'],
+			'reason' =>$postData['reason'],
+			'available_to'=>$available_to
+
+		));
 
 		
 		if ($this->save($finalSubmitEntity)) {
 			
-
 			$DmiMmrActionHomeLogs = TableRegistry::getTableLocator()->get('DmiMmrActionHomeLogs');
 
 			$savedDetails = $DmiMmrActionHomeLogs->getInformation($postData['customer_id'],$postData['sample_code']);
-
 
 			$entity = $DmiMmrActionHomeLogs->newEntity(array(
 
@@ -70,6 +78,8 @@ class DmiMmrActionFinalSubmitsTable extends Table{
 			
 			if($DmiMmrActionHomeLogs->save($entity)){
 
+				
+
 				//This is to update the sample flag entry in sample_inward table
 				$SampleInward = TableRegistry::getTableLocator()->get('SampleInward');
 				$SampleInward->updateAll(
@@ -81,8 +91,20 @@ class DmiMmrActionFinalSubmitsTable extends Table{
 					$final_action = 'Suspension';
 				}elseif ($postData['for_cancel'] == 'Yes') {
 					$final_action = 'Cancellation';
-				}elseif ($postData['for_suspension'] == 'Yes') {
-					$final_action = 'Refer';
+				}elseif ($postData['refer_to_ho'] == 'Yes') {
+					
+					//Add the data into ho table for mmr
+					$DmiMmrHoAllocations = TableRegistry::getTableLocator()->get('DmiMmrHoAllocations');
+					$savetheHoAllocation = $DmiMmrHoAllocations->saveHoAllocation($_SESSION['firm_id'],$_SESSION['sample_code']);
+					
+					if ($savetheHoAllocation == true) {
+
+						$DmiMmrSmsTemplates = TableRegistry::getTableLocator()->get('DmiMmrSmsTemplates');
+						$DmiMmrSmsTemplates->sendMessage(16,$_SESSION['firm_id'],$_SESSION['sample_code']);
+						$DmiMmrSmsTemplates->sendMessage(17,$_SESSION['firm_id'],$_SESSION['sample_code']);
+						$final_action = 'Refer';
+					}
+		
 				}elseif ($opt_for_showcause == 'Yes') {
 					$final_action = 'Showcause';
 				}

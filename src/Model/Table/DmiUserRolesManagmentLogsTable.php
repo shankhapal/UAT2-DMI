@@ -103,7 +103,8 @@ namespace app\Model\Table;
 										'allocation_jt_ama'=>'Forward to Jt. AMA','allocation_ama'=>'Forward to AMA','masters'=>'Masters','super_admin'=>'Super Admin','renewal_verification'=>'Renewal Scrutiny','renewal_allocation'=>'Renewal Allocation','view_reports'=>'View Reports','pao'=>'PAO/DDO','once_update_permission'=>'Aadhar Update Permission',
 										'old_appln_data_entry'=>'Old Applications Data Entry','so_inspection'=>'SO In-Charge','smd_inspection'=>'SMD In-Charge','feedbacks'=>'Feedbacks','unlock_user'=>'Unlock User','transfer_appl'=>'Transfer Application','sample_inward'=>'Sample Inward','sample_forward'=>'Sample Forward',
 										'generate_inward_letter'=>'Generate Inward Letter','reports'=>'Reports','dashboard'=>'Dashboard','out_forward'=>'Out Forward','user_flag'=>'User Flag','so'=>'SO','sample_allocated'=>'Sample Allocated','sample_testing_progress'=>'Sample Testing Progress','sample_result_approval'=>'Sample Result Approval',
-										'finalized_sample'=>'Finalized Sample','administration'=>'Administration','ho'=>'HO','cal'=>'CAL','ral'=>'RAL','ro'=>'RO','once_update_permission'=>'Once Update Permission','aadhar_update_permission'=>'Aadhar Update Permission','inspection_pp'=>'Inspection of PP','so_grant_pp'=>'SO Grant PP','re_esign'=>'Re Esign Module');
+										'finalized_sample'=>'Finalized Sample','administration'=>'Administration','ho'=>'HO','cal'=>'CAL','ral'=>'RAL','ro'=>'RO','once_update_permission'=>'Once Update Permission','aadhar_update_permission'=>'Aadhar Update Permission','inspection_pp'=>'Inspection of PP','so_grant_pp'=>'SO Grant PP',
+										're_esign'=>'Re Esign Module','allocate_lims_report'=>'Allocation of LIMS Reports');
 
 				$j = 0;
 				foreach($user_roles_name_list as $user_name) {

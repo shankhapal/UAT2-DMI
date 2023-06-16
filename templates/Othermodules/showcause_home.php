@@ -29,11 +29,12 @@
 							<div class="card-header"><h3 class="card-title-new">Show Cause Notice</h3></div>
 							<?php 
 								echo $this->element('misgrade_elements/scn_user_form'); 
-							
+								
 								if (!empty($statusofscn)) {
-									echo $this->element('misgrade_elements/showcause_communication'); 
+									if(trim($statusofscn['status']) != 'saved' ){
+										echo $this->element('misgrade_elements/showcause_communication'); 
+									}
 								}
-						
 							?>
 							<div class="card-footer">
 								<?php echo $this->element('misgrade_elements/showcause_buttons'); ?>
@@ -68,6 +69,8 @@
 <input type="hidden" id="status_id" value="<?php echo $status; ?>">
 <input type="hidden" id="customer_id_value" value="<?php echo $customer_id; ?>">
 <input type="hidden" id="which_user" value="<?php echo $_SESSION['whichUser']; ?>">
+<input type="hidden" id="sample_code_id" value="<?php echo $_SESSION['sample_code']; ?>">
+
 <?php 
 	echo $this->Form->control('scn_mode_id', array('type'=>'hidden', 'id'=>'scn_mode_id', 'value'=>$_SESSION['scn_mode'],'label'=>false,));
 	echo $this->Html->script('othermodules/showcause_home');

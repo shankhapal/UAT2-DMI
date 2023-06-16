@@ -48,6 +48,11 @@ class OthermodulesController extends AppController{
 		$this->loadModel('MCommodityCategory');
 		$this->loadModel('MCommodity');
 		$this->loadModel('DmiMmrActionFinalSubmits');
+		$this->loadModel('DmiRoOffices');
+		$this->loadModel('DmiMmrHoComments');
+		$this->loadModel('DmiMmrSmsTemplates');
+		$this->loadModel('DmiMmrAllocations');
+
 
 
 	}
@@ -949,12 +954,16 @@ class OthermodulesController extends AppController{
 		$this->Session->delete('pdf_file_name');
 
 		$userName = $this->Session->read('username');
+
 		$this->loadModel('DmiUsers');
 		$this->loadModel('DmiDistricts');
-		
+		$this->loadModel('DmiMmrSuspensions');
+		$this->loadModel('DmiMmrCancelledFirms');
+		$this->loadModel('DmiSurrenderGrantCertificatePdfs');
 		$this->loadModel('DmiRoOffices');
 		$this->loadModel('DmiUserRoles');
 		$this->loadModel('DmiCustomers');
+
 		$conn = ConnectionManager::get('default');
 
 		$user_role = $this->DmiUserRoles->find('all',array('fields'=>'super_admin','conditions'=>array('user_email_id IS'=>$this->Session->read('username'))))->first();
@@ -968,7 +977,7 @@ class OthermodulesController extends AppController{
 			$this->set('primary_id',$primary_id);
 
 		} else {
-
+			$currentDate = date('Y-m-d H:i:s'); 
 			$for_firm = 'secondary';
 			$userOffice = $this->DmiUsers->find('all',array('fields'=>array('posted_ro_office'),'conditions'=>array('email IS'=>$userName)))->first();
 			$userPostedOffice = $userOffice['posted_ro_office'];
@@ -999,10 +1008,38 @@ class OthermodulesController extends AppController{
 												INNER JOIN dmi_customers AS dc ON dc.customer_id = df.customer_primary_id 
 												WHERE df.district='$each' OR df.delete_status = 'null' OR df.delete_status = 'no'")->fetchAll('assoc');
 
-				if(!empty($firmDetails)){ $list[] = $firmDetails; }
+				if(!empty($firmDetails)){ 
+					$list[] = $firmDetails; 
+				}
 			}
 
-			$this->set('datalist',$list);
+			/// This Foreach block is added to exclude the Cancelled / Suspended / Surrendred application from the Array - Akash [15-06-2023] \\\\
+			foreach ($list as $subarray) {
+
+				foreach ($subarray as $each) {
+	
+					$customer_id = $each['customer_id'];
+					
+					#For Surrender
+					$surrender_record = $this->DmiSurrenderGrantCertificatePdfs->find('all')->where(['customer_id IS ' => $customer_id])->first();
+					
+					#For Suspension
+					$suspension_record = $this->DmiMmrSuspensions->find('all')->where(['customer_id IS' => $customer_id,'to_date >=' => $currentDate])->order('id DESC')->first();
+					
+					#For Cancellation	
+					$cancellation_record = $this->DmiMmrCancelledFirms->find('all')->where(['customer_id IS' => $customer_id])->order('id DESC')->first();
+					
+					// Exclude the record if customer_id is present in either $is_cancelled or $suspension_record
+					if ($surrender_record || $suspension_record || $cancellation_record) {
+						continue; // Skip to the next iteration of the loop
+					}
+		
+					// Add the record to the filtered array
+					$filteredRecords[] = $each;
+				}
+			}
+
+			$this->set('datalist',$filteredRecords);
 		}
 
 		$this->set('for_firm',$for_firm);
@@ -1286,7 +1323,7 @@ class OthermodulesController extends AppController{
 	// @AUTHOR : PRAVIN BHAKARE
 	// @CONTRIBUTER : AKASH THAKRE (migration)
 	// DATE : 25-02-2021
-		
+
 	public function applicantDetails() {
 
 		$this->viewBuilder()->setLayout('admin_dashboard');
@@ -1825,8 +1862,8 @@ class OthermodulesController extends AppController{
 
 											/***###|Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports|###***/
 
-	// Misgrading Home
-	// DESCRIPTION : 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
+	// DESCRIPTION : This method is for the manageing all the actions for the firms 
 	// A/C  : AKASH THAKRE
 	// DATE : 09-12-2022
 	// For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
@@ -1864,6 +1901,7 @@ class OthermodulesController extends AppController{
 		$underThisOffice = array();
 
 		foreach ($districtlist as $each) {
+
 			$firmDetails = $conn->execute("SELECT dmfs.id, dmfs.sample_code, dmfs.customer_id, df.firm_name, df.email, df.mobile_no, mc.commodity_name
 				FROM dmi_mmr_final_submits AS dmfs 
 				INNER JOIN dmi_firms as df ON df.customer_id = dmfs.customer_id
@@ -1908,24 +1946,36 @@ class OthermodulesController extends AppController{
 				
 				// Check if customer_id is present in $suspension_record
 				$suspension_record = $this->DmiMmrSuspensions->find('all')->where(['customer_id' => $customer_id,'to_date >=' => $currentDate])->order(['id' => 'DESC'])->first();
-				
+
+				//See if the the report is allocated and if allocated make sure it in replied form 
+				$is_scrutinizer_replied = $this->DmiMmrAllocations->find()->where(['customer_id' => $customer_id,'sample_code'=>$each['sample_code'],'available_to' => 'mo'])->order(['id' => 'DESC'])->first();
+
 				// Exclude the record if customer_id is present in either $is_cancelled or $suspension_record
-				if ($is_cancelled || $suspension_record) {
+				if ($is_cancelled || $suspension_record || $is_scrutinizer_replied) {
 					continue; // Skip to the next iteration of the loop
 				}
 	
-				// Rest of your code logic here
-				$showcause_status = $this->DmiMmrShowcauseLogs->find()->select(['status'])->where(['sample_code IS' => $each['sample_code']])->order(['id' => 'DESC'])->first();
+				// To Get the Show cause notice status
+				$showcause_status = $this->DmiMmrShowcauseLogs->find()->select(['id','status'])->where(['sample_code IS' => $each['sample_code']])->order(['id' => 'DESC'])->first();
 				$each['showcause_status'] = $showcause_status ? $showcause_status->status : null;
+				$each['showcause_table_id'] = $showcause_status ? $showcause_status->id : null;
+
+				//See the Status of refer to ho
+				$ho_stats = $this->DmiMmrActionFinalSubmits->find()->select(['available_to'])->where(['customer_id' => $customer_id,'sample_code IS' => $each['sample_code']])->order(['id' => 'DESC'])->first();
+				$each['ho_stats'] = $ho_stats ? $ho_stats->available_to : null;
 				
+				//See if the action is submitted
+				$action_taken = $this->DmiMmrActionFinalSubmits->find()->where(['customer_id' => $customer_id,'sample_code IS' => $each['sample_code']])->order(['id' => 'DESC'])->first();
+				$each['action_final_submit_status'] = $action_taken ? $action_taken->status : null;
+
 				// Add the record to the filtered array
 				$filteredRecords[] = $each;
 			
 			}
 		}
-		
+		//pr($filteredRecords);exit;
 		$this->set('underThisOffice', $filteredRecords);
-
+		
 
 		//This is for the Action Taken Firms
 		$actionTaken = [];
@@ -1933,21 +1983,41 @@ class OthermodulesController extends AppController{
 		foreach ($underThisOffice as $subarray) {
 
 			foreach ($subarray as $each) {
+
 				$customer_id = $each['customer_id'];
-				$action_taken = $this->DmiMmrActionFinalSubmits->find()->where(['customer_id' => $customer_id,'status' => 'action_taken'])->order(['id DESC'])->first();
+				$sample_code = $each['sample_code'];
+
+				$action_taken = $this->DmiMmrActionFinalSubmits->find()->where(['customer_id' => $customer_id,'sample_code'=>$sample_code,'status' => 'action_taken'])->order(['id DESC'])->first();
 				if (!empty($action_taken)) {
-					$actionTaken[] = $action_taken;
+
+					$firm = $this->DmiFirms->find()->select(['firm_name'])->where(['customer_id' => $customer_id])->first();
+					$period = $this->DmiMmrTimePeriod->getTimePeriod($action_taken->time_period);
+					
+					$actionTaken[] = [
+
+						'customer_id' => $customer_id,
+						'status' => $action_taken->status,
+						'showcause' => $action_taken->showcause,
+						'firm_name' => $firm->firm_name,
+						'misgrade_category_name' => $this->DmiMmrCategories->get($action_taken->misgrade_category)->misgrade_category_name . " : " . $this->DmiMmrCategories->get($action_taken->misgrade_category)->misgrade_category_dscp,
+						'misgrade_level_name' => $this->DmiMmrLevels->get($action_taken->misgrade_level)->misgrade_level_name,
+						'time_period'=> $period['month'],
+						'is_suspended' => $action_taken->is_suspended,
+						'is_cancelled' => $action_taken->is_cancelled
+					];
 				}
 			}
 		}
-
+	
 		$this->set('actionTaken', $actionTaken);
 
 
 
 	}
 
-	// Suspension Home
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
 	// DESCRIPTION : 
 	// AUTHOR : AKASH THAKRE
 	// DATE : 09-12-2022
@@ -1963,8 +2033,8 @@ class OthermodulesController extends AppController{
 
 
 
-	// Suspension Home
-	// DESCRIPTION : 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
+	// DESCRIPTION : This is for the fetching the id for the showcause notice
 	// AUTHOR : AKASH THAKRE
 	// DATE : 09-12-2022
 	// For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
@@ -1976,9 +2046,12 @@ class OthermodulesController extends AppController{
 		$this->Session->write('sample_code', $this->request->getQuery('sample_code'));
 		$this->Session->write('whichUser','dmiuser');
 		$this->Session->write('scn_mode',$this->request->getQuery('scn_mode'));
+		$this->Session->write('action_table_id',$this->request->getQuery('action_table_id'));
 		$this->redirect(array('controller'=>'othermodules','action'=>'showcause_home'));
 	}
 
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
 	public function fetchIdFromScnAppl() {
 
 	
@@ -1991,7 +2064,7 @@ class OthermodulesController extends AppController{
 	}
 
 
-
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
 	// DESCRIPTION : To show and redirect on the Misgrading Actions Home.
 	// AUTHOR : AKASH THAKRE
 	// DATE : 09-12-2022
@@ -2002,6 +2075,7 @@ class OthermodulesController extends AppController{
 		$message = '';
 		$message_theme = '';
 		$redirect_to = '';
+		$re_action = 'no';
 
 		$customer_id = $this->Session->read('firm_id');
 		$this->set('customer_id',$customer_id);
@@ -2052,7 +2126,7 @@ class OthermodulesController extends AppController{
 			$isCommodityGhee = 'no';
 		}
 
-	
+
 		if (!empty($misgradeStatus)) {
 
 			//Misgrade Category Info
@@ -2080,6 +2154,13 @@ class OthermodulesController extends AppController{
 			$reason = $misgradeStatus['reason'];
 			$status = $misgradeStatus['status'];
 
+
+			$ho_refer = $this->DmiMmrActionFinalSubmits->find()->select(['customer_id'])->where(['customer_id' =>$customer_id,'sample_code' => $sample_code,'status' => 'submitted','refer_to_ho'=>'Yes','available_to'=>'ro'])->order('id DESC')->first();
+			if (!empty($ho_refer)) {
+				$re_action = 'yes';
+			} else {
+				$re_action = 'no';
+			}
 			
 		} else {
 			$misCatId = ''; $misCatName = ''; $misCatDscp = '';
@@ -2107,9 +2188,10 @@ class OthermodulesController extends AppController{
 			}
 			
 		} 
-		
-		
+
+	
 		$this->set('isCommodityGhee',$isCommodityGhee);
+		$this->set('re_action',$re_action);
 		$this->set(compact('firmDetails','category','sub_commodity_value'));                             #Set the Firm Details
 		$this->set(compact('misgradingActions','misgradingLevels','misgradingCategories','timePeriod')); #Set the Dropdowns
 		$this->set(compact('misCatId','misCatName','misCatDscp','misLvlName','misActName'));             #Set the Saved Misgrade Category Values
@@ -2119,8 +2201,8 @@ class OthermodulesController extends AppController{
 	}
 
 
-	// Final Submit Actions
-	// DESCRIPTION : 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
+	// DESCRIPTION : This is the short function for final submitting the actions taken through AJAX
 	// AUTHOR : AKASH THAKRE
 	// DATE : 09-12-2022
 	// For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
@@ -2136,7 +2218,7 @@ class OthermodulesController extends AppController{
 		$savedDetails = $this->DmiMmrActionHomeLogs->getInformation($customer_id,$sample_code);
 		
 		//Showcause Details
-		$scnDetails = $this->DmiMmrShowcauseNoticePdfs->find()->where(['customer_id IS'=>$customer_id])->order('id DESC')->first();
+		$scnDetails = $this->DmiMmrShowcauseNoticePdfs->find()->where(['customer_id IS'=>$customer_id,'sample_code' => $sample_code])->order('id DESC')->first();
 		if (!empty($scnDetails)) {
 			$showcause = 'Yes';
 		}else{
@@ -2184,7 +2266,8 @@ class OthermodulesController extends AppController{
 			'by_user' => $_SESSION['username'],
 			'for_suspension' => $for_suspension,
 			'for_cancel' => $for_cancel,
-			'refer_to_ho' => $refer_to_ho
+			'refer_to_ho' => $refer_to_ho,
+			'reason' => $savedDetails['reason']
 		];
 
 		$misgradeStatus = $this->DmiMmrActionFinalSubmits->saveActionFinalData($arrayFinal);
@@ -2193,9 +2276,11 @@ class OthermodulesController extends AppController{
 		
 		exit;
 	}
+	
 
 
-	// DESCRIPTION : To show the suspension / cancellation home
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
+	// DESCRIPTION : To show the suspension / cancellation home with the details of actions final submitted 
 	// AUTHOR : AKASH THAKRE
 	// DATE : 09-12-2022
 	// For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
@@ -2221,6 +2306,7 @@ class OthermodulesController extends AppController{
 		$sample_code = $this->Session->read('sample_code');
 		$this->set('sample_code',$customer_id);
 
+		$username = $this->Session->read('username');
 		
 
 		if ($whichUser == 'applicant') {
@@ -2236,14 +2322,14 @@ class OthermodulesController extends AppController{
 
 		//Firm Details
 		$firmDetails = $this->DmiFirms->firmDetails($customer_id); 
-		$username = $this->Session->read('username');
+		
 
 		$category = $this->MCommodityCategory->getCategory($firmDetails['commodity']); 
 
 		$sub_comm_id = explode(',',(string) $firmDetails['sub_commodity']); #For Deprecations
 		$sub_commodity_value = $this->MCommodity->find('list',array('valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
 	
-		$statusofscn = $this->DmiMmrShowcauseLogs->getInformation($customer_id);
+		$statusofscn = $this->DmiMmrShowcauseLogs->getInformation($customer_id,$sample_code);
 		if (!empty($statusofscn)) {
 			$reason = $statusofscn['reason'];
 			$status = $statusofscn['status'];
@@ -2255,7 +2341,7 @@ class OthermodulesController extends AppController{
 		$this->set('statusofscn',$statusofscn);
 		
 
-		$mmrlogs = $this->DmiMmrFinalSubmits->find()->where(['sample_code IS' => $sample_code])->order('id DESC')->first();
+		$mmrlogs = $this->DmiMmrFinalSubmits->find()->where(['customer_id IS' => $customer_id,'sample_code IS' => $sample_code])->order('id DESC')->first();
 		$this->set('mmrlogs',$mmrlogs);
 
 		$sampleDetails = $this->SampleInward->find()->where(['org_sample_code' => $sample_code])->first();
@@ -2282,7 +2368,7 @@ class OthermodulesController extends AppController{
 		
 		$this->set('sampleArray',$sampleArray);
 
-		$scn_pdf = $this->DmiMmrShowcauseNoticePdfs->find()->select(['pdf_file'])->where(['customer_id' => $customer_id])->order('id DESC')->first();
+		$scn_pdf = $this->DmiMmrShowcauseNoticePdfs->find()->select(['pdf_file'])->where(['customer_id' => $customer_id,'sample_code'=>$sample_code])->order('id DESC')->first();
 		if (!empty($scn_pdf)) {
 			$scn_pdf_path = $scn_pdf['pdf_file'];
 		} else {
@@ -2325,9 +2411,14 @@ class OthermodulesController extends AppController{
 			} elseif (null !== $this->request->getData('update_action')) {
 
 				if($this->DmiMmrShowcauseLogs->updateLog($postData) == 1){
+
+					//SMS: Communication
+					$this->DmiMmrSmsTemplates->sendMessage(8,$customer_id,$sample_code);
+
 					$message = 'Updated the details for Show Cause Notice Succesfully.';
 					$message_theme = 'success';
 					$redirect_to = '../othermodules/showcauseHome';
+
 				}else{
 					$message = 'Sorry, The details could not be saved. Try Again';
 					$message_theme = 'failed';
@@ -2337,7 +2428,7 @@ class OthermodulesController extends AppController{
 			} elseif(null!==($this->request->getData('save_applicant_comment'))){
 				
 				$comment_by = $this->Session->read('username');
-				$comment_to = 'bWVsdmlucm95LnBAZ292Lmlu';
+				$comment_to = $_SESSION['customer_id'];
 				$comment = htmlentities($this->request->getData('reffered_back_comment'), ENT_QUOTES);
 				$from_user = 'applicant';
 				$to_user = 'ro';
@@ -2346,8 +2437,11 @@ class OthermodulesController extends AppController{
 				
 				if($result == 1){
 
-					$this->Customfunctions->saveActionPoint('Reffered Back Comment Saved', 'Success'); #Action
-					$message = "Comment on Showcause notice is sent tio the agmark successfully.";
+					//SMS: SCN Communication
+					$this->DmiMmrSmsTemplates->sendMessage(9,$customer_id,$sample_code);
+
+					$this->Customfunctions->saveActionPoint('Reffered Back Comment Sent', 'Success'); #Action
+					$message = "Comment on Showcause notice is sent to the Applicant successfully.";
 					$message_theme = "success";
 					$redirect_to = '../customers/secondary-home';
 
@@ -2372,8 +2466,11 @@ class OthermodulesController extends AppController{
 
 				if($result == 1){
 
+					//SMS: SCN Communication
+					$this->DmiMmrSmsTemplates->sendMessage(10,$customer_id,$sample_code);
+
 					$this->Customfunctions->saveActionPoint('Reffered Back Comment Saved', 'Success'); #Action
-					$message = "Comment on Showcause notice is sent tio the agmark successfully.";
+					$message = "Comment on Showcause notice is sent to the agmark successfully.";
 					$message_theme = "success";
 					$redirect_to = '../othermodules/misgrading_home';
 
@@ -2399,8 +2496,8 @@ class OthermodulesController extends AppController{
 	}
 
 
-
-	// Description : To sent the final showcause notice to applicant.
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
+	// Description : To final submit and send the notice to the packer.
 	// AUTHOR : Akash Thakre
 	// DATE : 09-12-2022
 	// For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
@@ -2410,17 +2507,25 @@ class OthermodulesController extends AppController{
 		$this->autoRender = false;
 		//get ajax post data
 		$customer_id = $_POST['customer_id'];
-		$showCause = $this->DmiMmrShowcauseLogs->getInformation($customer_id);
+		$sample_code = $_POST['sample_code'];
+
+		$showCause = $this->DmiMmrShowcauseLogs->getInformation($customer_id,$sample_code);
 		$result =  $this->DmiMmrShowcauseLogs->sendFinalNotice($showCause); 
 		
 		if ($result == true) {
+
+			//SMS : Show Cause Notice Sent
+			$this->DmiMmrSmsTemplates->sendMessage(7,$customer_id,$sample_code); #RO
+			$this->DmiMmrSmsTemplates->sendMessage(8,$customer_id,$sample_code); #Applicant
 			echo '~done~';
 		}
+		
 		exit;
 	}
 
 
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
 	//Description : To give the user an list of CAs to select for suspension of cancellation 
 	//Author : Akash Thakre
 	//Date : 24-04-2023
@@ -2490,6 +2595,12 @@ class OthermodulesController extends AppController{
 
 
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
+	//Description : Used to display the firm list on whom the action is taken by the agmark
+	//Author : Akash Thakre
+	//Date : 24-04-2023
+	//For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
+
 	public function listOfPackerActionTaken()
 	{
 		$conn = ConnectionManager::get('default');
@@ -2548,7 +2659,7 @@ class OthermodulesController extends AppController{
 
 	
 
-
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
 	//Description : To list the granted suspended firms
 	//Author : Akash Thakre
 	//Date : 09-06-2023
@@ -2609,8 +2720,8 @@ class OthermodulesController extends AppController{
 	}
 
 
-
-	//Description : To list the granted Cacnelled firms
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
+	//Description : To list the granted cancelled firms
 	//Author : Akash Thakre
 	//Date : 09-06-2023
 	//For: MMR
@@ -2639,13 +2750,14 @@ class OthermodulesController extends AppController{
 
 		foreach ($districtlist as $each) {
 
-			$firmDetails = $conn->execute("SELECT dmcf.id, dmcf.customer_id,dmcf.date,dmcf.pdf_file, df.firm_name, df.email, df.mobile_no
-				FROM dmi_mmr_cancelled_firms AS dmcf 
-				INNER JOIN dmi_firms as df ON df.customer_id = dmcf.customer_id
-				INNER JOIN dmi_districts AS dd ON dd.id = df.district::INTEGER
-				INNER JOIN dmi_certificate_types AS dct ON dct.id = df.certification_type::INTEGER
-				INNER JOIN dmi_grant_certificates_pdfs AS dgcp ON df.customer_id = dgcp.customer_id 
-				WHERE df.district='$each' AND df.certification_type='1'")->fetchAll('assoc');
+			$firmDetails = $conn->execute("SELECT DISTINCT dmcf.id, dmcf.customer_id, dmcf.date, dmcf.pdf_file, df.firm_name, df.email, df.mobile_no
+											FROM dmi_mmr_cancelled_firms AS dmcf 
+											INNER JOIN dmi_firms AS df ON df.customer_id = dmcf.customer_id
+											INNER JOIN dmi_districts AS dd ON dd.id = df.district::INTEGER
+											INNER JOIN dmi_certificate_types AS dct ON dct.id = df.certification_type::INTEGER
+											INNER JOIN dmi_grant_certificates_pdfs AS dgcp ON df.customer_id = dgcp.customer_id 
+											WHERE df.district='$each' AND df.certification_type='1'")->fetchAll('assoc');
+
 
 	
 			if (!empty($firmDetails)) {
@@ -2661,11 +2773,216 @@ class OthermodulesController extends AppController{
 				$filteredRecords[] = $each;
 			}
 		}
-		//pr($filteredRecords); exit;
+	
 		$this->set('cancelled_firms', $filteredRecords);
 
 		
 	}
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
+	//Description : To show the list of  firm to Dy. AMA for those firm are opted for the REFER TO HO action on Action Module
+	//Author : Akash Thakre
+	//Date : 09-06-2023
+	//For: MMR
+
+	public function referredToHeadOffice(){
+
+		//Get the applicant id refer to the head office
+		$refer = $this->DmiMmrActionFinalSubmits->find()->where(['refer_to_ho' => 'Yes','status' => 'submitted'])->order('id DESC')->toArray();
+		// Assuming $refer contains the original array with duplicate records
+		//pr($refer); exit;
+		$selectedRecords = [];
+
+		foreach ($refer as $record) {
+			$key = $record->customer_id . $record->misgrade_category . $record->misgrade_level;
+
+			if (!isset($seenRecords[$key])) {
+				$seenRecords[$key] = true;
+				$selectedRecords[] = [
+					'id'=>$record->id,
+					'customer_id' => $record->customer_id,
+					'misgrade_category_name' => $this->DmiMmrCategories->get($record->misgrade_category)->misgrade_category_name . " : " . $this->DmiMmrCategories->get($record->misgrade_category)->misgrade_category_dscp,
+					'misgrade_level_name' => $this->DmiMmrLevels->get($record->misgrade_level)->misgrade_level_name,
+					'showcause' => $record->showcause,
+					'modified' => $record->modified,
+					'by_user' =>$this->DmiUsers->getFullName($record->by_user),
+					'office_details'=>$this->DmiRoOffices->getOfficeDetails($record->by_user),
+					'sample_code' => $record->sample_code,
+					'available_to' => $record->available_to
+				];
+			}
+		}
+
+		$this->set('referDetails',$selectedRecords);
+
+	}
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
+	//Description : For communiaction between the RO and DY.AMA on Misgrading Report.
+	//Author : Akash Thakre
+	//Date : 09-06-2023
+	//For: MMR
+
+	public function communicationWithHeadOffice()
+	{	
+		//Blank Vairble set
+		$message = '';
+		$message_theme = '';
+		$redirect_to = '';
+
+		//get the values sent from the selection in template
+		$table_id = $this->request->getQuery('id');
+		$customer_id = $this->request->getQuery('customer_id');
+		$current_level = $this->request->getQuery('current_level');
+		$mode = $this->request->getQuery('mode');
+		$sample_code = $this->request->getQuery('sample_code');
+
+		//Get the details
+		$actionDetails = $this->DmiMmrActionFinalSubmits->find()->where(['customer_id' => $customer_id,'sample_code'=>$sample_code])->order('id DESC')->first();
+		
+		//Check if show cause notice is sent
+		$is_showcause = $actionDetails['showcause'];
+		if ($is_showcause == 'Yes') {
+			$get_scn_pdf = $this->DmiMmrShowcauseNoticePdfs->find()->select(['pdf_file'])->where(['customer_id IS' => $customer_id,'sample_code' => $sample_code])->order(['id DESC'])->first();
+			$scn_pdf = $get_scn_pdf->pdf_file;
+		} else {
+			$scn_pdf = null;
+		}
+		
+		//Load Model
+		$this->loadModel('DmiMmrHoComments');
+
+		//sample_code
+		$this->set('sample_code',$actionDetails['sample_code']);
+		$this->set('reason',$actionDetails['reason']);
+		$this->set('customer_id',$customer_id);
+		$this->set('current_level',$current_level);
+		$this->set('mode',$mode);
+		$this->set('table_id',$table_id);
+
+		//Commodity Code
+		$sampleInfo = $this->SampleInward->sampleInformation($actionDetails['sample_code']);
+		$this->set('commodity_code',$sampleInfo['commodity_code']);
+	
+		//Misgrade Category Info
+		$misgrade_category = $this->DmiMmrCategories->getMisgradingCategory($actionDetails['misgrade_category']);
+		$misgradeCategory  = $misgrade_category['misgrade_category_name']. " : " .$misgrade_category['misgrade_category_dscp'];
+
+		//Misgrade Category Info
+		$misgrade_level = $this->DmiMmrLevels->getMisgradingLevel($actionDetails['misgrade_level']);
+		$levelName = $misgrade_level['misgrade_level_name'];
+
+		//Misgrade Category Info
+		$misgrade_action = $this->DmiMmrActions->getMisgradingAction($actionDetails['misgrade_action']);
+		$actionName = $misgrade_action['misgrade_action_name'];
+
+	
+		//Packer Details
+		$firmDetails = $this->DmiFirms->firmDetails($customer_id); 
+		$category = $this->MCommodityCategory->getCategory($firmDetails['commodity']); 
+		$sub_comm_id = explode(',',(string) $firmDetails['sub_commodity']); #For Deprecations
+		$sub_commodity_value = $this->MCommodity->find('list',array('valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
+
+		// fetch comments history
+		$ho_comment_details = $this->DmiMmrHoComments->find('all',array('conditions'=>array('sample_code IS'=>$sample_code,'OR'=>array('comment_by IS'=>$this->Session->read('username'),'comment_to'=>$this->Session->read('username'))),'order'=>'id'))->toArray();
+		$this->set('ho_comment_details',$ho_comment_details);
+		
+		//to send and save comment
+
+		if (null!==($this->request->getData('send_comment'))){
+
+			//get user Position from whome comment sent //added on 07-03-2018 by Amol
+			if($current_level =='level_3'){
+				$from_user = 'ro';
+			}elseif($current_level == 'level_4'){
+				$from_user = 'ho';
+			}
+
+			
+			//html encoding post data before saving
+			$htmlencoded_comment = htmlentities($this->request->getData('comment'), ENT_QUOTES);
+			$comment_to = $this->request->getData('comment_to');
+
+			//Get the Dy. AMA
+			if(!empty($comment_to) && !empty($htmlencoded_comment))//condition added on 10-04-2017 by Amol
+			{
+
+				if($comment_to == 'ro')
+				{
+					$comment_to_email_id = $actionDetails['by_user'];
+					$to_user = 'ro';
+					$sms_id = 18;
+				}
+				elseif($comment_to == 'ho')
+				{
+					$find_dy_ama = $this->DmiUserRoles->find()->select(['user_email_id'])->where(['dy_ama' => 'yes'])->first();
+					$comment_to_email_id = $find_dy_ama['user_email_id'];
+					$comment_to_level = 'level_3';
+					$to_user = 'ho';
+					$sms_id = 19;
+				}
+				
+				if(!empty($comment_to_email_id))//Condition added on 10-04-2017 by Amol
+				{
+					$ho_comments_entity = $this->DmiMmrHoComments->newEntity(array(
+
+						'customer_id'=>$customer_id,
+						'comment_by'=>$this->Session->read('username'),
+						'comment_to'=>$comment_to_email_id,
+						'comment_date'=>date('Y-m-d H:i:s'),
+						'comment'=>$htmlencoded_comment,
+						'created'=>date('Y-m-d H:i:s'),
+						'modified'=>date('Y-m-d H:i:s'),
+						'from_user'=>$from_user,
+						'to_user'=>$to_user,
+						'sample_code'=>$sample_code
+					));
+
+					if($this->DmiMmrHoComments->save($ho_comments_entity)){
+
+						//Update the Action Final Submit table entity
+						$this->DmiMmrActionFinalSubmits->updateAll(array('available_to' => "$to_user"),array('customer_id IS' => $customer_id,'sample_code'=>$sample_code));
+
+						//SMS: Referred Back to RO
+						$this->DmiMmrSmsTemplates->sendMessage($sms_id,$customer_id,$sample_code);
+
+						$message = 'Your Comment is successfully sent';
+						$message_theme = 'success';
+
+						if ($to_user == 'ho') {
+							$redirect_to = '../othermodules/misgrading_home';
+						} else {
+							$redirect_to = '../othermodules/referred_to_head_office';
+						}
+						
+						
+					}
+				}
+			
+			}else{
+
+				$message = 'Sorry.. User not selected or Comment box is blank';
+				$message_theme = 'failed';
+				if ($current_level == 'level_3') {
+					$redirect_to = '../othermodules/misgrading_home';
+				} else {
+					$redirect_to = '../othermodules/referred_to_head_office';
+				}
+			}
+		}
+
+		
+		$this->set(compact('firmDetails','category','sub_commodity_value'));
+		$this->set(compact('misgradeCategory','levelName','actionName','is_showcause','scn_pdf'));
+		$this->set(compact('message','message_theme','redirect_to'));
+	
+	}
+
+
 
 }
 
