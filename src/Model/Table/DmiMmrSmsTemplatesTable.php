@@ -13,9 +13,9 @@ use Cake\Utility\Text;
 
 class DmiMmrSmsTemplatesTable extends Table{
 
-	var $name = "DmiMmrSmsTemplatesTable";
+	var $name = "DmiMmrSmsTemplates";
 
-	public function sendMessage($message_id, $customer_id) {
+	public function sendMessage($message_id, $customer_id, $sample_code) {
 	
 		$DmiCustomers = TableRegistry::getTableLocator()->get('DmiCustomers');
 		$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
@@ -104,7 +104,7 @@ class DmiMmrSmsTemplatesTable extends Table{
 			if (in_array(1,$destination_array)) {
 
 				$DmiMmrAllocations = TableRegistry::getTableLocator()->get('DmiMmrAllocations');
-				$find_allocated_mo = $DmiMmrAllocations->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'level_3 IS'=>$ro_email_id),'order' => array('id' => 'desc')))->first();
+				$find_allocated_mo = $DmiMmrAllocations->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, 'sample_code IS'=>$sample_code, 'level_3 IS'=>$ro_email_id),'order' => array('id' => 'desc')))->first();
 				$mo_email_id = $find_allocated_mo['level_1'];
 
 				//check if MO is allocated or not //added on 04-10-2017
@@ -257,11 +257,12 @@ class DmiMmrSmsTemplatesTable extends Table{
 
 			$template_id = $find_message_record['template_id'];//added on 12-05-2021 by Amol, new field
 
+			
 			//replacing dynamic values in the email message
-			$sms_message = $this->replaceDynamicValuesFromMessage($customer_id,$sms_message);
-
+			$sms_message = $this->replaceDynamicValuesFromMessage($sms_message,$customer_id,$sample_code);
+			
 			//replacing dynamic values in the email message
-			$email_message = $this->replaceDynamicValuesFromMessage($customer_id,$email_message);
+			$email_message = $this->replaceDynamicValuesFromMessage($sms_message,$customer_id,$sample_code);
 			
 
 
@@ -390,7 +391,7 @@ class DmiMmrSmsTemplatesTable extends Table{
 
 
 	//this function is created on 08-07-2017 by Amol to replace dynamic values in message
-	public function replaceDynamicValuesFromMessage($customer_id,$message) {
+	public function replaceDynamicValuesFromMessage($message,$customer_id,$sample_code) {
 
 		//getting count before execution
 		$total_occurrences = substr_count($message,"%%");
@@ -403,187 +404,173 @@ class DmiMmrSmsTemplatesTable extends Table{
 
 				switch ($matches[1]) {
 
-					case "submission_date":
-
-						$message = str_replace("%%submission_date%%",(string) $this->getReplaceDynamicValues('submission_date',$customer_id),$message);
-						break;
-
 					case "firm_name":
 
-						$message = str_replace("%%firm_name%%",(string) $this->getReplaceDynamicValues('firm_name',$customer_id),$message);
+						$message = str_replace("%%firm_name%%",(string) $this->getReplaceDynamicValues('firm_name',$customer_id,$sample_code),$message);
 						break;
 
 					case "commodities":
 
-						$message = str_replace("%%commodities%%",(string) $this->getReplaceDynamicValues('commodities',$customer_id),$message);
+						$message = str_replace("%%commodities%%",(string) $this->getReplaceDynamicValues('commodities',$customer_id,$sample_code),$message);
 						break;
 
 					case "applicant_name":
 
-						$message = str_replace("%%applicant_name%%",(string) $this->getReplaceDynamicValues('applicant_name',$customer_id),$message);
+						$message = str_replace("%%applicant_name%%",(string) $this->getReplaceDynamicValues('applicant_name',$customer_id,$sample_code),$message);
 						break;
 
 					case "applicant_mobile_no":
 
-						$message = str_replace("%%applicant_mobile_no%%",(string) $this->getReplaceDynamicValues('applicant_mobile_no',$customer_id),$message);
+						$message = str_replace("%%applicant_mobile_no%%",(string) $this->getReplaceDynamicValues('applicant_mobile_no',$customer_id,$sample_code),$message);
 						break;
 
 					case "company_id":
 
-						$message = str_replace("%%company_id%%",(string) $this->getReplaceDynamicValues('company_id',$customer_id),$message);
+						$message = str_replace("%%company_id%%",(string) $this->getReplaceDynamicValues('company_id',$customer_id,$sample_code),$message);
 						break;
 
-					case "certificate_valid_upto":
-
-						$message = str_replace("%%certificate_valid_upto%%",(string) $this->getReplaceDynamicValues('certificate_valid_upto',$customer_id),$message);
-						break;
 
 					case "premises_id":
 
-						$message = str_replace("%%premises_id%%",(string) $customer_id,$message);
+						$message = str_replace("%%premises_id%%",(string) $this->getReplaceDynamicValues('premises_id',$customer_id,$sample_code),$message);
 						break;
 
 					case "firm_email":
 
-						$message = str_replace("%%firm_email%%",(string) $this->getReplaceDynamicValues('firm_email',$customer_id),$message);
-						break;
-
-					case "firm_certification_type":
-
-						$message = str_replace("%%firm_certification_type%%",(string) $this->getReplaceDynamicValues('firm_certification_type',$customer_id),$message);
+						$message = str_replace("%%firm_email%%",(string) $this->getReplaceDynamicValues('firm_email',$customer_id,$sample_code),$message);
 						break;
 
 					case "ro_name":
 
-						$message = str_replace("%%ro_name%%",(string) $this->getReplaceDynamicValues('ro_name',$customer_id),$message);
+						$message = str_replace("%%ro_name%%",(string) $this->getReplaceDynamicValues('ro_name',$customer_id,$sample_code),$message);
 						break;
 
 					case "ro_mobile_no":
 
-						$message = str_replace("%%ro_mobile_no%%",(string) $this->getReplaceDynamicValues('ro_mobile_no',$customer_id),$message); 
+						$message = str_replace("%%ro_mobile_no%%",(string) $this->getReplaceDynamicValues('ro_mobile_no',$customer_id,$sample_code),$message);
 						break;
 
 					case "ro_office":
 
-						$message = str_replace("%%ro_office%%",(string) $this->getReplaceDynamicValues('ro_office',$customer_id),$message);
+						$message = str_replace("%%ro_office%%",(string) $this->getReplaceDynamicValues('ro_office',$customer_id,$sample_code),$message);
 						break;
 
 					case "ro_email_id":
 
-						$message = str_replace("%%ro_email_id%%",(string) $this->getReplaceDynamicValues('ro_email_id',$customer_id),$message);
+						$message = str_replace("%%ro_email_id%%",(string) $this->getReplaceDynamicValues('ro_email_id',$customer_id,$sample_code),$message);
 						break;
 
 					case "mo_name":
 
-						$message = str_replace("%%mo_name%%",(string) $this->getReplaceDynamicValues('mo_name',$customer_id),$message);
+						$message = str_replace("%%mo_name%%",(string) $this->getReplaceDynamicValues('mo_name',$customer_id,$sample_code),$message);
 						break;
 
 					case "mo_mobile_no":
 
-						$message = str_replace("%%mo_mobile_no%%",(string) $this->getReplaceDynamicValues('mo_mobile_no',$customer_id),$message);
+						$message = str_replace("%%mo_mobile_no%%",(string) $this->getReplaceDynamicValues('mo_mobile_no',$customer_id,$sample_code),$message);
 						break;
 
 					case "mo_office":
 
-						$message = str_replace("%%mo_office%%",(string) $this->getReplaceDynamicValues('mo_office',$customer_id),$message);
+						$message = str_replace("%%mo_office%%",(string) $this->getReplaceDynamicValues('mo_office',$customer_id,$sample_code),$message);
 						break;
 
 					case "mo_email_id":
 
-						$message = str_replace("%%mo_email_id%%",(string) $this->getReplaceDynamicValues('mo_email_id',$customer_id),$message);
+						$message = str_replace("%%mo_email_id%%",(string) $this->getReplaceDynamicValues('mo_email_id',$customer_id,$sample_code),$message);
 						break;
 
 				
 					case "dyama_name":
 
-						$message = str_replace("%%dyama_name%%",(string) $this->getReplaceDynamicValues('dyama_name',$customer_id),$message);
+						$message = str_replace("%%dyama_name%%",(string) $this->getReplaceDynamicValues('dyama_name',$customer_id,$sample_code),$message);
 						break;
 
 					case "dyama_mobile_no":
 
-						$message = str_replace("%%dyama_mobile_no%%",(string) $this->getReplaceDynamicValues('dyama_mobile_no',$customer_id),$message);
+						$message = str_replace("%%dyama_mobile_no%%",(string) $this->getReplaceDynamicValues('dyama_mobile_no',$customer_id,$sample_code),$message);
 						break;
 
 					case "dyama_email_id":
 
-						$message = str_replace("%%dyama_email_id%%",(string) $this->getReplaceDynamicValues('dyama_email_id',$customer_id),$message);
+						$message = str_replace("%%dyama_email_id%%",(string) $this->getReplaceDynamicValues('dyama_email_id',$customer_id,$sample_code),$message);
 						break;
 
 					case "jtama_name":
 
-						$message = str_replace("%%jtama_name%%",(string) $this->getReplaceDynamicValues('jtama_name',$customer_id),$message);
+						$message = str_replace("%%jtama_name%%",(string) $this->getReplaceDynamicValues('jtama_name',$customer_id,$sample_code),$message);
 						break;
 
 					case "jtama_mobile_no":
 
-						$message = str_replace("%%jtama_mobile_no%%",(string) $this->getReplaceDynamicValues('jtama_mobile_no',$customer_id),$message);
+						$message = str_replace("%%jtama_mobile_no%%",(string) $this->getReplaceDynamicValues('jtama_mobile_no',$customer_id,$sample_code),$message);
 						break;
 
 					case "jtama_email_id":
 
-						$message = str_replace("%%jtama_email_id%%",(string) $this->getReplaceDynamicValues('jtama_email_id',$customer_id),$message);
+						$message = str_replace("%%jtama_email_id%%",(string) $this->getReplaceDynamicValues('jtama_email_id',$customer_id,$sample_code),$message);
 						break;
 
 					case "ama_name":
 
-						$message = str_replace("%%ama_name%%",(string) $this->getReplaceDynamicValues('ama_name',$customer_id),$message);
+						$message = str_replace("%%ama_name%%",(string) $this->getReplaceDynamicValues('ama_name',$customer_id,$sample_code),$message);
 						break;
 
 					case "ama_mobile_no":
 
-						$message = str_replace("%%ama_mobile_no%%",(string) $this->getReplaceDynamicValues('ama_mobile_no',$customer_id),$message);
+						$message = str_replace("%%ama_mobile_no%%",(string) $this->getReplaceDynamicValues('ama_mobile_no',$customer_id,$sample_code),$message);
 						break;
 
 					case "ama_email_id":
 
-						$message = str_replace("%%ama_email_id%%",(string) $this->getReplaceDynamicValues('ama_email_id',$customer_id),$message);
+						$message = str_replace("%%ama_email_id%%",(string) $this->getReplaceDynamicValues('ama_email_id',$customer_id,$sample_code),$message);
 						break;
 
 				
 					case "applicant_email":
 
-						$message = str_replace("%%applicant_email%%",(string) $this->getReplaceDynamicValues('applicant_email',$customer_id),$message);
+						$message = str_replace("%%applicant_email%%",(string) $this->getReplaceDynamicValues('applicant_email',$customer_id,$sample_code),$message);
 						break;
 
 
 					case "ho_mo_name":
 
-						$message = str_replace("%%ho_mo_name%%",(string) $this->getReplaceDynamicValues('ho_mo_name',$customer_id),$message);
+						$message = str_replace("%%ho_mo_name%%",(string) $this->getReplaceDynamicValues('ho_mo_name',$customer_id,$sample_code),$message);
 						break;
 
 					case "ho_mo_mobile_no":
 
-						$message = str_replace("%%ho_mo_mobile_no%%",(string) $this->getReplaceDynamicValues('ho_mo_mobile_no',$customer_id),$message);
+						$message = str_replace("%%ho_mo_mobile_no%%",(string) $this->getReplaceDynamicValues('ho_mo_mobile_no',$customer_id,$sample_code),$message);
 						break;
 
 					case "ho_mo_email_id":
 
-						$message = str_replace("%%ho_mo_email_id%%", (string) $this->getReplaceDynamicValues('ho_mo_email_id',$customer_id),$message);
+						$message = str_replace("%%ho_mo_email_id%%",(string) $this->getReplaceDynamicValues('ho_mo_email_id',$customer_id,$sample_code),$message);
 						break;
 
 					case "sample_code":
 
-						$message = str_replace("%%sample_code%%", (string) $this->getReplaceDynamicValues('sample_code',$customer_id),$message);
+						$message = str_replace("%%sample_code%%",(string) $this->getReplaceDynamicValues('sample_code',$customer_id,$sample_code),$message);
 						break;
 						
 					case "scn_date":
 
-						$message = str_replace("%%scn_date%%", (string) $this->getReplaceDynamicValues('scn_date',$customer_id),$message);
+						$message = str_replace("%%scn_date%%",(string) $this->getReplaceDynamicValues('scn_date',$customer_id,$sample_code),$message);
 						break;
 
 					case "suspended_date":
 
-						$message = str_replace("%%suspended_date%%", (string) $this->getReplaceDynamicValues('suspended_date',$customer_id),$message);
+						$message = str_replace("%%suspended_date%%",(string) $this->getReplaceDynamicValues('suspended_date',$customer_id,$sample_code),$message);
 						break;
 
 					case "time_period":
 
-						$message = str_replace("%%time_period%%", (string) $this->getReplaceDynamicValues('time_period',$customer_id),$message);
+						$message = str_replace("%%time_period%%",(string) $this->getReplaceDynamicValues('time_period',$customer_id,$sample_code),$message);
 						break;
 
 					case "cancelled_date":
 
-						$message = str_replace("%%cancelled_date%%", (string) $this->getReplaceDynamicValues('cancelled_date',$customer_id),$message);
+						$message = str_replace("%%cancelled_date%%",(string) $this->getReplaceDynamicValues('cancelled_date',$customer_id,$sample_code),$message);
 						break;
 	
 					default:
@@ -611,10 +598,10 @@ class DmiMmrSmsTemplatesTable extends Table{
 
 	// This function find and return the value of replace variable value that are used in sms/email message templete
 	// Created By Pravin on 24-08-2017
-	public function getReplaceDynamicValues($replace_variable_value,$customer_id){
+	public function getReplaceDynamicValues($replace_variable_value,$customer_id,$sample_code){
 
+		
 		//Load Models
-	
 		$CustomersController = new CustomersController;
 
 		//Firm Type
@@ -692,7 +679,7 @@ class DmiMmrSmsTemplatesTable extends Table{
 
 
             $DmiMmrAllocations = TableRegistry::getTableLocator()->get('DmiMmrAllocations');
-            $find_allocated_mo = $DmiMmrAllocations->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'level_3 IS'=>$ro_email_id),'order' => array('id' => 'desc')))->first();
+            $find_allocated_mo = $DmiMmrAllocations->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'sample_code' => $sample_code,'level_3 IS'=>$ro_email_id),'order' => array('id' => 'desc')))->first();
 
             if (!empty($find_allocated_mo)) {	
 
@@ -710,7 +697,7 @@ class DmiMmrSmsTemplatesTable extends Table{
 				
 
             //Get ho_mo_details (Done by pravin 23-07-2018)
-            $find_allocated_ho_mo = $DmiMmrHoAllocations->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, 'dy_ama IS'=>$dy_ama_email_id),'order' => array('id' => 'desc')))->first();
+            $find_allocated_ho_mo = $DmiMmrHoAllocations->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'sample_code'=> $sample_code,'dy_ama IS'=>$dy_ama_email_id),'order' => array('id' => 'desc')))->first();
 
             if (!empty($find_allocated_ho_mo)) {
 
@@ -728,8 +715,8 @@ class DmiMmrSmsTemplatesTable extends Table{
 
             }
 
-			$details =	$DmiMmrFinalSubmits->find()->where(['customer_id' => $customer_id])->order('id DESC')->first();
-		
+			$details =	$DmiMmrFinalSubmits->find()->where(['customer_id' => $customer_id,'sample_code'=>$sample_code])->order('id DESC')->first();
+			
 			//sample code
 			$sample_code = $details['sample_code'];
 

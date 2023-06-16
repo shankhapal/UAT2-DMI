@@ -161,8 +161,11 @@
 			});
 		});
 
+
+
 		//for scrutiny allocation
 		$(document).on('click', '#scrutiny_allocate_btn', function(event) {
+
 			event.preventDefault(); 
 			
 			var sample_code = $("#sample_code").val();
@@ -185,12 +188,13 @@
 					$(".loader").hide();
 					$(".loadermsg").hide();
 					$("#scrutiny_alloction_Modal").hide();
-					var allocation_to = data.match(/~([^']+)~/)[1];
 
+					var responseObject = JSON.parse(data.replace(/~/g, ''));
+					
 					$.alert({
 						icon: "fas fa-exclamation-circle",
 						columnClass: 'm',
-						content: "The Sample Code / Report " + sample_code + " was successfully allocated for scrutiny to Scrutiny Officer. " + allocation_to + "",
+						content: "The Sample Code / Report Code " + sample_code + " has been successfully allocated to Scrutinizer	: " + responseObject.mo_name +" ("+responseObject.mo_email+")",
 						onClose: function(){
 							window.location.href = '../misgrading/report_listing_for_allocation';
 						}
@@ -392,8 +396,6 @@
 			success: function(response) {
 
 				var responseObject = JSON.parse(response.replace(/~/g, ''));
-				console.log(responseObject);
-				// Assuming you have a div element with the id "firm_details"
 				var responseDiv = document.getElementById("firm_details");
 
 				var htmlContent = 

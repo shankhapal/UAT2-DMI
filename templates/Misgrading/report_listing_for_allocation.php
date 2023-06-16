@@ -1,11 +1,11 @@
 <div class="content-header">
 	<div class="container-fluid">
 		<div class="row mb-2">
-			<div class="col-sm-6"><?php echo $this->Html->link('Back', array('controller' => 'dashboard', 'action'=>'home'),array('class'=>'add_btn btn btn-secondary')); ?></div>
+			<div class="col-sm-6"><span class="badge badge-success">Management of Misgrading</span></div>
 			<div class="col-sm-6">
 				<ol class="breadcrumb float-sm-right">
 					<li class="breadcrumb-item"><?php echo $this->Html->link('Dashboard', array('controller' => 'dashboard', 'action'=>'home')); ?></li>
-					<li class="breadcrumb-item active">Finalized Test Reports</li>
+					<li class="breadcrumb-item active">Final LIMS Reports</li>
 				</ol>
 			</div>
 		</div>

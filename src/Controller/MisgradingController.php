@@ -172,9 +172,7 @@ class MisgradingController extends AppController{
 
 		
 		$this->loadModel('DmiUserRoles'); 
-		$this->loadModel('DmiSmsEmailTemplates'); 
 		
-		$sample_code = $this->Session->read('sample_code');
 	
 		if(isset($_SESSION['current_level'])){ 
 			if ($_SESSION['current_level'] == 'level_1') {
@@ -283,7 +281,7 @@ class MisgradingController extends AppController{
 			if($this->DmiMmrFinalSubmits->saveData($this->request->getData())){
 
 				//SMS: Sample Attached
-				$this->DmiMmrSmsTemplates->sendMessage(5,$this->request->getData('packers_id'));
+				$this->DmiMmrSmsTemplates->sendMessage(5,$this->request->getData('packers_id'),$sample_code);
 
 				$message_theme = 'success';
 				$message = 
@@ -352,7 +350,7 @@ class MisgradingController extends AppController{
 						
 
 						//SMS: Communication
-						$this->DmiMmrSmsTemplates->sendMessage($sms_id,$customer_id);
+						$this->DmiMmrSmsTemplates->sendMessage($sms_id,$customer_id,$sample_code);
 						
 
 
@@ -392,7 +390,7 @@ class MisgradingController extends AppController{
 				$this->Customfunctions->saveActionPoint('Report Scrutinized', 'Success');
 
 				//SMS: Communication
-				$this->DmiMmrSmsTemplates->sendMessage(6,$customer_id);
+				$this->DmiMmrSmsTemplates->sendMessage(6,$customer_id,$sample_code);
 
 				$message = "Report is scrutinized and verified successfully";
 				$message_theme = "success";
@@ -1648,10 +1646,16 @@ class MisgradingController extends AppController{
 		}
 			
 		#SMS: MMR Report Allocation
-		$this->DmiMmrSmsTemplates->sendMessage(1,$customer_id);
-		$this->DmiMmrSmsTemplates->sendMessage(2,$customer_id);
+		$this->DmiMmrSmsTemplates->sendMessage(1,$customer_id,$sample_code);
+		$this->DmiMmrSmsTemplates->sendMessage(2,$customer_id,$sample_code);
 
-		echo '~'. $get_user_id['f_name']." ".$get_user_id['l_name']. '~';
+		$mo_array = [
+			'mo_name' => $user_details['f_name']." ".$user_details['l_name'],
+			'mo_email' => base64_decode($user_details['email'])
+		];
+	
+		echo '~' . json_encode($mo_array) . '~';
+		
 		exit;
 
 	}
@@ -1694,16 +1698,20 @@ class MisgradingController extends AppController{
 		$allocationDetails = $this->DmiMmrAllocations
 		->find()
 		->select([
-			'customer_id','DmiMmrAllocations.id','sample_code','current_level','created','modified',
-			'level_1','level_3','available_to','DmiUsers.f_name','DmiUsers.l_name','SampleInward.report_status'
+			'customer_id', 'DmiMmrAllocations.id', 'sample_code', 'current_level', 'created', 'modified',
+			'level_1', 'level_3', 'available_to', 'DmiUsers.f_name', 'DmiUsers.l_name','DmiUsers.email', 'SampleInward.report_status',
+			'MCommodity.commodity_name', 'DmiFirms.firm_name','DmiFirms.email','DmiRoOffices.ro_office','DmiRoOffices.office_type'
 		])
-		->distinct(['customer_id'])
-		->order(['customer_id', 'DmiMmrAllocations.id DESC']) // Specify the table alias for id column
-		->leftJoin(['DmiUsers' => 'dmi_users'],['DmiUsers.email = DmiMmrAllocations.level_3'])
-		->leftJoin(['SampleInward' => 'sample_inward'],['SampleInward.org_sample_code = DmiMmrAllocations.sample_code'])
+		->distinct(['DmiMmrAllocations.customer_id'])
+		->order(['DmiMmrAllocations.customer_id', 'DmiMmrAllocations.id DESC'])
+		->leftJoin(['DmiUsers' => 'dmi_users'], ['DmiUsers.email = DmiMmrAllocations.level_3'])
+		->leftJoin(['SampleInward' => 'sample_inward'], ['SampleInward.org_sample_code = DmiMmrAllocations.sample_code'])
+		->leftJoin(['MCommodity' => 'm_commodity'], ['MCommodity.commodity_code = SampleInward.commodity_code'])
+		->leftJoin(['DmiFirms' => 'dmi_firms'], ['DmiFirms.customer_id = DmiMmrAllocations.customer_id'])
+		->leftJoin(['DmiRoOffices' => 'dmi_ro_offices'], ['DmiRoOffices.id = DmiUsers.posted_ro_office'])
 		->where(['level_1' => $this->Session->read('username')])
 		->toArray();
-	
+			//pr($allocationDetails); exit;
 		$this->set('allocationDetails',$allocationDetails);
 		
 	}

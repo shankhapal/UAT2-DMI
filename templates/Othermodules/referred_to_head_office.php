@@ -64,14 +64,14 @@
 													if ($each['available_to'] == 'ho') {
 														echo $this->Html->link(
 															'',
-															['controller' => 'Othermodules', 'action' => 'communicationWithHeadOffice', '?' => ['id' => $each['id'], 'customer_id' => $each['customer_id'],'current_level' => 'level_4','mode' => 'edit']],
+															['controller' => 'Othermodules', 'action' => 'communicationWithHeadOffice', '?' => ['id' => $each['id'], 'customer_id' => $each['customer_id'], 'sample_code' => $each['sample_code'],'current_level' => 'level_4','mode' => 'edit']],
 															['class' => 'fas fa-long-arrow-alt-right', 'title' => 'Edit']
 														); 
 														
 													}else{
 														echo $this->Html->link(
 															'',
-															['controller' => 'Othermodules', 'action' => 'communicationWithHeadOffice', '?' => ['id' => $each['id'], 'customer_id' => $each['customer_id'],'current_level' => 'level_4','mode' => 'view']],
+															['controller' => 'Othermodules', 'action' => 'communicationWithHeadOffice', '?' => ['id' => $each['id'], 'customer_id' => $each['customer_id'], 'sample_code' => $each['sample_code'],'current_level' => 'level_4','mode' => 'view']],
 															['class' => 'fas fa-eye', 'title' => 'View']
 														); 
 													}

@@ -3848,7 +3848,8 @@ class ApplicationformspdfsController extends AppController{
 			'date'=>date('Y-m-d H:i:s'),
 			'pdf_version'=>$current_pdf_version,
 			'created'=>date('Y-m-d H:i:s'),
-			'modified'=>date('Y-m-d H:i:s')	
+			'modified'=>date('Y-m-d H:i:s'),
+			'sample_code'=>$_SESSION['sample_code']
 		));
 
 		$this->DmiMmrShowcauseNoticePdfs->save($showcauseNoticeEntity);

@@ -100,8 +100,8 @@ class DmiMmrActionFinalSubmitsTable extends Table{
 					if ($savetheHoAllocation == true) {
 
 						$DmiMmrSmsTemplates = TableRegistry::getTableLocator()->get('DmiMmrSmsTemplates');
-						$DmiMmrSmsTemplates->sendMessage(16,$_SESSION['firm_id']);
-						$DmiMmrSmsTemplates->sendMessage(17,$_SESSION['firm_id']);
+						$DmiMmrSmsTemplates->sendMessage(16,$_SESSION['firm_id'],$_SESSION['sample_code']);
+						$DmiMmrSmsTemplates->sendMessage(17,$_SESSION['firm_id'],$_SESSION['sample_code']);
 						$final_action = 'Refer';
 					}
 		

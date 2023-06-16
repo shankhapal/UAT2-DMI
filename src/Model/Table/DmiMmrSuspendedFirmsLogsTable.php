@@ -21,7 +21,8 @@ class DmiMmrSuspendedFirmsLogsTable extends Table{
 			'user_email_id'=>$_SESSION['username'],
 			'pdf_file'=>$newpath,
 			'date'=>date('Y-m-d H:i:s'),
-			'pdf_version'=>$pdfversion
+			'pdf_version'=>$pdfversion,
+			'sample_code'=>$_SESSION['sample_code']
 		));
 
 		if($this->save($dataArray)){

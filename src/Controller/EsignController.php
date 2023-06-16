@@ -915,9 +915,9 @@ public function renewalRequestReEsign(){
 			if ($this->Session->check('for_module')) {
 				
 				$this->loadModel('DmiMmrSmsTemplates');
-				$this->DmiMmrSmsTemplates->sendMessage(11,$customer_id);	#RO - Action Taken
-				$this->DmiMmrSmsTemplates->sendMessage($sms_id_ro,$customer_id); #RO - Which Action
-				$this->DmiMmrSmsTemplates->sendMessage($sms_id_for_firm,$customer_id); #Applicant
+				$this->DmiMmrSmsTemplates->sendMessage(11,$customer_id,$_SESSION['sample_code']);	#RO - Action Taken
+				$this->DmiMmrSmsTemplates->sendMessage($sms_id_ro,$customer_id,$_SESSION['sample_code']); #RO - Which Action
+				$this->DmiMmrSmsTemplates->sendMessage($sms_id_for_firm,$customer_id,$_SESSION['sample_code']); #Applicant
 			}
 			
 			$this->redirect($url_to_redirect);//updated on 31-05-2021 for Form Based Esign method by Amol

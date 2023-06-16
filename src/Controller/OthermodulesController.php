@@ -1323,7 +1323,7 @@ class OthermodulesController extends AppController{
 	// @AUTHOR : PRAVIN BHAKARE
 	// @CONTRIBUTER : AKASH THAKRE (migration)
 	// DATE : 25-02-2021
-		
+
 	public function applicantDetails() {
 
 		$this->viewBuilder()->setLayout('admin_dashboard');
@@ -1816,8 +1816,8 @@ class OthermodulesController extends AppController{
 
 											/***###|Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports|###***/
 
-	// Misgrading Home
-	// DESCRIPTION : 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
+	// DESCRIPTION : This method is for the manageing all the actions for the firms 
 	// A/C  : AKASH THAKRE
 	// DATE : 09-12-2022
 	// For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
@@ -1855,6 +1855,7 @@ class OthermodulesController extends AppController{
 		$underThisOffice = array();
 
 		foreach ($districtlist as $each) {
+
 			$firmDetails = $conn->execute("SELECT dmfs.id, dmfs.sample_code, dmfs.customer_id, df.firm_name, df.email, df.mobile_no, mc.commodity_name
 				FROM dmi_mmr_final_submits AS dmfs 
 				INNER JOIN dmi_firms as df ON df.customer_id = dmfs.customer_id
@@ -1914,15 +1915,13 @@ class OthermodulesController extends AppController{
 				$each['showcause_table_id'] = $showcause_status ? $showcause_status->id : null;
 
 				//See the Status of refer to ho
-				$ho_stats = $this->DmiMmrActionFinalSubmits->find()->select(['available_to'])->where(['customer_id' => $customer_id])->order(['id' => 'DESC'])->first();
+				$ho_stats = $this->DmiMmrActionFinalSubmits->find()->select(['available_to'])->where(['customer_id' => $customer_id,'sample_code IS' => $each['sample_code']])->order(['id' => 'DESC'])->first();
 				$each['ho_stats'] = $ho_stats ? $ho_stats->available_to : null;
 				
 				//See if the action is submitted
-				$action_taken = $this->DmiMmrActionFinalSubmits->find()->where(['customer_id' => $customer_id])->order(['id' => 'DESC'])->first();
+				$action_taken = $this->DmiMmrActionFinalSubmits->find()->where(['customer_id' => $customer_id,'sample_code IS' => $each['sample_code']])->order(['id' => 'DESC'])->first();
 				$each['action_final_submit_status'] = $action_taken ? $action_taken->status : null;
 
-				
-				
 				// Add the record to the filtered array
 				$filteredRecords[] = $each;
 			
@@ -1938,12 +1937,18 @@ class OthermodulesController extends AppController{
 		foreach ($underThisOffice as $subarray) {
 
 			foreach ($subarray as $each) {
+
 				$customer_id = $each['customer_id'];
-				$action_taken = $this->DmiMmrActionFinalSubmits->find()->where(['customer_id' => $customer_id,'status' => 'action_taken'])->order(['id DESC'])->first();
+				$sample_code = $each['sample_code'];
+
+				$action_taken = $this->DmiMmrActionFinalSubmits->find()->where(['customer_id' => $customer_id,'sample_code'=>$sample_code,'status' => 'action_taken'])->order(['id DESC'])->first();
 				if (!empty($action_taken)) {
+
 					$firm = $this->DmiFirms->find()->select(['firm_name'])->where(['customer_id' => $customer_id])->first();
 					$period = $this->DmiMmrTimePeriod->getTimePeriod($action_taken->time_period);
+					
 					$actionTaken[] = [
+
 						'customer_id' => $customer_id,
 						'status' => $action_taken->status,
 						'showcause' => $action_taken->showcause,
@@ -1964,7 +1969,9 @@ class OthermodulesController extends AppController{
 
 	}
 
-	// Suspension Home
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
 	// DESCRIPTION : 
 	// AUTHOR : AKASH THAKRE
 	// DATE : 09-12-2022
@@ -1980,8 +1987,8 @@ class OthermodulesController extends AppController{
 
 
 
-	// Suspension Home
-	// DESCRIPTION : 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
+	// DESCRIPTION : This is for the fetching the id for the showcause notice
 	// AUTHOR : AKASH THAKRE
 	// DATE : 09-12-2022
 	// For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
@@ -1997,6 +2004,8 @@ class OthermodulesController extends AppController{
 		$this->redirect(array('controller'=>'othermodules','action'=>'showcause_home'));
 	}
 
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
 	public function fetchIdFromScnAppl() {
 
 	
@@ -2009,7 +2018,7 @@ class OthermodulesController extends AppController{
 	}
 
 
-
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
 	// DESCRIPTION : To show and redirect on the Misgrading Actions Home.
 	// AUTHOR : AKASH THAKRE
 	// DATE : 09-12-2022
@@ -2146,8 +2155,8 @@ class OthermodulesController extends AppController{
 	}
 
 
-	// Final Submit Actions
-	// DESCRIPTION : 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
+	// DESCRIPTION : This is the short function for final submitting the actions taken through AJAX
 	// AUTHOR : AKASH THAKRE
 	// DATE : 09-12-2022
 	// For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
@@ -2163,7 +2172,7 @@ class OthermodulesController extends AppController{
 		$savedDetails = $this->DmiMmrActionHomeLogs->getInformation($customer_id,$sample_code);
 		
 		//Showcause Details
-		$scnDetails = $this->DmiMmrShowcauseNoticePdfs->find()->where(['customer_id IS'=>$customer_id])->order('id DESC')->first();
+		$scnDetails = $this->DmiMmrShowcauseNoticePdfs->find()->where(['customer_id IS'=>$customer_id,'sample_code' => $sample_code])->order('id DESC')->first();
 		if (!empty($scnDetails)) {
 			$showcause = 'Yes';
 		}else{
@@ -2221,9 +2230,11 @@ class OthermodulesController extends AppController{
 		
 		exit;
 	}
+	
 
 
-	// DESCRIPTION : To show the suspension / cancellation home
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
+	// DESCRIPTION : To show the suspension / cancellation home with the details of actions final submitted 
 	// AUTHOR : AKASH THAKRE
 	// DATE : 09-12-2022
 	// For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
@@ -2249,6 +2260,7 @@ class OthermodulesController extends AppController{
 		$sample_code = $this->Session->read('sample_code');
 		$this->set('sample_code',$customer_id);
 
+		$username = $this->Session->read('username');
 		
 
 		if ($whichUser == 'applicant') {
@@ -2264,14 +2276,14 @@ class OthermodulesController extends AppController{
 
 		//Firm Details
 		$firmDetails = $this->DmiFirms->firmDetails($customer_id); 
-		$username = $this->Session->read('username');
+		
 
 		$category = $this->MCommodityCategory->getCategory($firmDetails['commodity']); 
 
 		$sub_comm_id = explode(',',(string) $firmDetails['sub_commodity']); #For Deprecations
 		$sub_commodity_value = $this->MCommodity->find('list',array('valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
 	
-		$statusofscn = $this->DmiMmrShowcauseLogs->getInformation($customer_id);
+		$statusofscn = $this->DmiMmrShowcauseLogs->getInformation($customer_id,$sample_code);
 		if (!empty($statusofscn)) {
 			$reason = $statusofscn['reason'];
 			$status = $statusofscn['status'];
@@ -2283,7 +2295,7 @@ class OthermodulesController extends AppController{
 		$this->set('statusofscn',$statusofscn);
 		
 
-		$mmrlogs = $this->DmiMmrFinalSubmits->find()->where(['sample_code IS' => $sample_code])->order('id DESC')->first();
+		$mmrlogs = $this->DmiMmrFinalSubmits->find()->where(['customer_id IS' => $customer_id,'sample_code IS' => $sample_code])->order('id DESC')->first();
 		$this->set('mmrlogs',$mmrlogs);
 
 		$sampleDetails = $this->SampleInward->find()->where(['org_sample_code' => $sample_code])->first();
@@ -2310,7 +2322,7 @@ class OthermodulesController extends AppController{
 		
 		$this->set('sampleArray',$sampleArray);
 
-		$scn_pdf = $this->DmiMmrShowcauseNoticePdfs->find()->select(['pdf_file'])->where(['customer_id' => $customer_id])->order('id DESC')->first();
+		$scn_pdf = $this->DmiMmrShowcauseNoticePdfs->find()->select(['pdf_file'])->where(['customer_id' => $customer_id,'sample_code'=>$sample_code])->order('id DESC')->first();
 		if (!empty($scn_pdf)) {
 			$scn_pdf_path = $scn_pdf['pdf_file'];
 		} else {
@@ -2355,7 +2367,7 @@ class OthermodulesController extends AppController{
 				if($this->DmiMmrShowcauseLogs->updateLog($postData) == 1){
 
 					//SMS: Communication
-					$this->DmiMmrSmsTemplates->sendMessage(8,$customer_id);
+					$this->DmiMmrSmsTemplates->sendMessage(8,$customer_id,$sample_code);
 
 					$message = 'Updated the details for Show Cause Notice Succesfully.';
 					$message_theme = 'success';
@@ -2380,7 +2392,7 @@ class OthermodulesController extends AppController{
 				if($result == 1){
 
 					//SMS: SCN Communication
-					$this->DmiMmrSmsTemplates->sendMessage(9,$customer_id);
+					$this->DmiMmrSmsTemplates->sendMessage(9,$customer_id,$sample_code);
 
 					$this->Customfunctions->saveActionPoint('Reffered Back Comment Sent', 'Success'); #Action
 					$message = "Comment on Showcause notice is sent to the Applicant successfully.";
@@ -2409,7 +2421,7 @@ class OthermodulesController extends AppController{
 				if($result == 1){
 
 					//SMS: SCN Communication
-					$this->DmiMmrSmsTemplates->sendMessage(10,$customer_id);
+					$this->DmiMmrSmsTemplates->sendMessage(10,$customer_id,$sample_code);
 
 					$this->Customfunctions->saveActionPoint('Reffered Back Comment Saved', 'Success'); #Action
 					$message = "Comment on Showcause notice is sent to the agmark successfully.";
@@ -2438,8 +2450,8 @@ class OthermodulesController extends AppController{
 	}
 
 
-
-	// Description : To sent the final showcause notice to applicant.
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
+	// Description : To final submit and send the notice to the packer.
 	// AUTHOR : Akash Thakre
 	// DATE : 09-12-2022
 	// For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
@@ -2449,14 +2461,16 @@ class OthermodulesController extends AppController{
 		$this->autoRender = false;
 		//get ajax post data
 		$customer_id = $_POST['customer_id'];
-		$showCause = $this->DmiMmrShowcauseLogs->getInformation($customer_id);
+		$sample_code = $_POST['sample_code'];
+
+		$showCause = $this->DmiMmrShowcauseLogs->getInformation($customer_id,$sample_code);
 		$result =  $this->DmiMmrShowcauseLogs->sendFinalNotice($showCause); 
 		
 		if ($result == true) {
 
 			//SMS : Show Cause Notice Sent
-			$this->DmiMmrSmsTemplates->sendMessage(7,$customer_id); #RO
-			$this->DmiMmrSmsTemplates->sendMessage(8,$customer_id); #Applicant
+			$this->DmiMmrSmsTemplates->sendMessage(7,$customer_id,$sample_code); #RO
+			$this->DmiMmrSmsTemplates->sendMessage(8,$customer_id,$sample_code); #Applicant
 			echo '~done~';
 		}
 		
@@ -2465,6 +2479,7 @@ class OthermodulesController extends AppController{
 
 
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
 	//Description : To give the user an list of CAs to select for suspension of cancellation 
 	//Author : Akash Thakre
 	//Date : 24-04-2023
@@ -2534,6 +2549,12 @@ class OthermodulesController extends AppController{
 
 
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
+	//Description : Used to display the firm list on whom the action is taken by the agmark
+	//Author : Akash Thakre
+	//Date : 24-04-2023
+	//For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
+
 	public function listOfPackerActionTaken()
 	{
 		$conn = ConnectionManager::get('default');
@@ -2592,7 +2613,7 @@ class OthermodulesController extends AppController{
 
 	
 
-
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
 	//Description : To list the granted suspended firms
 	//Author : Akash Thakre
 	//Date : 09-06-2023
@@ -2600,9 +2621,6 @@ class OthermodulesController extends AppController{
 
 	public function listOfSuspendedFirms(){
 
-		//$this->DmiMmrSmsTemplates->sendMessage(11,'1556/1/KHI/001');	#RO - Action Taken
-		$this->DmiMmrSmsTemplates->sendMessage(12,'1556/1/KHI/001'); #RO - Which Action
-		$this->DmiMmrSmsTemplates->sendMessage(14,'1556/1/KHI/001'); #Applicant
 
 		$username = $this->Session->read('username');
 		$conn = ConnectionManager::get('default');
@@ -2656,8 +2674,8 @@ class OthermodulesController extends AppController{
 	}
 
 
-
-	//Description : To list the granted Cacnelled firms
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
+	//Description : To list the granted cancelled firms
 	//Author : Akash Thakre
 	//Date : 09-06-2023
 	//For: MMR
@@ -2717,6 +2735,12 @@ class OthermodulesController extends AppController{
 
 
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
+	//Description : To show the list of  firm to Dy. AMA for those firm are opted for the REFER TO HO action on Action Module
+	//Author : Akash Thakre
+	//Date : 09-06-2023
+	//For: MMR
+
 	public function referredToHeadOffice(){
 
 		//Get the applicant id refer to the head office
@@ -2750,6 +2774,13 @@ class OthermodulesController extends AppController{
 	}
 
 
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ Management of Misgrading]|
+	//Description : For communiaction between the RO and DY.AMA on Misgrading Report.
+	//Author : Akash Thakre
+	//Date : 09-06-2023
+	//For: MMR
+
 	public function communicationWithHeadOffice()
 	{	
 		//Blank Vairble set
@@ -2762,14 +2793,15 @@ class OthermodulesController extends AppController{
 		$customer_id = $this->request->getQuery('customer_id');
 		$current_level = $this->request->getQuery('current_level');
 		$mode = $this->request->getQuery('mode');
+		$sample_code = $this->request->getQuery('sample_code');
 
 		//Get the details
-		$actionDetails = $this->DmiMmrActionFinalSubmits->find()->where(['customer_id' => $customer_id])->order('id DESC')->first();
+		$actionDetails = $this->DmiMmrActionFinalSubmits->find()->where(['customer_id' => $customer_id,'sample_code'=>$sample_code])->order('id DESC')->first();
 		
 		//Check if show cause notice is sent
 		$is_showcause = $actionDetails['showcause'];
 		if ($is_showcause == 'Yes') {
-			$get_scn_pdf = $this->DmiMmrShowcauseNoticePdfs->find()->select(['pdf_file'])->where(['customer_id IS' => $customer_id])->order(['id DESC'])->first();
+			$get_scn_pdf = $this->DmiMmrShowcauseNoticePdfs->find()->select(['pdf_file'])->where(['customer_id IS' => $customer_id,'sample_code' => $sample_code])->order(['id DESC'])->first();
 			$scn_pdf = $get_scn_pdf->pdf_file;
 		} else {
 			$scn_pdf = null;
@@ -2810,7 +2842,7 @@ class OthermodulesController extends AppController{
 		$sub_commodity_value = $this->MCommodity->find('list',array('valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
 
 		// fetch comments history
-		$ho_comment_details = $this->DmiMmrHoComments->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'OR'=>array('comment_by IS'=>$this->Session->read('username'),'comment_to'=>$this->Session->read('username'))),'order'=>'id'))->toArray();
+		$ho_comment_details = $this->DmiMmrHoComments->find('all',array('conditions'=>array('sample_code IS'=>$sample_code,'OR'=>array('comment_by IS'=>$this->Session->read('username'),'comment_to'=>$this->Session->read('username'))),'order'=>'id'))->toArray();
 		$this->set('ho_comment_details',$ho_comment_details);
 		
 		//to send and save comment
@@ -2870,7 +2902,7 @@ class OthermodulesController extends AppController{
 						$this->DmiMmrActionFinalSubmits->updateAll(array('available_to' => "$to_user"),array('customer_id IS' => $customer_id,'sample_code'=>$sample_code));
 
 						//SMS: Referred Back to RO
-						$this->DmiMmrSmsTemplates->sendMessage($sms_id,$customer_id);
+						$this->DmiMmrSmsTemplates->sendMessage($sms_id,$customer_id,$sample_code);
 
 						$message = 'Your Comment is successfully sent';
 						$message_theme = 'success';

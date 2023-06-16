@@ -63,7 +63,7 @@
 							
 							echo $this->Html->link(
 								'', 
-								['controller' => 'othermodules', 'action'=>'communicationWithHeadOffice','?' => ['id' => $eachdata['id'], 'customer_id' => $eachdata['customer_id'],'current_level' => 'level_3','mode'=>'edit']],
+								['controller' => 'othermodules', 'action'=>'communicationWithHeadOffice','?' => ['id' => $eachdata['id'], 'customer_id' => $eachdata['customer_id'],'sample_code' => $eachdata['sample_code'],'current_level' => 'level_3','mode'=>'edit']],
 								['class'=>'fas far fa-eye','title' => 'View']
 							); 
 						}
@@ -71,7 +71,7 @@
 							
 							echo $this->Html->link(
 								'', 
-								['controller' => 'othermodules', 'action'=>'communicationWithHeadOffice','?' => ['id' => $eachdata['id'], 'customer_id' => $eachdata['customer_id'],'current_level' => 'level_3','mode'=>'view']],
+								['controller' => 'othermodules', 'action'=>'communicationWithHeadOffice','?' => ['id' => $eachdata['id'], 'customer_id' => $eachdata['customer_id'],'sample_code' => $eachdata['sample_code'],'current_level' => 'level_3','mode'=>'view']],
 								['class'=>'fas far fa-eye','title' => 'View']
 							);
 
