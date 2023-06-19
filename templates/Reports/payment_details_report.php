@@ -38,7 +38,19 @@
                     					<div class="form-group">
 											<!-- all lables are uncommented by shreeya-->
 											<label>Report For</label> 
-											<?php echo $this->form->input('report_for', array('type'=>'select', 'options'=>$report_for_array, 'label'=>false, 'id'=>'report_for', 'escape'=>false, 'class'=>'form-control form-control-sm')); ?>
+											<?php //print_r($report_for_array);exit;
+											//echo $this->form->input('report_for', array('type'=>'select', 'options'=>$report_for_array, 'label'=>false, 'id'=>'report_for', 'escape'=>false, 'class'=>'form-control form-control-sm')); ?>
+											<select  name ="report_for" class="form-control form-control-sm">
+											<option value=0>All</option>
+											
+											<?php foreach ($report_for_array as $key => $value) {
+												
+												echo '<option value='.$key.'>'.$value.' </option>';
+											}
+											
+											?>
+											</select>
+
 										</div>
 								  	</div>
 									<div class="col-sm-3" id="office_all">
@@ -122,12 +134,7 @@
         		<div class="col-md-12">
 					<div class="mx-5">
 						<?php ?> <span class="badge bg-light shadow">RESULT</span><i class="fas fa-chevron-right px-2 fs80"></i> <?php
-							if(!empty($application_type)) {
-							?>  <span class="badge rounded-pill bg-grad1 shadow">Application Type</span>
-									<i class="fas fa-caret-right"></i>
-									<span class="badge bg-grad2 mr-3 shadow"> <?php echo $all_application_type[$application_type];  $search_value = 'yes'; ?> </span>
-								<?php
-							}
+							 
 							if(!empty($ro_office)) {
 							?>  <span class="badge rounded-pill bg-grad1 shadow">RO Office</span>
 									<i class="fas fa-caret-right"></i>
@@ -190,80 +197,92 @@
 									</tr>
 								</thead>
 								<tbody class="">
-                	 <?php 
-										 	if(!empty($firms_details)) {  ?>
-											<!-- <tr>
-												<td colspan="6" class="table-heading bg-dark">New Application Payment Details</td>
-											</tr> -->
-										<?php for ($i=0; $i<sizeof($firms_details); $i++) { ?>
+                					 
+								<?php 
+								//add for each loop for show the array of all records by shreeya on [15-06-2023]
+								$k = 0;
+								$j = 0;
+								foreach ($flowwise_table_data as $eachflow) { 
+									if (!empty($firms_details[$j])) { 
+										?>
+										<!-- <tr>
+											<td colspan="6" class="table-heading bg-dark">New Application Payment Details</td>
+										</tr> -->
+									
+										<?php for ($i = 0; $i < sizeof($firms_details[$j]); $i++) { ?>
+
 											<tr id="table_row" class="row-hover border border-light">
-												<td><span class="badge title mb-1 borderless hover-border"><?php echo $i+1; ?></span></td>
-												<td><span class="badge title borderless"><?php $explode_date = explode(' ',$customer_payment_details[$i]['transaction_date']);
-													echo $explode_date[0]; ?></span></td>
+												<td><span class="badge title mb-1 borderless hover-border"><?php echo $k+1; ?></span></td>
+												<td><span class="badge title borderless"><?php $explode_date = explode(' ', $customer_payment_details[$j][$i]['transaction_date']);
+														echo $explode_date[0]; ?></span></td>
 												<td>
-													
+
 													<!-- commented by shreeya on date [13-06-2023]-->
 													<?php //echo $all_application_type[$firms_details[$i]['certification_type']]; ?>
 													<!-- added if else according to record null or not by shreeya on date [13-06-2023]-->
-													<?php if (!empty($all_application_type[$firms_details[$i]['certification_type']])) { ?>
+													<?php if (!empty($all_application_type[$firms_details[$j][$i]['certification_type']])) { ?>
 														<span class="badge subtitle borderless">
-															<?php echo $all_application_type[$firms_details[$i]['certification_type']];
-													} else { ?>
+															<?php echo $all_application_type[$firms_details[$j][$i]['certification_type']];
+														} else { ?>
 														</span>
 														<span class="badge subtitle borderless">
 															<?php echo '--';
-													} ?>
-													</span>
+														} ?>
+														</span>
 
 												</td>
-												<td><span class="badge title mb-1 borderless hover-border"><?php echo $apl_type_res[$i]['application_type']; ?></span></td>
+												<td><span class="badge title mb-1 borderless hover-border"><?php echo $apl_type_res[$j][$i]['application_type']; ?></span></td>
 												<td>
 													<!-- added if else according to record null or not by shreeya on date [13-06-2023]-->
-													<?php if (!empty($all_ro_office[$ro_id[$i]['ro_id']])) { ?>
+													<?php if (!empty($all_ro_office[$ro_id[$j][$i]['ro_id']])) { ?>
 														<span class="badge subtitle borderless">
-															<?php echo $all_ro_office[$ro_id[$i]['ro_id']];
-													} else { ?>
+															<?php echo $all_ro_office[$ro_id[$j][$i]['ro_id']];
+														} else { ?>
 														</span>
 														<span class="badge subtitle borderless">
 															<?php echo '--';
-													} ?>
-													</span>
-	
+														} ?>
+														</span>
+
 												</td>
 												<td class="text-right">
 
 													<!-- commented by shreeya on date [13-06-2023]-->
 													<!-- <span class="badge title borderless"><?php// echo $all_states[$firms_details[$i]['state']]; ?></span> -->
 													<!-- added if else according to record null or not by shreeya on date [13-06-2023]-->
-													<?php if (!empty($all_states[$firms_details[$i]['state']])) { ?>
+													<?php if (!empty($all_states[$firms_details[$j][$i]['state']])) { ?>
 														<span class="badge subtitle borderless">
-															<?php echo $all_states[$firms_details[$i]['state']];
-													} else { ?>
+															<?php echo $all_states[$firms_details[$j][$i]['state']];
+														} else { ?>
 														</span>
 														<span class="badge subtitle borderless">
 															<?php echo '--';
-													} ?>
-													</span>
+														} ?>
+														</span>
 
-													
+
 												</td>
 												<td>
 													<!-- commented by shreeya on date [13-06-2023]-->
 													<!-- <span class="badge subtitle borderless"><?php //echo $all_district[$firms_details[$i]['district']]; ?></span> -->
 													<!-- added if else according to record null or not by shreeya on date [13-06-2023]-->
-													<?php if (!empty($all_district[$firms_details[$i]['district']])) { ?>
+													<?php if (!empty($all_district[$firms_details[$j][$i]['district']])) { ?>
 														<span class="badge subtitle borderless">
-															<?php echo $all_district[$firms_details[$i]['district']];
-													} else { ?>
+															<?php echo $all_district[$firms_details[$j][$i]['district']];
+														} else { ?>
 														</span>
 														<span class="badge subtitle borderless">
 															<?php echo '--';
-													} ?>
-													</span>
+														} ?>
+														</span>
 												</td>
-												<td><span class="badge subtitle borderless"><?php echo number_format($customer_payment_details[$i]['amount_paid'],2); ?></span></td>
+												<td><span class="badge subtitle borderless"><?php echo number_format($customer_payment_details[$j][$i]['amount_paid'], 2); ?></span></td>
 											</tr>
-										<?php }} ?>
+										<?php $k++;}
+									}
+									$j++;
+								}
+								?>
 								</tbody>
 							</table>
 						</div>
@@ -293,6 +312,7 @@
 									<tbody>
 										
 											<?php
+												$report_for_array = []; // Initialize $report_for_array as an empty array
                         						$report_for_array_new = array_values($report_for_array);
 											
 												$arrlength = count($report_for_array_new);
@@ -354,8 +374,8 @@
 																	</td>
 															  </tr>
 															  <?php }elseif($report_for_array_new[$x] == "Change Request"){ ?>
-                                 <tr class="hidden">
-                                    <td>
+                                 									<tr class="hidden">
+                                    										<td>
 																			<table class="table table-bordered">
 																					<tr>
 																							<td><span class=""></span>Change Certificate of Authorisation Payment Total :</td>
@@ -378,19 +398,19 @@
 																	</td>
 															  </tr>
 															<?php }elseif($report_for_array_new[$x] == "Chemist Approval") {?>
-                                 <tr class="hidden">
-                                    <td>
+                                 							<tr class="hidden">
+                                    							<td>
 																			<table class="table table-bordered">
-											<tr>
+																				<tr>
 																							<td><span class=""></span>Chemist Approval Applications Payment Total : </td>
 																							<td><span class=""></span> <?php echo $change_ca_total; ?></td>
-											</tr>
+																				</tr>
 																			</table>    
 																	</td>
 															  </tr>
 															<?php }elseif($report_for_array_new[$x] == "Approval of FDC") {?>	
-                               <tr class="hidden">
-                                    <td>
+                               								<tr class="hidden">
+                                 							   <td>
 																			<table class="table table-bordered">
 																					<tr>
 																							<td><span class=""></span>Approval of 15 Digit Code Applications Payment Total :</td>
@@ -400,8 +420,8 @@
 																	</td>
 															  </tr>
 															<?php }elseif($report_for_array_new[$x] == "E-Code"){ ?>	
-                                <tr class="hidden">
-                                    <td>
+                                							<tr class="hidden">
+                                    							<td>
 																			<table class="table table-bordered">
 																					<tr>
 																							<td><span class=""></span>E-Code Applications Payment Total :</td>
@@ -411,8 +431,8 @@
 																	</td>
 															  </tr>
 															<?php }elseif($report_for_array_new[$x] == "Advance Payment"){ ?>
-                                <tr class="hidden">
-                                    <td>
+                                							<tr class="hidden">
+                                   							 <td>
 																			<table class="table table-bordered">
 																					<tr>
 																							<td><span class=""></span>Advance Payment Applications Payment Total :</td>
@@ -422,7 +442,7 @@
 																	</td>
 															  </tr>
 															<?php }elseif($report_for_array_new[$x] == "Approval of DP"){ ?>
-                              <tr class="hidden">
+                              	<tr class="hidden">
                                     <td>
 																			<table class="table table-bordered">
 																					<tr>

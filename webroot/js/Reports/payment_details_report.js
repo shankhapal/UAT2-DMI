@@ -46,7 +46,12 @@ $(document).ready(function () {
       alert("Invalid Date Range Selection");
       return false;
     }
-  });
+
+    window.location.href = '/showDistrictDropdown';
+});
+
+
+
 
   $("html, body").animate(
     {
@@ -56,6 +61,11 @@ $(document).ready(function () {
   );
 
   //added new js for click radio button in revenue reports by shankhpal shinde
+
+
+
+
+
   $('input[type="radio"]').click(function () {
     var inputValue = $(this).attr("value");
 
