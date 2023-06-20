@@ -38,7 +38,17 @@
 					<?php if ($appl_type != 'Renewal') { ?>
 						<th>Appl. | Pdf</th>
 						<th>Report. | Pdf</th>
-					<?php } else { ?>
+						<!-- added code/conditions to show btn to generate esigned cert. for old appl. OR show esigned certificate pdf link
+							on 20-06-2023 by Amol -->
+						<?php if($_SESSION['is_old']=='old') { ?>
+							<?php if(empty($checkAlreadyOldEsigned)){ ?>
+								<th>Action</th>
+							<?php }else{ ?>
+								<th>Esigned Cert. Pdf</th>
+							<?php } ?>
+						<?php } 
+					
+					} else { ?>
 						<th>Action</th>
 					<?php } ?>
 				</tr>
@@ -101,6 +111,26 @@
 										<!-- End Laxmi B. -->		   
 										
 								    </td>
+									
+									<!-- added code/conditions to show btn to generate esigned cert. for old appl. OR show esigned certificate pdf link
+										on 20-06-2023 by Amol -->
+									<?php if($_SESSION['is_old']=='old') { ?>
+										
+										<?php if(empty($checkAlreadyOldEsigned)){ ?>
+											<?php if($each['show_gen_old_cert_btn']=='yes'){ ?>
+												<td><a href="#" id="gen_old_cert_btn<?php echo $i; ?>" class="btn btn-primary">Get Esigned Certificate</a></td>
+											<?php }else{ ?>
+												<td>Esigned Cert. Available</td>
+											<?php } ?>
+										<?php }else{ ?>
+											<td>
+												<a target="_blank" href="<?php echo $each['AlreadyOldEsigned']; ?>"><?php echo 'Esigned Cert.'; ?></a>
+											</td>
+										<?php } ?>
+										
+										
+									<?php } ?>
+						
 
 								<?php } elseif ($appl_type == 'Renewal') {
 										if ($each['show_esign_btn']=='yes') { ?> 
@@ -122,6 +152,8 @@
 	</div>
 <?php echo $this->Form->end(); ?>
 
-<?php echo $this->element('esign_views/renewal_grant_declaration_message'); ?>	
+<?php echo $this->element('esign_views/renewal_grant_declaration_message'); ?>
+<!-- added new script call on 20-06-2023 by Amol, for old appl cert. esign -->
+<?php echo $this->element('esign_views/generate_cert_for_old_esign_popup'); ?>
 <input type="hidden" id="i-value" value="<?php echo $i; ?>">
 <?php echo $this->Html->script('dashboard/granted_appl_list-js'); ?>

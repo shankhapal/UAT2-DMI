@@ -632,7 +632,7 @@ use App\Network\Response\Response;
 			//set common values conditionally
 			//added code to get old appl flag from session, and show old verified appl. listing, on 29-05-2023 by Amol
 			$is_old = $this->Session->read('is_old');
-			if($appl_type_id == '1' && !empty($is_old)){//for new
+			if($appl_type_id == '1' && !empty($is_old)){//for old
 				
 				$condition = array('pdf_version'=>'1','user_email_id IS'=>'old_application','date(created) >=' => $from_dt, 'date(created) <=' => $to_dt);
 				$report_pdf_field = 'pdf_file';
@@ -790,6 +790,24 @@ use App\Network\Response\Response;
 					$appl_array[$i]['appl_form'] = $appl_form;
 					$appl_array[$i]['report_form'] = $report_form;
 					$appl_array[$i]['firm_name'] = $get_firm_id['firm_name'];
+
+					//added code/conditions to show btn to generate esigned cert. for old appl. OR show esigned certificate pdf link
+					//added on 20-06-2023 by Amol
+					$checkRenewalGrant = $this->$grant_cert_table->find('all',array('fields'=>array('pdf_version'),'conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+					$appl_array[$i]['show_gen_old_cert_btn'] = 'no';
+					//check if already cert esigned for old appl
+					if($appl_type_id == '1' && !empty($is_old)){
+						$this->loadModel('DmiOldApplEsignCertLogs');
+						$checkAlreadyOldEsigned = $this->DmiOldApplEsignCertLogs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+						$appl_array[$i]['AlreadyOldEsigned'] = $checkAlreadyOldEsigned['pdf_file'];
+						$this->set('checkAlreadyOldEsigned',$checkAlreadyOldEsigned);
+					}
+					//to check if renewal esinged cert. available already, to show/hide btn
+					if($appl_type_id == '1' && !empty($is_old) && $checkRenewalGrant['pdf_version'] == 1){					
+						if(empty($checkAlreadyOldEsigned)){
+							$appl_array[$i]['show_gen_old_cert_btn'] = 'yes';
+						}			
+					}
 
 					$appl_array[$i]['show_esign_btn'] = 'no';
 					if($each_record['user_email_id']==$office_email_id || $each_record['user_email_id']==$ro_incharge){

@@ -454,17 +454,40 @@ class ApplicationformspdfsController extends AppController{
 					$this->DmiChangeApplDetails->updateChangeDetailsAftergrant($customer_id);
 				}
 				
-				$grantPdfRecords = $Dmi_grant_pdf_record->newEntity(array(		
-					'customer_id'=>$customer_id,
-					'user_email_id'=>$user_email_id,
-					'user_once_no'=>$user_once_no,
-					'pdf_file'=>$file_path,
-					'date'=>date('Y-m-d H:i:s'),
-					'pdf_version'=>$current_pdf_version,
-					'created'=>date('Y-m-d H:i:s'),
-					'modified'=>date('Y-m-d H:i:s')				
-				));
-				$Dmi_grant_pdf_record->save($grantPdfRecords);
+				//added condition to save logs for old appl cert esign in logs table
+				//on 20-06-2023 by Amol
+				if($_SESSION['gen_old_cert_session']=='yes'){
+					
+					$DmiOldApplEsignCertLogs = TableRegistry::getTableLocator()->get('DmiOldApplEsignCertLogs');
+					$file_path = '/writereaddata/DMI/certificates/'.$folderName.'/'.$rearranged_id.'(1)'.'.pdf';//default version 1 as old is first grant
+					
+					$oldApplCertRecords = $DmiOldApplEsignCertLogs->newEntity(array(		
+						'customer_id'=>$customer_id,
+						'user_email_id'=>$user_email_id,
+						'pdf_file'=>$file_path,
+						'pdf_version'=>'1',//default version 1 as old is first grant
+						'appl_type'=>$application_type,
+						'created'=>date('Y-m-d H:i:s'),
+						'modified'=>date('Y-m-d H:i:s')				
+					));
+					$DmiOldApplEsignCertLogs->save($oldApplCertRecords);
+					$this->Session->delete('gen_old_cert_session');
+				
+				//for normal grant
+				}else{
+				
+					$grantPdfRecords = $Dmi_grant_pdf_record->newEntity(array(		
+						'customer_id'=>$customer_id,
+						'user_email_id'=>$user_email_id,
+						'user_once_no'=>$user_once_no,
+						'pdf_file'=>$file_path,
+						'date'=>date('Y-m-d H:i:s'),
+						'pdf_version'=>$current_pdf_version,
+						'created'=>date('Y-m-d H:i:s'),
+						'modified'=>date('Y-m-d H:i:s')				
+					));
+					$Dmi_grant_pdf_record->save($grantPdfRecords);
+				}
 				
 			}else{
 			
@@ -1736,6 +1759,12 @@ class ApplicationformspdfsController extends AppController{
 				$user_full_name[$i] = $get_user_details['f_name'].' '.$get_user_details['l_name'];
 				
 				$cert_grant_date = $pdf_date;
+				
+				//added new condition to get last grant date for genration cert. for old appl.
+				//on 20-06-2023 by Amol
+				if($_SESSION['gen_old_cert_session']=='yes'){
+					$cert_grant_date = $lastGrantDate;
+				}
 				$certificate_valid_upto[$i] = $this->Customfunctions->getCertificateValidUptoDate($customer_id,$cert_grant_date);
 			}
 			
@@ -2075,6 +2104,13 @@ class ApplicationformspdfsController extends AppController{
 				$user_full_name[$i] = $get_user_details['f_name'].' '.$get_user_details['l_name'];
 				
 				$cert_grant_date = $pdf_date;
+				
+				//added new condition to get last grant date for genration cert. for old appl.
+				//on 20-06-2023 by Amol
+				if($_SESSION['gen_old_cert_session']=='yes'){
+					$cert_grant_date = $lastGrantDate;
+				}
+			
 				$certificate_valid_upto[$i] = $this->Customfunctions->getCertificateValidUptoDate($customer_id,$cert_grant_date);
 			}
 			
@@ -2351,6 +2387,13 @@ class ApplicationformspdfsController extends AppController{
 				$user_full_name[$i] = $get_user_details['f_name'].' '.$get_user_details['l_name'];
 				
 				$cert_grant_date = $pdf_date;
+				
+				//added new condition to get last grant date for genration cert. for old appl.
+				//on 20-06-2023 by Amol
+				if($_SESSION['gen_old_cert_session']=='yes'){
+					$cert_grant_date = $lastGrantDate;
+				}
+			
 				$certificate_valid_upto[$i] = $this->Customfunctions->getCertificateValidUptoDate($customer_id,$cert_grant_date);
 			}
 			
