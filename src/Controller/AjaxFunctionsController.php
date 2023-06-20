@@ -1698,6 +1698,23 @@ class AjaxFunctionsController extends AppController{
 		exit;
 	}
 
+	//added this method to create required sessions to generate esigned certificate for old verified appl.
+	//on 20-06-2023 by Amol
+	//called through ajax on btn click
+	public function setSessionForOldCertEsign() {
+
+		$customer_id = $_POST['customer_id'];
+		$pdf_name = $_POST['pdf_name'];
+
+		//set session
+		$this->Session->write('customer_id',$customer_id);
+		$this->Session->write('pdf_file_name',$pdf_name);
+		$this->Session->write('current_level','level_3');
+		$this->Session->write('application_type',1);
+		$this->Session->write('gen_old_cert_session','yes');
+
+		exit;
+	}
 
 
 	// SEARCH APPLICATION
