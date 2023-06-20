@@ -637,7 +637,7 @@ class ChemistController extends AppController {
   //chemist application shedule letter display in dashboard added by laxmi b.on 30-12-22
 		
 		$this->loadModel('DmiChemistRalToRoLogs');
-        $scheduleLetter = $this->DmiChemistRalToRoLogs->find('list',array('valueField'=>'pdf_file', 'conditions'=>array('chemist_id'=>$_SESSION['username'], 'training_completed IS'=>NULL, 'reshedule_status IS'=>'confirm')))->first();  
+        $scheduleLetter = $this->DmiChemistRalToRoLogs->find('list',array('valueField'=>'reshedule_pdf', 'conditions'=>array('chemist_id'=>$_SESSION['username'], 'training_completed IS'=>NULL, 'reshedule_status IS'=>'confirm')))->first();  
 		if(!empty($scheduleLetter)){
 			$this->set('pdf_file', $scheduleLetter);
 		}
