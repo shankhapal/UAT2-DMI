@@ -23,6 +23,7 @@ $("#state").change(function (e) {
 });
 
 $(document).ready(function () {
+  //aded according to search log by shankhpal shinde
   $("#fromdate").datepicker({
     format: "dd/mm/yyyy",
     orientation: "left top",

@@ -134,6 +134,12 @@
         		<div class="col-md-12">
 					<div class="mx-5">
 						<?php ?> <span class="badge bg-light shadow">RESULT</span><i class="fas fa-chevron-right px-2 fs80"></i> <?php
+						if(!empty($application_type)) {
+							?>  <span class="badge rounded-pill bg-grad1 shadow">Application Type</span>
+									<i class="fas fa-caret-right"></i>
+									<span class="badge bg-grad2 mr-3 shadow"> <?php echo $all_application_type[$application_type];  $search_value = 'yes'; ?> </span>
+								<?php
+							}
 							 
 							if(!empty($ro_office)) {
 							?>  <span class="badge rounded-pill bg-grad1 shadow">RO Office</span>
@@ -231,7 +237,7 @@
 														</span>
 
 												</td>
-												<td><span class="badge title mb-1 borderless hover-border"><?php echo $apl_type_res[$j][$i]['application_type']; ?></span></td>
+												<td><span class="badge title mb-1 borderless hover-border"><?php if (!empty($apl_type_res)){    echo $apl_type_res[$j][$i];} ?></span></td>
 												<td>
 													<!-- added if else according to record null or not by shreeya on date [13-06-2023]-->
 													<?php if (!empty($all_ro_office[$ro_id[$j][$i]['ro_id']])) { ?>

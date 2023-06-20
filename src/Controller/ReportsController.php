@@ -5866,26 +5866,43 @@ class ReportsController extends AppController {
 			$this->loadModel('DmiFlowWiseTablesLists');
 			
 			//show listing of New Application Added By Shreeya on Date [08-06-2023]
+			
+			$apl_type_res = array();
 			if($applicn_type  == 'New')
 			{
-
+				
 				$report_for = 'New';
 			
 				$appl_type = $this->DmiApplicationTypes->find('all')->select(['id', 'application_type'])->where(['application_type'=>$report_for])->first();
-			
+				
 				$application_type_id = $appl_type['id'];
 				
-
-					 if($report_for != 'New' || $report_for != 'Renewal'){
-					 	$flowwise_table_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['application_type IS' =>$application_type_id])->toArray();
-						
-					 }else{
-						
-						$flowwise_table_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['payment IS NOT' =>NULL])->order(['id'])->toArray();
-						
-					 }
-
+				// $conn = ConnectionManager::get('default');
 				
+				// //change the query for get application id by shreeya on date[17-06-2023]
+				// 	$query = $conn->execute("SELECT id FROM dmi_application_types");
+				// 	$appl_types = $query->fetchAll('assoc');
+				
+				// 	$appl_type_ids = []; // Create an empty array to store the 'id' values
+
+				// 	foreach ($appl_types as $appl_type) {
+				// 		$appl_type_ids[] = $appl_type['id']; // Add each 'id' value to the array
+				// 	}
+					
+				if(empty($report_for_array)){
+					$report_for = 0;
+				}
+				
+				// check $report_for == 0 select all application [14-06-2023]
+				if($report_for != 0 || !empty($application_type_id)){
+					
+					$flowwise_table_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['application_type IN' =>$application_type_id])->toArray();	
+					
+				}else{  
+				
+					$flowwise_table_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['payment IS NOT NULL','application_type IN'=>$report_for])->toArray();
+					
+				}
 
 
 					$i=0;
@@ -5911,6 +5928,7 @@ class ReportsController extends AppController {
 									
 
 						$k=0;
+						
 						foreach ($customer_id_list as $customer_id) {
 							
 							$customer_payment_id_list = $this->$payment_table->find('all')->select(['id'])->where(['customer_id' => $customer_id['customer_id'], 'payment_confirmation' => 'confirmed'])->toArray();
@@ -5932,9 +5950,12 @@ class ReportsController extends AppController {
 								$firms_details[$i][$k] = $this->DmiFirms->find('all')->where(['customer_id' => $customer_id['customer_id'],['delete_status IS NULL']])->first();
 
 								
-									$this->loadModel('DmiApplicationTypes');
-								$apl_type_res[$i][$k] =  $this->DmiApplicationTypes->find('all')->select(['application_type'])->where(['id' => $apl_type])->first();
-
+								$this->loadModel('DmiApplicationTypes');
+								
+								$apl_type_res1 =  $this->DmiApplicationTypes->find('all')->select(['id','application_type'])->where(['id' => $apl_type])->first();
+								$apl_type_res[$i][$k] = $apl_type_res1['application_type'];
+								
+								
 								if($firms_details[$i][$k] != NULL){
 									$ro_id[$i][$k] = $this->DmiDistricts->find('all')->select(['ro_id'])->where(['id' => $firms_details[$i][$k]['district']])->first();
 									// $i=$i+1;
@@ -5943,6 +5964,7 @@ class ReportsController extends AppController {
 							}
 								
 						}
+						
 
 						// below if-else check added by Ankur Jangid for empty IN query error check
 						if (!empty($customer_id_list)) {
@@ -5969,8 +5991,6 @@ class ReportsController extends AppController {
 							$this->loadModel($tbl_data);
 
 							$application_list_data[$j] = $this->$tbl_data->find('all',array('conditions'=>array('payment_confirmation'=>'confirmed','and'=>array('date(created) >=' => $from_date, 'date(created) <=' =>$to_date)),'order'=>'id desc'))->toArray();
-
-							
 							//$application_list_data[$j] = $this->$tbl_data->find('all')->select(['id','customer_id','certificate_type','amount_paid','payment_confirmation'])->where(['payment_confirmation' =>'confirmed'])->toArray(); 
 							$j++;
 						}
@@ -6007,18 +6027,21 @@ class ReportsController extends AppController {
 			
 				$application_type_id = $appl_type['id'];
 			
-
-				if($report_for != 'Renewal' || $report_for != 'New'){
-
-					$flowwise_table_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['application_type IS' =>$application_type_id])->toArray();
+				if(empty($report_for_array)){
+					$report_for = 0;
+				}
+				
+				// check $report_for == 0 select all application [14-06-2023]
+				if($report_for != 0 || !empty($application_type_id)){
 					
-				 }else{
+					$flowwise_table_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['application_type IN' =>$application_type_id])->toArray();	
 					
-					$flowwise_table_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['payment IS NOT' =>NULL])->order(['id'])->toArray();
+				}else{  
+				
+					$flowwise_table_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['payment IS NOT NULL','application_type IN'=>$report_for])->toArray();
 					
-				 }
+				}
 
-			
 
 				$i=0;
 				$total_payment_details = [];
@@ -6063,7 +6086,11 @@ class ReportsController extends AppController {
 
 							
 							$this->loadModel('DmiApplicationTypes');
-							$apl_type_res[$i][$k] =  $this->DmiApplicationTypes->find('all')->select(['application_type'])->where(['id' => $apl_type])->first();
+							//this line commented by shreeya
+							// $apl_type_res[$i][$k] =  $this->DmiApplicationTypes->find('all')->select(['application_type'])->where(['id' => $apl_type])->first();
+
+							$apl_type_res1 =  $this->DmiApplicationTypes->find('all')->select(['id','application_type'])->where(['id' => $apl_type])->first();
+							$apl_type_res[$i][$k] = $apl_type_res1['application_type'];
 
 							if($firms_details[$i][$k] != NULL){
 								$ro_id[$i][$k] = $this->DmiDistricts->find('all')->select(['ro_id'])->where(['id' => $firms_details[$i][$k]['district']])->first();
@@ -6130,7 +6157,7 @@ class ReportsController extends AppController {
 				
 			}
 			
-
+			
 			 		
 		}
 
@@ -6138,7 +6165,7 @@ class ReportsController extends AppController {
 
 		$this->loadModel('DmiFlowWiseTablesLists');
 		
-			$apl_type_res = [];
+			// $apl_type_res = [];
 			$application_type_id = '';
 			//added not empty application type to show all type of report 
 			if(empty($report_for_array)){
@@ -6163,8 +6190,6 @@ class ReportsController extends AppController {
 				// 	$appl_type = $query->fetchAll('assoc');
 				// 	$appl_type = $appl_type['id'];
 				
-
-
 					//change the query for get application id by shreeya on date[17-06-2023]
 					$query = $conn->execute("SELECT id FROM dmi_application_types");
 					$appl_types = $query->fetchAll('assoc');
@@ -6267,8 +6292,11 @@ class ReportsController extends AppController {
 							$firms_details[$i][$k] = $this->DmiFirms->find('all')->where(['customer_id IS' => $customer_id['customer_id'],['delete_status IS NULL']])->order(['customer_id' => 'ASC'])->first();
 							
 							$this->loadModel('DmiApplicationTypes');
-							$apl_type_res[$i][$k] =  $this->DmiApplicationTypes->find('all')->select(['application_type'])->where(['id IS' => $apl_type])->first();
-						
+							// $apl_type_res[$i][$k] =  $this->DmiApplicationTypes->find('all')->select(['application_type'])->where(['id IS' => $apl_type])->first();
+							
+
+							$apl_type_res1 =  $this->DmiApplicationTypes->find('all')->select(['id','application_type'])->where(['id' => $apl_type])->first();
+								$apl_type_res[$i][$k] = $apl_type_res1['application_type'];
 							
 							if($firms_details[$i][$k] != NULL){
 								$ro_id[$i][$k] = $this->DmiDistricts->find('all')->select(['ro_id'])->where(['id IS' => $firms_details[$i][$k]['district']])->first();
@@ -6419,11 +6447,11 @@ class ReportsController extends AppController {
 				$i++;
 				}
 			
+				
 			}
 		
 
-		
-	
+			
 		$total_new_ca_pp_lab =  $new_ca_total + $new_pp_total + $new_lab_total;   // for total newca payment
 		$total_renewal_ca_pp_lab =  $renewal_ca_total + $renewal_pp_total + $renewal_lab_total;   // for total_renewal_ca_pp_lab
 		$total_change_ca_pp_lab =  $change_ca_total + $change_pp_total + $change_lAB_total;   // for total_change_ca_pp_lab
