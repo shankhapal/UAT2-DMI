@@ -2100,9 +2100,6 @@ class AjaxFunctionsController extends AppController{
 			echo 'no';
 		}
 	}
-
-
-
 	// check If Session Is Exists
 	// DESCRIPTION : FOR CHECKING THE SESSION IF SESSION IS YES , RETURN THE YES OR NO
 	// @AUTHOR : SHANKHPAL SHENDE
@@ -2113,8 +2110,7 @@ class AjaxFunctionsController extends AppController{
 		//$this->autoRender = false;
 		// taking editmode data in Session variables
 		$this->Session->write('adpupdatemode','yes');
-		echo 'yes';
-		exit;
+	    echo 'yes';exit;
 			
 	}
 
@@ -2146,6 +2142,187 @@ class AjaxFunctionsController extends AppController{
 	}	
 
 
+	// Description : The attachedPpDelete function are use for delete attached printing press and labortory,
+	// Author : Shankhpal Shende
+	// Date : 03/05/2023
+	// For Module : attached pp/lab/wonlab
+	public function attachedPpLabDelete(){
+
+		$this->autoRender = false;
+		$this->loadModel('DmiCaPpLabMapings');
+		$this->loadModel('DmiCaPpLabActionLogs');
+		$this->loadModel('DmiCaMappingOwnLabDetails');
+
+		$record_id = $_POST['record_id'];
+		$remark = $_POST['remark'];
+	
+		//get customer_id
+		if ($this->Session->read('customer_id')==null) {
+			$customer_id = $this->Session->read('username');
+		} else {
+			$customer_id = $this->Session->read('customer_id');
+		}
+
+		//get firm details
+		$capplabdetails = $this->DmiCaPpLabMapings->pplabDetails($customer_id,$record_id);
+		
+		$current_ip = $_SERVER['REMOTE_ADDR'];
+		if ($current_ip == '::1') { $current_ip = '127.0.0.1'; }
+
+		$action_perform = '';
+		if (!empty($capplabdetails) && $capplabdetails['pp_id']) {
+				$action_perform = 'Printing Press (Removed)';
+		} else {
+				$action_perform = 'Laboratory (Removed)'; // Set the desired action here
+		}
+		
+		//add record in log table
+		$logArray = array(
+			'customer_id'=>$customer_id,
+			'ipaddress'=>$current_ip,
+			'action_perform'=>$action_perform,
+			'created'=>date('Y-m-d H:i:s'),
+			'status'=>'Success'
+		);
+
+		$logTableEntity = $this->DmiCaPpLabActionLogs->newEntity($logArray);
+		$this->DmiCaPpLabActionLogs->save($logTableEntity);
+		#update record add delete status yes and remark
+		if (strpos($record_id, "/Own") !== false) {
+
+			$recordidArray = explode("/", $record_id);
+			$ownlabId = $recordidArray[0];
+
+
+			$latest_id = $this->DmiCaPpLabMapings->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+
+			if($latest_id != null){
+				$report_fields = $this->DmiCaPpLabMapings->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();		
+				$record_id = $report_fields['id'];
+			}
+		
+			$this->DmiCaMappingOwnLabDetails->updateAll(array('delete_status'=>'yes','modified'=>date('Y-m-d H:i:s')),array('id'=>$ownlabId));
+
+			$save_details_result = $this->DmiCaPpLabMapings->updateAll(array('remark'=>$remark,'delete_status'=>'yes','modified'=>date('Y-m-d H:i:s')),array('id'=>$record_id));
+
+		} else {
+			
+			$save_details_result = $this->DmiCaPpLabMapings->updateAll(array('remark'=>$remark,'delete_status'=>'yes','modified'=>date('Y-m-d H:i:s')),array('id'=>$record_id));
+		}
+
+		if (empty($save_details_result)) {
+			echo 'no';
+		}else{
+			echo 'yes';
+		}
+	}
+
+	// Description : The getAllotedReplicaList function are use to get Replica Allotment list of Printing press, laboratory.
+	// Author : Shankhpal Shende
+	// Date : 10/05/2023
+	// For Module : attached pp/lab/wonlab
+	public function getAllotedReplicaList(){
+
+		$this->autoRender = false;
+		$this->loadModel('DmiCaPpLabMapings');
+		$this->loadModel('DmiCaMappingOwnLabDetails');
+
+		$record_id = $_POST['record_id'];
+
+		if (strpos($record_id, "/Own") !== false) {
+			$recordidArray = explode("/", $record_id);
+			$ownlabId = $recordidArray[0];
+			
+			$find_lab_details = $this->DmiCaMappingOwnLabDetails->find('all', array(
+					'conditions' => array(
+							'id' => $ownlabId
+					)
+			))->first();
+		
+			$lab_id = $find_lab_details['own_lab_id'];
+			
+		} else {
+			$find_details = $this->DmiCaPpLabMapings->find('all', array(
+					'conditions' => array(
+							'id' => $record_id
+					)
+			))->first();
+
+			if (!empty($find_details)) {
+					$lab_id = $find_details['lab_id'];
+			}
+		}
+
+		if (!empty($lab_id)) {
+			$get_replica_allot_details = $this->DmiCaPpLabMapings->getReplicaAllotmentDetails($lab_id);
+		} else {
+			$pp_id = $find_details['pp_id'] ?? null;
+			if (!empty($pp_id)) {
+					$get_replica_allot_details = $this->DmiCaPpLabMapings->getReplicaAllotmentDetails($pp_id);
+			}
+		}
+	
+		if (!empty($get_replica_allot_details)) {
+
+			$response = "<div style='overflow: auto; max-height: 300px;'>";
+			$response .= "<table class='myTable table-bordered' id='$record_id'>";
+			$response .= "<thead>";
+			$response .= "<tr>";
+			$response .= "<th>Replica From</th>";
+			$response .= "<th>Replica To</th>";
+			$response .= "<th>Date</th>";
+			$response .= "</tr>";
+			$response .= "</thead>";
+			$response .= "<tbody>";
+
+			foreach ($get_replica_allot_details as $row) {
+
+				$alloted_rep_from = $row['alloted_rep_from'];
+				$alloted_rep_to = $row['alloted_rep_to'];
+				$created = $row['created'];
+				$response .= "<tr>";
+				$response .= "<td>".$alloted_rep_from."</td>";
+				$response .= "<td>".$alloted_rep_to."</td>";
+				$response .= "<td>".$created."</td>";
+				$response .= "</tr>";
+			}
+
+			$response .= "</tbody>";
+			$response .= "</table>";
+			$response .= "<label>";
+			$response .= "Please Enter Remark";
+			$response .="</label>";
+			$response .="<textarea class='form-control' id='remark' rows='3'>";
+
+			echo $response;
+			exit;
+		}else{
+			
+			$response = "<table class='myTable table-bordered' id='" . $record_id ."'>";
+			$response .= "<thead>";
+			$response .= "<tr>";
+			$response .= "<th>Replica From</th>";
+			$response .= "<th>Replica To</th>";
+			$response .= "<th>Date</th>";
+			$response .= "</tr>";
+			$response .= "</thead>";
+			$response .= "<tbody>";
+			$response .= "<tr>";
+			$response .= "<td colspan='3' class='fs-4 text-center'>";
+			$response .= "NO Records Available";
+			$response .= "</td>";
+			$response .= "</tr>";
+			$response .= "</tbody>";
+			$response .= "</table>";
+			$response .= "<label>";
+			$response .= "Remark For delete printing press";
+			$response .="</label>";
+			$response .="<textarea class='form-control' id='remark' rows='3'>";
+			echo $response;
+			exit;
+
+		}
+	}
 
 	// ADD SAMPLE DETAILS
 	// @AUTHOR : SHANKHPAL SHENDE

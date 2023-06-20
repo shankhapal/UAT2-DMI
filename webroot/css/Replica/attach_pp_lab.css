@@ -1,3 +1,4 @@
+/* // for own lab module updated css file by shankhpal on 16-06-2023 to 20-06-2023 */
 #table_outer {overflow-x: scroll; }
 #table_outer th{border:1px solid gainsboro;}
 #table_container_1 { min-width: 200%; }
@@ -51,3 +52,26 @@ section{background-color: #eee;padding:10px;}
   .note{
     padding: 10px;
   }
+  .wonlabmargin{
+    margin-bottom: 20px;
+  }
+  #won_lab{
+    display: none;
+  }
+ #dialog-modal{
+  display: none;
+ }
+.error{
+  color:
+    red;
+}
+.card-body{
+  height: 400;
+  overflow: auto;
+}
+.modal-content{
+  height: 500;
+  overflow: auto;
+}
+
+  

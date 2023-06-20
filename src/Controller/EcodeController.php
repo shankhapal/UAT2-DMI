@@ -42,11 +42,15 @@ class EcodeController extends AppController {
 
 		}
 
+		/**
+		 * Function Updated for the attachment of own lab 
+		 * Added some conditions and modify the function for own lab module,
+		 * @author shankhpal shende
+		 * @version 19th June 2023
+		 */
 		public function replicaApplication(){
 			
 			$this->viewBuilder()->setLayout('replica_appl_layout');
-			$customer_id = $this->Session->read('username');
-			
 			$this->loadModel('DmiFirms');
 			$this->loadModel('MCommodity');
 			$this->loadModel('DmiECodeAllotmentDetails');
@@ -54,24 +58,23 @@ class EcodeController extends AppController {
 			$this->loadModel('DmiAllTblsDetails');
 			$this->loadModel('DmiPackingTypes');
 			$this->loadModel('DmiReplicaUnitDetails');
+			$this->loadModel('DmiChemistAllotments');
+			$this->loadModel('CommGrade');
 			$this->loadModel('DmiCaPpLabMapings'); // added by shankhpal shende on 18/10/2022
+			$this->loadModel('DmiCaMappingOwnLabDetails'); // load modal of own lab on 16/06/2023 by shankhpal
+
+			$customer_id = $this->Session->read('username');
+			
 			$message = '';
 			$message_theme = '';
 			$redirect_to = '';
 			
-			// added by Amol on 21-10-2022 as per replica controller
-			$attached_lab = $this->DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'lab_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id asc'))->toList();
-			//get printing list
-			$attached_pp = $this->DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'pp_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id asc'))->toList();     
-				
 			//get array
 			$attached_lab_data = $this->DmiCaPpLabMapings->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, 'lab_id IS NOT NULL'),'order'=>'id asc'))->first();
+			
 			$attached_pp_data = $this->DmiCaPpLabMapings->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, 'pp_id IS NOT NULL'),'order'=>'id asc'))->first();
 		
 			//first check if this packer have any chemist incharge or not, elae show alert
-			$this->loadModel('DmiChemistAllotments');
-			$this->loadModel('CommGrade');
-			
 			$check_che_incharge = $this->DmiChemistAllotments->find('all',array('fields'=>'chemist_id','conditions'=>array('customer_id IS'=>$customer_id,'status'=>1,'incharge'=>'yes')))->first();
 			if (empty($check_che_incharge) || empty($attached_pp_data) || empty($attached_lab_data)) {
 				
@@ -83,25 +86,34 @@ class EcodeController extends AppController {
 				$message = $message_var;
 				$message_theme = 'info';
 				$redirect_to = '../customers/secondary_home';
-				
 			}else{
 
 				//get packer details
 				$firm_details = $this->DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();		
-
 				//get CA granted E-Code number
 				$this->loadModel('DmiECodeForApplicants');
 				$get_e_code = $this->DmiECodeForApplicants->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
 				$firm_details['e_code'] = $get_e_code['e_code'];
-				
 				$this->set('firm_details',$firm_details);
 				
-				//list of authorized laboratory
+				$attached_lab = $this->DmiCaPpLabMapings->find('all',array('keyField'=>'lab_id','valueField'=>'lab_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc','delete_status IS NULL'))->first();
+				$lab_id = $attached_lab['lab_id'];
 				
-				//$lab_list = $this->DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/3/'.'%','delete_status IS Null'),'order'=>'firm_name asc'))->toArray();
+				// //get printing list
+				$attached_pp = $this->DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'pp_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id asc'))->toList();     
 				
+				/**
+				 * Added for own lab module, split own lab id and get details from dmi_ca_mapping_own_lab_details 
+				 * table
+				 * @author shankhpal shende
+				 * @version 16th June 2023
+				 */
+				if (strpos($lab_id, "/Own") !== false) {
+					$lab_list = $this->DmiCaMappingOwnLabDetails->find('list',array('keyField'=>'own_lab_id','valueField'=>'lab_name','conditions'=>array('ca_id'=>$customer_id,'delete_status IS NULL')))->toArray();
+				} else {
 				// added by shankhpal shende for display only attached lab on 18/10/2022
-				$lab_list = $this->DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/3/'.'%','delete_status IS NULL','id IN'=>$attached_lab),'order'=>'firm_name asc'))->toArray();
+					$lab_list = $this->DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/3/'.'%','delete_status IS NULL','id IN'=>$lab_id),'order'=>'firm_name asc'))->toArray();
+				}
 				
 				$this->set('lab_list',$lab_list);
 			
@@ -114,8 +126,7 @@ class EcodeController extends AppController {
 				
 				$get_grade = $this->CommGrade->find('all',array('fields'=>'grade_code','conditions'=>array('commodity_code IN'=>$commodity_ids),'group'=>'grade_code'))->toArray();
 			
-				foreach($get_grade as $val)
-				{
+				foreach($get_grade as $val){
 					$get_grade_desc = $this->MGradeDesc->find('all',array('fields'=>array('grade_code','grade_desc'),'conditions'=>array('grade_code IN'=>$val['grade_code']),'group'=>array('grade_code','grade_desc')))->first();
 					$grade_list[$get_grade_desc['grade_code']] = $get_grade_desc['grade_desc'];
 				}
@@ -739,10 +750,29 @@ class EcodeController extends AppController {
 			
 			$eachrow = $each;
 			
+			/**
+		 * Added for own lab module, split own lab id and get details from dmi_ca_mapping_own_lab_details 
+		 * table
+		 * @author shankhpal shende
+		 * @version 19th June 2023
+		 */
+
+		 $this->loadModel('DmiCaMappingOwnLabDetails');
+
+			if (strpos($eachrow['grading_lab'], "/Own") !== false) {
+					// Get selected lab name
+					$lab_details = $this->DmiCaMappingOwnLabDetails->find()
+							->select(['lab_name'])
+							->where(['own_lab_id' => $eachrow['grading_lab']])
+							->first();
+					$lab_name = $lab_details['lab_name'];
+					$tableRowData[$i]['lab_name'] = $lab_name;
+				}else{
 			//get selected lab name
 			$lab_details = $this->DmiFirms->find('all',array('fields'=>'firm_name','conditions'=>array('id IS'=>$eachrow['grading_lab'])))->first();
 			$lab_name = $lab_details['firm_name'];				
 			$tableRowData[$i]['lab_name'] = $lab_name;
+				}
 			
 			//get selected commodity
 			$commodity_details = $this->MCommodity->find('all',array('fields'=>'commodity_name','conditions'=>array('commodity_code IS'=>$eachrow['commodity'])))->first();
@@ -850,10 +880,28 @@ class EcodeController extends AppController {
 			
 			$eachrow = $each;
 			
+			/**
+			 * Added for own lab module, split own lab id and get details from dmi_ca_mapping_own_lab_details 
+			 * table
+			 * @author shankhpal shende
+			 * @version 15th June 2023
+			 */
+			$this->loadModel('DmiCaMappingOwnLabDetails');
+			
+			if (strpos($eachrow['grading_lab'], "/Own") !== false) {
+        // Get selected lab name
+        $lab_details = $this->DmiCaMappingOwnLabDetails->find()
+            ->select(['lab_name'])
+            ->where(['own_lab_id' => $eachrow['grading_lab']])
+            ->first();
+        $lab_name = $lab_details['lab_name'];
+        $tableRowData[$i]['lab_name'] = $lab_name;
+    	}else{
 			//get selected lab name
 			$lab_details = $this->DmiFirms->find('all',array('fields'=>'firm_name','conditions'=>array('id IS'=>$eachrow['grading_lab'])))->first();
 			$lab_name = $lab_details['firm_name'];				
 			$tableRowData[$i]['lab_name'] = $lab_name;
+			}
 			
 			//get selected commodity
 			$commodity_details = $this->MCommodity->find('all',array('fields'=>'commodity_name','conditions'=>array('commodity_code IS'=>$eachrow['commodity'])))->first();
@@ -1115,9 +1163,20 @@ class EcodeController extends AppController {
 			$i=$i+1;
 		}
 		//get lab details
+		/**
+		 * Added for own lab module, split own lab id and get details from dmi_ca_mapping_own_lab_details 
+		 * table
+		 * @author shankhpal shende
+		 * @version 20 June 2023
+		 */
+		$this->loadModel('DmiCaMappingOwnLabDetails');
+		if (strpos($lab_id, "/Own") !== false) {
+			$lab_details = $this->DmiCaMappingOwnLabDetails->find('all',array('fields'=>'ca_id','conditions'=>array('own_lab_id IS'=>$lab_id)))->first();
+			$lab_cust_id = $lab_details['ca_id'];
+		} else {
 		$lab_details = $this->DmiFirms->find('all',array('fields'=>'customer_id','conditions'=>array('id IS'=>$lab_id)))->first();
 		$lab_cust_id = $lab_details['customer_id'];
-		
+		}
 		#SMS: Approve and Allotment of  E Code
 		//$this->DmiSmsEmailTemplates->sendMessage(86,$lab_cust_id); #Laboratory
 		
