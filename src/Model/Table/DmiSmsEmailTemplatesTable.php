@@ -1195,9 +1195,27 @@ class DmiSmsEmailTemplatesTable extends Table{
 					}
 					
 					#LAB
+					/**
+					 * Added for own lab module, split own lab id and get details from dmi_ca_mapping_own_lab_details 
+					 * table
+					 * @author shankhpal shende
+					 * @version 15th June 2023
+					 */
 					if($each['map_type'] == 'lab'){
+					
+							if (strpos($each['lab_id'], "/Own") !== false) {
+								// Get selected lab name
+								$DmiCaMappingOwnLabDetails = TableRegistry::getTableLocator()->get('DmiCaMappingOwnLabDetails');
+								$getLabName = $DmiCaMappingOwnLabDetails->find('all',array('conditions'=>array('own_lab_id IS'=>$each['lab_id'])))->first();
+								$lab_name = $getLabName['lab_name'];
+								
+							}else{
+							//get selected lab name
 						$getLabName = $DmiFirms->find('all',array('conditions'=>array('id IS'=>$each['lab_id'])))->first();
 						$lab_name = $getLabName['firm_name'];
+					}
+					
+						
 					}
 					
 					#PACKER

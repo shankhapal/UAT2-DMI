@@ -49,11 +49,25 @@ class ReplicaController extends AppController {
 	public function replicaApplication() {
 		
 		$this->viewBuilder()->setLayout('replica_appl_layout');
-		$customer_id = $this->Session->read('username');
+		
 		
 		//check if applicant is approved for 15 digit or E-code and redirect to specific controller
 		$this->loadModel('Dmi15DigitGrantCertificatePdfs');
 		$this->loadModel('DmiECodeGrantCertificatePdfs');
+		$this->loadModel('DmiFirms');
+		$this->loadModel('MCommodity');
+		$this->loadModel('DmiReplicaAllotmentDetails');
+		$this->loadModel('MGradeDesc');
+		$this->loadModel('DmiAllTblsDetails');
+		$this->loadModel('DmiPackingTypes');
+		$this->loadModel('DmiChemistAllotments');
+		$this->loadModel('CommGrade');
+		$this->loadModel('DmiReplicaUnitDetails');
+		$this->loadModel('DmiCaPpLabMapings'); // added by shankhpal shende on 26/08/2022
+		$this->loadModel('DmiCaMappingOwnLabDetails'); // load modal of own lab on 16/06/2023 by shankhpal
+
+		$customer_id = $this->Session->read('username');
+
 		$checkECodeApproval = $this->DmiECodeGrantCertificatePdfs->find('all',array('fields'=>'id','conditions'=>array('customer_id IS'=>$customer_id)))->first();
 
 		if (!empty($checkECodeApproval)) {
@@ -65,34 +79,16 @@ class ReplicaController extends AppController {
 			}
 		}
 		
-		$this->loadModel('DmiFirms');
-		$this->loadModel('MCommodity');
-		$this->loadModel('DmiReplicaAllotmentDetails');
-		$this->loadModel('MGradeDesc');
-		$this->loadModel('DmiAllTblsDetails');
-		$this->loadModel('DmiPackingTypes');
-		$this->loadModel('DmiReplicaUnitDetails');
-		$this->loadModel('DmiCaPpLabMapings'); // added by shankhpal shende on 26/08/2022
-																				   
-
 		$message = '';
 		$message_theme = '';
 		$redirect_to = '';
 
-		// added by shankhpal shende on 26/08/2022 for to maping with Printing prss and LAboratory
-		//get lab list
-		$attached_lab = $this->DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'lab_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id asc'))->toList();
-		//get printing list
-		$attached_pp = $this->DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'pp_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id asc'))->toList();
-       
 		//get array
 		$attached_lab_data = $this->DmiCaPpLabMapings->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, 'lab_id IS NOT NULL'),'order'=>'id asc'))->first();
+			
 		$attached_pp_data = $this->DmiCaPpLabMapings->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, 'pp_id IS NOT NULL'),'order'=>'id asc'))->first();
 
 		//first check if this packer have any chemist incharge or not, elae show alert
-		$this->loadModel('DmiChemistAllotments');
-		$this->loadModel('CommGrade');
-
 		$check_che_incharge = $this->DmiChemistAllotments->find('all',array('fields'=>'chemist_id','conditions'=>array('customer_id IS'=>$customer_id,'status'=>1,'incharge'=>'yes')))->first();
 		
 		//updated by shankhpal shende on 26/08/2022
@@ -108,10 +104,8 @@ class ReplicaController extends AppController {
 			$redirect_to = '../customers/secondary_home';
 
 		} else {
-
 			//set the session for sms email templates - akash [02-12-2022]
 			$this->Session->write('forReplica','yes');
-
 			//get packer details
 			$firm_details = $this->DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
 
@@ -120,13 +114,30 @@ class ReplicaController extends AppController {
 			
 			$this->set('firm_details',$firm_details);
 			
-			//list of authorized laboratory
-			$lab_list = $this->DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/3/'.'%','delete_status IS NULL','id IN'=>$attached_lab),'order'=>'firm_name asc'))->toArray();
+			/**
+			 * Added for own lab module, split own lab id and get details from dmi_ca_mapping_own_lab_details 
+			 * table
+			 * @author shankhpal shende
+			 * @version 15th June 2023
+			 */
+
+			$attached_lab = $this->DmiCaPpLabMapings->find('all',array('keyField'=>'lab_id','valueField'=>'lab_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc','delete_status IS NULL'))->first();
+			$lab_id = $attached_lab['lab_id'];
+			
+			//get printing list
+			$attached_pp = $this->DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'pp_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id asc'))->toList();     
+			
+			if (strpos($lab_id, "/Own") !== false) {
+				$lab_list = $this->DmiCaMappingOwnLabDetails->find('list',array('keyField'=>'own_lab_id','valueField'=>'lab_name','conditions'=>array('ca_id'=>$customer_id,'delete_status IS NULL')))->toArray();
+			} else {
+				// added by shankhpal shende for display only attached lab on 18/10/2022
+				$lab_list = $this->DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/3/'.'%','delete_status IS NULL','id IN'=>$lab_id),'order'=>'firm_name asc'))->toArray();
+			}
+			
 			$this->set('lab_list',$lab_list);
 		
 			//get packer wise commodity list
 			$commodity_ids = explode(',',$firm_details['sub_commodity']);	
-
 			$commodity_list = $this->MCommodity->find('list',array('keyField'=>'commodity_code','valueField'=>'commodity_name','conditions'=>array('commodity_code IN'=>$commodity_ids)))->toArray();
 			
 			//****************************************************************************************************/			
@@ -925,6 +936,12 @@ class ReplicaController extends AppController {
 		$this->redirect('/replica/replicaApplicationApproval');
 	}
 
+	/**
+	 * function updated for attachment of own lab module
+	 * modify some condition's and added new logic as needed
+	 * @author shankhpal shende
+	 * @version 16th June 2023
+	 */
 	//method to show replica application on chemist side for verification
 	public function replicaApplicationApproval() {
 			
@@ -973,10 +990,28 @@ class ReplicaController extends AppController {
 			
 			$eachrow = $each;
 			
+			/**
+			 * Added for own lab module, split own lab id and get details from dmi_ca_mapping_own_lab_details 
+			 * table
+			 * @author shankhpal shende
+			 * @version 15th June 2023
+			 */
+			$this->loadModel('DmiCaMappingOwnLabDetails');
+			
+			if (strpos($eachrow['grading_lab'], "/Own") !== false) {
+        // Get selected lab name
+        $lab_details = $this->DmiCaMappingOwnLabDetails->find()
+            ->select(['lab_name'])
+            ->where(['own_lab_id' => $eachrow['grading_lab']])
+            ->first();
+        $lab_name = $lab_details['lab_name'];
+        $tableRowData[$i]['lab_name'] = $lab_name;
+    	}else{
 			//get selected lab name
 			$lab_details = $this->DmiFirms->find('all',array('fields'=>'firm_name','conditions'=>array('id IS'=>$eachrow['grading_lab'])))->first();
 			$lab_name = $lab_details['firm_name'];				
 			$tableRowData[$i]['lab_name'] = $lab_name;
+			}
 			
 			//get selected commodity
 			$commodity_details = $this->MCommodity->find('all',array('fields'=>'commodity_name','conditions'=>array('commodity_code IS'=>$eachrow['commodity'])))->first();
@@ -1051,6 +1086,12 @@ class ReplicaController extends AppController {
 	}
 
 
+	/**
+	 * function updated for attachment of own lab module
+	 * modify some condition's and added new logic as needed
+	 * @author shankhpal shende
+	 * @version 16 th June 2023
+	 */
 	//function to create view of pdf document for replica allotment letter
 	public function replicaAllotmentPdfView() {
 
@@ -1092,10 +1133,28 @@ class ReplicaController extends AppController {
 			
 			$eachrow = $each;
 			
+			/**
+			 * Added for own lab module, split own lab id and get details from dmi_ca_mapping_own_lab_details 
+			 * table
+			 * @author shankhpal shende
+			 * @version 15th June 2023
+			 */
+			$this->loadModel('DmiCaMappingOwnLabDetails');
+			
+			if (strpos($eachrow['grading_lab'], "/Own") !== false) {
+        // Get selected lab name
+        $lab_details = $this->DmiCaMappingOwnLabDetails->find()
+            ->select(['lab_name'])
+            ->where(['own_lab_id' => $eachrow['grading_lab']])
+            ->first();
+        $lab_name = $lab_details['lab_name'];
+        $tableRowData[$i]['lab_name'] = $lab_name;
+    	}else{
 			//get selected lab name
 			$lab_details = $this->DmiFirms->find('all',array('fields'=>'firm_name','conditions'=>array('id IS'=>$eachrow['grading_lab'])))->first();
 			$lab_name = $lab_details['firm_name'];				
 			$tableRowData[$i]['lab_name'] = $lab_name;
+			}
 			
 			//get selected commodity
 			$commodity_details = $this->MCommodity->find('all',array('fields'=>'commodity_name','conditions'=>array('commodity_code IS'=>$eachrow['commodity'])))->first();
@@ -1368,8 +1427,20 @@ class ReplicaController extends AppController {
 			$i=$i+1;
 		}
 		//get lab details
+		/**
+		 * Added for own lab module, split own lab id and get details from dmi_ca_mapping_own_lab_details 
+		 * table
+		 * @author shankhpal shende
+		 * @version 20 June 2023
+		 */
+		$this->loadModel('DmiCaMappingOwnLabDetails');
+		if (strpos($lab_id, "/Own") !== false) {
+			$lab_details = $this->DmiCaMappingOwnLabDetails->find('all',array('fields'=>'ca_id','conditions'=>array('own_lab_id IS'=>$lab_id)))->first();
+			$lab_cust_id = $lab_details['ca_id'];
+		} else {
 		$lab_details = $this->DmiFirms->find('all',array('fields'=>'customer_id','conditions'=>array('id IS'=>$lab_id)))->first();
 		$lab_cust_id = $lab_details['customer_id'];
+		}
 		
 		#SMS: Approve and Allotment of Replica Serial No.
 		$this->DmiSmsEmailTemplates->sendmessage(59,$lab_cust_id); #Laboratory

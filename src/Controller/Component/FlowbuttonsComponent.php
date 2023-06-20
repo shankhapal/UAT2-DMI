@@ -164,8 +164,9 @@ class FlowbuttonsComponent extends Component {
 		$firm_type = $this->Customfunctions->firmType($customerId);
 		
 		if(!empty($showGrantBtn) && $all_report_status == 'true'){
-			
-			if($applicationType==1 || $applicationType==3){//added $applicationType == 3 on 13-04-2023
+			// $applicationType == 5 added for 15-digit code application  Grant 
+			// added by shankhpal shende on 16/06/2023
+			if($applicationType==1 || $applicationType==3 || $applicationType == 5){//added $applicationType == 3 on 13-04-2023
 				
 				if($office_type=='RO'){
 					
