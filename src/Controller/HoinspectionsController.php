@@ -798,13 +798,17 @@ use App\Network\Response\Response;
 					//check if already cert esigned for old appl
 					if($appl_type_id == '1' && !empty($is_old)){
 						$this->loadModel('DmiOldApplEsignCertLogs');
+						$this->loadModel('DmiRenewalFinalSubmits');
 						$checkAlreadyOldEsigned = $this->DmiOldApplEsignCertLogs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+						//to check renewal in process to hide generate button
+						$checkRenewalInprocess = $this->DmiRenewalFinalSubmits->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+
 						$appl_array[$i]['AlreadyOldEsigned'] = $checkAlreadyOldEsigned['pdf_file'];
 						$this->set('checkAlreadyOldEsigned',$checkAlreadyOldEsigned);
 					}
 					//to check if renewal esinged cert. available already, to show/hide btn
 					if($appl_type_id == '1' && !empty($is_old) && $checkRenewalGrant['pdf_version'] == 1){					
-						if(empty($checkAlreadyOldEsigned)){
+						if(empty($checkAlreadyOldEsigned) && empty($checkRenewalInprocess)){
 							$appl_array[$i]['show_gen_old_cert_btn'] = 'yes';
 						}			
 					}

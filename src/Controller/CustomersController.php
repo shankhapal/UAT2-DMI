@@ -1561,6 +1561,12 @@ class CustomersController extends AppController {
 	
 
 		$this->set('approved_routine_inspection_pdf', $approved_routine_inspection_pdf);
+
+		//check if certificate is generated or not, if old appl data is verified
+		//added on 21-06-2023 by Amol
+		$this->loadModel('DmiOldApplEsignCertLogs');
+		$checkOldCertEsigned = $this->DmiOldApplEsignCertLogs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+		$this->set('checkOldCertEsigned', $checkOldCertEsigned);
 		
 	}
 
