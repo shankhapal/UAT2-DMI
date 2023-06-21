@@ -68,17 +68,53 @@ class DmiRoutineInspectionPpReportsTable extends Table{
 
 			if(!empty($last_report_details)){
 				$last_insp_suggestion = $last_report_details['last_insp_suggestion'];
+				$approved_date = $last_report_details['approved_date']; // if record is last apprive then fetch apprive date from this table 
 				$suggestions_last_ins_yes_no = $last_report_details['suggestions_last_ins_yes_no'];
+			}else{
+				$Dmi_grant_certificates_pdfs = TableRegistry::getTableLocator()->get('DmiGrantCertificatesPdfs');
+				$get_last_grant_date = $Dmi_grant_certificates_pdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>array('id desc')))->first();
+				$approved_date = $get_last_grant_date['date'];
 			}
 
-			$form_fields_details = Array ('id' =>"",'customer_id' =>"",'date_last_inspection'=>"",'date_p_inspection'=>"",'email'=>"",'mobile_no'=>"",'packaging_material'=>"",
-			'valid_upto'=>"",'street_address'=>"",'registered_office'=>"",'press_premises'=>"",'physical_check'=>"",'is_printing'=>"",
-			'storage_facilities'=>"",'lab_properly_equipped'=>"",'maintains_proper'=>"",'right_quality_of_printing'=>"",'press_is_marking_logo'=>"",'suggestions_last_ins_yes_no'=>isset($suggestions_last_ins_yes_no)?$suggestions_last_ins_yes_no:"",
-			'last_insp_suggestion'=>isset($last_insp_suggestion)?$last_insp_suggestion:"",'short_obserd'=>"",'if_any_sugg'=>"",'signature'=>"",
-			'signature_name'=>"",'io_reply_once_no' =>"", 'user_email_id' =>"",'user_once_no' =>"", 'referred_back_comment' =>"", 'referred_back_date' =>"", 
-			'io_reply' =>"", 'io_reply_date' =>"", 'form_status' =>"",'approved_date' =>"",'referred_back_by_email' =>"", 'referred_back_by_once' =>"", 
-			'current_level' =>"", 'constituent_oil_mill_docs' =>"",'separate_pipe_lines' =>"no", 'delete_ro_referred_back' =>"");
-
+			$form_fields_details = Array (
+				'id' =>"",
+				'customer_id' =>"",
+				'date_last_inspection'=>isset($approved_date)?$approved_date:"",
+				'date_p_inspection'=>"",
+				'email'=>"",
+				'mobile_no'=>"",
+				'packaging_material'=>"",
+				'valid_upto'=>"",
+				'street_address'=>"",
+				'registered_office'=>"",
+				'press_premises'=>"",
+				'physical_check'=>"",
+				'is_printing'=>"",
+				'storage_facilities'=>"",
+				'lab_properly_equipped'=>"",
+				'maintains_proper'=>"",
+				'right_quality_of_printing'=>"",
+				'press_is_marking_logo'=>"",
+				'suggestions_last_ins_yes_no'=>isset($suggestions_last_ins_yes_no)?$suggestions_last_ins_yes_no:"",
+				'last_insp_suggestion'=>isset($last_insp_suggestion)?$last_insp_suggestion:"",
+				'short_obserd'=>"",'if_any_sugg'=>"",
+				'signature'=>"",
+				'signature_name'=>"",
+				'io_reply_once_no' =>"", 
+				'user_email_id' =>"",
+				'user_once_no' =>"", 
+				'referred_back_comment' =>"", 
+				'referred_back_date' =>"", 
+				'io_reply' =>"", 
+				'io_reply_date' =>"", 
+				'form_status' =>"",
+				'approved_date' =>"",
+				'referred_back_by_email' =>"", 
+				'referred_back_by_once' =>"", 
+				'current_level' =>"",
+				'constituent_oil_mill_docs' =>"",
+			  'separate_pipe_lines' =>"no", 
+			  'delete_ro_referred_back' =>"");
 		}
 				
 		$user_email_id = $_SESSION['username'];

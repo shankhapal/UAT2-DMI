@@ -1259,6 +1259,13 @@ $(document).ready(function () {
       var comm_with = $("#comm_with").val();
 
       if (appl_type != "" && io_user_id != null && customer_id != "") {
+        // Check if ro_scheduled_date is empty
+        // added by shankhpal shende on 20/06/2023
+        if (ro_scheduled_date === "") {
+          // Show an error message or perform any other necessary action
+          alert("Please select a scheduled date for Routine Inspection.");
+          return false;
+        }
         //condition added on 07-02-2023
         //to check if the application is already allocated.
         //if yes, then alert user on reallocation of application to get confirmation.
@@ -1314,6 +1321,13 @@ $(document).ready(function () {
         customer_id != "" &&
         customer_id != ""
       ) {
+        // Check if ro_scheduled_date is empty
+        // added by shankhpal shende on 20/06/2023
+        if (ro_scheduled_date === "") {
+          // Show an error message or perform any other necessary action
+          alert("Please select a scheduled date for Routine Inspection.");
+          return false;
+        }
         $.ajax({
           type: "POST",
           async: true,

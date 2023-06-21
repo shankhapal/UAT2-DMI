@@ -55,7 +55,7 @@
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                        <?php echo $this->Form->control('printing_press', array('type'=>'text', 'id'=>'printing_press','value'=>$firm_details['firm_name'],'readonly'=>true, 'placeholder'=>'Enter Name of the Printing Press', 'label'=>false, 'class'=>'form-control')); ?>
+                                        <?php echo $this->Form->control('printing_press', array('type'=>'text', 'id'=>'printing_press','value'=>$firm_details['firm_name'], 'placeholder'=>'Enter Name of the Printing Press', 'label'=>false, 'class'=>'form-control readOnly')); ?>
                                             <span id="error_printing_press" class="error invalid-feedback"></span>
                                         </div>
                                     </div>
@@ -87,7 +87,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
-                                                <?php echo $this->Form->control('mobile_no', array('type'=>'text','value'=>base64_decode($firm_details['mobile_no']),'id'=>'mobile_no','readonly'=>'readonly', 'class'=>'form-control', 'label'=>false)); ?>
+                                                <?php echo $this->Form->control('mobile_no', array('type'=>'text','value'=>base64_decode($firm_details['mobile_no']),'id'=>'mobile_no', 'class'=>'form-control readOnly', 'label'=>false)); ?>
                                                 <span id="error_mobile_no" class="error invalid-feedback"></span>
                                             </div>
                                             <div class="col-md-2">
@@ -96,7 +96,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
-                                            <?php echo $this->Form->control('email', array('type'=>'email', 'placeholder'=>'Enter firm email id','value'=>base64_decode($firm_details['email']),'readonly'=>'readonly', 'id'=>'email', 'class'=>'form-control input-field', 'label'=>false)); ?>
+                                            <?php echo $this->Form->control('email', array('type'=>'email', 'placeholder'=>'Enter firm email id','value'=>base64_decode($firm_details['email']), 'id'=>'email', 'class'=>'form-control readOnly input-field', 'label'=>false)); ?>
                                                 <span id="error_email" class="error invalid-feedback"></span>
                                             </div>
                                         </div>
@@ -110,7 +110,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
-                                            <?php echo $this->Form->control('registered_office', array('type'=>'textarea','value'=>$section_form_details[4], 'id'=>'registered_office','readonly'=>'readonly', 'class'=>'form-control input-field', 'label'=>false)); ?>
+                                            <?php echo $this->Form->control('registered_office', array('type'=>'textarea','value'=>$section_form_details[4], 'id'=>'registered_office', 'class'=>'form-control input-field readOnly', 'label'=>false)); ?>
                                                 <span id="error_registered_office" class="error invalid-feedback"></span>
                                             </div>
                                             <div class="col-md-2">
@@ -119,7 +119,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
-                                            <?php echo $this->Form->control('press_premises', array('type'=>'textarea','value'=>$section_form_details[5], 'class'=>'form-control input-field','readonly'=>'readonly', 'label'=>false)); ?>
+                                            <?php echo $this->Form->control('press_premises', array('type'=>'textarea','value'=>$section_form_details[5], 'class'=>'form-control input-field readOnly', 'label'=>false)); ?>
                                             </div>
                                         </div>
                                     </div>
@@ -136,7 +136,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
-                                                <?php echo $this->Form->control('valid_upto', array('type'=>'text', 'id'=>'valid_upto', 'escape'=>false,'maxlength'=>'10', 'minlength'=>'10','value'=>$section_form_details[6], 'class'=>'cvOn cvReq cvDate form-control', 'readonly'=>'readonly', 'label'=>false)); ?>
+                                                <?php echo $this->Form->control('valid_upto', array('type'=>'text', 'id'=>'valid_upto', 'escape'=>false,'maxlength'=>'10', 'minlength'=>'10','value'=>$section_form_details[6], 'class'=>'cvOn cvReq cvDate form-control readOnly', 'label'=>false)); ?>
                                                     <span id="error_valid_upto" class="error invalid-feedback"></span>
                                                 </div>
                                             </div>
@@ -154,7 +154,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
-                                                          <?php echo $this->Form->control('packaging_material', array('type'=>'select', 'options'=>$section_form_details[7], 'multiple'=>'multiple', 'label'=>false, 'readonly'=>'readonly', 'class'=>'form-control')); ?>
+                                                          <?php echo $this->Form->control('packaging_material', array('type'=>'select', 'options'=>$section_form_details[7], 'multiple'=>'multiple', 'label'=>false,'class'=>'form-control readOnly')); ?>
                                                     </div>
                                                 </div>
                                             </div>

@@ -75,15 +75,41 @@ class DmiRtiCaPackerDetailsTable extends Table{
 
 				if(!empty($last_report_details)){
 					$enumerate_briefly_suggestions = $last_report_details['enumerate_briefly_suggestions'];
+					$approved_date = $last_report_details['approved_date']; // if record is last apprive then fetch apprive date from this table 
 					$e_briefly_suggestions_radio = $last_report_details['e_briefly_suggestions_radio'];
+				}else{
+					$Dmi_grant_certificates_pdfs = TableRegistry::getTableLocator()->get('DmiGrantCertificatesPdfs');
+					$get_last_grant_date = $Dmi_grant_certificates_pdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>array('id desc')))->first();
+					$approved_date = $get_last_grant_date['date'];
 				}
 				
 				$form_fields_details = Array (
-					'id' =>"",'customer_id' =>"",'io_reply_once_no' =>"",  'referred_back_comment' =>"",'referred_back_date' =>"",'date_last_inspection' =>"",
-					'date_p_inspection' =>"",'name_authorized_packer' =>"",'street_address' =>"",'email' =>"",'mobile_no' =>"",'certificate_no' =>"",
-					'valid_upto' =>"",'commodity' =>"",'grading_lab' =>"",'printing_press' =>"",'record_of_invice' =>"",'chemist_incharge' =>"",
-					'present_time_of_inspection' =>"",'premises_adequately' =>"",'lab_properly_equipped' =>"",'are_you_upto_date' =>"",'concerned_offices' =>"",
-					'last_lot_no' =>"",'last_lot_date' =>"",'analytical_results' =>"",'month_upto' =>"",
+					'id' =>"",'customer_id' =>"",
+					'io_reply_once_no' =>"",  
+					'referred_back_comment' =>"",
+					'referred_back_date' =>"",
+					'date_last_inspection' =>isset($approved_date)?$approved_date:"",
+					'date_p_inspection' =>"",
+					'name_authorized_packer' =>"",
+					'street_address' =>"",
+					'email' =>"",
+					'mobile_no' =>"",
+					'certificate_no' =>"",
+					'valid_upto' =>"",
+					'commodity' =>"",
+					'grading_lab' =>"",
+					'printing_press' =>"",
+					'record_of_invice' =>"",
+					'chemist_incharge' =>"",
+					'present_time_of_inspection' =>"",
+					'premises_adequately' =>"",
+					'lab_properly_equipped' =>"",
+					'are_you_upto_date' =>"",
+					'concerned_offices' =>"",
+					'last_lot_no' =>"",
+					'last_lot_date' =>"",
+					'analytical_results' =>"",
+					'month_upto' =>"",
 					'enumerate_briefly_suggestions'=>isset($enumerate_briefly_suggestions)?$enumerate_briefly_suggestions:"",'e_briefly_suggestions_radio'=>isset($e_briefly_suggestions_radio)?$e_briefly_suggestions_radio:"",
 					'replica_account_correct' =>"",'discrepancies_replica_aco' =>"",
 					'fssai_approved ' =>"",'io_reply' =>"", 'io_reply_date' =>"", 'form_status' =>"",'referred_back_by_email' =>"", 'referred_back_by_once' =>"", 
