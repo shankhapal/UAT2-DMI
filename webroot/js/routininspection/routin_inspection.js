@@ -4,6 +4,32 @@
 // 	Date: 11-05-2023 - 16-05-2023
 // */ -->
 $(document).ready(function () {
+  // the following logic is check the date of present inspection is less than to last inspection
+  // added by shankhpal on 20/06/2023
+  var date_last_inspection = $("#date_last_inspection").val();
+
+  if (date_last_inspection !== "") {
+    $("#date_last_inspection").addClass("readOnly");
+  }
+  $("#date_p_inspection").change(function () {
+    var date_p_inspection = $("#date_p_inspection").val();
+
+    // Check if both dates are not empty
+    if (date_last_inspection !== "" && date_p_inspection !== "") {
+      // Parse the dates using Moment.js
+      var moment_last_inspection = moment(date_last_inspection, "DD/MM/YYYY");
+      var moment_p_inspection = moment(date_p_inspection, "DD/MM/YYYY");
+
+      // Compare the last inspection date with the present inspection date
+      if (moment_p_inspection.isBefore(moment_last_inspection)) {
+        alert(
+          "Present inspection date should be greater than or equal to the last inspection date."
+        );
+        $("#date_p_inspection").val(""); // Clear the selected date
+      }
+    }
+  });
+
   var application_mode = $("#application_mode").val();
   var current_level = $("#current_level").val();
   // alert(current_level);

@@ -74,7 +74,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
-                                                <?php echo $this->Form->control('street_address', array('type'=>'textarea', 'id'=>'street_address','value'=>$firm_details['street_address'],'readonly'=>true,  'class'=>'form-control input-field', 'label'=>false)); ?>
+                                                <?php echo $this->Form->control('street_address', array('type'=>'textarea', 'id'=>'street_address','value'=>$firm_details['street_address'],  'class'=>'form-control input-field readOnly', 'label'=>false)); ?>
                                                 <span id="error_street_address" class="error invalid-feedback"></span>
                                                  </div>
                                             </div>
@@ -123,7 +123,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
-                                                <?php echo $this->Form->control('certificate_no', array('type'=>'text', 'id'=>'certificate_no','value'=>$firm_details['customer_id'],'readonly'=>true,  'class'=>'form-control', 'label'=>false)); ?>
+                                                <?php echo $this->Form->control('certificate_no', array('type'=>'text', 'id'=>'certificate_no','value'=>$firm_details['customer_id'],  'class'=>'form-control readOnly', 'label'=>false)); ?>
                                                 <span id="error_certificate_no" class="error invalid-feedback"></span>
                                                  </div>
                                             </div>
@@ -138,7 +138,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
-                                               <?php echo $this->Form->control('valid_upto', array('type'=>'text', 'id'=>'valid_upto', 'class'=>'form-control','value'=>$section_form_details[2],'label'=>false,'readonly'=>true,)); ?>
+                                               <?php echo $this->Form->control('valid_upto', array('type'=>'text', 'id'=>'valid_upto', 'class'=>'form-control readOnly','value'=>$section_form_details[2],'label'=>false)); ?>
                                                 <span id="error_valid_upto" class="error invalid-feedback"></span>
                                                  </div>
                                             </div>
@@ -158,7 +158,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
-                                                        <?php echo $this->Form->control('sub_commodity', array('type'=>'select', 'options'=>$sub_commodity_value, 'multiple'=>'multiple', 'label'=>false, 'disabled'=>'disabled', 'class'=>'form-control')); ?>
+                                                        <?php echo $this->Form->control('sub_commodity', array('type'=>'select', 'options'=>$sub_commodity_value, 'multiple'=>'multiple', 'label'=>false, 'class'=>'form-control readOnly')); ?>
                                                  </div>
                                             </div>
                                         </div>

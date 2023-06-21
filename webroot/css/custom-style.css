@@ -946,6 +946,7 @@ date: 04/11/2022
 
   .readOnly{
     pointer-events: none;
+    background: rgb(233 236 239);;
   }
   
   blink {

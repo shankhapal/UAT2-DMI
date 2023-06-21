@@ -57,7 +57,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                 </div>
             </div>
             <div class="col-md-3">
-                <?php echo $this->Form->control('name_of_lab', array('type'=>'text', 'id'=>'name_of_lab','value'=>$firm_details['firm_name'],'class'=>'form-control','label'=>false,'readonly'=>'readonly')); ?>
+                <?php echo $this->Form->control('name_of_lab', array('type'=>'text', 'id'=>'name_of_lab','value'=>$firm_details['firm_name'],'class'=>'form-control readOnly','label'=>false)); ?>
                 <span id="error_name_of_lab" class="error invalid-feedback"></span>
             </div>
             <div class="col-md-3">
@@ -66,7 +66,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                 </div>
             </div>
             <div class="col-md-3">
-                <?php echo $this->Form->control('street_address', array('type'=>'textarea', 'id'=>'street_address','value'=>$firm_details['street_address'],'readonly'=>true,'placeholder'=>'Enter street address', 'class'=>'form-control input-field', 'label'=>false)); ?>
+                <?php echo $this->Form->control('street_address', array('type'=>'textarea', 'id'=>'street_address','value'=>$firm_details['street_address'],'placeholder'=>'Enter street address', 'class'=>'form-control input-field readOnly', 'label'=>false)); ?>
                 <span id="error_street_address" class="error invalid-feedback"></span>
             </div>
         </div>
@@ -82,7 +82,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                 </div>
             </div>
             <div class="col-md-4">
-                <?php echo $this->Form->control('email', array('type'=>'text', 'placeholder'=>'Enter firm email id','value'=>base64_decode($firm_details['email']),'readonly'=>true, 'id'=>'email', 'class'=>'form-control input-field', 'label'=>false)); ?>
+                <?php echo $this->Form->control('email', array('type'=>'text', 'placeholder'=>'Enter firm email id','value'=>base64_decode($firm_details['email']),'id'=>'email', 'class'=>'form-control input-field readOnly', 'label'=>false)); ?>
                 <span id="error_email" class="error invalid-feedback"></span>
             </div>
             <div class="col-md-2">
@@ -91,7 +91,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                 </div>
             </div>
             <div class="col-md-4">
-               <?php echo $this->Form->control('mobile_no', array('type'=>'text', 'placeholder'=>'Enter mobile no. here', 'id'=>'mobile_no','value'=>base64_decode($firm_details['mobile_no']),'readonly'=>true, 'class'=>'form-control input-field', 'label'=>false)); ?>
+               <?php echo $this->Form->control('mobile_no', array('type'=>'text', 'placeholder'=>'Enter mobile no. here', 'id'=>'mobile_no','value'=>base64_decode($firm_details['mobile_no']),'class'=>'form-control input-field readOnly', 'label'=>false)); ?>
                 <span id="error_mobile_no" class="error invalid-feedback"></span>
             </div>
         </div>
