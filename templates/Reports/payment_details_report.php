@@ -224,7 +224,7 @@
 												<td>
 
 													<!-- commented by shreeya on date [13-06-2023]-->
-													<?php //echo $all_application_type[$firms_details[$i]['certification_type']]; ?>
+												
 													<!-- added if else according to record null or not by shreeya on date [13-06-2023]-->
 													<?php if (!empty($all_application_type[$firms_details[$j][$i]['certification_type']])) { ?>
 														<span class="badge subtitle borderless">
@@ -254,7 +254,7 @@
 												<td class="text-right">
 
 													<!-- commented by shreeya on date [13-06-2023]-->
-													<!-- <span class="badge title borderless"><?php// echo $all_states[$firms_details[$i]['state']]; ?></span> -->
+												
 													<!-- added if else according to record null or not by shreeya on date [13-06-2023]-->
 													<?php if (!empty($all_states[$firms_details[$j][$i]['state']])) { ?>
 														<span class="badge subtitle borderless">
@@ -270,7 +270,7 @@
 												</td>
 												<td>
 													<!-- commented by shreeya on date [13-06-2023]-->
-													<!-- <span class="badge subtitle borderless"><?php //echo $all_district[$firms_details[$i]['district']]; ?></span> -->
+												
 													<!-- added if else according to record null or not by shreeya on date [13-06-2023]-->
 													<?php if (!empty($all_district[$firms_details[$j][$i]['district']])) { ?>
 														<span class="badge subtitle borderless">
@@ -282,13 +282,26 @@
 														} ?>
 														</span>
 												</td>
-												<td><span class="badge subtitle borderless"><?php echo number_format($customer_payment_details[$j][$i]['amount_paid'], 2); ?></span></td>
+												<td><span class="badge subtitle borderless"><?php echo number_format($customer_payment_details[$j][$i]['amount_paid'], 2); ?></span></td>				
 											</tr>
 										<?php $k++;}
 									}
 									$j++;
 								}
 								?>
+								</tbody>
+							</table>
+							<!-- show total grant added by shreeya on date[21-06-2023]-->
+							<table class="table table-sm rounded" id="payment_details_report_table">
+								<tbody class="">
+                					<tr>
+										<td>
+											<span class="badge title borderless">
+												<?php echo $sum_of_all;?>
+											</span>
+										</td>
+										
+									</tr>
 								</tbody>
 							</table>
 						</div>
@@ -318,22 +331,25 @@
 									<tbody>
 										
 											<?php
-												$report_for_array = []; // Initialize $report_for_array as an empty array
-                        						$report_for_array_new = array_values($report_for_array);
-											
+												
+												
+												$report_for_array_new = array_keys($report_for_array); //for show only key
+												$report_for_array_new1 = array_values($report_for_array);
+												
 												$arrlength = count($report_for_array_new);
+												$arrlength = count($report_for_array_new1);
 
 												for($x = 0; $x < $arrlength; $x++) { ?>
 														<tr>
 															<td>
 																<span class="glyphicon glyphicon-plus plusIcon" id="list_<?php echo $x?>"></span>
 																<span class="glyphicon glyphicon-minus plusIcon" style="display:none"></span>
-																<?php echo $report_for_array_new[$x]." "."Application Payment Details"; ?>
+																<?php echo $report_for_array_new1[$x]." "."Application Payment Details"; ?>
 															</td>  
 														</tr>
-											<?php
-
-												if($report_for_array_new[$x] == "New"){?>
+												<?php
+												//	change application type name "New" -> 1	by shreeya[19-06-2023]	
+												if($report_for_array_new[$x] == 1){?>
 													<tr class="hidden">
 														<td>
 															<table class="table table-bordered">
@@ -356,7 +372,7 @@
 															</table>    
 														</td>
 															 </tr>
-															<?php }elseif($report_for_array_new[$x] == "Renewal"){ ?>
+															<?php }elseif($report_for_array_new[$x] == 2){ ?>
 															   <tr class="hidden">
                                     								<td>
 																		<table class="table table-bordered">
@@ -379,7 +395,7 @@
 																		</table>    
 																	</td>
 															  </tr>
-															  <?php }elseif($report_for_array_new[$x] == "Change Request"){ ?>
+															  <?php }elseif($report_for_array_new[$x] == 3){ ?>
                                  									<tr class="hidden">
                                     										<td>
 																			<table class="table table-bordered">
@@ -403,18 +419,18 @@
 																			</table>    
 																	</td>
 															  </tr>
-															<?php }elseif($report_for_array_new[$x] == "Chemist Approval") {?>
+															<?php }elseif($report_for_array_new[$x] == 4) {?>
                                  							<tr class="hidden">
                                     							<td>
 																			<table class="table table-bordered">
 																				<tr>
 																							<td><span class=""></span>Chemist Approval Applications Payment Total : </td>
-																							<td><span class=""></span> <?php echo $change_ca_total; ?></td>
+																							<td><span class=""></span> <?php echo $chemist_total; ?></td>
 																				</tr>
 																			</table>    
 																	</td>
 															  </tr>
-															<?php }elseif($report_for_array_new[$x] == "Approval of FDC") {?>	
+															<?php }elseif($report_for_array_new[$x] == 5) {?>	
                                								<tr class="hidden">
                                  							   <td>
 																			<table class="table table-bordered">
@@ -425,7 +441,7 @@
 																			</table>    
 																	</td>
 															  </tr>
-															<?php }elseif($report_for_array_new[$x] == "E-Code"){ ?>	
+															<?php }elseif($report_for_array_new[$x] == 6){ ?>	
                                 							<tr class="hidden">
                                     							<td>
 																			<table class="table table-bordered">
@@ -436,7 +452,7 @@
 																			</table>    
 																	</td>
 															  </tr>
-															<?php }elseif($report_for_array_new[$x] == "Advance Payment"){ ?>
+															<?php }elseif($report_for_array_new[$x] == 7){ ?>
                                 							<tr class="hidden">
                                    							 <td>
 																			<table class="table table-bordered">
@@ -447,9 +463,9 @@
 																			</table>    
 																	</td>
 															  </tr>
-															<?php }elseif($report_for_array_new[$x] == "Approval of DP"){ ?>
-                              	<tr class="hidden">
-                                    <td>
+															<?php }elseif($report_for_array_new[$x] == 8){ ?>
+                              									<tr class="hidden">
+                                    								<td>
 																			<table class="table table-bordered">
 																					<tr>
 																							<td><span class=""></span>Approval of Designated Persion Applications Payment Total :</td>
@@ -458,9 +474,9 @@
 																			</table>    
 																	</td>
 															  </tr>
-															<?php }elseif($report_for_array_new[$x] == "Routine Inspection") {?>	
-                              <tr class="hidden">
-                                    <td>
+															<?php }elseif($report_for_array_new[$x] == 9) {?>	
+                              									<tr class="hidden">
+                                    								<td>
 																			<table class="table table-bordered">
 																					<tr>
 																							<td><span class=""></span>Routine Inspection Applications Payment Total :</td>
@@ -469,9 +485,9 @@
 																			</table>    
 																	</td>
 															  </tr>
-															<?php }elseif($report_for_array_new[$x] == "Bianually Grading Reports"){ ?>
+															<?php }elseif($report_for_array_new[$x] == 10){ ?>
 																<tr class="hidden">
-                                    <td>
+                                    								<td>
 																			<table class="table table-bordered">
 																					<tr>
 																							<td><span class=""></span>Bianually Grading Reports Applications Payment Total :</td>
