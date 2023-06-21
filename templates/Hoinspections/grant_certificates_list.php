@@ -32,7 +32,11 @@
 					<th>Firm Name</th>
 					<th>Applicant Id</th>
 					<th>Grant Date</th>
-					<th>Cert. Pdf</th>
+					<?php if($_SESSION['is_old']=='old') { ?>
+						<th>Old Cert. Pdf</th>
+					<?php }else{ ?>
+						<th>Cert. Pdf</th>
+					<?php } ?>
 
 					<!-- added condition on 16-09-2021, as per new order -->
 					<?php if ($appl_type != 'Renewal') { ?>
@@ -120,7 +124,7 @@
 											<?php if($each['show_gen_old_cert_btn']=='yes'){ ?>
 												<td><a href="#" id="gen_old_cert_btn<?php echo $i; ?>" class="btn btn-primary">Get Esigned Certificate</a></td>
 											<?php }else{ ?>
-												<td>Esigned Cert. Available</td>
+												<td>Renewal Inprocess OR Cert. Available</td>
 											<?php } ?>
 										<?php }else{ ?>
 											<td>

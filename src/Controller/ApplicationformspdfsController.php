@@ -1764,6 +1764,7 @@ class ApplicationformspdfsController extends AppController{
 				//on 20-06-2023 by Amol
 				if($_SESSION['gen_old_cert_session']=='yes'){
 					$cert_grant_date = $lastGrantDate;
+					$pdf_date = substr($lastGrantDate,0,10);//to crop 00:00:00
 				}
 				$certificate_valid_upto[$i] = $this->Customfunctions->getCertificateValidUptoDate($customer_id,$cert_grant_date);
 			}
@@ -2109,6 +2110,7 @@ class ApplicationformspdfsController extends AppController{
 				//on 20-06-2023 by Amol
 				if($_SESSION['gen_old_cert_session']=='yes'){
 					$cert_grant_date = $lastGrantDate;
+					$pdf_date = substr($lastGrantDate,0,10);//to crop 00:00:00
 				}
 			
 				$certificate_valid_upto[$i] = $this->Customfunctions->getCertificateValidUptoDate($customer_id,$cert_grant_date);
@@ -2392,6 +2394,7 @@ class ApplicationformspdfsController extends AppController{
 				//on 20-06-2023 by Amol
 				if($_SESSION['gen_old_cert_session']=='yes'){
 					$cert_grant_date = $lastGrantDate;
+					$pdf_date = substr($lastGrantDate,0,10);//to crop 00:00:00
 				}
 			
 				$certificate_valid_upto[$i] = $this->Customfunctions->getCertificateValidUptoDate($customer_id,$cert_grant_date);
