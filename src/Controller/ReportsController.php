@@ -5981,8 +5981,9 @@ class ReportsController extends AppController {
 							$tbl_data = $payment_value['payment'];
 							$this->loadModel($tbl_data);
 
-							$application_list_data[$j] = $this->$tbl_data->find('all',array('conditions'=>array('payment_confirmation'=>'confirmed','and'=>array('date(created) >=' => $from_date, 'date(created) <=' =>$to_date)),'order'=>'id desc'))->toArray();
-							//$application_list_data[$j] = $this->$tbl_data->find('all')->select(['id','customer_id','certificate_type','amount_paid','payment_confirmation'])->where(['payment_confirmation' =>'confirmed'])->toArray(); 
+							//$application_list_data[$j] = $this->$tbl_data->find('all',array('conditions'=>array('payment_confirmation'=>'confirmed','and'=>array('date(created) >=' => $from_date, 'date(created) <=' =>$to_date)),'order'=>'id desc'))->toArray();
+							//added for show paymet count of ca,pp,lab by shreeya on date [21-06-2023]
+							$application_list_data[$j] = $this->$tbl_data->find('all')->select(['id','customer_id','certificate_type','amount_paid','payment_confirmation'])->where(['payment_confirmation' =>'confirmed'])->toArray(); 
 							$j++;
 						}
 						//for new
@@ -6126,10 +6127,9 @@ class ReportsController extends AppController {
 						$tbl_data = $payment_value['payment'];
 						$this->loadModel($tbl_data);
 
-						$application_list_data[$j] = $this->$tbl_data->find('all',array('conditions'=>array('payment_confirmation'=>'confirmed','and'=>array('date(created) >=' => $from_date, 'date(created) <=' =>$to_date)),'order'=>'id desc'))->toArray();
-
-						
-						//$application_list_data[$j] = $this->$tbl_data->find('all')->select(['id','customer_id','certificate_type','amount_paid','payment_confirmation'])->where(['payment_confirmation' =>'confirmed'])->toArray(); 
+						//$application_list_data[$j] = $this->$tbl_data->find('all',array('conditions'=>array('payment_confirmation'=>'confirmed','and'=>array('date(created) >=' => $from_date, 'date(created) <=' =>$to_date)),'order'=>'id desc'))->toArray();
+						//added for show paymet count of ca,pp,lab by shreeya on date [21-06-2023]
+						$application_list_data[$j] = $this->$tbl_data->find('all')->select(['id','customer_id','certificate_type','amount_paid','payment_confirmation'])->where(['payment_confirmation' =>'confirmed'])->toArray(); 
 						$j++;
 					}
 					
@@ -6339,10 +6339,9 @@ class ReportsController extends AppController {
 						$tbl_data = $payment_value['payment'];
 						$this->loadModel($tbl_data);
 
-						$application_list_data[$j] = $this->$tbl_data->find('all',array('conditions'=>array('payment_confirmation'=>'confirmed','and'=>array('date(created) >=' => $from_date, 'date(created) <=' =>$to_date)),'order'=>'id desc'))->toArray();
-
-						
-						//$application_list_data[$j] = $this->$tbl_data->find('all')->select(['id','customer_id','certificate_type','amount_paid','payment_confirmation'])->where(['payment_confirmation' =>'confirmed'])->toArray(); 
+						//$application_list_data[$j] = $this->$tbl_data->find('all',array('conditions'=>array('payment_confirmation'=>'confirmed','and'=>array('date(created) >=' => $from_date, 'date(created) <=' =>$to_date)),'order'=>'id desc'))->toArray();
+						//added for show paymet count of ca,pp,lab by shreeya on date [21-06-2023]
+						$application_list_data[$j] = $this->$tbl_data->find('all')->select(['id','customer_id','certificate_type','amount_paid','payment_confirmation'])->where(['payment_confirmation' =>'confirmed'])->toArray(); 
 						$j++;
 					}
 				
