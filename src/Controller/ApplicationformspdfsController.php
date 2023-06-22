@@ -416,6 +416,12 @@ class ApplicationformspdfsController extends AppController{
 			$current_pdf_version = $last_pdf_version+1; //increment last version by 1
 		}
 		
+		//to set default pdf version 1 for old verified appl cert esign.
+		//added on 21-06-2023 by Amol
+		if($_SESSION['gen_old_cert_session']=='yes'){
+			$current_pdf_version = 1;
+		}
+		
 		
 
 		$user_email_id = $this->Session->read('username');
@@ -459,13 +465,12 @@ class ApplicationformspdfsController extends AppController{
 				if($_SESSION['gen_old_cert_session']=='yes'){
 					
 					$DmiOldApplEsignCertLogs = TableRegistry::getTableLocator()->get('DmiOldApplEsignCertLogs');
-					$file_path = '/writereaddata/DMI/certificates/'.$folderName.'/'.$rearranged_id.'(1)'.'.pdf';//default version 1 as old is first grant
 					
 					$oldApplCertRecords = $DmiOldApplEsignCertLogs->newEntity(array(		
 						'customer_id'=>$customer_id,
 						'user_email_id'=>$user_email_id,
 						'pdf_file'=>$file_path,
-						'pdf_version'=>'1',//default version 1 as old is first grant
+						'pdf_version'=>$current_pdf_version,//default version 1 as old is first grant
 						'appl_type'=>$application_type,
 						'created'=>date('Y-m-d H:i:s'),
 						'modified'=>date('Y-m-d H:i:s')				
