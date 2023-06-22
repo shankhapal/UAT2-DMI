@@ -218,13 +218,14 @@ use Cake\View\ViewBuilder;
 			$renewalApplicationrevenue_Query =$this->DmiRenewalApplicantPaymentDetails->find('all')->where($searchPendingConditions)
 						->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); 
 			$renewalApplicationrevenue = ['sum' => $renewalApplicationrevenue_Query];			
-
+			
 			//$newApplicationrevenueTrans = $this->DmiApplicantPaymentDetails->find('list',array('valueField'=>'id','conditions'=>am($searchPendingConditions,array('payment_confirmation'=>'confirmed'))))->toList();
 			$newApplicationrevenueTrans = $this->DmiApplicantPaymentDetails->find('list')->select(['id', 'id'])->where($searchPendingConditions)->where(['payment_confirmation' => 'confirmed'])->combine('id', 'id')->toArray();
 			
 			//$renewalApplicationrevenueTrans =$this->DmiRenewalApplicantPaymentDetails->find('list',array('valueField'=>'id','conditions'=>am($searchPendingConditions,array('payment_confirmation'=>'confirmed'))))->toList();
 			$renewalApplicationrevenueTrans = $this->DmiRenewalApplicantPaymentDetails->find('list')->select(['id', 'id'])->where($searchPendingConditions)->where(['payment_confirmation' => 'confirmed'])->combine('id', 'id')->toArray();
 			
+
 			$total_payment_transaction = count($newApplicationrevenueTrans) + count($renewalApplicationrevenueTrans);
 		
 			$totalVisitor =$this->DmiVisitorCounts->find('all')->select(['visitor'])->order(['id' => 'DESC'])->first();
@@ -270,9 +271,9 @@ use Cake\View\ViewBuilder;
 
 					 
 			$total_revenue = $this->thousandsCurrencyFormat($newApplicationrevenue['sum'] + $renewalApplicationrevenue['sum']);				 
-			
-			$new_appl_revenue = $this->thousandsCurrencyFormat($newApplicationrevenue['sum']);
 		
+			$new_appl_revenue = $this->thousandsCurrencyFormat($newApplicationrevenue['sum']);
+			
 			$renewal_appl_revenue = $this->thousandsCurrencyFormat($renewalApplicationrevenue['sum']); 
 			
 			$this->loadModel('DmiFrontStatistics');

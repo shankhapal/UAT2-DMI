@@ -122,7 +122,7 @@
 									<tr>
 										<td><span class="badge subtitle">15</span></td>
 										<td><a class="badge title text-info" href="payment_details_report">Payment Details Report</a></td>
-										<td><span class="subtitle">Report includes list of all application payment detail records.</span></td>
+										<td><span class="subtitle">Report includes list of all applications with payment detail.</span></td>
 									</tr>
 								</tbody>
 							</table>

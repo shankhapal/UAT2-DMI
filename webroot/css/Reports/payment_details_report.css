@@ -22,3 +22,19 @@
   }
 
    .fs80{font-size:80%;}
+  /* added by shankhpal shende on 31/03/2023 */
+  .rep-option{  
+    padding-left: 15px
+  }
+  .hidden {
+    display: none;
+    /*   opacity: 0; */
+  }
+  .shown {
+    display: visible;
+    transition: all .5s ease-out;
+    opacity: 1;
+    color: red;
+  }
+
+

@@ -256,9 +256,11 @@
 					<br><span class="subtitle">Total Revenue</span></a>
 				</div>
 				<div class="stats-card-back" id="myForm7">
+					<!-- pass new paramer for show which type of application ("new or Renewal") by shreeya on date [07-06-2023]-->
 					<ul class="ul">
-						<li class="badge bg-light mb-3"><a href="<?php echo $this->request->getAttribute('webroot');?>reports/payment_details_report"><span class="text-primary"></span> New Application Revenue : <?php echo $statistics_counts[0]['reve_app_n']; ?></a></li>
-						<li class="badge bg-light mb-3"><a href="<?php echo $this->request->getAttribute('webroot');?>reports/payment_details_report"><span class="text-primary"></span> Renewal Application Revenue : <?php echo $statistics_counts[0]['reve_app_r']; ?></a></li>
+						<li class="badge bg-light mb-3"><a href="<?php echo $this->request->getAttribute('webroot');?>reports/payment_details_report/<?= base64_encode("New")?>"><span class="text-primary"></span> New Application Revenue : <?php echo $statistics_counts[0]['reve_app_n']; ?></a></li>
+						<li class="badge bg-light mb-3"><a href="<?php echo $this->request->getAttribute('webroot');?>reports/payment_details_report//<?= base64_encode("Renewal")?>"><span class="text-primary"></span> Renewal Application Revenue : <?php echo $statistics_counts[0]['reve_app_r']; ?></a></li>
+
 					</ul>
 				</div>
 			</div>
