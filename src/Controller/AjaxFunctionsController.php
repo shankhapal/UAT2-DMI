@@ -2583,5 +2583,87 @@ class AjaxFunctionsController extends AppController{
 
 	}
 
+	/**
+	 * Function Created for  pending work that has remained 
+	 *	incomplete for more than 5 days. 
+	 * It utilizes an Ajax function to retrieve and display a list of the pending tasks.
+	 * @author Shankhpal Shende
+	 * @version 23rd June 2023
+	 */
+	public function	toDisplay5DaysPendingWork(){
+
+		$this->autoRender = false;
+
+		$InchargeId = $this->Session->read('username');
+		$this->loadModel('DmiFlowWiseTablesLists');
+		$flow_wise_tables = $this->DmiFlowWiseTablesLists->find('all',array('conditions'=>array('application_type IN'=>$this->Session->read('applTypeArray')),'order'=>'id ASC'))->toArray();
+
+		$level_arr = array('level_1','level_2','level_3','level_4','level_4_ro','level_4_mo');
+		$this->loadModel('DmiApplicationTypes');
+		//for each flow
+		$i=0;
+		foreach($flow_wise_tables as $eachflow){
+			//flow wise appl tables
+			$applPosTable = $eachflow['appl_current_pos'];
+			$this->loadModel($applPosTable);
+			//get application type
+			$getApplType = $this->DmiApplicationTypes->find('all',array('fields'=>'application_type','conditions'=>array('id IS'=>$eachflow['application_type'])))->first();
+
+			$finalSubmitTable = $eachflow['application_form'];
+			$this->loadModel($finalSubmitTable);
+
+			$grantCertTable = $eachflow['grant_pdf'];
+			$this->loadModel($grantCertTable);
+			$j=0;
+			foreach($level_arr as $eachLevel){
+				//check appl position with current user and level
+		
+				$checkCurPosition[$i][$j] = $this->$applPosTable->find('all',array('conditions'=>array('current_level IS'=>$eachLevel,'current_user_email_id IS'=>$InchargeId)))->toArray();
+
+				$k=0;
+				foreach($checkCurPosition[$i][$j] as $eachAppl){
+					if($eachLevel=='level_1' || $eachLevel=='level_2' || $eachLevel=='level_4_ro' || $eachLevel=='level_4_mo'){
+						$appl_list[$i][$j][$k]['appl_type'] = $getApplType['application_type'];
+						$appl_list[$i][$j][$k]['appl_id'] = $eachAppl['customer_id'];
+
+						if($eachLevel=='level_1'){	
+							$appl_list[$i][$j][$k]['process'] = 'Scrutiny';
+						}elseif($eachLevel=='level_2'){
+							$appl_list[$i][$j][$k]['process'] = 'Site Inspection';
+						}elseif($eachLevel=='level_4_ro'){
+							$appl_list[$i][$j][$k]['process'] = 'SO appl. communication';
+						}elseif($eachLevel=='level_4_mo'){
+							$appl_list[$i][$j][$k]['process'] = 'SO appl. Scrutiny at RO';
+						}
+						$k++;	
+					}elseif($eachLevel=='level_3' || $eachLevel=='level_4'){
+						//check if appl submission and granted
+						$checkLastStatus = $this->$finalSubmitTable->find('all',array('conditions'=>array('customer_id IS'=>$eachAppl['customer_id']),'order'=>'id desc'))->first();
+						
+						if($checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_4')){
+							//nothing
+						}else{
+							$appl_list[$i][$j][$k]['appl_type'] = $getApplType['application_type'];
+							$appl_list[$i][$j][$k]['appl_id'] = $eachAppl['customer_id'];
+
+							if($eachLevel=='level_3'){	
+								$appl_list[$i][$j][$k]['process'] = 'with Nodal officer';
+							}elseif($eachLevel=='level_4'){	
+								$appl_list[$i][$j][$k]['process'] = 'with HO Officer';
+							}
+							
+						}
+						$k=$k+1;
+					}
+				}
+				$j++;
+			}
+			$i++;
+		}
+		
+  	echo json_encode($appl_list);
+
+	}
+
 }
 ?>
