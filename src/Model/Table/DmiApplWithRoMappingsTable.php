@@ -58,13 +58,7 @@ class DmiApplWithRoMappingsTable extends Table{
 		$office_id = $this->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
 				
 		//get office details from office table
-		//$office_details = $DmiRoOffices->find('all',array('conditions'=>array('id IS'=>$office_id['office_id'],'OR'=>array('delete_status IS NULL','delete_status'=>'no'))))->first();
-			// condition added by shankhpal for handling warning [Trying to access array offset on value of type null]
-			// on date 23/06/2023
-		$office_details = null; // Define the variable outside the conditional statement	
-		if ($office_id !== null && isset($office_id['office_id'])) {
-  	  $office_details = $DmiRoOffices->find('all', array('conditions' => array('id IS' => $office_id['office_id'], 'OR' => array('delete_status IS NULL', 'delete_status' => 'no'))))->first();
-		}
+		$office_details = $DmiRoOffices->find('all',array('conditions'=>array('id IS'=>$office_id['office_id'],'OR'=>array('delete_status IS NULL','delete_status'=>'no'))))->first();
 
 
 		// condition for export unit to RAL and Ro mumbai for application added by laxmi on 9-1-23
