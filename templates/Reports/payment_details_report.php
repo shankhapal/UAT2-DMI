@@ -38,17 +38,27 @@
                     					<div class="form-group">
 											<!-- all lables are uncommented by shreeya-->
 											<label>Report For</label> 
-											<?php //print_r($report_for_array);exit;
-											//echo $this->form->input('report_for', array('type'=>'select', 'options'=>$report_for_array, 'label'=>false, 'id'=>'report_for', 'escape'=>false, 'class'=>'form-control form-control-sm')); ?>
-											<select  name ="report_for" class="form-control form-control-sm">
-											<option value=0>All</option>
+											<?php //print_r($value);exit;
+											// $report_for_array_val = array_values($report_for_array);
+											// $report_for_array_key = array_keys($report_for_array);
+
+											echo $this->Form->control('report_for', ['type' => 'select','options' => $application_array , 
+												'label' => false,
+												'id' => 'report_for',
+												'empty' => 'All',
+												'class' => 'form-control form-control-sm'
+											]);
+
+											//echo //$this->form->input('report_for', array('type'=>'select', 'options'=>report_for_array, 'label'=>false, 'id'=>'report_for', 'escape'=>false, 'class'=>'form-control form-control-sm')); ?>
+											<!-- <select  name ="report_for" class="form-control form-control-sm"> -->
+											<!-- <option value=0>All</option> -->
 											
-											<?php foreach ($report_for_array as $key => $value) {
+											<!-- <?php //foreach ($report_for_array as $key => $value) {
 												
-												echo '<option value='.$key.'>'.$value.' </option>';
-											}
+												//echo '<option value='.$key.'>'.$value.' </option>';
+											//}
 											
-											?>
+											?> -->
 											</select>
 
 										</div>
@@ -321,186 +331,186 @@
                     
 								</tbody>
 							</table> -->
-							
 							<table class="table tree table-inverse">
-									<thead>
-											<tr class="sm-text">
-												  <th><span class="table-heading">All Application Payment Details</span></th>
+			<thead>
+					<tr class="sm-text">
+							<th><span class="table-heading">All Application Payment Details</span></th>
+						</tr>
+			</thead>
+			<tbody>
+				
+					<?php
+												
+												
+						$report_for_array_new = array_keys($application_array); //for show only key
+						$report_for_array_new1 = array_values($application_array);
+						
+						$arrlength = count($report_for_array_new);
+						$arrlength = count($report_for_array_new1);
+
+						for($x = 0; $x < $arrlength; $x++) { ?>
+								<tr>
+									<td>
+										<span class="glyphicon glyphicon-plus plusIcon" id="list_<?php echo $x?>"></span>
+										<span class="glyphicon glyphicon-minus plusIcon" style="display:none"></span>
+										<?php echo $report_for_array_new1[$x]." "."Application Payment Details"; ?>
+									</td>  
+								</tr>
+				<?php
+				//	change application type name "New" -> 1	by shreeya[19-06-2023]	
+				if($report_for_array_new[$x] == 1){?>
+					<tr class="hidden">
+						<td>
+							<table class="table table-bordered">
+								<tr>
+									<td><span class=""></span>New Certificate of Authorisation Payment Total :</td>
+									<td><span class=""></span> <?php echo $new_ca_total ?></td>
+								</tr>
+								<tr>
+									<td><span class=""></span>New Printing Applications Payment Total :</td>
+									<td><span class=""></span> <?php echo $new_pp_total; ?> </td>
+								</tr>
+								<tr>
+									<td><span class=""></span>New Laboratory Applications Payment Total :</td>
+									<td><span class=""></span> <?php echo $new_lab_total; ?> </td>
+								</tr>
+								<tr>
+									<td><span class=""></span>Grant Total :</td>
+									<td><span class=""></span> <?php echo $total_new_ca_pp_lab; ?> </td>
+								</tr>
+							</table>    
+						</td>
+								</tr>
+							<?php }elseif($report_for_array_new[$x] == 2){ ?>
+								<tr class="hidden">
+									<td>
+										<table class="table table-bordered">
+											<tr>
+												<td><span class=""></span>Renewal Certificate of Authorisation Payment Total :</td>
+												<td><span class=""></span> <?php echo $renewal_ca_total; ?></td>
+											</tr>
+											<tr>
+												<td><span class=""></span>Renewal Printing Applications Payment Total :</td>
+												<td><span class=""></span> <?php echo $renewal_pp_total; ?> </td>
+											</tr>
+											<tr>
+												<td><span class=""></span>Renewal Laboratory Applications Payment Total :</td>
+												<td><span class=""></span> <?php echo $renewal_lab_total; ?> </td>
+											</tr>
+											<tr>
+													<td><span class=""></span>Grant Total :</td>
+													<td><span class=""></span> <?php echo $total_renewal_ca_pp_lab; ?> </td>
+											</tr>
+										</table>    
+									</td>
+								</tr>
+								<?php }elseif($report_for_array_new[$x] == 3){ ?>
+									<tr class="hidden">
+											<td>
+											<table class="table table-bordered">
+													<tr>
+															<td><span class=""></span>Change Certificate of Authorisation Payment Total :</td>
+															<td><span class=""></span> <?php echo $change_ca_total; ?></td>
+													</tr>
+													<tr>
+															<td><span class=""></span>Change Printing Applications Payment Total :</td>
+															<td><span class=""></span> <?php echo $change_pp_total; ?> </td>
+													</tr>
+													<tr>
+															<td><span class=""></span>Change Laboratory Applications Payment Total :</td>
+															<td><span class=""></span> <?php echo $change_lAB_total; ?> </td>
+													</tr>
+													<tr>
+															<td><span class=""></span>Grant Total :</td>
+															<td><span class=""></span> <?php echo $total_change_ca_pp_lab; ?> </td>
+													</tr>
+
+											</table>    
+									</td>
+								</tr>
+							<?php }elseif($report_for_array_new[$x] == 4) {?>
+							<tr class="hidden">
+								<td>
+											<table class="table table-bordered">
+												<tr>
+															<td><span class=""></span>Chemist Approval Applications Payment Total : </td>
+															<td><span class=""></span> <?php echo $chemist_total; ?></td>
 												</tr>
-									</thead>
-									<tbody>
-										
-											<?php
-												
-												
-												$report_for_array_new = array_keys($report_for_array); //for show only key
-												$report_for_array_new1 = array_values($report_for_array);
-												
-												$arrlength = count($report_for_array_new);
-												$arrlength = count($report_for_array_new1);
+											</table>    
+									</td>
+								</tr>
+							<?php }elseif($report_for_array_new[$x] == 5) {?>	
+							<tr class="hidden">
+								<td>
+											<table class="table table-bordered">
+													<tr>
+															<td><span class=""></span>Approval of 15 Digit Code Applications Payment Total :</td>
+															<td><span class=""></span> <?php echo $fiftin_digit_total; ?></td>
+													</tr>
+											</table>    
+									</td>
+								</tr>
+									<?php }elseif($report_for_array_new[$x] == 6){ ?>	
+									<tr class="hidden">
+										<td>
+													<table class="table table-bordered">
+															<tr>
+																	<td><span class=""></span>E-Code Applications Payment Total :</td>
+																	<td><span class=""></span> <?php echo $ecode_total; ?></td>
+															</tr>
+													</table>    
+											</td>
+										</tr>
+									<?php }elseif($report_for_array_new[$x] == 7){ ?>
+									<tr class="hidden">
+										<td>
+													<table class="table table-bordered">
+															<tr>
+																	<td><span class=""></span>Advance Payment Applications Payment Total :</td>
+																	<td><span class=""></span> <?php echo $adv_total; ?></td>
+															</tr>
+													</table>    
+											</td>
+										</tr>
+									<?php }elseif($report_for_array_new[$x] == 8){ ?>
+										<tr class="hidden">
+											<td>
+													<table class="table table-bordered">
+															<tr>
+																	<td><span class=""></span>Approval of Designated Persion Applications Payment Total :</td>
+																	<td><span class=""></span> <?php echo $adp_total; ?></td>
+															</tr>
+													</table>    
+											</td>
+										</tr>
+									<?php }elseif($report_for_array_new[$x] == 9) {?>	
+										<tr class="hidden">
+											<td>
+													<table class="table table-bordered">
+															<tr>
+																	<td><span class=""></span>Routine Inspection Applications Payment Total :</td>
+																	<td><span class=""></span> <?php echo $rti_total; ?></td>
+															</tr>
+													</table>    
+											</td>
+										</tr>
+									<?php }elseif($report_for_array_new[$x] == 10){ ?>
+										<tr class="hidden">
+											<td>
+													<table class="table table-bordered">
+															<tr>
+																	<td><span class=""></span>Bianually Grading Reports Applications Payment Total :</td>
+																	<td><span class=""></span> <?php echo $bgr_total; ?></td>
+															</tr>
+													</table>    
+											</td>
+										</tr>
+									<?php } ?>	
 
-												for($x = 0; $x < $arrlength; $x++) { ?>
-														<tr>
-															<td>
-																<span class="glyphicon glyphicon-plus plusIcon" id="list_<?php echo $x?>"></span>
-																<span class="glyphicon glyphicon-minus plusIcon" style="display:none"></span>
-																<?php echo $report_for_array_new1[$x]." "."Application Payment Details"; ?>
-															</td>  
-														</tr>
-												<?php
-												//	change application type name "New" -> 1	by shreeya[19-06-2023]	
-												if($report_for_array_new[$x] == 1){?>
-													<tr class="hidden">
-														<td>
-															<table class="table table-bordered">
-																<tr>
-																	<td><span class=""></span>New Certificate of Authorisation Payment Total :</td>
-																	<td><span class=""></span> <?php echo $new_ca_total ?></td>
-																</tr>
-																<tr>
-																	<td><span class=""></span>New Printing Applications Payment Total :</td>
-																	<td><span class=""></span> <?php echo $new_pp_total; ?> </td>
-																</tr>
-																<tr>
-																	<td><span class=""></span>New Laboratory Applications Payment Total :</td>
-																	<td><span class=""></span> <?php echo $new_lab_total; ?> </td>
-																</tr>
-																<tr>
-																	<td><span class=""></span>Grant Total :</td>
-																	<td><span class=""></span> <?php echo $total_new_ca_pp_lab; ?> </td>
-																</tr>
-															</table>    
-														</td>
-															 </tr>
-															<?php }elseif($report_for_array_new[$x] == 2){ ?>
-															   <tr class="hidden">
-                                    								<td>
-																		<table class="table table-bordered">
-																			<tr>
-																				<td><span class=""></span>Renewal Certificate of Authorisation Payment Total :</td>
-																				<td><span class=""></span> <?php echo $renewal_ca_total; ?></td>
-																			</tr>
-																			<tr>
-																				<td><span class=""></span>Renewal Printing Applications Payment Total :</td>
-																				<td><span class=""></span> <?php echo $renewal_pp_total; ?> </td>
-																			</tr>
-																			<tr>
-																				<td><span class=""></span>Renewal Laboratory Applications Payment Total :</td>
-																				<td><span class=""></span> <?php echo $renewal_lab_total; ?> </td>
-																			</tr>
-																			<tr>
-																					<td><span class=""></span>Grant Total :</td>
-																					<td><span class=""></span> <?php echo $total_renewal_ca_pp_lab; ?> </td>
-																			</tr>
-																		</table>    
-																	</td>
-															  </tr>
-															  <?php }elseif($report_for_array_new[$x] == 3){ ?>
-                                 									<tr class="hidden">
-                                    										<td>
-																			<table class="table table-bordered">
-																					<tr>
-																							<td><span class=""></span>Change Certificate of Authorisation Payment Total :</td>
-																							<td><span class=""></span> <?php echo $change_ca_total; ?></td>
-																					</tr>
-																					<tr>
-																							<td><span class=""></span>Change Printing Applications Payment Total :</td>
-																							<td><span class=""></span> <?php echo $change_pp_total; ?> </td>
-																					</tr>
-																					<tr>
-																							<td><span class=""></span>Change Laboratory Applications Payment Total :</td>
-																							<td><span class=""></span> <?php echo $change_lAB_total; ?> </td>
-																					</tr>
-																					<tr>
-																							<td><span class=""></span>Grant Total :</td>
-																							<td><span class=""></span> <?php echo $total_change_ca_pp_lab; ?> </td>
-																					</tr>
-
-																			</table>    
-																	</td>
-															  </tr>
-															<?php }elseif($report_for_array_new[$x] == 4) {?>
-                                 							<tr class="hidden">
-                                    							<td>
-																			<table class="table table-bordered">
-																				<tr>
-																							<td><span class=""></span>Chemist Approval Applications Payment Total : </td>
-																							<td><span class=""></span> <?php echo $chemist_total; ?></td>
-																				</tr>
-																			</table>    
-																	</td>
-															  </tr>
-															<?php }elseif($report_for_array_new[$x] == 5) {?>	
-                               								<tr class="hidden">
-                                 							   <td>
-																			<table class="table table-bordered">
-																					<tr>
-																							<td><span class=""></span>Approval of 15 Digit Code Applications Payment Total :</td>
-																							<td><span class=""></span> <?php echo $fiftin_digit_total; ?></td>
-																					</tr>
-																			</table>    
-																	</td>
-															  </tr>
-															<?php }elseif($report_for_array_new[$x] == 6){ ?>	
-                                							<tr class="hidden">
-                                    							<td>
-																			<table class="table table-bordered">
-																					<tr>
-																							<td><span class=""></span>E-Code Applications Payment Total :</td>
-																							<td><span class=""></span> <?php echo $ecode_total; ?></td>
-																					</tr>
-																			</table>    
-																	</td>
-															  </tr>
-															<?php }elseif($report_for_array_new[$x] == 7){ ?>
-                                							<tr class="hidden">
-                                   							 <td>
-																			<table class="table table-bordered">
-																					<tr>
-																							<td><span class=""></span>Advance Payment Applications Payment Total :</td>
-																							<td><span class=""></span> <?php echo $adv_total; ?></td>
-																					</tr>
-																			</table>    
-																	</td>
-															  </tr>
-															<?php }elseif($report_for_array_new[$x] == 8){ ?>
-                              									<tr class="hidden">
-                                    								<td>
-																			<table class="table table-bordered">
-																					<tr>
-																							<td><span class=""></span>Approval of Designated Persion Applications Payment Total :</td>
-																							<td><span class=""></span> <?php echo $adp_total; ?></td>
-																					</tr>
-																			</table>    
-																	</td>
-															  </tr>
-															<?php }elseif($report_for_array_new[$x] == 9) {?>	
-                              									<tr class="hidden">
-                                    								<td>
-																			<table class="table table-bordered">
-																					<tr>
-																							<td><span class=""></span>Routine Inspection Applications Payment Total :</td>
-																							<td><span class=""></span> <?php echo $rti_total; ?></td>
-																					</tr>
-																			</table>    
-																	</td>
-															  </tr>
-															<?php }elseif($report_for_array_new[$x] == 10){ ?>
-																<tr class="hidden">
-                                    								<td>
-																			<table class="table table-bordered">
-																					<tr>
-																							<td><span class=""></span>Bianually Grading Reports Applications Payment Total :</td>
-																							<td><span class=""></span> <?php echo $bgr_total; ?></td>
-																					</tr>
-																			</table>    
-																	</td>
-															  </tr>
-															<?php } ?>	
-
-											  <?php  }	?>
-								</tbody>
-							</table>
+						<?php  }	?>
+		</tbody>
+	</table>
+						
 						</div>
 					</div>
 				</div>

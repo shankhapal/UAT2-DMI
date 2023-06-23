@@ -545,10 +545,29 @@ class ReportsController extends AppController {
 				->where(function ($exp, $q) {return $exp->notEq('customer_id', '');})->toArray();
 
 				$newApplicationrevenue_Query = $this->DmiApplicantPaymentDetails->find('all')->where($searchPendingConditions)
-					->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); $newApplicationrevenue = ['sum' => $newApplicationrevenue_Query]; 
+					->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); 
+				$newApplicationrevenue = ['sum' => $newApplicationrevenue_Query]; 
 
 				$renewalApplicationrevenue_Query =$this->DmiRenewalApplicantPaymentDetails->find('all')->where($searchPendingConditions)
-					->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); $renewalApplicationrevenue = ['sum' => $renewalApplicationrevenue_Query]; 
+					->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid');
+				$renewalApplicationrevenue = ['sum' => $renewalApplicationrevenue_Query]; 
+
+				//sum of revenue change application by shreeya on date [22-06-2023]
+				$changeApplicationrevenue_Query =$this->DmiChangePaymentDetails->find('all')->where($searchPendingConditions)
+						->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); 
+				$changeApplicationrevenue = ['sum' => $changeApplicationrevenue_Query];	
+
+				//sum of chemist application by shreeya on date [22-06-2023]
+				$chemistApplicationrevenue_Query =$this->DmiChemistPaymentDetails->find('all')->where($searchPendingConditions)
+						->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); 
+				$chemistApplicationrevenue = ['sum' => $chemistApplicationrevenue_Query];	
+
+				//sum for adv renewal application by shreeya on date [22-06-2023]
+				$advApplicationrevenue_Query =$this->DmiAdvPaymentDetails->find('all')->where($searchPendingConditions)
+						->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); 
+				$advApplicationrevenue = ['sum' => $advApplicationrevenue_Query];	
+
+
 			}
 
 
@@ -558,7 +577,14 @@ class ReportsController extends AppController {
 			$FrontStatisticsController = new FrontstatisticsController();
 			$newrevenue = $FrontStatisticsController->thousandsCurrencyFormat($newApplicationrevenue['sum']);
 			$renewalrevenue = $FrontStatisticsController->thousandsCurrencyFormat($renewalApplicationrevenue['sum']);
-			$totalrevenue = $FrontStatisticsController->thousandsCurrencyFormat($newApplicationrevenue['sum']+$renewalApplicationrevenue['sum']);
+			//added by shreeya for chemist,change And adv applitionson date [22-06-2023]
+			$changerevenue = $FrontStatisticsController->thousandsCurrencyFormat($changeApplicationrevenue['sum']);
+			$chemistrevenue = $FrontStatisticsController->thousandsCurrencyFormat($chemistApplicationrevenue['sum']);
+			$advrevenue = $FrontStatisticsController->thousandsCurrencyFormat($advApplicationrevenue['sum']);
+			
+			//added sum of chemist, change and adv by shreeya on date [22-06-2023]
+			$totalrevenue = $FrontStatisticsController->thousandsCurrencyFormat($newApplicationrevenue['sum']+$renewalApplicationrevenue['sum']+
+							$changeApplicationrevenue['sum']+$chemistApplicationrevenue['sum']+$advApplicationrevenue['sum']);
 
 			
 
@@ -578,6 +604,11 @@ class ReportsController extends AppController {
 			$this->Session->write('renewalCertificateEsigned',count($renewalCertificateEsigned));
 			$this->Session->write('newApplicationrevenue',$newrevenue);
 			$this->Session->write('renewalApplicationrevenue',$renewalrevenue);
+			//added by shreeya on date [22-06-2023]
+			$this->Session->write('changeApplicationrevenue',$changerevenue);
+			$this->Session->write('chemistApplicationrevenue',$chemistrevenue);
+			$this->Session->write('advApplicationrevenue',$advrevenue);
+
 			$this->Session->write('totalrevenue',$totalrevenue);
 			$this->Session->write('totalVisitor',$totalVisitor['visitor']);
 			$this->Session->write('caRenewalDue',$caRenewalDue);
@@ -600,6 +631,11 @@ class ReportsController extends AppController {
 			$this->set('renewalCertificateEsigned',count($renewalCertificateEsigned));
 			$this->set('newApplicationrevenue',$newrevenue);
 			$this->set('renewalApplicationrevenue',$renewalrevenue);
+			//added by shreeya on date [22-06-2023]
+			$this->set('changeApplicationrevenue',$changerevenue);
+			$this->set('chemistApplicationrevenue',$chemistrevenue);
+			$this->set('advApplicationrevenue',$advrevenue);
+		
 			$this->set('totalrevenue',$totalrevenue);
 			$this->set('totalVisitor',$totalVisitor['visitor']);
 			$this->set('caRenewalDue',$caRenewalDue);
@@ -645,6 +681,12 @@ class ReportsController extends AppController {
 			$this->set('renewalCertificateEsigned',$this->Session->read('renewalCertificateEsigned'));
 			$this->set('newApplicationrevenue',$this->Session->read('newApplicationrevenue'));
 			$this->set('renewalApplicationrevenue',$this->Session->read('renewalApplicationrevenue'));
+
+			//added by shreeya on date [22-06-2023]
+			$this->set('changeApplicationrevenue',$this->Session->read('changeApplicationrevenue'));
+			$this->set('chemistApplicationrevenue',$this->Session->read('chemistApplicationrevenue'));
+			$this->set('advApplicationrevenue',$this->Session->read('advApplicationrevenue'));
+
 			$this->set('totalrevenue',$this->Session->read('totalrevenue'));
 			$this->set('totalVisitor',$this->Session->read('totalVisitor'));
 			$this->set('caRenewalDue',$this->Session->read('caRenewalDue'));
@@ -5588,60 +5630,62 @@ class ReportsController extends AppController {
 		//added for show the application_type by shreeya on date [07-06-2023]
 		$applicn_type=base64_decode($applicn_type);
 
-		if ($applicn_type== 'New') 
-		{
-			$report_for = 'New';
-		} 
-		elseif ($applicn_type== 'Renewal') 
-		{
-			$report_for = 'Renewal';
-		} 
+		$this->loadModel('DmiApplicationTypes');
+		//show the all application type added by shreeya on date 13-06-2023
+		$application_type_data = $this->DmiApplicationTypes->find('all')->select(['id', 'application_type'])->where(['delete_status IS NULL','application_type'=>$applicn_type])->toArray();
+		$report_for = $application_type_data['id'];
+		//pr($report_for); exit;
+		
+
+
+		// if ($applicn_type== 'New') 
+		// {
+		// 	$report_for = 1;
+		// } 
+		// elseif ($applicn_type== 'Renewal') 
+		// {
+		// 	$report_for = 2;
+		// } 
+		// elseif ($applicn_type== 'Change Request') 
+		// {
+		// 	$report_for = 3;
+		// } 
+		// elseif ($applicn_type== 'Chemist Approval') 
+		// {
+		// 	$report_for = 4;
+		// } 
+		// elseif ($applicn_type== 'Advance Payment') 
+		// {
+		// 	$report_for = 7;
+		// } 
 		
 		
 		
-		$connection = ConnectionManager::get('default');
+	
 		//load models
 		$this->loadModel('DmiApplicationTypes');
 		$this->loadModel('DmiFlowWiseTablesLists');
+	
 		
-		
-		// $report_for_array;
-		//show the all application type added by shreeya on date 13-06-2023
-		$application_array = $this->DmiApplicationTypes->find('all')->select(['id', 'application_type'])->where(['delete_status IS NULL'])->order(['id'])->combine('id', 'application_type')->toArray();
-		//dynamically added application type by shreeya on date 14-06-2023
-		foreach($application_array as $key => $value){
-
-			$report_for_array[$key] = $value ;
-			
-		}
-		
-			$all_states = $this->DmiStates->find('all')->select(['id', 'state_name'])->where(['OR' => [['delete_status IS NULL'] ,['delete_status ='=>'no']]])
+		$all_states = $this->DmiStates->find('all')->select(['id', 'state_name'])->where(['OR' => [['delete_status IS NULL'] ,['delete_status ='=>'no']]])
 			->order(['state_name'])->combine('id', 'state_name')->toArray(); 
 		
-		
-			$all_district = $this->DmiDistricts->find('all')->select(['id', 'district_name'])->where(['OR' => [['delete_status IS NULL'], ['delete_status ='=>'no']]])
+		$all_district = $this->DmiDistricts->find('all')->select(['id', 'district_name'])->where(['OR' => [['delete_status IS NULL'], ['delete_status ='=>'no']]])
 			->combine('id', 'district_name')->toArray(); 
-		
-			$all_application_type = $this->DmiCertificateTypes->find('all')->select(['id', 'certificate_type'])->combine('id', 'certificate_type')->toArray();  
+		$all_application_type = $this->DmiCertificateTypes->find('all')->select(['id', 'certificate_type'])->combine('id', 'certificate_type')->toArray();  
 
-		
-		
-		
 		//added 'office_type'=>'RO' condition on 27-07-2018     
 		// Change on 5/11/2018, Add order by conditions , By Pravin Bhakare
 		
 		$all_ro_office = $this->DmiRoOffices->find('all')->select(['id', 'ro_office'])->where([['delete_status IS NULL'],'OR' => [['office_type' => 'RO'], ['office_type' => 'SO']]])
 			->order(['ro_office'])->combine('id', 'ro_office')->toArray(); 
-
-
-		$this->set('report_for_array',$report_for_array);
-		$this->set('all_ro_office',$all_ro_office);
-		$this->set('all_states',$all_states);
-		$this->set('all_district',$all_district);
-		$this->set('all_application_type',$all_application_type);
-
 		
-
+	 
+		//show the all application type added by shreeya on date 13-06-2023
+		$application_array = $this->DmiApplicationTypes->find('all')->select(['id', 'application_type'])->where(['delete_status IS NULL'])->order(['id'])->combine('id', 'application_type')->toArray();
+		//dynamically added application type by shreeya on date 14-06-2023
+		
+		
 		// Change on 5/11/2018, set search_to_date value, By Pravin 5/11/2018
 		$application_type = '';
 		$ro_office='';
@@ -5703,13 +5747,14 @@ class ReportsController extends AppController {
 		$total_renewal_ca_pp_lab = 0;
 		$total_change_ca_pp_lab = 0;
 
+		$report_for = 0;
 		$sum_of_all_total_status = false; // added by shreeya [21/06/2023]
 
 		//first show  all  type of application by shreeya on date [17-06-2023]
 		if (null!==($this->request->getData('search_logs')))
 		{
 			$report_for_array_select = $this->request->getData('report_for');
-
+				
 			$report_for = $report_for_array_select;
 			
 			$table = 'DmiStates';
@@ -5862,362 +5907,38 @@ class ReportsController extends AppController {
 				
 		} else {
 			
-			$report_for = 0;
-
 			$firm_customer_id_condition = array();
 			$renewal_firm_customer_id_list = array();
-			$this->loadModel('DmiFlowWiseTablesLists');
-			
-			//show listing of New Application Added By Shreeya on Date [08-06-2023]
-			
-			$apl_type_res = array();
-			if($applicn_type  == 'New')
-			{
-				
-				$report_for = 'New';
-			
-				$appl_type = $this->DmiApplicationTypes->find('all')->select(['id', 'application_type'])->where(['application_type'=>$report_for])->first();
-				
-				$application_type_id = $appl_type['id'];
-				
-				if(empty($report_for_array)){
-					$report_for = 0;
-				}
-				
-				// check $report_for == 0 select all application [14-06-2023]
-				if($report_for != 0 || !empty($application_type_id)){
-					
-					$flowwise_table_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['application_type IN' =>$application_type_id])->toArray();	
-					
-				}else{  
-				
-					$flowwise_table_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['payment IS NOT NULL','application_type IN'=>$report_for])->toArray();
-					
-				}
-
-
-					$i=0;
-					$total_payment_details = [];
-					$ca_payment = [];
-					$printing_payment = [];
-					$lab_payment = [];
-
-					foreach ($flowwise_table_data as $FlowWise_Tables){
-
-						
-						$apl_type = $FlowWise_Tables['application_type'];
-						
-						$payment_table = $FlowWise_Tables['payment'];
-						
-						
-						$this->loadModel($payment_table);
-						$query_cil = $this->$payment_table->find('all');
-						
-						$customer_id_list = $query_cil->select(['customer_id', 'max' => $query_cil->func()->max('certificate_type')])
-									->distinct()->where($firm_customer_id_condition)
-									->group(['customer_id'])->order(['MAX(certificate_type)'])->toArray();
-									
-
-						$k=0;
-						
-						foreach ($customer_id_list as $customer_id) {
-							
-							$customer_payment_id_list = $this->$payment_table->find('all')->select(['id'])->where(['customer_id' => $customer_id['customer_id'], 'payment_confirmation' => 'confirmed'])->toArray();
-						
-							if (!empty($customer_payment_id_list)) {
-								
-								$split_customer_id = explode('/',$customer_id['customer_id']);
-								
-								if ($split_customer_id[1] == 1) { $ca_application_payment_total[$i] = $i;}
-								elseif ($split_customer_id[1] == 2) { $printing_application_payment_total[$i] = $i;}
-								elseif ($split_customer_id[1] == 3) { $laboratory_application_payment_total[$i] = $i;}else{
-									$payment_max_id[$i][$k] = $customer_payment_id_list[0]['id'];
-								}
-
-								$payment_max_id[$i][$k] = $customer_payment_id_list[0]['id'];
-							
-								$customer_payment_details[$i][$k] =  $this->$payment_table->find('all')->where(['id IN' => $customer_payment_id_list[0]['id']])->first();
-							
-								$firms_details[$i][$k] = $this->DmiFirms->find('all')->where(['customer_id' => $customer_id['customer_id'],['delete_status IS NULL']])->first();
-
-								
-								$this->loadModel('DmiApplicationTypes');
-								
-								$apl_type_res1 =  $this->DmiApplicationTypes->find('all')->select(['id','application_type'])->where(['id' => $apl_type])->first();
-								$apl_type_res[$i][$k] = $apl_type_res1['application_type'];
-								
-								
-								if($firms_details[$i][$k] != NULL){
-									$ro_id[$i][$k] = $this->DmiDistricts->find('all')->select(['ro_id'])->where(['id' => $firms_details[$i][$k]['district']])->first();
-									// $i=$i+1;
-								}                                  
-								$k++;
-							}
-								
-						}
-						
-
-						// below if-else check added by Ankur Jangid for empty IN query error check
-						if (!empty($customer_id_list)) {
-							$payment_max_id_condition = ['id IN' => $payment_max_id];
-						} else {
-							$payment_max_id_condition = ['id IS' => ''];
-						}
-
-					
-
-						$payment_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['payment IS NOT' =>NULL])->order(['id'])->toArray();
-
-						//dates between to fetch records
-						$from_date = date("Y-m-d H:i:s",strtotime("-12 month"));
-						
-						$to_date = date('Y-m-d H:i:s');//str_replace('/','-',$to_date);
-							
-						$j=1;
-						$application_list_data = [];
-						foreach ($payment_data as $payment_value) {
-
-						
-							$tbl_data = $payment_value['payment'];
-							$this->loadModel($tbl_data);
-
-							//$application_list_data[$j] = $this->$tbl_data->find('all',array('conditions'=>array('payment_confirmation'=>'confirmed','and'=>array('date(created) >=' => $from_date, 'date(created) <=' =>$to_date)),'order'=>'id desc'))->toArray();
-							//added for show paymet count of ca,pp,lab by shreeya on date [21-06-2023]
-							$application_list_data[$j] = $this->$tbl_data->find('all')->select(['id','customer_id','certificate_type','amount_paid','payment_confirmation'])->where(['payment_confirmation' =>'confirmed'])->toArray(); 
-							$j++;
-						}
-						//for new
-						foreach ($application_list_data[1] as $resultArr) {
-								
-								$certiifctaetype = $resultArr['certificate_type'];
-							
-
-								if($certiifctaetype == 1){
-									$new_ca_total = $new_ca_total + $resultArr['amount_paid'];  // store total amt of newca
-								}
-								if($certiifctaetype == 2){
-									$new_pp_total = $new_pp_total + $resultArr['amount_paid'];  // store total amt of newpp
-								}
-								if($certiifctaetype == 3){
-									$new_lab_total = $new_lab_total + $resultArr['amount_paid'];  // store total amt of newlab
-								}
-								$i++;
-						}
-
-
-					}
-					
-						// //sum of revenue new application by shreeya on date [20-06-2023]
-						$newApplicationrevenue_Query = $this->DmiApplicantPaymentDetails->find('all')
-						->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); // updated by Ankur
-						$newApplicationrevenue = ['sum' => $newApplicationrevenue_Query];
-
-						$sum_of_new = $this->thousandsCurrencyFormat($newApplicationrevenue['sum']);
-						//show total of new application[21-06-2023]
-						$sum_of_all = 'Total:'.$sum_of_new;
-						$sum_of_all_total_status = true;
-						
-						
-			}
-			//show listing of Renewal Application Added By Shreeya on Date [13-06-2023]
-			elseif($applicn_type  == 'Renewal'){
-				
-				$report_for = 'Renewal';
-			
-				$appl_type = $this->DmiApplicationTypes->find('all')->select(['id', 'application_type'])->where(['application_type'=>$report_for])->first();
-			
-				$application_type_id = $appl_type['id'];
-			
-				if(empty($report_for_array)){
-					$report_for = 0;
-				}
-				
-				// check $report_for == 0 select all application [14-06-2023]
-				if($report_for != 0 || !empty($application_type_id)){
-					
-					$flowwise_table_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['application_type IN' =>$application_type_id])->toArray();	
-				
-					
-				}else{  
-				
-					$flowwise_table_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['payment IS NOT NULL','application_type IN'=>$report_for])->toArray();
-					
-				}
-
-
-				$i=0;
-				$total_payment_details = [];
-				$ca_payment = [];
-				$printing_payment = [];
-				$lab_payment = [];
-
-				foreach ($flowwise_table_data as $FlowWise_Tables){
-
-					
-					$apl_type = $FlowWise_Tables['application_type'];
-					
-					$payment_table = $FlowWise_Tables['payment'];
-					
-					
-					$this->loadModel($payment_table);
-					$query_cil = $this->$payment_table->find('all');
-					
-					//change the query remove group by on date 13-06-2023 by shreeya
-					$customer_id_list = $query_cil->select('customer_id')->where(['payment_confirmation' => 'confirmed'])->toArray();
-
-					$k=0;
-					foreach ($customer_id_list as $customer_id) {
-						
-						$customer_payment_id_list = $this->$payment_table->find('all')->select(['id'])->where(['customer_id' => $customer_id['customer_id'], 'payment_confirmation' => 'confirmed'])->toArray();
-					
-						if (!empty($customer_payment_id_list)) {
-							
-							$split_customer_id = explode('/',$customer_id['customer_id']);
-							
-							if ($split_customer_id[1] == 1) { $ca_application_payment_total[$i] = $i;}
-							elseif ($split_customer_id[1] == 2) { $printing_application_payment_total[$i] = $i;}
-							elseif ($split_customer_id[1] == 3) { $laboratory_application_payment_total[$i] = $i;}else{
-								$payment_max_id[$i][$k] = $customer_payment_id_list[0]['id'];
-							}
-
-							$payment_max_id[$i][$k] = $customer_payment_id_list[0]['id'];
-						
-							$customer_payment_details[$i][$k] =  $this->$payment_table->find('all')->where(['id IN' => $customer_payment_id_list[0]['id']])->first();
-						
-							$firms_details[$i][$k] = $this->DmiFirms->find('all')->where(['customer_id' => $customer_id['customer_id'],['delete_status IS NULL']])->first();
-
-							
-							$this->loadModel('DmiApplicationTypes');
-							//this line commented by shreeya
-							// $apl_type_res[$i][$k] =  $this->DmiApplicationTypes->find('all')->select(['application_type'])->where(['id' => $apl_type])->first();
-
-							$apl_type_res1 =  $this->DmiApplicationTypes->find('all')->select(['id','application_type'])->where(['id' => $apl_type])->first();
-							$apl_type_res[$i][$k] = $apl_type_res1['application_type'];
-
-							if($firms_details[$i][$k] != NULL){
-								$ro_id[$i][$k] = $this->DmiDistricts->find('all')->select(['ro_id'])->where(['id' => $firms_details[$i][$k]['district']])->first();
-								// $i=$i+1;
-							}                                  
-							$k++;
-						}
-							
-					}
-
-					// below if-else check added by Ankur Jangid for empty IN query error check
-					if (!empty($customer_id_list)) {
-						$payment_max_id_condition = ['id IN' => $payment_max_id];
-					} else {
-						$payment_max_id_condition = ['id IS' => ''];
-					}
-
-				
-
-					$payment_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['payment IS NOT NULL'])->order(['id'])->toArray();
-
-					//dates between to fetch records
-					$from_date = date("Y-m-d H:i:s",strtotime("-12 month"));
-					
-					$to_date = date('Y-m-d H:i:s');//str_replace('/','-',$to_date);
-						
-					$j=1;
-					$application_list_data = [];
-					foreach ($payment_data as $payment_value) {
-
-					
-						$tbl_data = $payment_value['payment'];
-						$this->loadModel($tbl_data);
-
-						//$application_list_data[$j] = $this->$tbl_data->find('all',array('conditions'=>array('payment_confirmation'=>'confirmed','and'=>array('date(created) >=' => $from_date, 'date(created) <=' =>$to_date)),'order'=>'id desc'))->toArray();
-						//added for show paymet count of ca,pp,lab by shreeya on date [21-06-2023]
-						$application_list_data[$j] = $this->$tbl_data->find('all')->select(['id','customer_id','certificate_type','amount_paid','payment_confirmation'])->where(['payment_confirmation' =>'confirmed'])->toArray(); 
-						$j++;
-					}
-					
-					// for renewal
-					foreach ($application_list_data[2] as $resultArr) {
-						
-					$certiifctaetype = $resultArr['certificate_type'];
-				
-
-					if($certiifctaetype == 1){
-						$renewal_ca_total = $renewal_ca_total + $resultArr['amount_paid'];  // store total amt of renewalCA
-					}
-					if($certiifctaetype == 2){
-						$renewal_pp_total = $renewal_pp_total + $resultArr['amount_paid'];  // store total amt of renewalPP
-					}
-					if($certiifctaetype == 3){
-						$renewal_lab_total = $renewal_lab_total + $resultArr['amount_paid'];  // store total amt of renewalLAB
-					}
-					$i++;
-					}
-
-
-
-				}
-				
-					// //sum of revenue renewal application by shreeya on date [20-06-2023]
-					$renewalApplicationrevenue_Query =$this->DmiRenewalApplicantPaymentDetails->find('all')
-					->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); 
-					$renewalApplicationrevenue = ['sum' => $renewalApplicationrevenue_Query];
-
-					$sum_of_all_renewal = $this->thousandsCurrencyFormat($renewalApplicationrevenue['sum']);
-					//show total of renewa application[21-06-2023]
-					$sum_of_all = 'Total:'.$sum_of_all_renewal;
-					$sum_of_all_total_status = true;
-					
-
-			}
-			
-			
-			
-			
-				
-			
-			 		
+				 		
 		}
 
 		
-
-		$this->loadModel('DmiFlowWiseTablesLists');
 		
-			// $apl_type_res = [];
+			$apl_type_res = [];
 			$application_type_id = '';
-			//added not empty application type to show all type of report 
-			if(empty($report_for_array)){
-				$report_for = 0;
-			}
-		
-			if ($report_for == 0 || $report_for == 1 ||  $report_for == 2 ||  $report_for == 3 ||  $report_for == 4 ||  $report_for == 5 ||  $report_for == 6 ||  $report_for == 7 ||  $report_for == 8 ||  $report_for == 9 ||  $report_for == 10 ) 
 			
-			{
-					
-				$conn = ConnectionManager::get('default');
+			//change the query for get application id by shreeya on date[17-06-2023]
+			$conn = ConnectionManager::get('default');
+			$query = $conn->execute("SELECT id FROM dmi_application_types");
+			$appl_types = $query->fetchAll('assoc');
+	
+			$appl_type_ids = []; // Create an empty array to store the 'id' values
+
+			foreach ($appl_types as $appl_type) {
+				$appl_type_ids[] = $appl_type['id']; // Add each 'id' value to the array
+			}
+
+			//check $report_for == 0 select all application [14-06-2023]
+			if($report_for == 0 ){
+			
+				$flowwise_table_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['application_type IN' =>$appl_type_ids])->toArray();
+
+			}else{  
 				
-					//change the query for get application id by shreeya on date[17-06-2023]
-					$query = $conn->execute("SELECT id FROM dmi_application_types");
-					$appl_types = $query->fetchAll('assoc');
-
-					$appl_type_ids = []; // Create an empty array to store the 'id' values
-
-					foreach ($appl_types as $appl_type) {
-						$appl_type_ids[] = $appl_type['id']; // Add each 'id' value to the array
-					}
-
-					
-				// check $report_for == 0 select all application [14-06-2023]
-				if($report_for == 0 ){
-				
-					$flowwise_table_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['application_type IN' =>$appl_type_ids])->toArray();
-
-				}else{  
-					
-					$flowwise_table_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['payment IS NOT NULL','application_type IN'=>$report_for])->toArray();
-					//'application_type IN'=>array('3','4','7') 'application_type IN'=>$report_for
-				
-
-					
-					
-				}
+				$flowwise_table_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['payment IS NOT NULL','application_type IN'=>$report_for])->toArray();
+				//'application_type IN'=>array('3','4','7') 'application_type IN'=>$report_for
+			
+			}
 			
 				$i=0;
 				$total_payment_details = [];
@@ -6251,8 +5972,6 @@ class ReportsController extends AppController {
 										->distinct()->where($firm_customer_id_condition)
 										->group(['customer_id'])->order(['MAX(certificate_type)'])->toArray();
 						
-					
-					
 					}
 					
 					//added for application type Chemist Approval by shreeya on date on 15-06-2023
@@ -6447,7 +6166,7 @@ class ReportsController extends AppController {
 				$i++;
 				}
 			
-			}		
+			// }		
 			
 		
 
@@ -6478,62 +6197,69 @@ class ReportsController extends AppController {
 						->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); 
 		$chemistApplicationrevenue = ['sum' => $chemistApplicationrevenue_Query];	
 
-		//sum  for 15digit renewal application by shreeya on date [20-06-2023]
-		$digitApplicationrevenue_Query =$this->Dmi15DigitPaymentDetails->find('all')
-						->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); 
-		$digitApplicationrevenue = ['sum' => $digitApplicationrevenue_Query];	
-
-		//sum  for ecode application by shreeya on date [20-06-2023]
-		$ecodeApplicationrevenue_Query =$this->DmiECodePaymentDetails->find('all')
-						->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); 
-		$ecodeApplicationrevenue = ['sum' => $ecodeApplicationrevenue_Query];	
-
 		//sum for adv renewal application by shreeya on date [20-06-2023]
 		$advApplicationrevenue_Query =$this->DmiAdvPaymentDetails->find('all')
 						->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); 
 		$advApplicationrevenue = ['sum' => $advApplicationrevenue_Query];	
 
+		//sum  for 15digit renewal application by shreeya on date [20-06-2023]
+		// $digitApplicationrevenue_Query =$this->Dmi15DigitPaymentDetails->find('all')
+		// 				->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); 
+		// $digitApplicationrevenue = ['sum' => $digitApplicationrevenue_Query];	
+
+		//sum  for ecode application by shreeya on date [20-06-2023]
+		// $ecodeApplicationrevenue_Query =$this->DmiECodePaymentDetails->find('all')
+		// 				->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); 
+		// $ecodeApplicationrevenue = ['sum' => $ecodeApplicationrevenue_Query];	
+
+		
+
 		//sum for adp renewal application by shreeya on date [20-06-2023]
-		$adpApplicationrevenue_Query =$this->DmiAdpPaymentDetails->find('all')
-						->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); 
-		$adpApplicationrevenue = ['sum' => $adpApplicationrevenue_Query];	
+		// $adpApplicationrevenue_Query =$this->DmiAdpPaymentDetails->find('all')
+		// 				->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); 
+		// $adpApplicationrevenue = ['sum' => $adpApplicationrevenue_Query];	
 
 		//sum for RTI renewal application by shreeya on date [20-06-2023]
-		$rtiApplicationrevenue_Query =$this->DmiRtiPaymentDetails->find('all')
-						->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); 
-		$rtiApplicationrevenue = ['sum' => $rtiApplicationrevenue_Query];	
+		// $rtiApplicationrevenue_Query =$this->DmiRtiPaymentDetails->find('all')
+		// 				->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); 
+		// $rtiApplicationrevenue = ['sum' => $rtiApplicationrevenue_Query];	
 
 		//sum for surrender  renewal application by shreeya on date [20-06-2023]
-		$surrenderApplicationrevenue_Query =$this->DmiSurrenderPaymentDetails->find('all')
-						->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); 
-		$surrenderApplicationrevenue = ['sum' => $surrenderApplicationrevenue_Query];	
+		// $surrenderApplicationrevenue_Query =$this->DmiSurrenderPaymentDetails->find('all')
+		// 				->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); 
+		// $surrenderApplicationrevenue = ['sum' => $surrenderApplicationrevenue_Query];	
 
 		
 		$newrevenue = $this->thousandsCurrencyFormat($newApplicationrevenue['sum']);
 		$renewalrevenue = $this->thousandsCurrencyFormat($renewalApplicationrevenue['sum']);
 		$changerevenue =$this->thousandsCurrencyFormat($changeApplicationrevenue['sum']);
 		$chemistrevenue = $this->thousandsCurrencyFormat($chemistApplicationrevenue['sum']);
-		$digitrevenue = $this->thousandsCurrencyFormat($digitApplicationrevenue['sum']);
-		$ecoderevenue = $this->thousandsCurrencyFormat($ecodeApplicationrevenue['sum']);
 		$advrevenue = $this->thousandsCurrencyFormat($advApplicationrevenue['sum']);
-		$adprevenue = $this->thousandsCurrencyFormat($adpApplicationrevenue['sum']);
-		$rtirevenue = $this->thousandsCurrencyFormat($rtiApplicationrevenue['sum']);
-		$surrenderrevenue = $this->thousandsCurrencyFormat($surrenderApplicationrevenue['sum']);
+		// $digitrevenue = $this->thousandsCurrencyFormat($digitApplicationrevenue['sum']);
+		// $ecoderevenue = $this->thousandsCurrencyFormat($ecodeApplicationrevenue['sum']);
+		// $adprevenue = $this->thousandsCurrencyFormat($adpApplicationrevenue['sum']);
+		// $rtirevenue = $this->thousandsCurrencyFormat($rtiApplicationrevenue['sum']);
+		// $surrenderrevenue = $this->thousandsCurrencyFormat($surrenderApplicationrevenue['sum']);
 
 
 		$sum_of_all_total = $this->thousandsCurrencyFormat($newApplicationrevenue['sum']+$renewalApplicationrevenue['sum']+$changeApplicationrevenue['sum']+
-		$chemistApplicationrevenue['sum']+$digitApplicationrevenue['sum']+$ecodeApplicationrevenue['sum']+
-		$advApplicationrevenue['sum']+$adpApplicationrevenue['sum']+$rtiApplicationrevenue['sum']+$surrenderApplicationrevenue['sum']);
+		$chemistApplicationrevenue['sum']+$advApplicationrevenue['sum']);
 		
 		//added the condition to show grant total by shreeya on date[21-06-2023]
 		if($sum_of_all_total_status == false){
 			$sum_of_all = 'Grant Total:'.$sum_of_all_total;
 		}
 		
-	
 		$this->set('sum_of_all',$sum_of_all);
-		
-		$this->set('report_for_array',$report_for_array); // variable set for Application type 
+	
+	
+		$this->set('application_array',$application_array);
+		$this->set('all_ro_office',$all_ro_office);
+		$this->set('all_states',$all_states);
+		$this->set('all_district',$all_district);
+		$this->set('all_application_type',$all_application_type);
+
+		//$this->set('report_for_array',$report_for_array); // variable set for Application type 
 		$this->set('total_new_ca_pp_lab',$total_new_ca_pp_lab); // variable set for total_new_ca_pp_lab
 		$this->set('total_renewal_ca_pp_lab',$total_renewal_ca_pp_lab); // variable set for total_renewal_ca_pp_lab
 		$this->set('total_change_ca_pp_lab',$total_change_ca_pp_lab); // variable set for total_change_ca_pp_lab

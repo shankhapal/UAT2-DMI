@@ -20,7 +20,11 @@ use Cake\View\ViewBuilder;
 		var $layout = 'admin_dashboard';
 			
 		public function initialize(): void
+			
 		{
+			ini_set('memory_limit', '2G');
+
+
 			parent::initialize();
 			
 				// $this->loadComponent('Session'); // commented by Ankur Jangid
@@ -207,6 +211,10 @@ use Cake\View\ViewBuilder;
 			$this->loadModel('DmiApplicantPaymentDetails');
 			$this->loadModel('DmiRenewalApplicantPaymentDetails');
 			$this->loadModel('DmiVisitorCounts');
+			//load model change,chemist and adv by shreeya [22-06-2023]
+			$this->loadModel('DmiChangePaymentDetails');//load model change
+			$this->loadModel('DmiChemistPaymentDetails');
+			$this->loadModel('DmiAdvPaymentDetails');
 			
 			//$newApplicationrevenue = $this->DmiApplicantPaymentDetails->find('all',array('fields' =>array('sum(amount_paid::integer)'),'conditions'=>am($searchPendingConditions,array('payment_confirmation'=>'confirmed'))))->toArray();
 			//$renewalApplicationrevenue =$this->DmiRenewalApplicantPaymentDetails->find('all',array('fields' =>array('sum(amount_paid::integer)'),'conditions'=>am($searchPendingConditions,array('payment_confirmation'=>'confirmed'))))->toArray();
@@ -219,14 +227,36 @@ use Cake\View\ViewBuilder;
 						->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); 
 			$renewalApplicationrevenue = ['sum' => $renewalApplicationrevenue_Query];			
 			
+			
+			//sum of revenue change application by shreeya on date [22-06-2023]
+			$changeApplicationrevenue_Query =$this->DmiChangePaymentDetails->find('all')
+					->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); 
+			$changeApplicationrevenue = ['sum' => $changeApplicationrevenue_Query];	
+
+			//sum of chemist application by shreeya on date [22-06-2023]
+			$chemistApplicationrevenue_Query =$this->DmiChemistPaymentDetails->find('all')
+					->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); 
+			$chemistApplicationrevenue = ['sum' => $chemistApplicationrevenue_Query];	
+
+			//sum for adv renewal application by shreeya on date [22-06-2023]
+			$advApplicationrevenue_Query =$this->DmiAdvPaymentDetails->find('all')
+					->where(['payment_confirmation' => 'confirmed'])->sumOf('amount_paid'); 
+			$advApplicationrevenue = ['sum' => $advApplicationrevenue_Query];	
+
+
 			//$newApplicationrevenueTrans = $this->DmiApplicantPaymentDetails->find('list',array('valueField'=>'id','conditions'=>am($searchPendingConditions,array('payment_confirmation'=>'confirmed'))))->toList();
 			$newApplicationrevenueTrans = $this->DmiApplicantPaymentDetails->find('list')->select(['id', 'id'])->where($searchPendingConditions)->where(['payment_confirmation' => 'confirmed'])->combine('id', 'id')->toArray();
 			
 			//$renewalApplicationrevenueTrans =$this->DmiRenewalApplicantPaymentDetails->find('list',array('valueField'=>'id','conditions'=>am($searchPendingConditions,array('payment_confirmation'=>'confirmed'))))->toList();
 			$renewalApplicationrevenueTrans = $this->DmiRenewalApplicantPaymentDetails->find('list')->select(['id', 'id'])->where($searchPendingConditions)->where(['payment_confirmation' => 'confirmed'])->combine('id', 'id')->toArray();
 			
-
-			$total_payment_transaction = count($newApplicationrevenueTrans) + count($renewalApplicationrevenueTrans);
+			//added by shreeya on date [22-06-2023]
+			$changeApplicationrevenueTrans = $this->DmiChangePaymentDetails->find('list')->select(['id', 'id'])->where($searchPendingConditions)->where(['payment_confirmation' => 'confirmed'])->combine('id', 'id')->toArray();
+			$chemistApplicationrevenueTrans = $this->DmiChemistPaymentDetails->find('list')->select(['id', 'id'])->where($searchPendingConditions)->where(['payment_confirmation' => 'confirmed'])->combine('id', 'id')->toArray();
+			$advApplicationrevenueTrans = $this->DmiAdvPaymentDetails->find('list')->select(['id', 'id'])->where($searchPendingConditions)->where(['payment_confirmation' => 'confirmed'])->combine('id', 'id')->toArray();
+			
+			//added three new count chemist,change And advance by shreeya on date [22-06-2023]
+			$total_payment_transaction = count($newApplicationrevenueTrans) + count($renewalApplicationrevenueTrans) + count($changeApplicationrevenueTrans) + count($chemistApplicationrevenueTrans) +count($advApplicationrevenueTrans);
 		
 			$totalVisitor =$this->DmiVisitorCounts->find('all')->select(['visitor'])->order(['id' => 'DESC'])->first();
 			//$totalVisitor =$this->DmiVisitorCounts->find('all',array('fields' =>array('visitor'),'order' => array('id' =>'desc')))->first();
@@ -269,18 +299,21 @@ use Cake\View\ViewBuilder;
 			count($renewalApplicationEsigned)+count($renewalInspectionReportEsigned)+count($renewalCertificateEsigned);
 			
 
-					 
-			$total_revenue = $this->thousandsCurrencyFormat($newApplicationrevenue['sum'] + $renewalApplicationrevenue['sum']);				 
+			//total revenue sum added chemist,change and adv by shreeya on date [22-06-2023] 
+			$total_revenue = $this->thousandsCurrencyFormat($newApplicationrevenue['sum'] + $renewalApplicationrevenue['sum'] + 
+			$changeApplicationrevenue['sum'] + $chemistApplicationrevenue['sum'] +$advApplicationrevenue['sum']);				 
 		
 			$new_appl_revenue = $this->thousandsCurrencyFormat($newApplicationrevenue['sum']);
-			
 			$renewal_appl_revenue = $this->thousandsCurrencyFormat($renewalApplicationrevenue['sum']); 
+			//sum of count  added chemist,change and adv by shreeya on date [22-06-2023] 
+			$chemist_appl_revenue = $this->thousandsCurrencyFormat($chemistApplicationrevenue['sum']);
+			$change_appl_revenue = $this->thousandsCurrencyFormat($changeApplicationrevenue['sum']); 
+			$adv_appl_revenue = $this->thousandsCurrencyFormat($advApplicationrevenue['sum']);
+			 
 			
 			$this->loadModel('DmiFrontStatistics');
 			
 			/* LIMS STATISTIC*/
-			
-			
 			$this->loadModel('DmiUsers');
 			$this->loadModel('DmiRoOffices');
 			$this->loadModel('MReport');
@@ -355,6 +388,9 @@ use Cake\View\ViewBuilder;
 				'e_sign_grantc_r'=>count($renewalCertificateEsigned),
 				'reve_app_n'=>$new_appl_revenue,
 				'reve_app_r'=>$renewal_appl_revenue,
+				'reve_app_chem'=>$chemist_appl_revenue,//added new by shreeya[22-06-2023]
+				'reve_app_change'=>$change_appl_revenue,//added new
+				'reve_app_adv'=>$adv_appl_revenue,//added new
 				'total_revenue' => $total_revenue,
 				'new_appl_revenue'=>$new_appl_revenue,
 				'renewal_appl_revenue'=>$renewal_appl_revenue,
