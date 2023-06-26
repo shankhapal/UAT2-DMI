@@ -361,7 +361,7 @@
 													<table class="table table-bordered">
 														<tr>
 															<td><span class=""></span>New Certificate of Authorisation Payment Total :</td>
-															<td><span class=""></span> <?php echo $new_ca_total ?></td>
+															<td><span class=""></span> <?php echo $new_ca_total;?></td>
 														</tr>
 														<tr>
 															<td><span class=""></span>New Printing Applications Payment Total :</td>
