@@ -364,6 +364,14 @@
 												<p class="nav-icon-p"><b>Work Transfer</b></p>
 											</a>
 										</li>
+										<?php if ($current_user_roles['ro_inspection'] == 'yes'){ ?>
+											<li class="nav-item">
+												<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/get_officer_wise_pending_appl" class="bg-success nav-link">
+													<i class="fas fa-retweet nav-icon"></i>
+													<p class="nav-icon-p"><b>Officers Pending Work</b></p>
+												</a>
+											</li>
+										<?php } ?>
 									</li>
 									<li class="nav-item">
 										<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/routine_inspection_list" class="bg-success nav-link">
