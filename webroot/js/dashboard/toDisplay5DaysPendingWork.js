@@ -12,31 +12,42 @@ $(document).ready(function () {
       // Parse the JSON response
       var data = JSON.parse(response);
 
-      // Iterate through each row and create table rows
-      for (var i = 0; i < data.length; i++) {
-        var row = data[i];
-        tableRows +=
-          "<tr>" +
-          "<td>" +
-          row[0] +
-          "</td>" +
-          "<td>" +
-          row[1] +
-          "</td>" +
-          "<td>" +
-          row[2] +
-          "</td>" +
-          "<td>" +
-          row[3] +
-          "</td>" +
-          "<td>" +
-          row[4] +
-          "</td>" +
-          "</tr>";
+      // Iterate through each property in the data object
+      for (var prop in data) {
+        if (data.hasOwnProperty(prop)) {
+          var innerObj = data[prop];
+
+          // Iterate through each inner array
+          for (var key in innerObj) {
+            if (innerObj.hasOwnProperty(key)) {
+              var arrayValues = innerObj[key];
+
+              // Iterate through each array value
+              for (var i = 0; i < arrayValues.length; i++) {
+                var row = arrayValues[i];
+                tableRows +=
+                  "<tr>" +
+                  "<td>" +
+                  row.appl_type +
+                  "</td>" +
+                  "<td>" +
+                  row.appl_id +
+                  "</td>" +
+                  "<td>" +
+                  row.process +
+                  "</td>" +
+                  "</tr>";
+              }
+            }
+          }
+        }
       }
 
       // Insert the table rows into the table body
-      $("#myPendingWorkModel tbody").html(tableRows);
+      $("#myPendingWorkModelBody").html(tableRows);
+
+      // Initialize DataTables on your table
+      $(".table").DataTable();
 
       // Display the modal
       $("#myPendingWorkModel").modal("show");
