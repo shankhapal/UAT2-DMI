@@ -2990,10 +2990,17 @@ class OthermodulesController extends AppController{
 		$InchargeId = $this->Session->read('username');
 		//get list of offices under this incharge
 		$this->loadModel('DmiRoOffices');
-		$getOfficesUnderIncharge = $this->DmiRoOffices->find('list',array('valueField'=>'id','conditions'=>array('ro_email_id IS'=>$InchargeId,'delete_status IS NULL')))->toArray();
-		//get all officers under this Incharge
 		$this->loadModel('DmiUsers');
-		$getOfficerUnderIncharge = $this->DmiUsers->find('all',array('fields'=>'email','conditions'=>array('posted_ro_office IN'=>$getOfficesUnderIncharge,'status IS'=>'active')))->toArray();
+		//get RO Incharge Posted Office
+		$getROInchargeOffice = $this->DmiUsers->find('all',array('fields'=>array('posted_ro_office'),'conditions'=>array('email IS'=>$InchargeId,'status IS'=>'active')))->first();
+		$getOfficesUnderIncharge = $this->DmiRoOffices->find('list',array('valueField'=>'id','conditions'=>array('OR'=>array('ro_email_id IS'=>$InchargeId,'ro_id_for_so IS'=>$getROInchargeOffice['posted_ro_office']),'delete_status IS NULL')))->toArray();
+		//get all officers under this Incharge
+		
+		$getOfficerUnderIncharge = array();
+		if(!empty($getOfficesUnderIncharge)){
+			$getOfficerUnderIncharge = $this->DmiUsers->find('all',array('fields'=>array('f_name','l_name','email','posted_ro_office'),'conditions'=>array('posted_ro_office IN'=>$getOfficesUnderIncharge,'status IS'=>'active')))->toArray();
+		}
+		
 		$this->set('getOfficerUnderIncharge',$getOfficerUnderIncharge);
 
 		$this->loadModel('DmiFlowWiseTablesLists');
@@ -3006,7 +3013,13 @@ class OthermodulesController extends AppController{
 		$this->set('level_arr',$level_arr);
 
 		$appl_list = array();
+		$checkCurPosition = array();
+
+		$l=0;
 		foreach($getOfficerUnderIncharge as $eachofficer){
+
+			//get Office name for each officer
+			$getOfficeName = $this->DmiRoOffices->find('all',array('fields'=>'ro_office','conditions'=>array('id IS'=>$eachofficer['posted_ro_office'])))->first();
 
 			//for each flow
 			$i=0;
@@ -3028,29 +3041,32 @@ class OthermodulesController extends AppController{
 				foreach($level_arr as $eachLevel){
 
 					//check appl position with current user and level
-					$checkCurPosition = $this->$applPosTable->find('all',array('conditions'=>array('current_level IS'=>$eachLevel,'current_user_email_id IS'=>$eachofficer['email'])))->toArray();
+					$checkCurPosition[$l][$i][$j] = $this->$applPosTable->find('all',array('conditions'=>array('current_level IS'=>$eachLevel,'current_user_email_id IS'=>$eachofficer['email'])))->toArray();
 
 					$k=0;
-					foreach($checkCurPosition as $eachAppl){
+					foreach($checkCurPosition[$l][$i][$j] as $eachAppl){
 
 						if($eachLevel=='level_1' || $eachLevel=='level_2' || $eachLevel=='level_4_ro' || $eachLevel=='level_4_mo'){
 
-							$appl_list[$i][$j][$k]['appl_type'] = $getApplType['application_type'];
-							$appl_list[$i][$j][$k]['appl_id'] = $eachAppl['customer_id'];
+							$appl_list[$l][$i][$j][$k]['appl_type'] = $getApplType['application_type'];
+							$appl_list[$l][$i][$j][$k]['appl_id'] = $eachAppl['customer_id'];
+							$appl_list[$l][$i][$j][$k]['last_trans_date'] = $eachAppl['modified'];
+							$appl_list[$l][$i][$j][$k]['office_name'] = $getOfficeName['ro_office'];
 
 							if($eachLevel=='level_1'){	
-								$appl_list[$i][$j][$k]['process'] = 'Scrutiny';
+								$appl_list[$l][$i][$j][$k]['process'] = 'Scrutiny';
 
 							}elseif($eachLevel=='level_2'){
-								$appl_list[$i][$j][$k]['process'] = 'Site Inspection';
+								$appl_list[$l][$i][$j][$k]['process'] = 'Site Inspection';
 
 							}elseif($eachLevel=='level_4_ro'){
-								$appl_list[$i][$j][$k]['process'] = 'SO appl. communication';
+								$appl_list[$l][$i][$j][$k]['process'] = 'SO appl. communication';
 
 							}elseif($eachLevel=='level_4_mo'){
-								$appl_list[$i][$j][$k]['process'] = 'SO appl. Scrutiny at RO';
+								$appl_list[$l][$i][$j][$k]['process'] = 'SO appl. Scrutiny at RO';
 
 							}
+							$k=$k+1;
 						
 						}elseif($eachLevel=='level_3' || $eachLevel=='level_4'){
 
@@ -3059,28 +3075,35 @@ class OthermodulesController extends AppController{
 							if($checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_4')){
 								//nothing
 							}else{
+								$appl_list[$l][$i][$j][$k]['appl_type'] = $getApplType['application_type'];
+								$appl_list[$l][$i][$j][$k]['appl_id'] = $eachAppl['customer_id'];
+								$appl_list[$l][$i][$j][$k]['last_trans_date'] = $eachAppl['modified'];
+								$appl_list[$l][$i][$j][$k]['office_name'] = $getOfficeName['ro_office'];
+
 								if($eachLevel=='level_3'){	
-									$appl_list[$i][$j][$k]['process'] = 'with Nodal officer';
+									$appl_list[$l][$i][$j][$k]['process'] = 'with Nodal officer';
 	
 								}elseif($eachLevel=='level_4'){	
-									$appl_list[$i][$j][$k]['process'] = 'with HO Officer';
+									$appl_list[$l][$i][$j][$k]['process'] = 'with HO Officer';
 	
 								}
+								$k=$k+1;
 							}
 							
 						}
 
-						$k=$k+1;
+						
 					}
 					$j=$j+1;
 				}
 
 				$i=$i+1;
 			}
-
+		$l=$l+1;
 		}
 
-		print_r($appl_list);exit;
+		$this->set('appl_list',$appl_list);
+		$this->set('checkCurPosition',$checkCurPosition);
 	
 	}
 
