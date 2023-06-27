@@ -38,10 +38,21 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                                                      <label for="inputEmail3" class="col-sm col-form-label">Date & Time of present Inspection <span class="cRed">*</span></label>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6">
+                                            <div class="col-md-3">
+												<label>Select Date</label>
                                               <?php echo $this->Form->control('date_p_inspection', array('type'=>'text', 'id'=>'date_p_inspection', 'value'=>$section_form_details[0]['date_p_inspection'], 'class'=>'form-control input-field', 'placeholder'=>'Enter DD/MM/YYYY', 'label'=>false)); ?>
                                                 <span id="error_date_p_inspection" class="error invalid-feedback"></span>
-                                                 </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <!-- added time field as per change req and suggestions on date 27/06/2023
+                                                added by shankhpal shende -->
+											<label>Select/Change time</label>
+                                              <?php 
+                                              echo $this->Form->control('time_p_inspection', array('type'=>'time', 'id'=>'time_p_inspection', 'class'=>'form-control input-field', 'label'=>false)); ?>
+                                                <?php 
+                                              echo $this->Form->control('show_time', array('type'=>'text', 'value'=>$section_form_details[0]['time_p_inspection'], 'placeholder'=>'Not Selected', 'class'=>'form-control input-field', 'label'=>'Selected Time')); ?>
+												<span id="error_time_p_inspection" class="error invalid-feedback"></span>
+                                            </div>
                                             </div>
                                         </div>
                                     </div>
@@ -556,7 +567,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                                     <div class="col-md-6">
                                         <div class="form-group row">
                                             <div class="col-sm">
-                                                 <?php echo $this->Form->control('last_lot_date', array('type'=>'text', 'id'=>'last_lot_date', 'value'=>$section_form_details[0]['date_last_inspection'], 'class'=>'form-control input-field', 'placeholder'=>'Enter DD/MM/YYYY', 'label'=>false)); ?>
+                                                 <?php echo $this->Form->control('last_lot_date', array('type'=>'text', 'id'=>'last_lot_date', 'value'=>$section_form_details[0]['last_lot_date'], 'class'=>'form-control input-field', 'placeholder'=>'Enter DD/MM/YYYY', 'label'=>false)); ?>
                                                 <span id="error_last_lot_date" class="error invalid-feedback"></span>
                                             </div> 
                                         </div>
@@ -610,24 +621,35 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                             </div>
 
                             <!-- 13. Quantity Graded During Current Month Upto -->
-                        <div class="card-header sub-card-header-firm"><h3 class="card-title">13. Quantity Graded During Current Month Upto</h3></div>
+                            <div class="card-header sub-card-header-firm">
+                            <h3 class="card-title">13. Quantity Graded During Current Month Upto</h3>
+                            </div>
                             <div class="form-horizontal">
-                                <div class="card-body">
-                                    <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group row">
-                                            <label for="inputEmail3" class="col-sm col-form-label">Quantity Graded During Current Month Upto<span class="cRed">*</span></label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group row">
-                                            <div class="col-sm">
-                                                <?php echo $this->Form->control('month_upto', array('type'=>'text', 'id'=>'month_upto', 'value'=>$section_form_details[0]['month_upto'], 'class'=>'form-control input-field', 'placeholder'=>'Enter DD/MM/YYYY', 'label'=>false)); ?>
-                                                <span id="error_month_upto" class="error invalid-feedback"></span>
-                                            </div> 
-                                        </div>
+                            <div class="card-body">
+                                <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                     <label for="inputEmail3" class="col-form-label">Quantity Graded During Current Month Upto<span class="cRed">*</span></label>
+                                   <?php echo $this->Form->control('month_upto', array('type'=>'text', 'id'=>'month_upto', 'value'=>$section_form_details[0]['month_upto'], 'class'=>'form-control input-field', 'placeholder'=>'Enter DD/MM/YYYY', 'label'=>false)); ?>
+                                    <span id="error_month_upto" class="error invalid-feedback"></span>
                                     </div>
                                 </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                    <label for="inputEmail2" class="col-form-label">Quantity<span class="cRed">*</span></label>
+                                    <?php echo $this->Form->control('quantity', array('type'=>'text', 'id'=>'quantity', 'value'=>$section_form_details[0]['quantity'], 'class'=>'form-control input-field', 'placeholder'=>'Enter Quantity', 'label'=>false)); ?>
+                                    <span id="error_quantity" class="error invalid-feedback"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                    <label for="inputEmail3" class="col-form-label">Units</label>
+                                     <?php echo $this->Form->control('grade_units', array('type'=>'select', 'options'=>$section_form_details[8], 'label'=>false, 'class'=>'form-control')); ?>
+                                    <span id="error_grade_units" class="error invalid-feedback"></span>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
                             </div>
 
 

@@ -410,6 +410,8 @@ function routineInspectionFormValidation() {
 
     var month_upto = $("#month_upto").val();
     var shortcomings_noticed = $("#shortcomings_noticed").val();
+    var time_p_inspection = $("#time_p_inspection").val(); // for present time of inspection added on 27/06/2023 by shankhpal
+    var quantity = $("#quantity").val();
     var value_return = "true";
 
     if ($("#fssai_approved-yes").is(":checked")) {
@@ -459,6 +461,19 @@ function routineInspectionFormValidation() {
       value_return = "false";
     }
 
+    if (quantity == "") {
+      $("#error_quantity").show().text("Please Enter quantity");
+      setTimeout(function () {
+        $("#error_quantity").fadeOut();
+      }, 8000);
+      $("#quantity").addClass("is-invalid");
+      $("#quantity").click(function () {
+        $("#error_quantity").hide().text;
+        $("#quantity").removeClass("is-invalid");
+      });
+      value_return = "false";
+    }
+
     if (analytical_results == "") {
       $("#error_analytical_results")
         .show()
@@ -470,6 +485,20 @@ function routineInspectionFormValidation() {
       $("#analytical_results").click(function () {
         $("#error_analytical_results").hide().text;
         $("#analytical_results").removeClass("is-invalid");
+      });
+      value_return = "false";
+    }
+
+    // validation to check time field is empty or not added by shankhpal on 27/06/2023
+    if (time_p_inspection == "") {
+      $("#error_time_p_inspection").show().text("Please Enter time");
+      setTimeout(function () {
+        $("#error_time_p_inspection").fadeOut();
+      }, 8000);
+      $("#time_p_inspection").addClass("is-invalid");
+      $("#time_p_inspection").click(function () {
+        $("#error_time_p_inspection").hide().text;
+        $("#time_p_inspection").removeClass("is-invalid");
       });
       value_return = "false";
     }
@@ -1016,6 +1045,7 @@ function routineInspectionFormValidation() {
     const name_of_inspecting_officer = $("#name_of_inspecting_officer").val(); // added on 23/05/2023 by shankhpal
     const signnature_io_docs = $("#signnature_io_docs").val();
     const shortcomings_noticed_docs = $("#shortcomings_noticed_docs").val();
+    var time_p_inspection = $("#time_p_inspection").val(); // for present time of inspection added on 27/06/2023 by shankhpal
     var value_return = "true";
 
     if (name_of_inspecting_officer == "") {
@@ -1103,6 +1133,20 @@ function routineInspectionFormValidation() {
       $("#date_last_inspection").click(function () {
         $("#error_date_last_inspection").hide().text;
         $("#date_last_inspection").removeClass("is-invalid");
+      });
+      value_return = "false";
+    }
+
+    // validation to check time field is empty or not added by shankhpal on 27/06/2023
+    if (time_p_inspection == "") {
+      $("#error_time_p_inspection").show().text("Please Enter time");
+      setTimeout(function () {
+        $("#error_time_p_inspection").fadeOut();
+      }, 8000);
+      $("#time_p_inspection").addClass("is-invalid");
+      $("#time_p_inspection").click(function () {
+        $("#error_time_p_inspection").hide().text;
+        $("#time_p_inspection").removeClass("is-invalid");
       });
       value_return = "false";
     }
@@ -1276,6 +1320,7 @@ function routineInspectionFormValidation() {
       "#signnature_of_inspecting_officer_docs"
     ).val();
 
+    var time_p_inspection = $("#time_p_inspection").val(); // for present time of inspection added on 27/06/2023 by shankhpal
     const name_of_packers = $("#name_of_packers").val();
 
     // if (name_of_packers == "") {
@@ -1392,6 +1437,19 @@ function routineInspectionFormValidation() {
       value_return = "false";
     }
 
+    // validation to check time field is empty or not added by shankhpal on 27/06/2023
+    if (time_p_inspection == "") {
+      $("#error_time_p_inspection").show().text("Please Enter time");
+      setTimeout(function () {
+        $("#error_time_p_inspection").fadeOut();
+      }, 8000);
+      $("#time_p_inspection").addClass("is-invalid");
+      $("#time_p_inspection").click(function () {
+        $("#error_time_p_inspection").hide().text;
+        $("#time_p_inspection").removeClass("is-invalid");
+      });
+      value_return = "false";
+    }
     if (commodity == "") {
       $("#error_commodity").show().text("Please Enter commodity");
       setTimeout(function () {
