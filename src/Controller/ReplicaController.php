@@ -84,10 +84,26 @@ class ReplicaController extends AppController {
 		$redirect_to = '';
 
 		//get array
-		$attached_lab_data = $this->DmiCaPpLabMapings->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, 'lab_id IS NOT NULL'),'order'=>'id asc'))->first();
-			
-		$attached_pp_data = $this->DmiCaPpLabMapings->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, 'pp_id IS NOT NULL'),'order'=>'id asc'))->first();
+		$attached_lab_data = $this->DmiCaPpLabMapings->find('all', [
+			'conditions' => [
+					'customer_id IS' => $customer_id,
+					'lab_id IS NOT NULL',
+					'delete_status IS NULL'
+			],
+			'order' => ['id' => 'desc'],
+			'limit' => 1
+		])->first();
 
+	
+		$attached_pp_data = $this->DmiCaPpLabMapings->find('all', [
+			'conditions' => [
+					'customer_id IS' => $customer_id,
+					'pp_id IS NOT NULL',
+					'delete_status IS NULL'
+			],
+			'order' => ['id' => 'desc']
+		])->last();
+	
 		//first check if this packer have any chemist incharge or not, elae show alert
 		$check_che_incharge = $this->DmiChemistAllotments->find('all',array('fields'=>'chemist_id','conditions'=>array('customer_id IS'=>$customer_id,'status'=>1,'incharge'=>'yes')))->first();
 		
@@ -121,11 +137,14 @@ class ReplicaController extends AppController {
 			 * @version 15th June 2023
 			 */
 
-			$attached_lab = $this->DmiCaPpLabMapings->find('all',array('keyField'=>'lab_id','valueField'=>'lab_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc','delete_status IS NULL'))->first();
+			$attached_lab = $this->DmiCaPpLabMapings->find('all', ['keyField' => 'lab_id','valueField' => 'lab_id',
+    	'conditions' => ['customer_id IS' => $customer_id,'delete_status IS NULL','map_type'=>'lab'],'order' => 'id desc'])->first();
 			$lab_id = $attached_lab['lab_id'];
 			
 			//get printing list
-			$attached_pp = $this->DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'pp_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id asc'))->toList();     
+			$attached_pp = $this->DmiCaPpLabMapings->find('list', ['keyField' => 'pp_id','valueField' => 'pp_id',
+			'conditions' => ['AND' => ['customer_id IS' => $customer_id,'delete_status IS NULL','map_type' => 'pp']],
+    	'order' => 'id desc'])->toList();
 			
 			if (strpos($lab_id, "/Own") !== false) {
 				$lab_list = $this->DmiCaMappingOwnLabDetails->find('list',array('keyField'=>'own_lab_id','valueField'=>'lab_name','conditions'=>array('ca_id'=>$customer_id,'delete_status IS NULL')))->toArray();

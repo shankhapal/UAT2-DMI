@@ -70,14 +70,27 @@ class Code15digitController extends AppController {
 			$message_theme = '';
 			$redirect_to = '';
 
-			// added by Amol on 21-10-2022 as per replica controller
-			$attached_lab = $this->DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'lab_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id asc'))->toList();
-			//get printing list
-			$attached_pp = $this->DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'pp_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id asc'))->toList();     
 				
 			//get array
-			$attached_lab_data = $this->DmiCaPpLabMapings->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, 'lab_id IS NOT NULL'),'order'=>'id asc'))->first();
-			$attached_pp_data = $this->DmiCaPpLabMapings->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, 'pp_id IS NOT NULL'),'order'=>'id asc'))->first();
+			$attached_lab_data = $this->DmiCaPpLabMapings->find('all', [
+				'conditions' => [
+						'customer_id IS' => $customer_id,
+						'lab_id IS NOT NULL',
+						'delete_status IS NULL'
+				],
+				'order' => ['id' => 'desc'],
+				'limit' => 1
+			])->first();
+
+		
+			$attached_pp_data = $this->DmiCaPpLabMapings->find('all', [
+				'conditions' => [
+						'customer_id IS' => $customer_id,
+						'pp_id IS NOT NULL',
+						'delete_status IS NULL'
+				],
+				'order' => ['id' => 'desc']
+			])->last();
 		
 			//first check if this packer have any chemist incharge or not, elae show alert
 			$check_che_incharge = $this->DmiChemistAllotments->find('all',array('fields'=>'chemist_id','conditions'=>array('customer_id IS'=>$customer_id,'status'=>1,'incharge'=>'yes')))->first();
@@ -98,13 +111,6 @@ class Code15digitController extends AppController {
 				//generate packer unique id from table id
 				$firm_details['ca_unique_no'] = $this->getCaUniqueid($firm_details['id']);
 				$this->set('firm_details',$firm_details);
-				
-				//Query updated for both attached printing and lab data on 16/06/2023 -- by shankhpal
-				$attached_lab = $this->DmiCaPpLabMapings->find('all',array('keyField'=>'lab_id','valueField'=>'lab_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc','delete_status IS NULL'))->first();
-				$lab_id = $attached_lab['lab_id'];
-
-				// //get printing list
-		        $attached_pp = $this->DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'pp_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id asc'))->toList();     
 
 				/**
 				 * Added for own lab module, split own lab id and get details from dmi_ca_mapping_own_lab_details 
@@ -112,6 +118,16 @@ class Code15digitController extends AppController {
 				 * @author shankhpal shende
 				 * @version 16th June 2023
 				 */
+
+				$attached_lab = $this->DmiCaPpLabMapings->find('all', ['keyField' => 'lab_id','valueField' => 'lab_id',
+    		'conditions' => ['customer_id IS' => $customer_id,'delete_status IS NULL','map_type'=>'lab'],'order' => 'id desc'])->first();
+				$lab_id = $attached_lab['lab_id'];
+			
+				//get printing list
+				$attached_pp = $this->DmiCaPpLabMapings->find('list', ['keyField' => 'pp_id','valueField' => 'pp_id',
+				'conditions' => ['AND' => ['customer_id IS' => $customer_id,'delete_status IS NULL','map_type' => 'pp']],
+				'order' => 'id desc'])->toList();
+
 				if (strpos($lab_id, "/Own") !== false) {
 					$lab_list = $this->DmiCaMappingOwnLabDetails->find('list',array('keyField'=>'own_lab_id','valueField'=>'lab_name','conditions'=>array('ca_id'=>$customer_id,'delete_status IS NULL')))->toArray();
 				} else {

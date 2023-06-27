@@ -2146,13 +2146,15 @@ class CustomersController extends AppController {
 			$app_id = $lab_list_value['customer_id'];
 			$get_office_record = $this->DmiApplWithRoMappings->getOfficeDetails($app_id);
 			
-			$office_type = $get_office_record['office_type'];
-			$ro_office = $get_office_record['ro_office'];
-			$id = $lab_list_value['id'];
-
-			$lab_data[$id] = $lab_list_value['firm_name'].", #"."Address: ".$lab_list_value['street_address'].", #"."Applicant ID: ".$lab_list_value['customer_id'].", #"."Office: ".$ro_office.", #"."Office Type: ".$office_type;
+			// Check if $get_office_record is not null before accessing its values
+			if ($get_office_record !== null) {
+				$office_type = $get_office_record['office_type'];
+				$ro_office = $get_office_record['ro_office'];
+				$id = $lab_list_value['id'];
+				$lab_data[$id] = $lab_list_value['firm_name'].", #"."Address: ".$lab_list_value['street_address'].", #"."Applicant ID: ".$lab_list_value['customer_id'].", #"."Office: ".$ro_office.", #"."Office Type: ".$office_type;
+					// Rest of the code
+			}
 			$i++;
-			
 		}
 		
 		$printers_list = $this->DmiFirms->find('all',array('keyField'=>'id','valueField'=>'firm_name','joins'=>array(array('table' => 'dmi_grant_certificates_pdfs','alias' => 'dmigcp','type' => 'INNER','conditions' => array('dmigcp.customer_id = DmiFirms.customer_id'))),
@@ -2283,7 +2285,7 @@ class CustomersController extends AppController {
 					
 					$own_lab_id = $eachlist['lab_id'];
 					$lab_data = $this->DmiCaMappingOwnLabDetails->find()->where(['own_lab_id' => $own_lab_id])->order(['id' => 'DESC'])->toArray();
-				 pr($lab_data);die;
+				
 					$result[$i]['lab_name'] = $own_lab_data[$eachlist['lab_id']];
 				}else{
 					$result[$i]['l_name'] = $lab_data[$eachlist['lab_id']];

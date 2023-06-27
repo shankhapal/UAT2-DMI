@@ -29,8 +29,11 @@
            packer for information and compliance of shortcomings after submission by inspection Officer.
            Author: Shankhpal Shende
            Date:17/05/2023 -->
+            <?php if(!empty($approved_routine_inspection_pdf)){ ?> 
             <div class="card-header"><h3 class="card-title">Routine Inspection Report:</h3></div>
             <div class="card-body">
+                <!-- // condition added for rti module if approved_routine_inspection_pdf is empty then table not display 
+                // added by shankhpal on 21/06/2023 -->
                 <table id="example2" class="table m-0 table-bordered">
                     <thead class="tablehead">
                         <tr>
@@ -53,5 +56,6 @@
                 </table>
             </div>
         </div>  
+         <?php } ?>
     </section>
 </div>
