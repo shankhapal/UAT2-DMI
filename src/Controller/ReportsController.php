@@ -6031,10 +6031,10 @@ class ReportsController extends AppController {
 
 		// check report_for null 
 		//added the condtion according to report_for null by shreeya on date [26-06-2023]
-		$reportForNull = 'no';
-		if(empty($report_for) || $report_for == ''){
-			$reportForNull = 'yes';
-		}
+		// $reportForNull = 'no';
+		// if(empty($report_for) || $report_for == ''){
+		// 	$reportForNull = 'yes';
+		// }
 
 		
 			//added for get application id  array by shreeya on date[23-06-2023]
@@ -6042,7 +6042,7 @@ class ReportsController extends AppController {
 			$application_key = array_keys($application_array);
 	
 
-			if($reportForNull == 'yes'){
+			if(empty($report_for) || $report_for == ''){
 		
 				$flowwise_table_data = $this->DmiFlowWiseTablesLists->find('all')->select(['id','payment','application_type'])->where(['application_type IN' =>$application_key])->toArray();
 
