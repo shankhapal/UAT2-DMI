@@ -35,7 +35,7 @@
 	  
 	 }
 	 else{ 
-
+//else part
 		//dashboard graph code starts here ?>
 			
 		<div class="content-wrapper mt30">
