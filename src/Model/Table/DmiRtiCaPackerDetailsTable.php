@@ -213,9 +213,20 @@ class DmiRtiCaPackerDetailsTable extends Table{
 		//Unit Weight of Parcel
 		$MUnitWeight = TableRegistry::getTableLocator()->get('MUnitWeight');
 		$grade_units =$MUnitWeight->find('list',array('keyField'=>'unit_id','valueField'=>'unit_weight','conditions' => array('display' => 'Y'),'order'=>'unit_id asc'))->toArray();
-	
-		return array($form_fields_details,$added_sample_details,$certificate_valid_upto,$sub_commodity_value,$lab_list,$printers_list,$self_registered_chemist,$total_suggestions,$grade_units);			
+		// this will be return hours and minutes dropdown
+		$options = ['' => 'Hour : Minute'];
+    for ($hour = 1; $hour <= 12; $hour++) {
+        for ($minute = 0; $minute <= 59; $minute++) {
+            $formattedHour = sprintf('%02d', $hour);
+            $formattedMinute = sprintf('%02d', $minute);
+            $time12HourFormat = date('h:i A', strtotime("$formattedHour:$formattedMinute"));
+            $options["$formattedHour:$formattedMinute"] = "$time12HourFormat";
+        }
+    }
+
+		return array($form_fields_details,$added_sample_details,$certificate_valid_upto,$sub_commodity_value,$lab_list,$printers_list,$self_registered_chemist,$total_suggestions,$grade_units,$options);			
 	}
+	
 	
 	/* Comment
 	Reason : Updated saveFormDetails function as per change request 

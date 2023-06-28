@@ -4,7 +4,7 @@
 	    Name of person : shankhpal shende
 	    Date: 13-05-2023
 */ -->
-<?php //pr($section_form_details[7]);die;
+<?php //pr($section_form_details);die;
 echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-data', 'id'=>$section)); ?>
 <section id="form_outer_main" class="content form-middle">
     <div class="container-fluid" id="form_outer_main">
@@ -39,20 +39,23 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
-												<label>Select Date</label>
                                               <?php echo $this->Form->control('date_p_inspection', array('type'=>'text', 'id'=>'date_p_inspection', 'value'=>$section_form_details[0]['date_p_inspection'], 'class'=>'form-control input-field', 'placeholder'=>'Enter DD/MM/YYYY', 'label'=>false)); ?>
                                                 <span id="error_date_p_inspection" class="error invalid-feedback"></span>
                                             </div>
                                             <div class="col-md-3">
-                                                <!-- added time field as per change req and suggestions on date 27/06/2023
-                                                added by shankhpal shende -->
-											<label>Select/Change time</label>
-                                              <?php 
-                                              echo $this->Form->control('time_p_inspection', array('type'=>'time', 'id'=>'time_p_inspection', 'class'=>'form-control input-field', 'label'=>false)); ?>
-                                                <?php 
-                                              echo $this->Form->control('show_time', array('type'=>'text', 'value'=>$section_form_details[0]['time_p_inspection'], 'placeholder'=>'Not Selected', 'class'=>'form-control input-field', 'label'=>'Selected Time')); ?>
-												<span id="error_time_p_inspection" class="error invalid-feedback"></span>
-                                            </div>
+                                               <!-- Added time field as per change req and suggestions on date 27/06/2023 added by shankhpal shende -->
+                                                <?php
+                                                echo $this->Form->control('time_p_inspection', [
+                                                    'type' => 'select',
+                                                    'id' => 'time_p_inspection',
+                                                    'options' => $section_form_details[9],
+                                                    'default' => $section_form_details[0]['time_p_inspection'],
+                                                    'class' => 'form-control input-field',
+                                                    'label' => false
+                                                ]);
+                                                ?>
+                                                <span id="error_time_p_inspection" class="error invalid-feedback"></span>
+                                                 </div>
                                             </div>
                                         </div>
                                     </div>
@@ -644,7 +647,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                                 <div class="col-md-4">
                                     <div class="form-group">
                                     <label for="inputEmail3" class="col-form-label">Units</label>
-                                     <?php echo $this->Form->control('grade_units', array('type'=>'select', 'options'=>$section_form_details[8], 'label'=>false, 'class'=>'form-control')); ?>
+                                     <?php echo $this->Form->control('grade_units', array('type'=>'select', 'options'=>$section_form_details[8], 'default' => $section_form_details[0]['grade_units'], 'label'=>false, 'class'=>'form-control')); ?>
                                     <span id="error_grade_units" class="error invalid-feedback"></span>
                                     </div>
                                 </div>
@@ -1050,6 +1053,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
 echo $this->Html->css('RoutineInspection/routine_inspection_style');
 echo $this->Html->script('routininspection/routin_inspection');
 echo $this->Html->script('routininspection/rti_file_uploads_validation');
+echo $this->Html->script('routininspection/rti_other_validation');
 
 ?>
 
