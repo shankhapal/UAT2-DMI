@@ -3912,6 +3912,203 @@ class CustomfunctionsComponent extends Component {
 	
 		return $isCancelled;
 	}
+
+	
+	/**
+	 * The function is used to get result data for a single user and all (multiple uses).
+	 * @author Shankhpal Shende
+	 * @version 28/06/2023
+	 */
+
+	public function getSingleOrAllUserAppliResult($user=null){
+		
+		$DmiFlowWiseTablesLists = TableRegistry::getTableLocator()->get('DmiFlowWiseTablesLists');
+		$DmiApplicationTypes = TableRegistry::getTableLocator()->get('DmiApplicationTypes');
+		
+		
+		if($user != null){
+	
+			$flow_wise_tables = $DmiFlowWiseTablesLists->find('all', array(
+					'conditions' => array('application_type IN' => $this->Session->read('applTypeArray')),
+					'order' => 'id ASC'
+			))->toArray();
+			
+			$level_arr = array('level_1', 'level_2', 'level_3', 'level_4', 'level_4_ro', 'level_4_mo');
+
+			$appl_list = array();
+			// for each flow
+			$i = 0;
+			foreach ($flow_wise_tables as $eachflow) {
+				
+				// flow wise appl tables
+				$applPosTable = $eachflow['appl_current_pos'];
+				$applPosTable = TableRegistry::getTableLocator()->get($applPosTable);
+				
+				// get application type
+				$getApplType = $DmiApplicationTypes->find('all', array(
+						'fields' => 'application_type',
+						'conditions' => array('id IS' => $eachflow['application_type'])
+				))->first();
+					
+				$finalSubmitTable = $eachflow['application_form'];
+				$finalSubmitTable = TableRegistry::getTableLocator()->get($finalSubmitTable);
+
+				$grantCertTable = $eachflow['grant_pdf'];
+				$grantCertTable = TableRegistry::getTableLocator()->get($grantCertTable);
+
+				$j = 0;
+				foreach ($level_arr as $eachLevel) {
+					// check appl position with current user and level
+					$checkCurPosition[$i][$j] = $applPosTable->find('all', array('conditions' => array('current_level IS' => $eachLevel, 'current_user_email_id IS' => $user)))->toArray();
+					
+					$k = 0;
+					foreach ($checkCurPosition[$i][$j] as $eachAppl) {
+
+						$lastModified = explode(' ', $eachAppl['modified'])[0];
+						if (!empty($lastModified)) {
+								$currentDate = date('d/m/Y');
+								$date1 = Chronos::createFromFormat('d/m/Y', $lastModified);
+								$date2 = Chronos::createFromFormat('d/m/Y', $currentDate);
+								$daysDifference = $date1->diffInDays($date2);
+						} else {
+								// Handle the case when $lastModified is empty or missing
+								// You can assign a default value or perform any other desired action
+								$daysDifference = 0; // For example, setting the difference to 0
+						}
+
+						if ($daysDifference > 5) {
+								
+							if ($eachLevel == 'level_1' || $eachLevel == 'level_2' || $eachLevel == 'level_4_ro' || $eachLevel == 'level_4_mo') {
+									
+								$appl_list[$i][$j][$k]['appl_type'] = $getApplType['application_type'];
+								$appl_list[$i][$j][$k]['appl_id'] = $eachAppl['customer_id'];
+
+								if ($eachLevel == 'level_1'){
+										$appl_list[$i][$j][$k]['process'] = 'Scrutiny';
+								} elseif ($eachLevel == 'level_2') {
+										$appl_list[$i][$j][$k]['process'] = 'Site Inspection';
+								} elseif ($eachLevel == 'level_4_ro') {
+										$appl_list[$i][$j][$k]['process'] = 'SO appl. communication';
+								} elseif ($eachLevel == 'level_4_mo') {
+										$appl_list[$i][$j][$k]['process'] = 'SO appl. Scrutiny at RO';
+								}
+							
+								$k++;
+								
+							} elseif ($eachLevel == 'level_3' || $eachLevel == 'level_4') {
+
+								// check if appl submission and granted
+								$checkLastStatus = $finalSubmitTable->find('all', array('conditions' => array('customer_id IS' => $eachAppl['customer_id']),'order' => 'id desc'))->first();
+								
+								if ($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level']=='level_4')){
+								//nothing to do
+								}elseif ($eachLevel == 'level_3' || $eachLevel == 'level_4') {
+									
+									// check if appl submission and granted
+									$checkLastStatus = $finalSubmitTable->find('all', array('conditions' => array('customer_id IS' => $eachAppl['customer_id']),'order' => 'id desc'))->first();
+									
+									if ($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_4')) {
+										// check if grant certificate exists
+										$checkGrantCert = $this->$grantCertTable->find('all', array('conditions' => array('customer_id IS' => $eachAppl['customer_id'])))->toArray();
+
+										if (!empty($checkGrantCert)) {
+												$appl_list[$i][$j][$k]['appl_type'] = $getApplType['application_type'];
+												$appl_list[$i][$j][$k]['appl_id'] = $eachAppl['customer_id'];
+												$appl_list[$i][$j][$k]['process'] = 'Grant Certificate';
+												$k++;
+										}
+									}
+								}
+							}
+						} else {
+								// More than 5 days ago
+								$isWithinLast5Days = false;
+						}
+					
+					}
+					$j++;
+				}
+			$i++;
+			}
+			echo json_encode($appl_list);
+		}else{
+			
+			$days = 5;
+			$interval = 4;
+			$time = '10:30';
+
+			$DmiUsers = TableRegistry::getTableLocator()->get('DmiUsers');
+			$DmiApplicationTypes = TableRegistry::getTableLocator()->get('DmiApplicationTypes');
+
+			// Get all active users' emails
+			$all_active_users = $DmiUsers->find()
+					->select(['email'])
+					->where(['status' => 'active', 'division IN' => ['BOTH', 'DMI']])
+					->toArray();
+
+			$all_user_emails = array_column($all_active_users, 'email');
+
+			$appl_type_array = $DmiApplicationTypes->find('all', [
+					'conditions' => ['delete_status IS NULL'],
+					'order' => ['id' => 'asc']
+			])->toArray();
+			$application_types = array_column($appl_type_array, 'id');
+
+			$flow_wise_tables = $DmiFlowWiseTablesLists->find('all', [
+					'conditions' => ['application_type IN' => $application_types],
+					'order' => ['id' => 'asc']
+			])->toArray();
+
+			// Group the flow_wise_tables by application_type
+			$result = [];
+			foreach ($flow_wise_tables as $table) {
+					$applicationType = $table['application_type'];
+					$result[$applicationType][] = $table;
+			}
+
+			foreach ($result as $eachresult) {
+				// Flow wise appl tables
+				foreach ($eachresult as $eachflow) {
+					$applPosTableAlias = $eachflow['appl_current_pos'];
+					$applPosTable = TableRegistry::getTableLocator()->get($applPosTableAlias);
+
+					// Get application type
+					$getApplType = $DmiApplicationTypes->find('all', [
+							'fields' => 'application_type',
+							'conditions' => ['id' => $eachflow['application_type']]
+					])->first();
+
+					$finalSubmitTable = $eachflow['application_form'];
+					if (!empty($finalSubmitTable)) {
+						$finalSubmitTable = TableRegistry::getTableLocator()->get($finalSubmitTable);
+
+						$grantCertTable = $eachflow['grant_pdf'];
+						$grantCertTable = TableRegistry::getTableLocator()->get($grantCertTable);
+
+						$level_arr = ['level_1', 'level_2', 'level_3', 'level_4', 'level_4_ro', 'level_4_mo'];
+
+						$checkCurPosition = []; // Initialize the array for each flow
+
+						foreach ($level_arr as $eachLevel) {
+							$checkCurPosition[$eachLevel] = []; // Initialize an empty array for each level
+
+							foreach ($all_user_emails as $encoded_email) {
+									
+								$positions = $applPosTable->find('all', [
+									'conditions' => [
+											'current_level' => $eachLevel,
+											'current_user_email_id' => $encoded_email
+									]
+								])->toArray();
+								// Append positions to the array for each email and level
+								$checkCurPosition[$eachLevel][$encoded_email] = $positions;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 	
 }
 ?>
