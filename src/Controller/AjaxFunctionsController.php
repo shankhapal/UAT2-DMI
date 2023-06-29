@@ -2616,9 +2616,8 @@ class AjaxFunctionsController extends AppController{
 		$this->loadModel('DmiUsers');
 		$InchargeId = $this->Session->read('username');
 
-		// $responce = $this->Customfunctions->getSingleOrAllUserAppliResult($InchargeId);
-		$responce = $this->Customfunctions->getSingleOrAllUserAppliResult();
-
+		$responce = $this->Customfunctions->getSingleOrAllUserAppliResult($InchargeId);
+		//$responce = $this->Customfunctions->getSingleOrAllUserAppliResult();
 		return $responce;
 		
 	}

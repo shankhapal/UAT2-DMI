@@ -4041,24 +4041,22 @@ class CustomfunctionsComponent extends Component {
 			$DmiApplicationTypes = TableRegistry::getTableLocator()->get('DmiApplicationTypes');
 
 			// Get all active users' emails
-			$all_active_users = $DmiUsers->find()
-					->select(['email'])
-					->where(['status' => 'active', 'division IN' => ['BOTH', 'DMI']])
-					->toArray();
-
+			$all_active_users = $DmiUsers->find()->select(['email'])->where(['status' => 'active', 'division IN' => ['BOTH', 'DMI']])->toArray();
+		
 			$all_user_emails = array_column($all_active_users, 'email');
-
+		
 			$appl_type_array = $DmiApplicationTypes->find('all', [
 					'conditions' => ['delete_status IS NULL'],
 					'order' => ['id' => 'asc']
 			])->toArray();
+			
 			$application_types = array_column($appl_type_array, 'id');
-
+			
 			$flow_wise_tables = $DmiFlowWiseTablesLists->find('all', [
 					'conditions' => ['application_type IN' => $application_types],
 					'order' => ['id' => 'asc']
 			])->toArray();
-
+			
 			// Group the flow_wise_tables by application_type
 			$result = [];
 			foreach ($flow_wise_tables as $table) {
@@ -4066,7 +4064,10 @@ class CustomfunctionsComponent extends Component {
 					$result[$applicationType][] = $table;
 			}
 
+			$countApplication = 0; // Initialize count
+
 			foreach ($result as $eachresult) {
+				
 				// Flow wise appl tables
 				foreach ($eachresult as $eachflow) {
 					$applPosTableAlias = $eachflow['appl_current_pos'];
@@ -4077,7 +4078,7 @@ class CustomfunctionsComponent extends Component {
 							'fields' => 'application_type',
 							'conditions' => ['id' => $eachflow['application_type']]
 					])->first();
-
+					
 					$finalSubmitTable = $eachflow['application_form'];
 					if (!empty($finalSubmitTable)) {
 						$finalSubmitTable = TableRegistry::getTableLocator()->get($finalSubmitTable);
@@ -4087,28 +4088,110 @@ class CustomfunctionsComponent extends Component {
 
 						$level_arr = ['level_1', 'level_2', 'level_3', 'level_4', 'level_4_ro', 'level_4_mo'];
 
-						$checkCurPosition = []; // Initialize the array for each flow
+						$levelCounts = []; // Counter for each level
+						$applicationCount = []; // Counter for application list
 
-						foreach ($level_arr as $eachLevel) {
-							$checkCurPosition[$eachLevel] = []; // Initialize an empty array for each level
+						// Create an email-to-name mapping for active users
+						$emailToName = [];
+						foreach ($all_active_users as $user) {
+								$emailToName[$user['email']] = $user['name'];
+						}
 
-							foreach ($all_user_emails as $encoded_email) {
-									
-								$positions = $applPosTable->find('all', [
-									'conditions' => [
-											'current_level' => $eachLevel,
-											'current_user_email_id' => $encoded_email
-									]
+						foreach ($all_user_emails as $eachemail) {
+							$userApplicationCount = 0; // Counter for each user
+								
+							foreach ($level_arr as $eachLevel) {
+
+								$checkCurPosition = $applPosTable->find('all', [
+										'conditions' => [
+												'current_level' => $eachLevel,
+												'current_user_email_id IS NOT' => null,
+												'current_user_email_id' => $eachemail,
+												'created <' => date('Y-m-d', strtotime('-5 days'))
+										]
 								])->toArray();
-								// Append positions to the array for each email and level
-								$checkCurPosition[$eachLevel][$encoded_email] = $positions;
+								
+								foreach ($checkCurPosition as $eachAppl) {
+
+									if ($eachLevel == 'level_1' || $eachLevel == 'level_2' || $eachLevel == 'level_4_ro' || $eachLevel == 'level_4_mo') {
+											$appl_list['appl_type'] = $getApplType['application_type'];
+											$appl_list['appl_id'] = $eachAppl['customer_id'];
+											
+											if ($eachLevel == 'level_1') {
+													$appl_list['process'] = 'Scrutiny';
+											} elseif ($eachLevel == 'level_2') {
+													$appl_list['process'] = 'Site Inspection';
+											} elseif ($eachLevel == 'level_4_ro') {
+													$appl_list['process'] = 'SO appl. communication';
+											} elseif ($eachLevel == 'level_4_mo') {
+													$appl_list['process'] = 'SO appl. Scrutiny at RO';
+											}
+											
+											$levelCounts[$eachLevel] = isset($levelCounts[$eachLevel]) ? $levelCounts[$eachLevel] + 1 : 1;
+											$userApplicationCount++; // Increment application count for the user
+									}elseif($eachLevel=='level_3' || $eachLevel=='level_4'){
+										//check if appl submission and granted
+										$checkLastStatus = $finalSubmitTable->find('all',array('conditions'=>array('customer_id IS'=>$eachAppl['customer_id']),'order'=>'id desc'))->first();
+										if($checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_4')){
+											//nothing
+										}else{
+											$appl_list['appl_type'] = $getApplType['application_type'];
+											$appl_list['appl_id'] = $eachAppl['customer_id'];
+
+											if($eachLevel=='level_3'){	
+												$appl_list['process'] = 'with Nodal officer';
+				
+											}elseif($eachLevel=='level_4'){	
+												$appl_list['process'] = 'with HO Officer';
+				
+											}
+										}
+									}
+								}
+							}
+							// Store application count for the user if it's not zero
+							if ($userApplicationCount > 0) {
+									$userEmail = $eachemail;
+									$userName = isset($emailToName[$userEmail]) ? $emailToName[$userEmail] : $userEmail;
+									$applicationCount[$userEmail] = [
+											'name' => $userName,
+											'count' => $userApplicationCount
+									];
 							}
 						}
+
+						// Create an array to store the application list
+						$applicationList = [];
+						// Populate the application list array
+						foreach ($applicationCount as $userEmail => $data) {
+							
+							$userName = $data['name'];
+							$count = $data['count'];
+
+							$phoneData = $DmiUsers->find()->select(['phone'])->where(['email'=>$userName,'status' => 'active', 'division IN' => ['BOTH', 'DMI']])->first();
+							$userPhone = $phoneData['phone'];
+							// Create an array for each application entry
+							$applicationEntry = [
+									'userEmail' => $userEmail,
+									'count' => $count,
+									'phone' => $userPhone
+								//	'appl_type' => $appl_list['appl_type'],
+								//	'appl_id' => $appl_list['appl_id'],
+								//	'process' => $appl_list['process']
+							];
+
+							// Add the application entry to the application list
+							$applicationList[] = $applicationEntry;
+						}
+					
+						// Convert the application list to JSON format
+						$response = json_encode($applicationList);
+						// Send the response
+						echo $response;
 					}
 				}
 			}
 		}
 	}
-	
 }
 ?>

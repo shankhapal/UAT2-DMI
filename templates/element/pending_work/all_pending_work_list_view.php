@@ -34,6 +34,6 @@
 
 <?php 
 if ($_SESSION['pendingwork'] == null) {
-    echo $this->Html->script('dashboard/toDisplay5DaysPendingWork');
+  echo $this->Html->script('dashboard/toDisplay5DaysPendingWork');
 }
 ?>
