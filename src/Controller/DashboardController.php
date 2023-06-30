@@ -1135,7 +1135,8 @@ class DashboardController extends AppController{
 											$firm_name = $firm_details['firm_name'];
 											$firm_table_id = $firm_details['id'];
 											$appl_type_id = $each_flow['application_type'];
-											$appl_view_link = '../scrutiny/form_scrutiny_fetch_id/'.$firm_table_id.'/view/'.$appl_type_id;
+											//$appl_view_link = '../scrutiny/form_scrutiny_fetch_id/'.$firm_table_id.'/view/'.$appl_type_id;
+											$appl_view_link = '../scrutiny/form_scrutiny_fetch_id/'.$firm_table_id.'/view/1';//default set to 1 to open application sections added by shankhapal shende on 30/06/2023
 
 											$approved_record = $this->DmiRtiFinalReports->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id desc'))->first();
 										
