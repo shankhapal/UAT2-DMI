@@ -364,14 +364,16 @@
 												<p class="nav-icon-p"><b>Work Transfer</b></p>
 											</a>
 										</li>
-										<?php if ($current_user_roles['ro_inspection'] == 'yes'){ ?>
+										<!-- new menu added on 22-06-2023 by Amol for RO Incharge -->
+										<?php if ($current_user_roles['ro_inspection'] == 'yes' && $current_user_roles['super_admin'] != 'yes'){ ?>
 											<li class="nav-item">
 												<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/get_officer_wise_pending_appl" class="bg-success nav-link">
 													<i class="fas fa-retweet nav-icon"></i>
-													<p class="nav-icon-p"><b>Officers Pending Work</b></p>
+													<p class="nav-icon-p"><b>Office wise Pending</b></p>
 												</a>
 											</li>
 										<?php } ?>
+										
 									</li>
 									<li class="nav-item">
 										<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/routine_inspection_list" class="bg-success nav-link">
@@ -576,6 +578,14 @@
 							<a href="<?php echo $this->request->getAttribute('webroot'); ?>othermodules/firms_list_to_update" class="nav-link">
 								<i class="fas fa-user-edit nav-icon"></i>
 								<p class="nav-icon-p">Update Firm Details</p>
+							</a>
+						</li>
+
+						<!-- new menu added on 27-06-2023 by Amol for HO Admin -->
+						<li class="nav-item">
+							<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/get_ro_wise_pending_appl" class="bg-success nav-link">
+								<i class="fas fa-retweet nav-icon"></i>
+								<p class="nav-icon-p"><b>RO Wise Pending</b></p>
 							</a>
 						</li>
 

@@ -60,21 +60,12 @@ $user_role_arr = json_encode($current_user_roles);
 	}
 ?>
 
-
 <?php if ($current_user_roles['ro_inspection'] == 'yes' && $current_user_roles['super_admin'] != 'yes'): ?>
-   <?= $this->Html->link(
-    'Officers Wise Pending',
-    ['controller' => 'OtherModules', 'action' => 'get_officer_wise_pending_appl'],
-    ['class' => 'btn btn-warning m-2']
-		); ?>
+<a class="btn btn-warning m-2" href="<?php echo $this->request->getAttribute('webroot');?>othermodules/get_officer_wise_pending_appl">Officer Wise Pending</a>
 <?php endif; ?>
 
 <?php if ($current_user_roles['super_admin'] == 'yes'): ?>	
-		<?= $this->Html->link(
-    'ROs Wise pending',
-    ['controller' => 'OtherModules', 'action' => 'get_ro_wise_pending_appl'],
-    ['class' => 'btn btn-warning m-2']
-		); ?>
+<a class="btn btn-warning m-2" href="<?php echo $this->request->getAttribute('webroot');?>othermodules/get_ro_wise_pending_appl">RO Wise pending</a>
 <?php endif; ?>
 
 
