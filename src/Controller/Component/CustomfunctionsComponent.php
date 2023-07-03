@@ -3933,7 +3933,7 @@ class CustomfunctionsComponent extends Component {
 					'order' => 'id ASC'
 			))->toArray();
 			
-			$level_arr = array('level_1', 'level_2', 'level_3', 'level_4', 'level_4_ro', 'level_4_mo');
+			$level_arr = array('level_1', 'level_2', 'level_3', 'level_4', 'level_4_ro', 'level_4_mo','pao');
 
 			$appl_list = array();
 			// for each flow
@@ -3978,7 +3978,7 @@ class CustomfunctionsComponent extends Component {
 
 						if ($daysDifference > 5) {
 								
-							if ($eachLevel == 'level_1' || $eachLevel == 'level_2' || $eachLevel == 'level_4_ro' || $eachLevel == 'level_4_mo') {
+							if ($eachLevel == 'level_1' || $eachLevel == 'level_2' || $eachLevel == 'level_4_ro' || $eachLevel == 'level_4_mo' || $eachLevel == "pao") {
 									
 								$appl_list[$i][$j][$k]['appl_type'] = $getApplType['application_type'];
 								$appl_list[$i][$j][$k]['appl_id'] = $eachAppl['customer_id'];
@@ -3991,6 +3991,9 @@ class CustomfunctionsComponent extends Component {
 										$appl_list[$i][$j][$k]['process'] = 'SO appl. communication';
 								} elseif ($eachLevel == 'level_4_mo') {
 										$appl_list[$i][$j][$k]['process'] = 'SO appl. Scrutiny at RO';
+								}elseif($eachLevel=='pao'){
+									$appl_list[$i][$j][$k]['process'] = 'Payment Verification';
+									$appl_list[$i][$j][$k]['last_trans_date'] = $eachAppl['created'];//intensionally taken created date for PAO
 								}
 							
 								$k++;
@@ -4086,7 +4089,7 @@ class CustomfunctionsComponent extends Component {
 						$grantCertTable = $eachflow['grant_pdf'];
 						$grantCertTable = TableRegistry::getTableLocator()->get($grantCertTable);
 
-						$level_arr = ['level_1', 'level_2', 'level_3', 'level_4', 'level_4_ro', 'level_4_mo'];
+						$level_arr = ['level_1', 'level_2', 'level_3', 'level_4', 'level_4_ro', 'level_4_mo','pao'];
 
 						$levelCounts = []; // Counter for each level
 						$applicationCount = []; // Counter for application list
@@ -4125,6 +4128,9 @@ class CustomfunctionsComponent extends Component {
 													$appl_list['process'] = 'SO appl. communication';
 											} elseif ($eachLevel == 'level_4_mo') {
 													$appl_list['process'] = 'SO appl. Scrutiny at RO';
+											}elseif($eachLevel=='pao'){
+													$appl_list['process'] = 'Payment Verification';
+													$appl_list['last_trans_date'] = $eachAppl['created'];//intensionally taken created date for PAO
 											}
 											
 											$levelCounts[$eachLevel] = isset($levelCounts[$eachLevel]) ? $levelCounts[$eachLevel] + 1 : 1;
@@ -4174,9 +4180,9 @@ class CustomfunctionsComponent extends Component {
 							$applicationEntry = [
 									'userEmail' => $userEmail,
 									'count' => $count,
-									'phone' => $userPhone
+									'phone' => $userPhone,
 								//	'appl_type' => $appl_list['appl_type'],
-								//	'appl_id' => $appl_list['appl_id'],
+									'appl_id' => $appl_list['appl_id'],
 								//	'process' => $appl_list['process']
 							];
 
@@ -4184,10 +4190,41 @@ class CustomfunctionsComponent extends Component {
 							$applicationList[] = $applicationEntry;
 						}
 					
-						// Convert the application list to JSON format
-						$response = json_encode($applicationList);
-						// Send the response
-						echo $response;
+						$DmiPendingSmsEmailSendStatus = TableRegistry::getTableLocator()->get('DmiPendingSmsEmailSendStatus');
+						if(!empty($applicationList)){
+
+							foreach ($applicationList as $eachAppl) {
+
+								$appl_id = $eachAppl['appl_id'];
+
+								$todayCount = $DmiPendingSmsEmailSendStatus->find()->select(['created'])->order('id desc')->first();
+								
+								if(!empty($todayCount)){
+
+									$created_date = $todayCount->created;
+									
+									//$validity_last_year = date('d-m-Y',strtotime(strtotime($created_date)));
+									$last_created_date = strtotime(str_replace('/','-',$created_date));
+										
+									$cur_date = strtotime(str_replace('/','-',date('Y-m-d')));
+								
+									if ($last_created_date > $cur_date) {
+										$Dmi_pending_count_Entity = $DmiPendingSmsEmailSendStatus->newEntity(array(
+																'created'=>date('Y-m-d H:i:s')
+															));
+
+										if ($DmiPendingSmsEmailSendStatus->save($Dmi_pending_count_Entity)) {
+											return true;
+										}
+									} else {
+										
+									}
+								}
+							
+								
+							}
+						}
+						
 					}
 				}
 			}

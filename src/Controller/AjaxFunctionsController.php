@@ -2615,9 +2615,8 @@ class AjaxFunctionsController extends AppController{
 		$this->request->getSession()->write('pendingwork', 'yes');
 		$this->loadModel('DmiUsers');
 		$InchargeId = $this->Session->read('username');
-
+		
 		$responce = $this->Customfunctions->getSingleOrAllUserAppliResult($InchargeId);
-		//$responce = $this->Customfunctions->getSingleOrAllUserAppliResult();
 		return $responce;
 		
 	}

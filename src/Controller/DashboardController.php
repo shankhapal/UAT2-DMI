@@ -255,6 +255,19 @@ class DashboardController extends AppController{
 
 					//$dashboard_comments = usort($dashboard_comments, 'date');
 
+					//to get name of login user added by shankhpal on 30/06/2023
+					$get_user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$username)))->first();
+					if(!empty($get_user_details)){
+						
+						$user_full_name = $get_user_details['f_name'].' '.$get_user_details['l_name'];
+					
+					}else{
+						
+						$user_full_name = null;
+					}
+					
+					$this->set('user_full_name',$user_full_name);
+
 					$this->set('dashboard_comments',$dashboard_comments);
 
 				}
