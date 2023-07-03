@@ -91,6 +91,10 @@ class AppController extends Controller
 			Router::url('/');
 		}
 
+		/*$this->loadComponent('Customfunctions');
+		$check = $this->Customfunctions->getCertificateValidUptoDate('4894/3/SGL/002','31-07-2021 00:00:00');
+		print_r($check);exit;*/
+
 
 		//This Below we defined the Array for the Application Types from which dashboard will count and list will recognize 
 		//the Flow for DMI users - Amol
