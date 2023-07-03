@@ -323,7 +323,7 @@ class ScrutinyController extends AppController{
 
 		// get current section all details
 		$section_details = $this->DmiCommonScrutinyFlowDetails->currentSectionDetails($application_type,$office_type,$firm_type,$form_type,$section_id);
-
+		
 		// get all section all details
 		$allSectionDetails = $this->DmiCommonScrutinyFlowDetails->allSectionList($application_type,$office_type,$firm_type,$form_type);
 

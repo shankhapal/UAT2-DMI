@@ -45,8 +45,38 @@ if ($current_user_roles['pao'] == 'yes') {
 }
 
 $user_role_arr = json_encode($current_user_roles);
+
 ?>
 
 
 <div class="clear"></div>
+
 </div>
+
+<!-- //added for to display pending work list of login user added by shankhpal shende on 30/06/2023 -->
+<div class="btn-group btn-group-justified m-2">
+<?php if ($current_user_roles['super_admin'] != 'yes'){
+	echo $this->Html->link('Pending More than 5 days with you','#',['class' => 'btn btn-warning m-2','data-toggle' => 'modal','data-target' => '#myPendingWorkModel','id'=>'mypendingWork']); 
+	}
+?>
+
+
+<?php if ($current_user_roles['ro_inspection'] == 'yes' && $current_user_roles['super_admin'] != 'yes'): ?>
+   <?= $this->Html->link(
+    'Officers Wise Pending',
+    ['controller' => 'OtherModules', 'action' => 'get_officer_wise_pending_appl'],
+    ['class' => 'btn btn-warning m-2']
+		); ?>
+<?php endif; ?>
+
+<?php if ($current_user_roles['super_admin'] == 'yes'): ?>	
+		<?= $this->Html->link(
+    'ROs Wise pending',
+    ['controller' => 'OtherModules', 'action' => 'get_ro_wise_pending_appl'],
+    ['class' => 'btn btn-warning m-2']
+		); ?>
+<?php endif; ?>
+
+
+	</div>
+

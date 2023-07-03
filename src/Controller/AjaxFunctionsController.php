@@ -2609,124 +2609,16 @@ class AjaxFunctionsController extends AppController{
 	 * @version 23rd June 2023
 	 */
 	public function	toDisplay5DaysPendingWork(){
-
+     
 		$this->autoRender = false;
-		$InchargeId = $this->Session->read('username');
-		 // Create a session and write data to it
-		//  $this->Session->write('pendingwork','yes');
-		$this->request->getSession()->write('pendingwork', 'yes');
-		$this->loadModel('DmiFlowWiseTablesLists');
-		$flow_wise_tables = $this->DmiFlowWiseTablesLists->find('all', array(
-				'conditions' => array('application_type IN' => $this->Session->read('applTypeArray')),
-				'order' => 'id ASC'
-		))->toArray();
-
-		$level_arr = array('level_1', 'level_2', 'level_3', 'level_4', 'level_4_ro', 'level_4_mo');
-		$this->loadModel('DmiApplicationTypes');
-
-		$appl_list = array();
-
-		// for each flow
-		$i = 0;
-		foreach ($flow_wise_tables as $eachflow) {
-			
-			// flow wise appl tables
-			$applPosTable = $eachflow['appl_current_pos'];
-			$this->loadModel($applPosTable);
-
-			// get application type
-			$getApplType = $this->DmiApplicationTypes->find('all', array(
-					'fields' => 'application_type',
-					'conditions' => array('id IS' => $eachflow['application_type'])
-			))->first();
-				
-			$finalSubmitTable = $eachflow['application_form'];
-			$this->loadModel($finalSubmitTable);
-
-			$grantCertTable = $eachflow['grant_pdf'];
-			$this->loadModel($grantCertTable);
-
-			$j = 0;
-			foreach ($level_arr as $eachLevel) {
-				// check appl position with current user and level
-				$checkCurPosition[$i][$j] = $this->$applPosTable->find('all', array('conditions' => array('current_level IS' => $eachLevel, 'current_user_email_id IS' => $InchargeId)))->toArray();
-			
-					$k = 0;
-					foreach ($checkCurPosition[$i][$j] as $eachAppl) {
-						
-						
-						$lastModified = explode(' ', $eachAppl['modified'])[0];
-				
-						
-						if (!empty($lastModified)) {
-								$currentDate = date('d/m/Y');
-
-								$date1 = Chronos::createFromFormat('d/m/Y', $lastModified);
-								$date2 = Chronos::createFromFormat('d/m/Y', $currentDate);
-
-								$daysDifference = $date1->diffInDays($date2);
-						} else {
-								// Handle the case when $lastModified is empty or missing
-								// You can assign a default value or perform any other desired action
-								$daysDifference = 0; // For example, setting the difference to 0
-						}
-
-						if ($daysDifference > 5) {
-								
-							if ($eachLevel == 'level_1' || $eachLevel == 'level_2' || $eachLevel == 'level_4_ro' || $eachLevel == 'level_4_mo') {
-									
-								$appl_list[$i][$j][$k]['appl_type'] = $getApplType['application_type'];
-								$appl_list[$i][$j][$k]['appl_id'] = $eachAppl['customer_id'];
-
-								if ($eachLevel == 'level_1'){
-										$appl_list[$i][$j][$k]['process'] = 'Scrutiny';
-								} elseif ($eachLevel == 'level_2') {
-										$appl_list[$i][$j][$k]['process'] = 'Site Inspection';
-								} elseif ($eachLevel == 'level_4_ro') {
-										$appl_list[$i][$j][$k]['process'] = 'SO appl. communication';
-								} elseif ($eachLevel == 'level_4_mo') {
-										$appl_list[$i][$j][$k]['process'] = 'SO appl. Scrutiny at RO';
-								}
-							
-								$k++;
-								
-							} elseif ($eachLevel == 'level_3' || $eachLevel == 'level_4') {
-
-								// check if appl submission and granted
-								$checkLastStatus = $this->$finalSubmitTable->find('all', array('conditions' => array('customer_id IS' => $eachAppl['customer_id']),'order' => 'id desc'))->first();
-								
-								if ($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level']=='level_4')){
-								//nothing to do
-								}elseif ($eachLevel == 'level_3' || $eachLevel == 'level_4') {
-									
-									// check if appl submission and granted
-									$checkLastStatus = $this->$finalSubmitTable->find('all', array('conditions' => array('customer_id IS' => $eachAppl['customer_id']),'order' => 'id desc'))->first();
-									
-									if ($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_4')) {
-										// check if grant certificate exists
-										$checkGrantCert = $this->$grantCertTable->find('all', array('conditions' => array('customer_id IS' => $eachAppl['customer_id'])))->toArray();
-
-										if (!empty($checkGrantCert)) {
-												$appl_list[$i][$j][$k]['appl_type'] = $getApplType['application_type'];
-												$appl_list[$i][$j][$k]['appl_id'] = $eachAppl['customer_id'];
-												$appl_list[$i][$j][$k]['process'] = 'Grant Certificate';
-												$k++;
-										}
-									}
-								}
-							}
-						} else {
-								// More than 5 days ago
-								$isWithinLast5Days = false;
-						}
-					
-					}
-				$j++;
-			}
-			$i++;
-		}
 		
-  	echo json_encode($appl_list);
+		$this->request->getSession()->write('pendingwork', 'yes');
+		$this->loadModel('DmiUsers');
+		$InchargeId = $this->Session->read('username');
+		
+		$responce = $this->Customfunctions->getSingleOrAllUserAppliResult($InchargeId);
+		return $responce;
+		
 	}
 }
 ?>

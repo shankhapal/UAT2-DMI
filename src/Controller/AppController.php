@@ -51,10 +51,10 @@ class AppController extends Controller
 
         $this->loadComponent('RequestHandler',['enableBeforeRedirect' => false,]);
         $this->loadComponent('Flash');
-		$this->loadComponent('Beforepageload');
-		$this->loadComponent('Createcaptcha');
-		$this->loadComponent('Customfunctions');
-		$this->loadComponent('Authentication');
+				$this->loadComponent('Beforepageload');
+				$this->loadComponent('Createcaptcha');
+				$this->loadComponent('Customfunctions');
+				$this->loadComponent('Authentication');
         $this->Session = $this->getRequest()->getSession();
 
 		//Load Model
@@ -159,6 +159,9 @@ class AppController extends Controller
 		$user_last_login = $this->Customfunctions->userLastLogins();
 		$this->set('user_last_login',$user_last_login);
 
+		$responce = $this->Customfunctions->getSingleOrAllUserAppliResult();
+	
+		
 		
 
 	}
