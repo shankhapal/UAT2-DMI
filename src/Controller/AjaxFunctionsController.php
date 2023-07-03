@@ -7,6 +7,7 @@ use App\Network\Request\Request;
 use App\Network\Response\Response;
 use Cake\ORM\TableRegistry;
 use Controller\Dashboard;
+use Cake\Chronos\Chronos;  // Chronos library is use for DateTime by shankhpal on 08/06/2023 
 
 class AjaxFunctionsController extends AppController{
 	
@@ -2163,9 +2164,7 @@ class AjaxFunctionsController extends AppController{
 			$customer_id = $this->Session->read('customer_id');
 		}
 
-		//get firm details
-		$capplabdetails = $this->DmiCaPpLabMapings->pplabDetails($customer_id,$record_id);
-		
+	
 		$current_ip = $_SERVER['REMOTE_ADDR'];
 		if ($current_ip == '::1') { $current_ip = '127.0.0.1'; }
 
@@ -2189,21 +2188,22 @@ class AjaxFunctionsController extends AppController{
 		$this->DmiCaPpLabActionLogs->save($logTableEntity);
 		#update record add delete status yes and remark
 		if (strpos($record_id, "/Own") !== false) {
+			
+			//get firm details
+			$capplabdetails = $this->DmiCaPpLabMapings->pplabDetails($customer_id,$record_id);
 
 			$recordidArray = explode("/", $record_id);
 			$ownlabId = $recordidArray[0];
 
-
-			$latest_id = $this->DmiCaPpLabMapings->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
-
-			if($latest_id != null){
-				$report_fields = $this->DmiCaPpLabMapings->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();		
-				$record_id = $report_fields['id'];
-			}
-		
-			$this->DmiCaMappingOwnLabDetails->updateAll(array('delete_status'=>'yes','modified'=>date('Y-m-d H:i:s')),array('id'=>$ownlabId));
+			//get array
+			$attached_lab_data = $this->DmiCaPpLabMapings->find('all', ['conditions' => ['customer_id IS' => $customer_id,
+			'lab_id IS NOT NULL','delete_status IS NULL'],'order' => ['id' => 'desc'],'limit' => 1])->first();
+			
+			$record_id = $attached_lab_data['id'];
 
 			$save_details_result = $this->DmiCaPpLabMapings->updateAll(array('remark'=>$remark,'delete_status'=>'yes','modified'=>date('Y-m-d H:i:s')),array('id'=>$record_id));
+
+			$this->DmiCaMappingOwnLabDetails->updateAll(array('delete_status'=>'yes','modified'=>date('Y-m-d H:i:s')),array('id'=>$ownlabId));
 
 		} else {
 			
@@ -2601,5 +2601,24 @@ class AjaxFunctionsController extends AppController{
 
 	}
 
+	/**
+	 * Function Created for  pending work that has remained 
+	 *	incomplete for more than 5 days. 
+	 * It utilizes an Ajax function to retrieve and display a list of the pending tasks.
+	 * @author Shankhpal Shende
+	 * @version 23rd June 2023
+	 */
+	public function	toDisplay5DaysPendingWork(){
+     
+		$this->autoRender = false;
+		
+		$this->request->getSession()->write('pendingwork', 'yes');
+		$this->loadModel('DmiUsers');
+		$InchargeId = $this->Session->read('username');
+		
+		$responce = $this->Customfunctions->getSingleOrAllUserAppliResult($InchargeId);
+		return $responce;
+		
+	}
 }
 ?>

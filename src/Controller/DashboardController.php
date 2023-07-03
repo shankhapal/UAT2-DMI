@@ -255,6 +255,19 @@ class DashboardController extends AppController{
 
 					//$dashboard_comments = usort($dashboard_comments, 'date');
 
+					//to get name of login user added by shankhpal on 30/06/2023
+					$get_user_details = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$username)))->first();
+					if(!empty($get_user_details)){
+						
+						$user_full_name = $get_user_details['f_name'].' '.$get_user_details['l_name'];
+					
+					}else{
+						
+						$user_full_name = null;
+					}
+					
+					$this->set('user_full_name',$user_full_name);
+
 					$this->set('dashboard_comments',$dashboard_comments);
 
 				}
@@ -1135,7 +1148,8 @@ class DashboardController extends AppController{
 											$firm_name = $firm_details['firm_name'];
 											$firm_table_id = $firm_details['id'];
 											$appl_type_id = $each_flow['application_type'];
-											$appl_view_link = '../scrutiny/form_scrutiny_fetch_id/'.$firm_table_id.'/view/'.$appl_type_id;
+											//$appl_view_link = '../scrutiny/form_scrutiny_fetch_id/'.$firm_table_id.'/view/'.$appl_type_id;
+											$appl_view_link = '../scrutiny/form_scrutiny_fetch_id/'.$firm_table_id.'/view/1';//default set to 1 to open application sections added by shankhapal shende on 30/06/2023
 
 											$approved_record = $this->DmiRtiFinalReports->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved'),'order'=>'id desc'))->first();
 										

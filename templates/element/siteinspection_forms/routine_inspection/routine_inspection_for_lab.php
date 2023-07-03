@@ -39,9 +39,15 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                     <label for="inputEmail3" class="col-sm col-form-label">Date & Time of present Inspection <span class="cRed">*</span></label>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-3">
                 <?php echo $this->Form->control('date_p_inspection', array('type'=>'text', 'id'=>'date_p_inspection', 'value'=>$section_form_details[0]['date_p_inspection'], 'class'=>'form-control input-field', 'placeholder'=>'Enter DD/MM/YYYY', 'label'=>false)); ?>
                 <span id="error_date_p_inspection" class="error invalid-feedback"></span>
+            </div>
+            <div class="col-md-3">
+                <!-- added time field as per change req and suggestions on date 27/06/2023
+                added by shankhpal shende -->
+                <?php echo $this->Form->control('time_p_inspection', array('type'=>'time', 'id'=>'time_p_inspection', 'value'=>$section_form_details[0]['time_p_inspection'], 'class'=>'form-control input-field', 'placeholder'=>'Enter time', 'label'=>false)); ?>
+                <span id="error_time_p_inspection" class="error invalid-feedback"></span>
             </div>
         </div>
     </div>

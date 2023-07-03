@@ -109,6 +109,7 @@ class DmiRoutineInspectionPpReportsTable extends Table{
 				'io_reply_date' =>"", 
 				'form_status' =>"",
 				'approved_date' =>"",
+				'time_p_inspection'=>"", // added new field by shankhpal on 27/06/2023
 				'referred_back_by_email' =>"", 
 				'referred_back_by_once' =>"", 
 				'current_level' =>"",
@@ -230,7 +231,17 @@ class DmiRoutineInspectionPpReportsTable extends Table{
 			);
 		}
 
-		return array($form_fields_details,$added_packaging_details,$find_ca_list,$all_packers_value,$registered_office_address,$printing_premises_address,$certificate_valid_upto,$packaging_materials_value,$total_suggestions);
+		// this will be return hours and minutes dropdown
+		$time_array = ['' => 'Hour : Minute'];
+    for ($hour = 1; $hour <= 12; $hour++) {
+        for ($minute = 0; $minute <= 59; $minute++) {
+            $formattedHour = sprintf('%02d', $hour);
+            $formattedMinute = sprintf('%02d', $minute);
+            $time12HourFormat = date('h:i A', strtotime("$formattedHour:$formattedMinute"));
+            $time_array["$formattedHour:$formattedMinute"] = "$time12HourFormat";
+        }
+    }
+		return array($form_fields_details,$added_packaging_details,$find_ca_list,$all_packers_value,$registered_office_address,$printing_premises_address,$certificate_valid_upto,$packaging_materials_value,$total_suggestions,$time_array);
 	}
 
 
@@ -292,6 +303,8 @@ class DmiRoutineInspectionPpReportsTable extends Table{
 		$htmlencoded_if_any_sugg = htmlentities($forms_data['if_any_sugg'], ENT_QUOTES);
 		$htmlencoded_name_of_inspecting_officer = htmlentities($forms_data['name_of_inspecting_officer'], ENT_QUOTES);
 				
+		$time_p_inspection = htmlentities($forms_data['time_p_inspection'], ENT_QUOTES); // time_p_inspection added on 27/06/2023 by shankhpal
+
 		if(!empty($forms_data['shortcomings_noticed_docs']->getClientFilename())){
 
 			$file_name = $forms_data['shortcomings_noticed_docs']->getClientFilename();
@@ -392,6 +405,7 @@ class DmiRoutineInspectionPpReportsTable extends Table{
 			'name_of_inspecting_officer'=> $htmlencoded_name_of_inspecting_officer,
 			'signnature_io_docs'=>$signnature_io_docs,
 			'version'=>$current_version,
+			'time_p_inspection'=>$time_p_inspection, // added on 27/06/2023 by shankhpal
 			'form_status'=>'saved',
 			'created'=>date('Y-m-d H:i:s'),
 			'modified'=>date('Y-m-d H:i:s')
@@ -439,6 +453,7 @@ class DmiRoutineInspectionPpReportsTable extends Table{
 			'referred_back_by_email'=>$_SESSION['username'],
 			'referred_back_by_once'=>$_SESSION['once_card_no'],
 			'version'=>$current_version,
+			'time_p_inspection'=>$report_details['time_p_inspection'], // added on 27/06/2023 by shankhpal
 			'form_status'=>'referred_back',
 			'current_level'=>$_SESSION['current_level'],
 			'created'=>date('Y-m-d H:i:s'),

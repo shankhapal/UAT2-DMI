@@ -35,7 +35,7 @@
 	  
 	 }
 	 else{ 
-
+//else part
 		//dashboard graph code starts here ?>
 			
 		<div class="content-wrapper mt30">
@@ -82,3 +82,7 @@
 		<input type="hidden" id="listSubValue" value="<?php echo $_SESSION['listSubTab']; ?>" />
 	
 	<?php echo $this->Html->script('dashboard/toClickStatusWiseTab'); } ?>
+
+<!-- element file call from pending_work/all_pending_work_list_view, it displays a list of all pending work that has more than completed 5 days, implemented by Shankhpal Shende on June 26, 2023. -->
+<?php echo $this->element('pending_work/all_pending_work_list_view'); ?>
+

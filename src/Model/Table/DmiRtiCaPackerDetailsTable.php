@@ -111,9 +111,20 @@ class DmiRtiCaPackerDetailsTable extends Table{
 					'analytical_results' =>"",
 					'month_upto' =>"",
 					'enumerate_briefly_suggestions'=>isset($enumerate_briefly_suggestions)?$enumerate_briefly_suggestions:"",'e_briefly_suggestions_radio'=>isset($e_briefly_suggestions_radio)?$e_briefly_suggestions_radio:"",
-					'replica_account_correct' =>"",'discrepancies_replica_aco' =>"",
-					'fssai_approved ' =>"",'io_reply' =>"", 'io_reply_date' =>"", 'form_status' =>"",'referred_back_by_email' =>"", 'referred_back_by_once' =>"", 
-					'current_level' =>"", 'delete_ro_referred_back' =>"",'analytical_result_docs'=>""
+					'replica_account_correct' =>"",
+					'discrepancies_replica_aco' =>"",
+					'fssai_approved ' =>"",
+					'io_reply' =>"", 
+					'io_reply_date' =>"", 
+					'form_status' =>"",
+					'referred_back_by_email' =>"", 
+					'referred_back_by_once' =>"", 
+					'current_level' =>"", 
+					'delete_ro_referred_back' =>"",
+					'analytical_result_docs'=>"",
+					'time_p_inspection'=>"", // added new field by shankhpal on 27/06/2023
+					'quantity'=>"", // added new field by shankhpal on 27/06/2023
+					'grade_units'=>"" // added new field by shankhpal on 27/06/2023
 				); 
 					
 			}
@@ -198,10 +209,24 @@ class DmiRtiCaPackerDetailsTable extends Table{
 					
 			);
 		}
+		//added for unit dropdown
+		//Unit Weight of Parcel
+		$MUnitWeight = TableRegistry::getTableLocator()->get('MUnitWeight');
+		$grade_units =$MUnitWeight->find('list',array('keyField'=>'unit_id','valueField'=>'unit_weight','conditions' => array('display' => 'Y'),'order'=>'unit_id asc'))->toArray();
+		// this will be return hours and minutes dropdown
+		$time_array = ['' => 'Hour : Minute'];
+    for ($hour = 1; $hour <= 12; $hour++) {
+        for ($minute = 0; $minute <= 59; $minute++) {
+            $formattedHour = sprintf('%02d', $hour);
+            $formattedMinute = sprintf('%02d', $minute);
+            $time12HourFormat = date('h:i A', strtotime("$formattedHour:$formattedMinute"));
+            $time_array["$formattedHour:$formattedMinute"] = "$time12HourFormat";
+        }
+    }
 
-		
-		return array($form_fields_details,$added_sample_details,$certificate_valid_upto,$sub_commodity_value,$lab_list,$printers_list,$self_registered_chemist,$total_suggestions);			
+		return array($form_fields_details,$added_sample_details,$certificate_valid_upto,$sub_commodity_value,$lab_list,$printers_list,$self_registered_chemist,$total_suggestions,$grade_units,$time_array);			
 	}
+	
 	
 	/* Comment
 	Reason : Updated saveFormDetails function as per change request 
@@ -209,7 +234,7 @@ class DmiRtiCaPackerDetailsTable extends Table{
 	Date: 13-05-2023
   */
 	public function saveFormDetails($customer_id,$forms_data){
-
+	
 		$CustomersController = new CustomersController;			
 		$ca_bevo_applicant = $CustomersController->Customfunctions->checkCaBevo($customer_id); 
 		$Dmi_flow_wise_tables_list = TableRegistry::getTableLocator()->get('DmiFlowWiseTablesLists');
@@ -318,7 +343,9 @@ class DmiRtiCaPackerDetailsTable extends Table{
 				$name_of_inspecting_officer  = htmlentities($forms_data['name_of_inspecting_officer'], ENT_QUOTES);
 				$designation_inspecting_officer =   htmlentities($forms_data['designation_inspecting_officer'], ENT_QUOTES);
 				$analytical_results = htmlentities($forms_data['analytical_results'], ENT_QUOTES);
-		
+				$quantity = htmlentities($forms_data['quantity'], ENT_QUOTES); // quantity added on 27/06/2023 by shankhpal
+				$grade_units = htmlentities($forms_data['grade_units'], ENT_QUOTES); // grade_units added on 27/06/2023 by shankhpal
+				$time_p_inspection = htmlentities($forms_data['time_p_inspection'], ENT_QUOTES); // time_p_inspection added on 27/06/2023 by shankhpal
 				if(!empty($forms_data['analytical_result_docs']->getClientFilename())){
 
 					$file_name = $forms_data['analytical_result_docs']->getClientFilename();
@@ -480,7 +507,10 @@ class DmiRtiCaPackerDetailsTable extends Table{
 				'shortcomings_noticed_docs'=>$shortcomings_noticed_docs,
 				'signnature_of_packer_docs'=>$signnature_of_packer_docs,
 				'signnature_of_inspecting_officer_docs'=>$signnature_of_inspecting_officer_docs,
-				'version'=>$current_version,
+				'version'=>$current_version, 
+				'quantity'=>$quantity, // added on 27/06/2023 by shankhpal
+				'grade_units' => $grade_units, // added on 27/06/2023 by shankhpal
+				'time_p_inspection'=>$time_p_inspection, // added on 27/06/2023 by shankhpal
 				'form_status'=>'saved',
 				'created'=>date('Y-m-d H:i:s'),
 				'modified'=>date('Y-m-d H:i:s')
@@ -539,6 +569,9 @@ class DmiRtiCaPackerDetailsTable extends Table{
 			'shortcomings_noticed_docs'=> $report_details['shortcomings_noticed_docs'],
 			'signnature_of_packer_docs'=> $report_details['signnature_of_packer_docs'],
 			'signnature_of_inspecting_officer_docs'=> $report_details['signnature_of_inspecting_officer_docs'],
+			'quantity'=>$report_details['quantity'],  // added on 27/06/2023 by shankhpal
+			'grade_units' => $report_details['grade_units'], // added on 27/06/2023 by shankhpal
+			'time_p_inspection'=>$report_details['time_p_inspection'], // added on 27/06/2023 by shankhpal
 			'referred_back_comment'=>$reffered_back_comment,
 			'rb_comment_ul'=>$rb_comment_ul,
 			'referred_back_date'=>date('Y-m-d H:i:s'),

@@ -45,10 +45,12 @@ if ($current_user_roles['pao'] == 'yes') {
 }
 
 $user_role_arr = json_encode($current_user_roles);
+
 ?>
 
 
 <div class="clear"></div>
+
 </div>
 
 <!-- //added for to display pending work list of login user added by shankhpal shende on 30/06/2023 -->
@@ -67,4 +69,5 @@ $user_role_arr = json_encode($current_user_roles);
 <?php endif; ?>
 
 
-</div>
+	</div>
+

@@ -252,15 +252,18 @@
 		<div class="stats-card mr-4">
 			<div class="stats-card-inner box-8">
 				<div class="stats-card-front"><a id="test-7" href="#" onclick="openForm7(); return false;">
-					<span class="title-number"><?php echo $statistics_counts[0]['total_revenue']; ?></span>
+					<span class=""><?php echo $statistics_counts[0]['total_revenue']; ?></span>
 					<br><span class="subtitle">Total Revenue</span></a>
 				</div>
 				<div class="stats-card-back" id="myForm7">
 					<!-- pass new paramer for show which type of application ("new or Renewal") by shreeya on date [07-06-2023]-->
 					<ul class="ul">
-						<li class="badge bg-light mb-3"><a href="<?php echo $this->request->getAttribute('webroot');?>reports/payment_details_report/<?= base64_encode("New")?>"><span class="text-primary"></span> New Application Revenue : <?php echo $statistics_counts[0]['reve_app_n']; ?></a></li>
+						<li class="badge bg-light mb-3"><a href="<?php echo $this->request->getAttribute('webroot');?>reports/payment_details_report//<?= base64_encode("New")?>"><span class="text-primary"></span> New Application Revenue : <?php echo $statistics_counts[0]['reve_app_n']; ?></a></li>
 						<li class="badge bg-light mb-3"><a href="<?php echo $this->request->getAttribute('webroot');?>reports/payment_details_report//<?= base64_encode("Renewal")?>"><span class="text-primary"></span> Renewal Application Revenue : <?php echo $statistics_counts[0]['reve_app_r']; ?></a></li>
-
+						<!-- Addednew application type by shreeya on date [22-06-2023] -->
+						<li class="badge bg-light mb-3"><a href="<?php echo $this->request->getAttribute('webroot');?>reports/payment_details_report//<?= base64_encode("Chemist Approval")?>"><span class="text-primary"></span> Renewal Chemist Approval : <?php echo $statistics_counts[0]['reve_app_chem']; ?></a></li>
+						<li class="badge bg-light mb-3"><a href="<?php echo $this->request->getAttribute('webroot');?>reports/payment_details_report//<?= base64_encode("Change Request")?>"><span class="text-primary"></span> Renewal Change Request : <?php echo $statistics_counts[0]['reve_app_change']; ?></a></li>
+						<li class="badge bg-light mb-3"><a href="<?php echo $this->request->getAttribute('webroot');?>reports/payment_details_report//<?= base64_encode("Advance Payment")?>"><span class="text-primary"></span> Advance Payment : <?php echo $statistics_counts[0]['reve_app_adv']; ?></a></li>
 					</ul>
 				</div>
 			</div>
