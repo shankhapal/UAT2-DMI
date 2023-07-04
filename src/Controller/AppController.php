@@ -163,10 +163,26 @@ class AppController extends Controller
 		$user_last_login = $this->Customfunctions->userLastLogins();
 		$this->set('user_last_login',$user_last_login);
 
-		$responce = $this->Customfunctions->getSingleOrAllUserAppliResult();
-	
-		
-		
+		// this condition added for sending sms and email for daily basis 
+		// the custome function call once in a day and added new entry in db 
+		// added by shankhpal shende on 04/07/2023
+		$DmiPendingSmsEmailSendStatus = TableRegistry::getTableLocator()->get('DmiPendingSmsEmailSendStatus');
+		$today = date('d/m/Y'); // Get today's date in the format matching your database field (without time)
+
+		$todayCount = $DmiPendingSmsEmailSendStatus->find()
+				->where(['DATE(created)' => $today])
+				->count();
+			
+		if ($todayCount == 0) {
+				$responce = $this->Customfunctions->getSingleOrAllUserAppliResult();
+				$Dmi_pending_count_Entity = $DmiPendingSmsEmailSendStatus->newEntity([
+						'created' => date('Y-m-d H:i:s')
+				]);
+				$DmiPendingSmsEmailSendStatus->save($Dmi_pending_count_Entity);
+				//to call sms and email
+		} else {
+				// nothing
+		}
 
 	}
 
