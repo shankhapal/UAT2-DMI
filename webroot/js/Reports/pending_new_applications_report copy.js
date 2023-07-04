@@ -457,27 +457,20 @@
        
         $('#fromdate').datepicker({format: "dd/mm/yyyy",orientation: "left top",autoclose: true,});
         $('#todate').datepicker({ format: "dd/mm/yyyy", orientation: "left top", autoclose: true, });
-        $('#selected_month').datepicker({ 
-            orientation: "left top", autoclose: true, minViewMode: "months",
-            startView: "months",
-            autoclose: true,
-            format: 'dd/mm/yyyy'});
-
-
         //added this code by shreeya for show the month wise record on  date [03-07-2023]
-        // $("#selected_month").datepicker({
-        //     dateFormat: 'yyyy-mm',
-        //     changeMonth: true,
-        //     changeYear: true,
-        //     showButtonPanel: true,
+        $("#selected_month").datepicker({
+            dateFormat: 'yyyy-mm',
+            changeMonth: true,
+            changeYear: true,
+            showButtonPanel: true,
     
-        //     onClose: function(dateText, inst) {
+            onClose: function(dateText, inst) {
               
-        //         var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
-        //         var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
-        //         $(this).val($.datepicker.formatDate('MM yy', new Date(year, month, 1)));
-        //     }
-        // });
+                var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                $(this).val($.datepicker.formatDate('MM yy', new Date(year, month, 1)));
+            }
+        });
     
       
         $('#pending-new-applications-report-data-table').DataTable({/*"ordering": false*/});
@@ -490,29 +483,17 @@
             var from = $("#fromdate").val()?.split("/");
             var to = $("#todate").val()?.split("/");
 
-           // var month = $("#selected_month").val()?.split("/");
-
-
-            var date = $("#selected_month").val();
-            var dateComponents = date.split("/");
-            var day = dateComponents[0];
-            var month = dateComponents[1];
-            var year = dateComponents[2];
-
-          
-
-
             if(!(from==undefined || to==undefined)){
-                var fromdate = new Date(from[2], from[1] - 1, from[0]);
-                 var todate = new Date(to[2], to[1] - 1, to[0]);
-                if(todate < fromdate){
+            var fromdate = new Date(from[2], from[1] - 1, from[0]);
+            var todate = new Date(to[2], to[1] - 1, to[0]);
+            if(todate < fromdate){
 
-                    alert('Invalid Date Range Selection');
-                    return false;
-                }
-         
+                alert('Invalid Date Range Selection');
+                return false;
             }
-      
+         
+        }
+        var month = $("#selected_month").val()?.split("/");
        
     
     });
