@@ -122,6 +122,7 @@ class DmiRtiLaboratoryDetailsTable extends Table{
         'referred_back_date' =>"",
         'io_reply' =>"",
         'io_reply_date' =>"",
+        'time_p_inspection'=>"", // added new field by shankhpal on 27/06/2023
         'form_status' =>"",  
         'referred_back_by_email' =>"",
         'referred_back_by_once' =>"",
@@ -235,8 +236,19 @@ class DmiRtiLaboratoryDetailsTable extends Table{
 					
 			);
 		}
+
+    $time_array = ['' => 'Hour : Minute'];
+    $time_array = ['' => 'Hour : Minute'];
+    for ($hour = 1; $hour <= 12; $hour++) {
+        for ($minute = 0; $minute <= 59; $minute++) {
+            $formattedHour = sprintf('%02d', $hour);
+            $formattedMinute = sprintf('%02d', $minute);
+            $time12HourFormat = date('h:i A', strtotime("$formattedHour:$formattedMinute"));
+            $time_array["$formattedHour:$formattedMinute"] = "$time12HourFormat";
+        }
+    }
     
-		return array($form_fields_details,$sub_commodity_value,$chemist_full_name,$list_of_packer,$total_suggestions);			
+		return array($form_fields_details,$sub_commodity_value,$chemist_full_name,$list_of_packer,$total_suggestions,$time_array);			
 	}
 	
 	
@@ -276,7 +288,7 @@ class DmiRtiLaboratoryDetailsTable extends Table{
     $base64_encode_mobile_no =  base64_encode($forms_data['mobile_no']);
     $htmlentities_sub_commodity =  htmlentities($forms_data['sub_commodity'],ENT_QUOTES);
     $htmlentities_approved_chemist =  htmlentities($forms_data['approved_chemist'],ENT_QUOTES);
-    $htmlentities_present_time_of_inspection =  htmlentities($forms_data['present_time_of_inspection'],ENT_QUOTES);
+    
     $htmlentities_is_lab_well_lighted =  htmlentities($forms_data['is_lab_well_lighted'],ENT_QUOTES);
     $htmlentities_is_properly_equipped =  htmlentities($forms_data['is_properly_equipped'],ENT_QUOTES);
     $htmlentities_eq_working_order =  htmlentities($forms_data['eq_working_order'],ENT_QUOTES);
@@ -295,6 +307,10 @@ class DmiRtiLaboratoryDetailsTable extends Table{
     $htmlentities_authorized_persion_name =  htmlentities($forms_data['authorized_persion_name'],ENT_QUOTES);
     $htmlentities_name_of_inspecting_officer =  htmlentities($forms_data['name_of_inspecting_officer'],ENT_QUOTES);
     $htmlentities_designation_inspecting_officer =  htmlentities($forms_data['designation_inspecting_officer'],ENT_QUOTES);
+    
+    $htmlentities_present_time_of_inspection =  $forms_data['present_time_of_inspection'];
+   
+    $time_p_inspection = htmlentities($forms_data['time_p_inspection'], ENT_QUOTES); // time_p_inspection added 
 
     if(!empty($forms_data['analytical_result_docs']->getClientFilename())){
 
@@ -426,6 +442,7 @@ class DmiRtiLaboratoryDetailsTable extends Table{
       'user_email_id'=>$_SESSION['username'],
       'user_once_no'=>$_SESSION['once_card_no'],
       'version'=>$current_version,
+      'time_p_inspection'=>$time_p_inspection, // added on 27/06/2023 by shankhpal
       'form_status'=>'saved',
       'created'=>date('Y-m-d H:i:s'),
       'modified'=>date('Y-m-d H:i:s')));	
@@ -480,6 +497,7 @@ class DmiRtiLaboratoryDetailsTable extends Table{
       'authorized_signature_docs' => $report_details['authorized_signature_docs'],
       'signnature_of_inspecting_officer_docs' => $report_details['signnature_of_inspecting_officer_docs'],
       'analytical_result_docs' => $report_details['analytical_result_docs'],
+      'time_p_inspection'=>$report_details['time_p_inspection'], // added on 27/06/2023 by shankhpal
 			'referred_back_comment'=>$reffered_back_comment,
 			'rb_comment_ul'=>$rb_comment_ul,
 			'referred_back_date'=>date('Y-m-d H:i:s'),

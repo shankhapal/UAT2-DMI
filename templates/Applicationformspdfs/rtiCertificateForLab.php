@@ -28,12 +28,16 @@
 	
 		<tr>
 			  <td style="padding:10px; vertical-align:top;">Date of Last Inspection :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_lab_data['date_last_inspection'])?$rti_lab_data['date_last_inspection']:"NA"; ?></td>
+			  <td style="padding:10px; vertical-align:top;">Date:
+				<?php echo isset($rti_lab_data['date_last_inspection'])?$rti_lab_data['date_last_inspection']:"NA"; ?></td>
 		</tr>
     <tr>
-			  <td style="padding:10px; vertical-align:top;">Date & Time of present Inspection :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_lab_data['date_p_inspection'])?$rti_lab_data['date_p_inspection']:"NA"; ?></td>
+    		<td style="padding:10px; vertical-align:top;">Date & Time of present Inspection :</td>
+    		<td style="padding:10px; vertical-align:top;">Date:
+				<?php echo isset($rti_lab_data['date_p_inspection']) ? $rti_lab_data['date_p_inspection'] : "NA"; ?>, Time:
+				 <?php echo isset($rti_lab_data['time_p_inspection']) ? $rti_lab_data['time_p_inspection'] : "NA"; ?></td>
 		</tr>
+
     <tr>
         <td style="padding:10px; vertical-align:top;">1. Name and addres of the laboratory Contact details :</td>
 			  <td style="padding:10px; vertical-align:top;"><?php echo 
@@ -61,13 +65,15 @@
         </td>
 		</tr>
     
-    <tr>
-        <td style="padding:10px; vertical-align:top;">3. Name of the approved chemist Present at the time of inspection :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_lab_data['approved_chemist'])?$rti_lab_data['approved_chemist']:"NA"; ?></td>
-		</tr>
+		<tr>
+			<td style="padding:10px; vertical-align:top;">3. Name of the approved chemist Present at the time of inspection :</td>
+			<td style="padding:10px; vertical-align:top;"><?php echo isset($rti_lab_data['approved_chemist']) && !empty($rti_lab_data['approved_chemist']) ? $rti_lab_data['approved_chemist'] : "NA"; ?></td>
+	</tr>
+
+
 		<tr>
         <td style="padding:10px; vertical-align:top;">4. Whether present at the time of Inspection :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_lab_data['present_time_of_inspection'])?$rti_lab_data['present_time_of_inspection']:"NA"; ?></td>
+			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_lab_data['present_time_of_inspection']) && !empty($rti_lab_data['present_time_of_inspection'])?$rti_lab_data['present_time_of_inspection']:"NA"; ?></td>
 		</tr>
 		
      <tr>

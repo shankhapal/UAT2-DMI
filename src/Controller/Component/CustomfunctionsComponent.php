@@ -9,7 +9,7 @@ use Cake\Datasource\EntityInterface;
 use QRcode;
 use Cake\Chronos\Chronos;  // Chronos library is use for DateTime by shankhpal on 08/06/2023 
 use Cake\Datasource\ConnectionManager;
-
+use Cake\Http\Response; // added by shankhpal on 04/07/2023
 
 class CustomfunctionsComponent extends Component {
 
@@ -4189,41 +4189,12 @@ class CustomfunctionsComponent extends Component {
 							// Add the application entry to the application list
 							$applicationList[] = $applicationEntry;
 						}
-					
-						$DmiPendingSmsEmailSendStatus = TableRegistry::getTableLocator()->get('DmiPendingSmsEmailSendStatus');
-						if(!empty($applicationList)){
-
-							foreach ($applicationList as $eachAppl) {
-
-								$appl_id = $eachAppl['appl_id'];
-
-								$todayCount = $DmiPendingSmsEmailSendStatus->find()->select(['created'])->order('id desc')->first();
-								
-								if(!empty($todayCount)){
-
-									$created_date = $todayCount->created;
-									
-									//$validity_last_year = date('d-m-Y',strtotime(strtotime($created_date)));
-									$last_created_date = strtotime(str_replace('/','-',$created_date));
-										
-									$cur_date = strtotime(str_replace('/','-',date('Y-m-d')));
-								
-									if ($last_created_date > $cur_date) {
-										$Dmi_pending_count_Entity = $DmiPendingSmsEmailSendStatus->newEntity(array(
-																'created'=>date('Y-m-d H:i:s')
-															));
-
-										if ($DmiPendingSmsEmailSendStatus->save($Dmi_pending_count_Entity)) {
-											return true;
-										}
-									} else {
-										
-									}
-								}
-							
-								
-							}
+						// Check if the response object is available
+						if (!$this->response instanceof Response) {
+								$this->response = new Response();
 						}
+						// Return the response without printing JSON data on the screen
+						return $this->response->withType('application/json')->withStringBody(json_encode($applicationList));
 						
 					}
 				}

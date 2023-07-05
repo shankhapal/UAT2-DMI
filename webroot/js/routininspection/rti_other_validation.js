@@ -4,3 +4,8 @@ $(document).ready(function () {
     minuteStep: 1,
   });
 });
+
+$("#present_time_of_inspection").multiselect({
+  maxWidth: 200,
+  placeholder: "Select Option",
+});
