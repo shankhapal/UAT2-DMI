@@ -163,7 +163,7 @@ class AppController extends Controller
 		$user_last_login = $this->Customfunctions->userLastLogins();
 		$this->set('user_last_login',$user_last_login);
 
-		$responce = $this->Customfunctions->getSingleOrAllUserAppliResult();
+		//$responce = $this->Customfunctions->getSingleOrAllUserAppliResult();
 	
 		
 		
