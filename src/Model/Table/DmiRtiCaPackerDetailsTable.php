@@ -212,7 +212,7 @@ class DmiRtiCaPackerDetailsTable extends Table{
 		//added for unit dropdown
 		//Unit Weight of Parcel
 		$MUnitWeight = TableRegistry::getTableLocator()->get('MUnitWeight');
-		$grade_units =$MUnitWeight->find('list',array('keyField'=>'unit_id','valueField'=>'unit_weight','conditions' => array('display' => 'Y'),'order'=>'unit_id asc'))->toArray();
+		$grade_units =$MUnitWeight->find('list',array('keyField'=>'unit_weight','valueField'=>'unit_weight','conditions' => array('display' => 'Y'),'order'=>'unit_id asc'))->toArray();
 		// this will be return hours and minutes dropdown
 		$time_array = ['' => 'Hour : Minute'];
     for ($hour = 1; $hour <= 12; $hour++) {

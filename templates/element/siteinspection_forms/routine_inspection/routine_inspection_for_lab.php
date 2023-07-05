@@ -4,10 +4,6 @@
 	    Name of person : shankhpal shende
 	    Date: 24-05-2023
 */ -->
-<?php
-	//
-	//
-?>
 <?php //pr($section_form_details);die;
 echo $this->Html->css('../multiselect/jquery.multiselect');
 echo $this->Html->script('../multiselect/jquery.multiselect');
@@ -15,7 +11,6 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
 <section id="form_outer_main" class="content form-middle">
 <div class="container-fluid">
 <h5 class="mt-1 mb-2">Routine Inspection Report (Approved Laboratory)</h5>
-
 <div id='form_inner_main'>
 <div class="row">
 <div class="col-md-12">
@@ -169,42 +164,35 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
             </div>
             <div class="col-md-6">
           <?php
+                $chemst = $section_form_details[0]['approved_chemist'];
+                $selectedOptions = explode(',', $section_form_details[0]['present_time_of_inspection']);
 
-            $chemst = $section_form_details[0]['approved_chemist'];
-            $selectedOptions = explode(',', $section_form_details[0]['present_time_of_inspection']);
-
-           $selectedValues = [];
-           if(!empty($chemst)){
-            foreach ($selectedOptions as $option) {
-                foreach ($chemst as $key => $value) {
-                    if ($option == $key) {
-                        $selectedValues[] = $option;
-                        break; // Exit the inner loop since the value has been found
+                $selectedValues = [];
+                if(!empty($chemst)){
+                    foreach ($selectedOptions as $option) {
+                        foreach ($chemst as $key => $value) {
+                            if ($option == $key) {
+                                $selectedValues[] = $option;
+                                break; // Exit the inner loop since the value has been found
+                            }
+                        }
                     }
                 }
-            }
-           }
             
-            echo $this->Form->control(
-                'present_time_of_inspection',
-                [
-                    'type' => 'select',
-                    'options' => $chemst,
-                    'default' => $selectedValues,
-                    'multiple' => 'multiple',
-                    'escape' => false,
-                    'id' => 'present_time_of_inspection',
-                    'label' => false,
-                    'class' => 'form-control wd120'
-                ]
-            );
-
-
-            ?>
-
-
-
-
+                echo $this->Form->control(
+                    'present_time_of_inspection',
+                    [
+                        'type' => 'select',
+                        'options' => $chemst,
+                        'default' => $selectedValues,
+                        'multiple' => 'multiple',
+                        'escape' => false,
+                        'id' => 'present_time_of_inspection',
+                        'label' => false,
+                        'class' => 'form-control wd120'
+                    ]
+                );
+                ?>
             </div>                    
         </div>
     </div>
