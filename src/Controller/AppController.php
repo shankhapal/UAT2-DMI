@@ -166,7 +166,8 @@ class AppController extends Controller
 		// this condition added for sending sms and email for daily basis 
 		// the custome function call once in a day and added new entry in db 
 		// added by shankhpal shende on 04/07/2023
-		$DmiPendingSmsEmailSendStatus = TableRegistry::getTableLocator()->get('DmiPendingSmsEmailSendStatus');
+    //temp. commented
+		/*$DmiPendingSmsEmailSendStatus = TableRegistry::getTableLocator()->get('DmiPendingSmsEmailSendStatus');
 		$today = date('d/m/Y'); // Get today's date in the format matching your database field (without time)
 
 		$todayCount = $DmiPendingSmsEmailSendStatus->find()
@@ -182,7 +183,8 @@ class AppController extends Controller
 				//to call sms and email
 		} else {
 				// nothing
-		}
+		}*/
+
 
 	}
 
