@@ -276,7 +276,17 @@ class ApplicationController extends AppController{
 			$this->Communication->singleWindowCommentHistory($chemist_id);
 			
 		}			
+		// This condition added by shankhpal shende for BGR Module on 06/07/2023
+		if($application_type == 11){
+			$chemistDetails = $this->DmiChemistRegistrations->find('all',array('conditions'=>array('chemist_id IS'=>$customer_id,'delete_status IS NULL')))->first();
+			$customer_id = $chemistDetails['created_by'];
 
+			$form_type='BGR';
+			$this->loadModel('DmiBgrGrantCertificatePdfs');  
+			//added for checking if application is Granted on 24/11/2022
+			$checkIfgrant = $this->DmiBgrGrantCertificatePdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
+			$this->set('checkIfgrant',$checkIfgrant);
+		}
 
 		$this->Customfunctions->showOldCertDetailsPopup($customer_id);
 

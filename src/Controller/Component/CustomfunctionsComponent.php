@@ -3984,8 +3984,8 @@ class CustomfunctionsComponent extends Component {
 								
 							//check entry in rejected/junked table
 							$checkIfRejected = $DmiRejectedApplLogs->find('all',array('fields'=>'id','conditions'=>array('customer_id IS'=>$eachAppl['customer_id'],'appl_type IS'=>$eachflow['application_type'])))->first();
-
-							if(!empty($checkIfRejected)){
+							
+							if(empty($checkIfRejected)){
 
 								if ($eachLevel == 'level_1' || $eachLevel == 'level_2' || $eachLevel == 'level_4_ro' || $eachLevel == 'level_4_mo' || $eachLevel == "pao") {
 									
@@ -4011,7 +4011,8 @@ class CustomfunctionsComponent extends Component {
 									// check if appl submission and granted
 									$checkLastStatus = $finalSubmitTable->find('all', array('conditions' => array('customer_id IS' => $eachAppl['customer_id']),'order' => 'id desc'))->first();
 								
-									if ($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level']=='level_4')){
+									if(($checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_4')) ||
+									($eachflow['application_type'] == 4 && $checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_1'))){
 										//nothing to do
 									}elseif ($eachLevel == 'level_3' || $eachLevel == 'level_4') {
 									
@@ -4126,7 +4127,7 @@ class CustomfunctionsComponent extends Component {
 								
 								foreach ($checkCurPosition as $eachAppl) {
 
-									//check entry in rejected/junked table
+									//check entry in rejected/junked table -- added on 06/07/2023 by shankhpal
 									$checkIfRejected = $DmiRejectedApplLogs->find('all',array('fields'=>'id','conditions'=>array('customer_id IS'=>$eachAppl['customer_id'],'appl_type IS'=>$eachflow['application_type'])))->first();
 
 									if(empty($checkIfRejected)){
@@ -4153,7 +4154,8 @@ class CustomfunctionsComponent extends Component {
 										}elseif($eachLevel=='level_3' || $eachLevel=='level_4'){
 											//check if appl submission and granted
 											$checkLastStatus = $finalSubmitTable->find('all',array('conditions'=>array('customer_id IS'=>$eachAppl['customer_id']),'order'=>'id desc'))->first();
-											if($checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_4')){
+											if(($checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_4')) ||
+											($eachflow['application_type'] == 4 && $checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_1'))){
 												//nothing
 											}else{
 												$appl_list['appl_type'] = $getApplType['application_type'];
