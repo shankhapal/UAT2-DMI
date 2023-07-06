@@ -190,7 +190,7 @@
 									<span class="badge bg-grad2 mr-3 shadow"> <?php echo $user_roles_xy[$search_user_role];   $search_value = 'yes'; ?> </span>
 								<?php
 							}
-							if(!empty($ro_office_id)) {
+							if(!empty($ro_office_id))  {
 							?>  <span class="badge rounded-pill bg-grad1 shadow">Office</span>
 									<i class="fas fa-caret-right"></i>
 									<span class="badge bg-grad2 mr-3 shadow">
@@ -250,7 +250,7 @@
 								<?php
 							}
 							if(empty($search_value)) {
-							?>  <span class="badge bg-grad2 mr-3 shadow"> <?php echo 'ALL'; ?> </span>
+							?>  <span class="badge bg-grad2 mr-3 shadow"> <?php echo 'Default Last One Month List'; ?> </span>
 								<?php
 							}
 						?>

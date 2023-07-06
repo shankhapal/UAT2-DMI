@@ -103,6 +103,7 @@
             type: "POST",
             url: path+"/pending_application_report_user_id",
             data: form_data,
+            
             success: function(response){
 
                 $("#user_id").html(response);
