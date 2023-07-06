@@ -56,8 +56,10 @@
       
 			$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
 			$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
+			
+			$packer_id = $_SESSION['packer_id'];
 			$DmiBgrAnalysisAddMoreDetails = TableRegistry::getTableLocator()->get('DmiBgrAnalysisAddMoreDetails');
-			$added_firms = $DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->toArray();		
+			$added_firms = $DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$packer_id)))->toArray();		
 			$added_firm_field = $added_firms[0];	
 
 			

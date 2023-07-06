@@ -31,6 +31,7 @@
 		<?php echo $this->element('common_side_menus/common_top_left_logo'); ?>
 			<div class="sidebar">
 			  <?php echo $this->element('common_side_menus/common_top_left_profile'); ?>
+				<?php $split_packer_name = explode('/',$this->getRequest()->getSession()->read('packer_id')); ?>
 			<nav class="mt-2">
 				<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 					<!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
@@ -58,8 +59,18 @@
 
 					<li class="nav-item">
 						<?php echo $this->Html->link('<i class="nav-icon far fa-dot-circle"></i></i><p class="nav-icon-p">Action Logs</p>', array('controller'=>'common', 'action'=>'user_action_history'), array('escape'=>false, 'class'=>'nav-link '.$menu_profile)); ?>
-					</li>
-
+					</li>						
+					<!-- The menu are added for BGR Module 
+						Added by shankhpal shende on 21/06/2023 -->
+					<?php if($split_packer_name[1] == 1){ ?>
+						<li class="nav-item">
+							<a href="<?php echo $this->request->getAttribute("webroot");?>application/application-type/11" class="nav-link">
+						<i class="nav-icon far fa-file-alt"></i>
+							<p class="nav-icon-p">Biannually Grading Report</p>
+							</a>
+					</li>	
+					<?php } ?>
+						
 					<?php if (!empty($final_submit_status) && $final_submit_status == 'approved') { ?>
 						<li class="nav-item">
 							<?php echo $this->Html->link('<i class="nav-icon fas fa-user"></i><p class="nav-icon-p">Confirm Replica Serial</p>', array('controller'=>'replica', 'action'=>'replica_appl_list'), array('escape'=>false, 'class'=>'nav-link '.$menu_profile)); ?>
