@@ -513,7 +513,7 @@ class ApplicationController extends AppController{
 		if (null !== $this->request->getData('save')) {
             
 			$result = $this->$section_model->saveFormDetails($customer_id,$this->request->getData());
-			//print_r($this->request->getData());exit;
+			
 			if (is_array($result)=='') {
 				
 				if ($result == 1) {

@@ -1,4 +1,4 @@
-<?php //echo .$section_form_details[0]['document_receipt'];exit;// added class below form-for-file-too by laxmi 06-07-2023?>
+<?php // added class below form-for-file-too by laxmi 06-07-2023?>
 <?php echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-data', 'id'=>'profile','class'=>'form_name form-for-file-too')); ?>
 
 <div id="form_outer_main" class="card card-success form_outer_class">
