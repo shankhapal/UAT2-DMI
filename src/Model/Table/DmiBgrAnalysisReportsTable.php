@@ -11,49 +11,84 @@
 		var $name = "DmiBgrAnalysisReports";
 		
 		// Fetch form section all details
-		public function sectionFormDetails($customer_id)
+		public function sectionFormDetails($customerId)
 		{
-		
-			$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+			$dmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+			$mCommodity = TableRegistry::getTableLocator()->get('MCommodity');
+			$dmiBgrAnalysisAddMoreDetails = TableRegistry::getTableLocator()->get('DmiBgrAnalysisAddMoreDetails');
+			
+			$latestId = $this->find('list', array(
+					'valueField' => 'id',
+					'conditions' => array('customer_id IS' => $customerId)
+			))->toArray();
+					
+			if ($latestId != null) {
+    		$formFields = $this->find('all', array('conditions' => array('id' => MAX($latestId))))->first();
 				
-			if($latest_id != null){
-				$form_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();		
+				$formFieldsDetails = $formFields;
+
+			}
+			else{
 				
-				$form_fields_details = $form_fields;
-				
-			}else{
-				
-				$form_fields_details = Array ( 'id'=>"", 'customer_id' => "",
-				'reffered_back_comment' => "",
-				'reffered_back_date' => "", 'form_status' =>"", 'customer_reply' =>"", 'customer_reply_date' =>"", 'approved_date' => "",
-				'current_level' => "",'mo_comment' =>"", 'mo_comment_date' => "", 'ro_reply_comment' =>"", 'ro_reply_comment_date' =>"", 'delete_mo_comment' =>"", 'delete_ro_reply' => "",'delete_ro_referred_back' => "", 'delete_customer_reply' => "", 'ro_current_comment_to' => "",
-				'rb_comment_ul'=>"",'mo_comment_ul'=>"",'rr_comment_ul'=>"",'cr_comment_ul'=>""); 
-				
+				$formFieldsDetails = array (
+					'id'=>"",
+					'customer_id' => "",
+					'reffered_back_comment' => "",
+					'reffered_back_date' => "",
+					'form_status' =>"",
+					'customer_reply' =>"",
+					'customer_reply_date' =>"",
+					'approved_date' => "",
+					'current_level' => "",
+					'mo_comment' =>"",
+					'mo_comment_date' => "",
+					'ro_reply_comment' =>"",
+					'ro_reply_comment_date' =>"",
+					'delete_mo_comment' =>"",
+					'delete_ro_reply' => "",
+					'delete_ro_referred_back' => "",
+					'delete_customer_reply' => "",
+					'ro_current_comment_to' => "",
+					'rb_comment_ul'=>"",
+					'mo_comment_ul'=>"",
+					'rr_comment_ul'=>"",
+					'cr_comment_ul'=>""
+				);
+					
 			}
 
-		$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
-		$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
-	  $DmiBgrAnalysisAddMoreDetails = TableRegistry::getTableLocator()->get('DmiBgrAnalysisAddMoreDetails');
-		$added_firms = $DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->toArray();		
-		$added_firm_field = $added_firms[0];	
+			
+			
+			$addedfirms = $dmiFirms->find('all', array('conditions' => array('customer_id IS' => $customerId)))->toArray();
+			
+			$addedFirmField = $addedfirms[0];
 
-		
-		//taking id of multiple sub commodities	to show names in list	
-		$sub_comm_id = explode(',',(string) $added_firm_field['sub_commodity']); #For Deprecations
-		$sub_commodity_value = $MCommodity->find('list',array('valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
+			$subCommId = explode(',', (string) $addedFirmField['sub_commodity']); #For Deprecations
+			
+			$subCommodityValue = $mCommodity->find('list', array(
+				'valueField' => 'commodity_name',
+				'conditions' => array(
+				'commodity_code IN' => $subCommId
+			)))->toList();
 
-	  $DmiBgrAnalysisAddMoreDetails = TableRegistry::getTableLocator()->get('DmiBgrAnalysisAddMoreDetails');
-    $analysis_details = $DmiBgrAnalysisAddMoreDetails->analysisDetails();	
-		
-	  $added_analysis_details = $analysis_details[1];
+			$analysisDetails = $dmiBgrAnalysisAddMoreDetails->analysisDetails();
+			$addedAnalysisDetails = $analysisDetails[1];
 
-		$DmiChemicalParameters = TableRegistry::getTableLocator()->get('DmiChemicalParameters');
-		$chemical_parameters = $DmiChemicalParameters->find('list', array('valueField'=>'chemical_parameters','conditions'=>array('delete_status IS NULL'),'order'=>'id'))->toList();
+			$dmiChemicalParameters = TableRegistry::getTableLocator()->get('DmiChemicalParameters');
+			
+			$chemical_parameters = $dmiChemicalParameters->find('list', array(
+				'valueField' => 'chemical_parameters',
+				'conditions' => array(
+				'delete_status IS NULL
+				'),
+				'order' => 'id'
+			))->toList();
+
      
 
-		return array($form_fields_details,$added_analysis_details,$sub_commodity_value,$chemical_parameters);
+		return array($formFieldsDetails,$addedAnalysisDetails,$subCommodityValue,$chemical_parameters);
 				
-		}		
+		}
 		
 		
 		// save or update form data and comment reply by applicant
