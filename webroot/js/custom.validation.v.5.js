@@ -100,7 +100,7 @@ $(function(){
   
     });
   
-    function getErrorText(className, inputMinMax, inputFloatVal){
+    function getErrorText(className, inputMinMax, inputFloatVal){ 
       var txt;
       switch(className){
         case 'cvReq':
@@ -334,9 +334,24 @@ $(function(){
   
   
   $(document).ready(function(){
-  
+   // added below  function by laxmi to view profile and sign after upload without save on [06-07-2023]
+    $('.file_profile').change(function(){
+     var upload_view_src = $('.chemist_doc').attr('src');
+    //  if(upload_view_src == '' || upload_view_src == undefined){
+    //        $('.chemist_doc').hide();
+    //  }
+      var path = URL.createObjectURL(event.target.files[0]);
+      $("<img src width=auto height=80px >").insertAfter( $("#profile_img") ).fadeIn("fast").attr('src',path);
+    });
+    $('.file_sign').change(function(){
+      var path = URL.createObjectURL(event.target.files[0]);
+      $("<img src width=auto height=80px >").insertAfter( $("#sign_img") ).fadeIn("fast").attr('src',path);
+    });
+
+    //End by Laxmi
+
       $('.form_name').on('submit', function(){
-          
+         
           var returnFormStatus = true;
           var formSelStatus = 'valid';
           var returnEmptyStatus = formEmptyStatus('.form_name');
@@ -344,20 +359,39 @@ $(function(){
           
           //select field validations
           var selRw = $('.form_name').find('select').not(':hidden,.cvNotReq').not('select[disabled]').length;
+          
+           
           for(var i=0;i<selRw;i++){
               var selField = $('.form_name').find('select').not(':hidden,.cvNotReq').not('select[disabled]').eq(i).val();
               if(selField == ''){
                   showElAlrt('.form_name', 'select', i);
                   formSelStatus = 'invalid';
+                 
               }
           }
+
+          // added for file upload validation by laxmi on 06-07-2023
+          var selfile = $('.form-for-file-too').find('.filetype').length;
+          
+          for(var i=0;i<selRw;i++){
+            var selfile = $('.form-for-file-too').find(".selectedFile").eq(i).val();
+            var selfileselect = $('.form-for-file-too').find('.filetype').eq(i).val();
+            if( selfileselect == ''){ 
+              if(selfile == ''){  
+                showElAlrt('.form-for-file-too', '.filetype', i);
+                formSelStatus = 'invalid';
+              }
+                
+            }
+        }
+        //end Laxmi
   
           if(formSelStatus == 'invalid'){
               //showAlrt('Select value from dropdown!');
               returnFormStatus = false;
           }
-          
-          return returnFormStatus;
+        
+          return returnFormStatus; 
       });
   
   });

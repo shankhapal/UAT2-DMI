@@ -327,7 +327,7 @@ class ApplicationController extends AppController{
 		$this->set('firm_details',$firm_details);
 		$document_lists = $this->Mastertablecontent->allDocumentsList();
 		$this->set('document_lists',$document_lists);
-
+         
 		//get commodity details, for option to update commodities
 		//applied on 02-07-2021 by Amol
 		$this->Randomfunctions->getCommodityDetails($firm_details,$firm_type);
@@ -376,7 +376,7 @@ class ApplicationController extends AppController{
 
 		// get section details
 		$section_form_details = $this->$section_model->sectionFormDetails($customer_id);
-
+        
 
 		// if return value 1 (all forms saved), return value 2 (all forms approved), return value 0 (all forms not saved or approved)
 		$all_section_status = $this->Customfunctions->formStatusValue($allSectionDetails,$customer_id);
@@ -391,7 +391,15 @@ class ApplicationController extends AppController{
 
 		// get previous and next button id
 		$nextPreviousBtn =	$this->Customfunctions->getNextPreSec($allSectionDetails);
-		
+
+
+
+		//added middle name type in array and set for view side like S/o, W/o, D/o by laxmi B on 06-07-2023
+		if ($application_type == 4) {
+		$middle_type = array('S/o'=>'S/o', 'D/o'=>'D/o', 'W/o'=>'W/o');
+        $this->set('middle_type', $middle_type);
+		}
+
 		$this->set('section',$section);
 		$this->set('tablename',$section_model);
 		$this->set('current_form_data',$section_form_details[0]);
@@ -503,9 +511,9 @@ class ApplicationController extends AppController{
 
 		
 		if (null !== $this->request->getData('save')) {
-
+            
 			$result = $this->$section_model->saveFormDetails($customer_id,$this->request->getData());
-			
+			//print_r($this->request->getData());exit;
 			if (is_array($result)=='') {
 				
 				if ($result == 1) {

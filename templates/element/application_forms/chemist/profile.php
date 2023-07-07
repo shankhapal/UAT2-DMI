@@ -1,5 +1,5 @@
-
-<?php echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-data', 'id'=>'profile','class'=>'form_name')); ?>
+<?php //echo .$section_form_details[0]['document_receipt'];exit;// added class below form-for-file-too by laxmi 06-07-2023?>
+<?php echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-data', 'id'=>'profile','class'=>'form_name form-for-file-too')); ?>
 
 <div id="form_outer_main" class="card card-success form_outer_class">
 	<div class="card-header"><h3 class="card-title-new">Profile</h3></div>
@@ -29,6 +29,21 @@
 		<div class="card-body">
 			<div class="row">
 				<div class="col-md-12 row">
+                     <!-- added middle name type and middle name by laxmi on 04-07-2023 -->
+                    <div class="col-md-2">
+						<label for="field3"><span>Middle Name<span class="cRed">*</span></span>	</label>
+					</div>
+					<div class="col-md-2">
+						<?php echo $this->Form->control('middle_name_type', array('type'=>'select', 'id'=>'middle_name_type', 'escape'=>false, 'options'=>$middle_type, 'empty'=>'Select type','value'=>$section_form_details[0]['middle_name_type'], 'class'=>'cvOn cvReq form-control', 'label'=>false)); ?>
+						<div class="err_cv"></div>
+					</div>
+					<div class="col-md-2">
+					<?php echo $this->Form->control('middle_name', array('type'=>'text', 'id'=>'middle_name', 'escape'=>false, 'value'=>$section_form_details[0]['middle_name'], 'placeholder'=>'Enter Middle Name', 'class'=>'cvOn cvReq cvAlphaNum cvAlpha form-control', 'maxlength'=>255,  'label'=>false)); ?>
+						<div class="err_cv"></div>
+					</div>
+
+
+
 					<div class="col-md-2">
 						<label for="field3"><span>State/Region <span class="cRed">*</span></span>	</label>
 					</div>
@@ -36,7 +51,17 @@
 						<?php echo $this->Form->control('state', array('type'=>'select', 'id'=>'state', 'escape'=>false, 'options'=>$state_list, 'empty'=>'Select State','value'=>$section_form_details[0]['state'], 'class'=>'cvOn cvReq form-control', 'label'=>false)); ?>
 						<div class="err_cv"></div>
 					</div>
-					<div class="col-md-2">
+					
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="form-horizontal">
+		<div class="card-body">
+			<div class="row">
+				<div class="col-md-12 row">
+                      
+				<div class="col-md-2">
 						<label for="field3"><span>District <span class="cRed">*</span></span></label>
 					</div>
 					<div class="col-md-4">
@@ -51,14 +76,9 @@
 						</div>
 						<div class="err_cv"></div>
 					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="form-horizontal">
-		<div class="card-body">
-			<div class="row">
-				<div class="col-md-12 row">
+
+
+
 					<div class="col-md-2">
 						<label for="field3"><span>Email Id <span class="cRed">*</span></span></label>
 					</div>
@@ -67,13 +87,7 @@
 						<div class="err_cv"></div>
 					</div>
 
-					<div class="col-md-2">
-						<label for="field3"><span>Pin Code <span class="cRed">*</span></span>	</label>
-					</div>
-					<div class="col-md-4">
-						<?php echo $this->Form->control('pin_code', array('type'=>'text', 'id'=>'pin_code', 'escape'=>false, 'placeholder'=>'Enter Pincode','maxlength'=>6, 'minlength'=>6,'value'=>$section_form_details[0]['pin_code'], 'class'=>'cvOn cvReq cvNum form-control', 'label'=>false)); ?>
-						<div class="err_cv"></div>
-					</div>
+					
 				</div>
 			</div>
 		</div>
@@ -82,6 +96,15 @@
 		<div class="card-body">
 			<div class="row">
 				<div class="col-md-12 row">
+
+				<div class="col-md-2">
+						<label for="field3"><span>Pin Code <span class="cRed">*</span></span>	</label>
+					</div>
+					<div class="col-md-4">
+						<?php echo $this->Form->control('pin_code', array('type'=>'text', 'id'=>'pin_code', 'escape'=>false, 'placeholder'=>'Enter Pincode','maxlength'=>6, 'minlength'=>6,'value'=>$section_form_details[0]['pin_code'], 'class'=>'cvOn cvReq cvNum form-control', 'label'=>false)); ?>
+						<div class="err_cv"></div>
+					</div>
+
 					<div class="col-md-2">
 						<label for="field3"><span>Mobile No. <span class="cRed">*</span></span></label>
 					</div>
@@ -90,13 +113,7 @@
 						<div class="err_cv"></div>
 					</div>
 
-					<div class="col-md-2">
-						<label for="field3"><span>DOB <span class="cRed">*</span></span></label>
-					</div>
-					<div class="col-md-4">
-						<?php echo $this->Form->control('dob', array('type'=>'text', 'id'=>'dob', 'escape'=>false, 'placeholder'=>'Enter DD/MM/YYYY', 'maxlength'=>'10', 'minlength'=>'10','value'=>chop($section_form_details[0]['dob'],"00:00:00"), 'class'=>'cvOn cvReq cvDate form-control', 'disabled'=>true, 'label'=>false)); ?>
-						<div class="err_cv"></div>
-					</div>
+					
 				</div>
 			</div>
 		</div>
@@ -105,6 +122,16 @@
 		<div class="card-body">
 			<div class="row">
 				<div class="col-md-12 row">
+
+				<div class="col-md-2">
+						<label for="field3"><span>DOB <span class="cRed">*</span></span></label>
+					</div>
+					<div class="col-md-4">
+						<?php echo $this->Form->control('dob', array('type'=>'text', 'id'=>'dob', 'escape'=>false, 'placeholder'=>'Enter DD/MM/YYYY', 'maxlength'=>'10', 'minlength'=>'10','value'=>chop($section_form_details[0]['dob'],"00:00:00"), 'class'=>'cvOn cvReq cvDate form-control', 'disabled'=>true, 'label'=>false)); ?>
+						<div class="err_cv"></div>
+					</div>
+
+
 					<div class="col-md-2">
 						<label for="field3"><span>Gender <span class="cRed">*</span></span></label>
 					</div>
@@ -114,17 +141,7 @@
 							  echo $this->Form->radio('type', $options, $attributes); ?>
 						<div class="err_cv"></div>
 					</div>
-					<div class="col-md-2">
-						<label for="field3"><span>ID (Select any one). <span class="cRed">*</span></span></label>
-					</div>
-					<div class="col-md-2">
-						<?php echo $this->Form->control('document', array('type'=>'select', 'id'=>'document', 'options'=>$document_lists, 'value'=>$section_form_details[0]['document'],'empty'=>'Select Document Type', 'label'=>false, 'class'=>'cvOn cvReq form-control')); ?>
-						<div class="err_cv"></div>
-					</div>
-					<div class="col-md-2">
-						<?php echo $this->Form->control('document_id_no', array('type'=>'text', 'id'=>'document_id_no', 'escape'=>false, 'placeholder'=>'Enter ID Number','value'=>$section_form_details[0]['document_id_no'], 'class'=>'cvOn cvReq cvAlphaNum form-control', 'label'=>false)); ?>
-						<div class="err_cv"></div>
-					</div>
+					
 				</div>
 			</div>
 		</div>
@@ -141,16 +158,68 @@
 						<div class="err_cv"></div>
 					</div>
 
+
 					<div class="col-md-2">
 						<label for="field3"><span>Address2 </span></label>
 					</div>
 					<div class="col-md-4">
 						<?php echo $this->Form->control('address_1', array('type'=>'text', 'id'=>'address1', 'escape'=>false, 'value'=>$section_form_details[0]['address_1'], 'placeholder'=>'Enter Address', 'class'=>' cvNotReq form-control', 'label'=>false)); ?>
 					</div>
+
+					
 				</div>
 			</div>
 		</div>
 	</div>
+
+	<div class="form-horizontal">
+		<div class="card-body">
+			<div class="row">
+				<div class="col-md-12 row">
+
+				<div class="col-md-2">
+						<label for="field3"><span>ID (Select any one). <span class="cRed">*</span></span></label>
+					</div>
+					<div class="col-md-2">
+						<?php echo $this->Form->control('document', array('type'=>'select', 'id'=>'document', 'options'=>$document_lists, 'value'=>$section_form_details[0]['document'],'empty'=>'Select Document Type', 'label'=>false, 'class'=>'cvOn cvReq form-control')); ?>
+						<div class="err_cv"></div>
+					</div>
+					<div class="col-md-2">
+						<?php echo $this->Form->control('document_id_no', array('type'=>'text', 'id'=>'document_id_no', 'escape'=>false, 'placeholder'=>'Enter ID Number','value'=>$section_form_details[0]['document_id_no'], 'class'=>'cvOn cvReq cvAlphaNum form-control', 'label'=>false)); ?>
+						<div class="err_cv"></div>
+					</div>
+				 
+				 
+				 
+				 <?php //below condtion added for chemist to upload document receipt and in all file type added class filetype by laxmi [04-07-2023]
+					 if(!empty($_SESSION['application_type']) && $_SESSION['application_type'] == 4 ){?>
+					<div class="col-md-2">
+						<label for="field3"><span>Document Receipt Upload<span class="cRed">*</span></span>	</label>
+					</div>
+					<div class="col-md-4">
+						<?php echo $this->Form->control('document_receipt',array('type'=>'file', 'id'=>'document_receipt' ,'multiple'=>'multiple','class'=>'cvOn cvReq form-control filetype', 'label'=>false)); ?>
+						<?php echo $this->Form->control('document_receipt',array('type'=>'hidden', 'class'=>'hidden_doc selectedFile', 'value'=>$section_form_details[0]['document_receipt'], 'label'=>false)); ?>
+						<div class="err_cv"></div>
+						<p class="file_limits">File type: pdf & jpg & Max-size:2mb</p>
+						<?php // if document uploaded then it visible added by laxmi [07-07-2023]
+						  if(!empty($section_form_details[0]['document_receipt'])){
+							$reciept = $section_form_details[0]['document_receipt'];?>
+                            <a href = "<?php echo $reciept; ?>" target = "_blank" > Document reciept </a>
+						 <?php }
+						?>
+					</div>
+
+                     <?php } ?>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+
+
+
 	<div class="form-horizontal">
 		<div class="card-body">
 			<div class="row">
@@ -159,8 +228,8 @@
 						<label for="field3"><span>Profile Photo Upload<span class="cRed">*</span></span>	</label>
 					</div>
 					<div class="col-md-4">
-						<?php echo $this->Form->control('profile_photo',array('type'=>'file', 'id'=>'profile_photo', 'multiple'=>'multiple','class'=>'cvOn cvReq form-control', 'label'=>false)); ?>
-						<?php echo $this->Form->control('profile_photo_hidden',array('type'=>'hidden', 'class'=>'hidden_doc', 'value'=>$section_form_details[0]['profile_photo'], 'label'=>false)); ?>
+						<?php echo $this->Form->control('profile_photo',array('type'=>'file', 'id'=>'profile_photo', 'multiple'=>'multiple','class'=>'cvOn cvReq form-control filetype file_profile', 'label'=>false)); ?>
+						<?php echo $this->Form->control('profile_photo_hidden',array('type'=>'hidden', 'id'=>'profile_img','class'=>'hidden_doc selectedFile', 'value'=>$section_form_details[0]['profile_photo'], 'label'=>false)); ?>
 						<div class="err_cv"></div>
 						<p class="file_limits">File type: jpg & Max-size:2mb</p>
 					</div>
@@ -169,8 +238,8 @@
 						<label for="field3"><span>Signature Upload <span class="cRed">*</span></span>	</label>
 					</div>
 					<div class="col-md-4">
-						<?php echo $this->Form->control('signature_photo',array('type'=>'file', 'id'=>'signature_photo', 'multiple'=>'multiple','class'=>'cvOn cvReq form-control', 'label'=>false)); ?>
-						<?php echo $this->Form->control('signature_photo_hidden',array('type'=>'hidden', 'class'=>'hidden_doc', 'value'=>$section_form_details[0]['signature_photo'], 'label'=>false)); ?>
+						<?php echo $this->Form->control('signature_photo',array('type'=>'file', 'id'=>'signature_photo', 'multiple'=>'multiple','class'=>'cvOn cvReq form-control filetype file_sign', 'label'=>false)); ?>
+						<?php echo $this->Form->control('signature_photo_hidden',array('type'=>'hidden', 'id'=>'sign_img','class'=>'hidden_doc selectedFile', 'value'=>$section_form_details[0]['signature_photo'], 'label'=>false)); ?>
 						<div class="err_cv"></div>
 						<p class="file_limits">File type: jpg & Max-size:2mb</p>
 					</div>

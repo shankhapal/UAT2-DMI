@@ -26,7 +26,7 @@ class DmiChemistProfileDetailsTable extends Table{
 		 $registered_details = $get_registered_details;
 
 		
- 
+          
 
 		 if(empty($result)){
 				$result = array();
@@ -61,6 +61,11 @@ class DmiChemistProfileDetailsTable extends Table{
 				$result[0]['cr_comment_ul'] = '';
 				$result[0]['document'] = '';
 				$result[0]['document_id_no'] = '';
+				// added this new column in db table and added in this array by laxmi [06-07-2023]
+				$result[0]['middle_name_type'] = '';
+				$result[0]['middle_name'] = '';
+				$result[0]['document_receipt'] = '';
+
 		}else{
 
 			//added contion for chemist home withdraw application to section id null by laxmi B. on 29-05-2023
@@ -91,7 +96,7 @@ class DmiChemistProfileDetailsTable extends Table{
 
 	public function saveFormDetails($chemist_id,$forms_data) {
 
-
+        
 		$result = false;
 		$dataValidatation = $this->postDataValidation($forms_data);
 		$date = date('Y-m-d H:i:s');
@@ -107,7 +112,7 @@ class DmiChemistProfileDetailsTable extends Table{
 		if($dataValidatation == 1 ){
 
 			$section_form_details = $this->sectionFormDetails($chemist_id);
-
+           
 			$id = $section_form_details[0]['id'];
 			$status = 'saved';
 			$created = date('Y-m-d H:i:s');
@@ -139,6 +144,23 @@ class DmiChemistProfileDetailsTable extends Table{
 			$address_1 = htmlentities($forms_data['address_1'], ENT_QUOTES);
 			$document = htmlentities($forms_data['document'], ENT_QUOTES); #This is added by Akash on the 09-08-2022 
 			$document_id_no = htmlentities($forms_data['document_id_no'], ENT_QUOTES); #This is added by Akash on the 09-08-2022
+			//added new by laxmi [06-07-2023]
+			$middle_name = htmlentities($forms_data['middle_name'], ENT_QUOTES);
+			$middle_name_type = $forms_data['middle_name_type'];
+			if (!empty($forms_data['document_receipt']->getClientFilename())) {
+
+				$attchment = $forms_data['document_receipt'];
+				$file_name = $attchment->getClientFilename();
+				$file_size = $attchment->getSize();
+				$file_type = $attchment->getClientMediaType();
+				$file_local_path = $attchment->getStream()->getMetadata('uri');
+				// calling file uploading function
+				$document_receipt = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path);
+
+			} else{
+				$document_receipt = $section_form_details[0]['document_receipt'];
+			}
+
 
 			if (!empty($forms_data['profile_photo']->getClientFilename())) {
 
@@ -151,8 +173,9 @@ class DmiChemistProfileDetailsTable extends Table{
 				$profile_photo = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path);
 
 			} else {
-
+                // comment above line and set empty if profile phot not selected because it mendatory by laxmi [06-07-2023]
 				$profile_photo = $section_form_details[0]['profile_photo'];
+				//$profile_photo ='';
 			}
 
 			if (!empty($forms_data['signature_photo']->getClientFilename())) {
@@ -228,12 +251,24 @@ class DmiChemistProfileDetailsTable extends Table{
 				'modified'=>date('Y-m-d H:i:s'),
 				'is_latest'=>1,
 				'document'=>$document, #This is added by Akash on the 09-08-2022 
-				'document_id_no'=>$document_id_no #This is added by Akash on the 09-08-2022 
+				'document_id_no'=>$document_id_no, #This is added by Akash on the 09-08-2022 
+			   
+				// below added by laxmi on 06-07-2023
+			    'middle_name'=>$middle_name,
+			    'middle_name_type'=>$middle_name_type,
+				'document_receipt'=>$document_receipt
+			
 			));
-
-			if($this->save($DmiChemistProfileDetailsEntity)) {
+            
+			
+			//added not empty profile photo if else condtion by laxmi bcz it is mandetory[06-07-2023]
+			if(!empty($profile_photo)){
+			  if($this->save($DmiChemistProfileDetailsEntity)) {
 				return true;
-			}
+			  }
+		   }else{
+			return false;
+		   }  
 
 		} else {
 			return false;
