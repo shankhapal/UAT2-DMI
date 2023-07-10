@@ -38,6 +38,8 @@ class DmiChemistOtherDetailsTable extends Table{
 				$result[0]['ro_reply_comment'] = '';
 				$result[0]['delete_mo_comment'] = '';
 				$result[0]['customer_reply_date'] = '';
+				//added other option attachment by laxmi on 10-07-2023
+				$result[0]['other_details_attachment'] = '';
 
 		}else{
 
@@ -114,7 +116,25 @@ class DmiChemistOtherDetailsTable extends Table{
 				));
 				$Dmi_chemist_comment->save($newEntity);
 			}
+             
+			//added other attachment option by laxmi on 10-07-2023
+			$CustomersController = new CustomersController;
+			if (!empty($forms_data['other_details_attachment']->getClientFilename())) {
 
+				$attchment = $forms_data['other_details_attachment'];
+				$file_name = $attchment->getClientFilename();
+				
+				$file_size = $attchment->getSize();
+				$file_type = $attchment->getClientMediaType();
+				$file_local_path = $attchment->getStream()->getMetadata('uri');
+				// calling file uploading function
+				$other_details_attachment = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path);
+				
+			} else {
+                // comment above line and set empty if profile phot not selected because it mendatory by laxmi [06-07-2023]
+				$other_details_attachment = $section_form_details[0]['other_details_attachment'];
+				
+			}
 
 			$DmiChemistOtherDetailsEntity = $this->newEntity(array(
 
@@ -127,7 +147,9 @@ class DmiChemistOtherDetailsTable extends Table{
 				'form_status'=>$status,				
 				'created'=>$created,
 				'modified'=>date('Y-m-d H:i:s'),
-				'is_latest'=>1
+				'is_latest'=>1,
+				// added other option attachment by laxmi on 10-07-2023
+				'other_details_attachment' => $other_details_attachment
 			));
 
 			if ($this->save($DmiChemistOtherDetailsEntity)) {
@@ -225,7 +247,8 @@ class DmiChemistOtherDetailsTable extends Table{
 			'mo_comment_ul'=>$mo_comment_ul,
 			'ro_reply_comment'=>$ro_reply_comment,
 			'ro_reply_comment_date'=>$ro_reply_comment_date,
-			'rr_comment_ul'=>$rr_comment_ul
+			'rr_comment_ul'=>$rr_comment_ul,
+			'other_details_attachment' => $forms_data['other_details_attachment'] #this is added by laxmi10-7-23
 
 		));
 

@@ -374,8 +374,8 @@ class DmiChemistProfileDetailsTable extends Table{
 			'ro_reply_comment_date'=>$ro_reply_comment_date,
 			'rr_comment_ul'=>$rr_comment_ul,
 			'document'=>$forms_data['document'], #This is added by Akash on the 09-08-2022 
-			'document_id_no'=>$forms_data['document_id_no'] #This is added by Akash on the 09-08-2022 
-
+			'document_id_no'=>$forms_data['document_id_no'], #This is added by Akash on the 09-08-2022 
+			'document_receipt'=>$document_receipt # added by laxmi
 		));
 
 		if($this->save($newEntity)){
