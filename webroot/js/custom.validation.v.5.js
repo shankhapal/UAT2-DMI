@@ -1,15 +1,21 @@
 $(function(){
 
     $(document).on('keyup keypress blur change','.cvcalyear',function(){
-
+   
+     
 		//tis logic is used for calculate year difference beeteween two dates added by shankhpal shende on 27/09/2022
 		var id_No = this.id.split("-");//to get dynamic id of element for each row, and split to get no.
 		$("#ta-total-"+id_No).val();
 		id_No = id_No[2];
 		var date1 = $("#ta-from_dt-"+id_No).val();
-		var date2 = $("#ta-to_dt-"+id_No).val();
+		var date2 = $("#ta-to_dt-"+id_No).val(); 
 		var yearsDiff =  new Date(date2).getFullYear() - new Date(date1).getFullYear();
-		$("#ta-total-"+id_No).val(yearsDiff);
+    //calculated experience difference with basis  of mont and year by laxmi 10-07-2023
+     const split = date1.split('/');
+     const split1 = date2.split('/');
+     var monthsDiff = split1[1]-split[1];
+		
+    $("#ta-total-"+id_No).val(yearsDiff +"."+ monthsDiff);
     })
   
 	$('#value1, #value2').keyup(function(){
