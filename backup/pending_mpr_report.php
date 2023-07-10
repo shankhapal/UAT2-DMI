@@ -38,22 +38,22 @@
 								<!-- <div class="col-sm-3">
                     					<div class="form-group">
 											 all lables are uncommented by shreeya-->
-											<!-- <label>Report For</label>
-											<?php
-												// echo //$this->Form->control('report_for', ['type' => 'select','options' => $application_array ,
+											<!-- <label>Report For</label> 
+											<?php  
+												// echo //$this->Form->control('report_for', ['type' => 'select','options' => $application_array , 
 												// 'label' => false,
 												// 'id' => 'report_for',
 												// 'empty' => 'All',
 												// 'class' => 'form-control form-control-sm'
 												// ]);
-											?>
-
+											?> 
+										
 										</div>
 								  	</div> -->
 									<!-- <div class="col-sm-3">
                           				<div class="form-group">
-										  	 <label>Certificate Type</label>
-											<?php // echo $this->form->input('application_type', array('type'=>'select', 'value'=>$search_application_type_id, 'options'=>$application_type_xy, 'label'=>false, 'multiple'=>'multiple', 'id'=>'application_type', 'escape'=>false, 'class'=>'form-control form-control-sm search_field')); ?>
+										  	 <label>Certificate Type</label> 
+											<?php echo $this->form->input('application_type', array('type'=>'select', 'value'=>$search_application_type_id, 'options'=>$application_type_xy, 'label'=>false, 'multiple'=>'multiple', 'id'=>'application_type', 'escape'=>false, 'class'=>'form-control form-control-sm search_field')); ?>
 										</div>
 									</div> -->
 
@@ -66,7 +66,7 @@
 
 									<div class="col-sm-3" id="office_all">
 										<div class="form-group">
-											<label>Office</label>
+											<label>Office</label> 
 											<?php echo $this->form->input('office', array('type'=>'select', 'value'=>'', 'label'=>false,  'empty'=>'All', 'id'=>'office',  'escape'=>false, 'class'=>'form-control form-control-sm search_field')); ?>
 										</div>
 									</div>
@@ -78,51 +78,47 @@
 									</div>
 									<div class="col-sm-3" id="office_mo">
 										<div class="form-group">
-											<label>Office</label>
+											<label>Office</label> 
 											<?php echo $this->form->input('mo_office', array('type'=>'select', 'value'=>$mo_office_id, 'options'=>$ro_office, 'label'=>false, 'multiple'=>'multiple', 'id'=>'office_mo_input',  'escape'=>false, 'class'=>'form-control form-control-sm search_field')); ?>
 										</div>
 									</div>
 									<div class="col-sm-3" id="office_io">
 										<div class="form-group">
-												<label>Office</label>
+												<label>Office</label> 
 											<?php echo $this->form->input('io_office', array('type'=>'select', 'value'=>$io_office_id, 'options'=>$ro_office, 'label'=>false, 'multiple'=>'multiple', 'id'=>'office_io_input',  'escape'=>false, 'class'=>'form-control form-control-sm search_field')); ?>
 										</div>
 									</div>
-									<!-- commend by shreeya[08-07-2023]
 									<div class="col-sm-3" id="office_ho_mo">
 										<div class="form-group">
 												<label>Office</label>
-											<?php //echo $this->form->input('ho_mo_office', array('type'=>'text', 'value'=>'HO MO/SMO', 'disabled'=>true, 'label'=>false, 'id'=>'office_ho_mo_input',  'escape'=>false, 'class'=>'form-control form-control-sm search_field')); ?>
+											<?php echo $this->form->input('ho_mo_office', array('type'=>'text', 'value'=>'HO MO/SMO', 'disabled'=>true, 'label'=>false, 'id'=>'office_ho_mo_input',  'escape'=>false, 'class'=>'form-control form-control-sm search_field')); ?>
 										</div>
 									</div>
 
 									<div class="col-sm-3" id="office_dyama">
 										<div class="form-group">
 												<label>Office</label>
-											<?php //echo $this->form->input('dyama_office', array('type'=>'text', 'value'=>'DY.AMA','label'=>false,  'disabled'=>true, 'id'=>'office_dyama_input',  'escape'=>false, 'class'=>'form-control form-control-sm search_field')); ?>
+											<?php echo $this->form->input('dyama_office', array('type'=>'text', 'value'=>'DY.AMA','label'=>false,  'disabled'=>true, 'id'=>'office_dyama_input',  'escape'=>false, 'class'=>'form-control form-control-sm search_field')); ?>
 										</div>
 									</div>
 									<div class="col-sm-3" id="office_jtama">
 										<div class="form-group">
 												<label>Office</label>
-											<?php // echo $this->form->input('jtama_office', array('type'=>'text', 'value'=>'JT.AMA', 'label'=>false,  'disabled'=>true, 'id'=>'office_jtama_input',  'escape'=>false, 'class'=>'form-control form-control-sm search_field')); ?>
+											<?php echo $this->form->input('jtama_office', array('type'=>'text', 'value'=>'JT.AMA', 'label'=>false,  'disabled'=>true, 'id'=>'office_jtama_input',  'escape'=>false, 'class'=>'form-control form-control-sm search_field')); ?>
 										</div>
 									</div>
 									<div class="col-sm-3" id="office_ama">
 										<div class="form-group">
 												<label>Office</label>
-											<?php //echo $this->form->input('ama_office', array('type'=>'text', 'value'=>'AMA', 'label'=>false, 'disabled'=>true, 'id'=>'office_ama_input',  'escape'=>false, 'class'=>'form-control form-control-sm search_field')); ?>
+											<?php echo $this->form->input('ama_office', array('type'=>'text', 'value'=>'AMA', 'label'=>false, 'disabled'=>true, 'id'=>'office_ama_input',  'escape'=>false, 'class'=>'form-control form-control-sm search_field')); ?>
 										</div>
 									</div>
-									-->
-									
-									<div class="col-sm-3">
+									<div class="col-sm-3" id="office_ama">
 										<div class="form-group">
 											<label>Month</label>
 											<?php echo $this->form->input('selected_month', array('type'=>'text', 'value'=>'','label'=>false, 'id'=>'selected_month', 'empty'=>'select', 'escape'=>false, 'class'=>'form-control form-control-sm search_field', 'placeholder'=>'Month')); ?>
 										</div>
 									</div>
-								
 									<div class="col-sm-1">
 										<div class="">
 											<button id="search_btn" type="submit" name="search_logs" class="btn text-light option-menu-btn" value="Search" data-bs-toggle="tooltip" data-bs-placement="top" title="Search">
@@ -157,7 +153,7 @@
 											<?php //echo $this->form->input('to_date', array('type'=>'text', 'value'=>'','label'=>false, 'id'=>'year', 'empty'=>'select', 'escape'=>false, 'class'=>'form-control form-control-sm search_field', 'placeholder'=>'Year')); ?>
 										</div>
 									</div> -->
-
+									
 								</div>
 								<div class="clearfix"></div>
 
@@ -254,7 +250,7 @@
 								<?php
 							}
 							if(empty($search_value)) {
-							?>  <span class="badge bg-grad2 mr-3 shadow"> <?php echo 'Month Wise List'; ?> </span>
+							?>  <span class="badge bg-grad2 mr-3 shadow"> <?php echo 'Default Last One Month List'; ?> </span>
 								<?php
 							}
 						?>
@@ -275,7 +271,7 @@
 										<th><span class="table-heading">Sr.No</span></th>
 										<th><span class="table-heading">Application Submission Date</span></th>
 										<!-- <th><span class="table-heading">Application Type</span></th> -->
-										<th class="text-right"><span class="table-heading">Application Type</span></th>
+										<th class="text-right"><span class="table-heading">Certificate Type</span></th>
 										<th><span class="table-heading">Application ID</span></th>
 										<th class="text-right"><span class="table-heading">Pending With Officer</span></th>
 										<th><span class="table-heading">Posted Office</span></th>
@@ -304,11 +300,11 @@
 										<td class="text-right"><?php $explode_app_type = explode('(',$application_type[$i]); ?>
 											<span class="badge title borderless"><?php echo $explode_app_type[0]; ?> </span>
 										</td>
-
+										
 										<td>
 											<span class="badge title borderless"><?php echo $application_id[$i]; ?></span>
 										</td>
-
+										
 										<td class="text-right">
 											<span class="badge subtitle borderless"><?php echo $user_roles[$i]; ?></span>
 										</td>
@@ -318,8 +314,8 @@
 										<td>
 											<span class="badge subtitle borderless"><?php echo base64_decode($user_email_id[$i]); //for email encoding ?></span>
 										</td>
-
-
+										
+										
 									</tr>
 									<?php $sr_no++; }
 
@@ -345,4 +341,4 @@
 	<?php echo $this->Form->end(); ?>
 </div>
 
-<?php echo $this->Html->script('Reports/pending_mpr_report'); ?>
+<?php echo $this->Html->script('Reports/pending_new_applications_report'); ?>
