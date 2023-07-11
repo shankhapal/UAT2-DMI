@@ -65,12 +65,12 @@
             <div class="err_cv"></div>
           </div>
           <div class="col-md-2">
-            <label for="field3"><span>RAL Offices <span class="cRed">*</span></span></label>
+            <label for="field3"><span>RAL<span class="cRed">*</span></span></label>
           </div>
           <div class="col-md-4">
 
            <select name="ro_office" class="dropdown form-control" id="roOffice" value="">
-            <option disabled selected value="">--Select RO Office--</option>
+            <option disabled selected value="">--Select RAL Office--</option>
             <?php
             foreach ($ral_details as $key => $ral) {
             echo "<option value='".$ral['id']."' class='form-control'> ".$ral['ro_office']."</option>";
