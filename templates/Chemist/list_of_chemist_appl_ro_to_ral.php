@@ -19,7 +19,7 @@
     </tr>
   </thead>
   <tbody>
-    
+  
       <?php $i = 0;  
       if(!empty($listOfChemistApp)){ 
       foreach ($listOfChemistApp as $key => $list) {
@@ -36,7 +36,7 @@
       	 <td><?php echo $forwarded;?></td>
          <td><?php echo $shedule_to;?></td>
          <td><?php if(!empty($ral_schedule_pdf[$i])) { ?> <a href="<?php echo $ral_schedule_pdf[$i] ;?>" target="_blank" type="application/pdf" rel="alternate">View Letter</a> 
-             | <?php }?> <a href="<?php echo './../scrutiny/form_scrutiny_fetch_id/'.$chemisttblId[$i]['id'].'/view/'.  $list['appliaction_type'];?>">View Application</a>
+             | <?php }?> <a href="<?php echo $this->request->getAttribute("webroot").'scrutiny/form_scrutiny_fetch_id/'. $chemisttblId[$i]['id']. '/view/' .  $list['appliaction_type']; ?>">View Application</a>
          </td> 
      </tr>
      <?php $i++; 
