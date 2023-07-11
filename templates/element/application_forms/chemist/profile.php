@@ -194,7 +194,7 @@
 				 <?php //below condtion added for chemist to upload document receipt and in all file type added class filetype by laxmi [04-07-2023]
 					 if(!empty($_SESSION['application_type']) && $_SESSION['application_type'] == 4 ){?>
 					<div class="col-md-2">
-						<label for="field3"><span>Document Receipt Upload<span class="cRed">*</span></span>	</label>
+						<label for="field3"><span> Upload ID<span class="cRed">*</span></span>	</label>
 					</div>
 					<div class="col-md-4">
 						<?php echo $this->Form->control('document_receipt',array('type'=>'file', 'id'=>'document_receipt' ,'multiple'=>'multiple','class'=>'cvOn cvReq form-control filetype', 'label'=>false)); ?>
@@ -204,7 +204,7 @@
 						<?php // if document uploaded then it visible added by laxmi [07-07-2023]
 						  if(!empty($section_form_details[0]['document_receipt'])){
 							$reciept = $section_form_details[0]['document_receipt'];?>
-                            <a href = "<?php echo $reciept; ?>" target = "_blank" > Document reciept </a>
+                            <a href = "<?php echo $reciept; ?>" target = "_blank" > Uploaded ID </a>
 						 <?php }
 						?>
 					</div>
