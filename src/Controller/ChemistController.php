@@ -313,6 +313,8 @@ class ChemistController extends AppController {
 	// DATE : 25-06-2021 
 	
 	public function chemistRegistration() {
+		$this->loadModel('MCommodityCategory');
+		$this->loadModel('MCommodity');
 
 		$this->Session->write('application_dashboard','packer');
 		$this->validUser();
@@ -333,6 +335,9 @@ class ChemistController extends AppController {
 		$present_email  = '';
 		$present_mobile = '';
 
+        $commodity_categories = $this->MCommodityCategory->find('list',array('valueField'=>'category_name','conditions'=>array('display'=>'Y'),'order'=>array('category_name asc')))->toArray();
+		$this->set('commodity_categories',$commodity_categories);
+
 		$username = $this->Session->read('username');
 
 		if ($this->request->is('post')) {
@@ -341,10 +346,19 @@ class ChemistController extends AppController {
 			if (!empty($this->request->getData('email')) && !empty($this->request->getData('mobile')) && !empty($this->request->getData('dob'))) {
 
 				$usersData = $this->request->getData();
-
+                
 				$checkEmailExist =  $this->DmiChemistRegistrations->find('all', array('fields' => 'email', 'conditions' => array('email IS' => base64_encode($usersData['email']))))->first();
 				$checkMobileExist =  $this->DmiChemistRegistrations->find('all', array('fields' => 'mobile', 'conditions' => array('mobile IS' => $usersData['mobile'])))->first();
-
+                //below added for payment by laxmi 10-07-2023
+				$count_subcommodities = count($this->request->getData('selected_commodity'));
+				if(!empty($count_subcommodities)){
+                   $payment_amnt = 5000* $count_subcommodities;
+				}
+				$sub_commodities = $this->request->getData('selected_commodity');
+                
+				$subcsubcommoditities = implode(', ', $sub_commodities);
+				
+			
 				if ($this->request->getData('chemist_fname') !="" && $this->request->getData('chemist_lname') !="" && $this->request->getData('email') !="" && $this->request->getData('mobile') !="" && $this->request->getData('dob') !="") {
 
 					if ($checkEmailExist == null) {
@@ -372,7 +386,7 @@ class ChemistController extends AppController {
 							$htmlEncoded_chemistLastname = htmlentities($this->request->getData('chemist_lname'), ENT_QUOTES);
 
 							$certificationType = explode('/',(string) $username); #For Deprecations
-						$DmiChemistRegistrationsEntity = $this->DmiChemistRegistrations->newEntity(array(
+						    $DmiChemistRegistrationsEntity = $this->DmiChemistRegistrations->newEntity(array(
 
 								'chemist_fname'=>$htmlEncoded_chemistFirstname,
 								'chemist_lname'=>$htmlEncoded_chemistLastname,
@@ -387,10 +401,14 @@ class ChemistController extends AppController {
 								'created_by'=>$username,
 								'usertype'=>$certificationType[1],
 								'created'=>date('Y-m-d H:i:s'),
-								'modified'=>date('Y-m-d H:i:s')
+								'modified'=>date('Y-m-d H:i:s'),
+								'commodity'=>$usersData['commodity'],
+								'sub_commodities'=>$subcsubcommoditities,
+								'payment'=>$payment_amnt,
 							));
-
-
+							
+                            
+                             
 							if ($this->DmiChemistRegistrations->save($DmiChemistRegistrationsEntity)) {
 
 								//Save Chemist Logs
