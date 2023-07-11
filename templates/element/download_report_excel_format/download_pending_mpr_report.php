@@ -1,9 +1,51 @@
 <?php
-//functionality to manage header and all table rows in excel sheet date:18/12/2017//
- 
-$list_status = array('Srno','Date','Application Type','Application ID','Pending With','Posted Office','User ID','Reason For Delay','Action Taken For Completion/Disposal of Pending Application');	
 
-$header = "<table style='border: 5px solid black;'>
+
+
+$list_status = array('Srno','Submission Date','Application Type','Application ID','Pending With','Posted Office','User ID','Reason For Delay','Action Taken For Completion/Disposal of Pending Application');	
+
+//added this foreach to show heading & month wise data with month format 
+//*****************done by shreeya on date [10-07-2023]******************
+$srno = 1;
+ $j = 0 ;
+
+
+ foreach ($orders as $order)
+{   
+
+	$ax = $order;
+	$axx = $application_type[$j];
+	$axxx = $application_id[$j];
+	$aiv = $user_roles[$j];
+	$av	= $user_office[$j];
+	$avi	= $user_email_id[$j];
+
+	
+	$split_selected_month = explode('/', $order);
+	
+	$day = $split_selected_month[0];
+	$monthNumber = $split_selected_month[1];
+	$year = $split_selected_month[2];
+
+	// Convert month number to alphabetic format  by shreeya [10-07-2023]
+	$month = date('F', mktime(0, 0, 0, $monthNumber, 1));
+
+	$header = "<table style='border: 5px solid black;'>
+			<tr styel='border: 2px solid black'>
+				<th colspan='3'>Name Of Regional Office $user_office[$j] <br>AQCMS Pendancy MPR For The Month Of  $month</th>
+				
+			</tr>";
+		
+	
+	$srno++;
+	
+	$j++;
+	
+}
+//**************** date [10-07-2023]*******************
+
+//show listing records
+$header .= "
 			<tr styel='border: 2px solid black'>
 				<th >Srno</th>
 				<th styel='border: 2px solid black'>Date</th>
