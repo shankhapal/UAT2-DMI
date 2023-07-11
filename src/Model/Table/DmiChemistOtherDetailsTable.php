@@ -86,9 +86,11 @@ class DmiChemistOtherDetailsTable extends Table{
 			$created = date('Y-m-d H:i:s');
 
 			$social_work = htmlentities($forms_data['social_work'], ENT_QUOTES);
-			$prest_instit = htmlentities($forms_data['prest_instit'], ENT_QUOTES);
-			$academic_focus = htmlentities($forms_data['academic_focus'], ENT_QUOTES);
-			$articles_pub = htmlentities($forms_data['articles_pub'], ENT_QUOTES);
+			//below line comment by laxmi due to suggestion  on 10-07-2023
+
+			//$prest_instit = htmlentities($forms_data['prest_instit'], ENT_QUOTES);
+			//$academic_focus = htmlentities($forms_data['academic_focus'], ENT_QUOTES);
+			//$articles_pub = htmlentities($forms_data['articles_pub'], ENT_QUOTES);
 
 			$section_id = $_SESSION['section_id'];
 			$Dmi_chemist_comment = TableRegistry::getTableLocator()->get('DmiChemistComments');
@@ -141,9 +143,10 @@ class DmiChemistOtherDetailsTable extends Table{
 				'id'=>$id,
 				'customer_id'=>$chemist_id,
 				'social_work'=>$social_work,
-				'prest_instit'=>$prest_instit,
-				'academic_focus'=>$academic_focus,
-				'articles_pub'=>$articles_pub,
+				#below line comment by laxmi on suggestion dated 10-07-2023
+				//'prest_instit'=>$prest_instit,
+				//'academic_focus'=>$academic_focus,
+				//'articles_pub'=>$articles_pub,
 				'form_status'=>$status,				
 				'created'=>$created,
 				'modified'=>date('Y-m-d H:i:s'),
@@ -228,9 +231,10 @@ class DmiChemistOtherDetailsTable extends Table{
 
 			'customer_id'=>$customer_id,
 			'social_work'=>$forms_data['social_work'],
-			'prest_instit'=>$forms_data['prest_instit'],
-			'academic_focus'=>$forms_data['academic_focus'],
-			'articles_pub'=>$forms_data['articles_pub'],
+			#below line comment by laxmi on suggestion dated 10-07-2023
+			//'prest_instit'=>$forms_data['prest_instit'],
+			//'academic_focus'=>$forms_data['academic_focus'],
+			//'articles_pub'=>$forms_data['articles_pub'],
 			'form_status'=>$forms_data['form_status'],
 			'is_latest'=>$forms_data['is_latest'],
 			'created'=>$created_date,
