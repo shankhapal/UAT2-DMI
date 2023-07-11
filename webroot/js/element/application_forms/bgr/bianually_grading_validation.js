@@ -30,10 +30,16 @@ $("#dated").click(function () {
   $("#dated").removeClass("is-invalid");
 });
 
+$("#authorized_chemist").click(function () {
+  clearError($("#error_authorized_chemist"));
+  $("#authorized_chemist").removeClass("is-invalid");
+});
+
 function biannually_grading_report() {
   const period_form = $("#period_form").val();
   const period_to = $("#period_to").val();
   const dated = $("#dated").val();
+  const authorized_chemist = $("#authorized_chemist").val();
 
   let value_return = true;
 
@@ -43,6 +49,11 @@ function biannually_grading_report() {
     value_return = false;
   }
 
+  if (authorized_chemist === null || authorized_chemist.length === 0) {
+    showError($("#error_authorized_chemist"), "Please select chemist");
+    $("#authorized_chemist").addClass("is-invalid");
+    value_return = false;
+  }
   if (period_to == "") {
     showError($("#error_period_to"), "Please select period to");
     $("#period_to").addClass("is-invalid");

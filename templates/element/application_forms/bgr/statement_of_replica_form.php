@@ -6,7 +6,7 @@ define('PLACEHOLDER_TEXT', 'Enter Valid upto');
 echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-data', 'id'=>$section)); ?>
 <section id="form_outer_main" class="content form-middle">
     <div class="container-fluid">
-        <h5 class="mt-1 mb-2">b) Detail Analysis Report of the Agmark Graded Commodity in Batch Wise</h5>
+        <h5 class="mt-1 mb-2">c) Detail Statement of Replica</h5>
         <div id="form_inner_main">
             <div class="row">
                 <div class="col-md-12">
@@ -63,7 +63,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                                     <?php echo $this->Form->control('valid_up_to', array(
                                         'type' => 'text',
                                         'id' => 'valid_up_to',
-                                        'value' => $section_form_details[4],
+                                        //'value' => $section_form_details[4],
                                         'class' => 'form-control input-field readOnly',
                                         'label' => false
                                         )); ?>
@@ -82,7 +82,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                                         'id' => '',
                                         'multiple'=>true,
                                         'escape'=>false,
-                                        'options'=>$section_form_details[2],
+                                        //'options'=>$section_form_details[2],
                                         'class' => 'form-control input-field',
                                         'label' => false,
                                         'readonly' => true
@@ -104,7 +104,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                                     <?php echo $this->Form->control('ca_no', array(
                                         'type' => 'text',
                                         'id' => 'ca_no',
-                                        'value' => $firm_details['customer_id'],
+                                        //'value' => $firm_details['customer_id'],
                                         'class' => 'form-control input-field readOnly',
                                         'label' => false
                                         )); ?>
@@ -121,7 +121,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                                     <?php echo $this->Form->control('dated', array(
                                         'type' => 'text',
                                         'id' => 'dated',
-                                        'value' => $section_form_details[0]['dated'],
+                                        //'value' => $section_form_details[0]['dated'],
                                         'class' => INPUT_CLASS,
                                         'placeholder' => 'Please Select dated',
                                         'label' => false
@@ -142,26 +142,26 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                                 </div>
                                 <div class="col-md-2">
                                    <?php
-                                    $chemst = $section_form_details[5];
-                                    $selectedOptions = explode(',', $section_form_details[0]['authorized_chemist']);
-                                    $selectedValues = [];
+                                    // $chemst = $section_form_details[5];
+                                    // $selectedOptions = explode(',', $section_form_details[0]['authorized_chemist']);
+                                    // $selectedValues = [];
 
-                                    if (!empty($chemst)) {
-                                        foreach ($selectedOptions as $option) {
-                                            foreach ($chemst as $key => $value) {
-                                               if ($option == $key) {
-                                                    $selectedValues[] = $option;
-                                                    break; // Exit the inner loop since the value has been found
-                                                }
-                                            }
-                                        }
-                                    }
+                                    // if (!empty($chemst)) {
+                                    //     foreach ($selectedOptions as $option) {
+                                    //         foreach ($chemst as $key => $value) {
+                                    //            if ($option == $key) {
+                                    //                 $selectedValues[] = $option;
+                                    //                 break; // Exit the inner loop since the value has been found
+                                    //             }
+                                    //         }
+                                    //     }
+                                    // }
                                    
                                    echo $this->Form->control('authorized_chemist', array(
                                         'type' => 'select',
                                         'id' => 'authorized_chemist',
-                                        'options' => $section_form_details[5],
-                                        'default' => $selectedValues,
+                                        //'options' => $section_form_details[5],
+                                        //'default' => $selectedValues,
                                         'multiple' => 'multiple',
                                         'escape' => false,
                                         'class' => 'form-control input-field',
@@ -181,7 +181,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                                    <?php echo $this->Form->control('period_form', array(
                                         'type' => 'text',
                                         'id' => 'period_form',
-                                        'value' => $section_form_details[0]['period_form'],
+                                        //'value' => $section_form_details[0]['period_form'],
                                         'class' => INPUT_CLASS,
                                         'placeholder' => 'Please Select Period from',
                                         'label' => false
@@ -199,7 +199,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                                     <?php echo $this->Form->control('period_to', array(
                                         'type' => 'text',
                                         'id' => 'period_to',
-                                        'value' => $section_form_details[0]['period_to'],
+                                        //'value' => $section_form_details[0]['period_to'],
                                         'class' => INPUT_CLASS,
                                         'placeholder' => 'Enter period to',
                                         'label' => false
@@ -210,9 +210,9 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                         </div>
                        
                         <div class="card card-success border p-2">
-                          	<?php echo $this->element(
+                          	<?php //echo $this->element(
                                 'application_forms/bgr/bgr_addmore_tbl/analysis_reports_form_tbl'
-                            ); ?>
+                            //); ?>
 
                         </div>
                     </div>

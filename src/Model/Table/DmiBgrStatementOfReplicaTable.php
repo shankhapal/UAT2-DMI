@@ -11,43 +11,84 @@
 		var $name = "DmiBgrStatementOfReplica";
 		
 		// Fetch form section all details
-		public function sectionFormDetails($customer_id)
+		public function sectionFormDetails($customerId)
 		{
+				$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+				$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
+	  		$DmiBgrAnalysisAddMoreDetails = TableRegistry::getTableLocator()->get('DmiBgrAnalysisAddMoreDetails');
+				$DmiBgrStatementAddMoreDetails = TableRegistry::getTableLocator()->get('DmiBgrStatementAddMoreDetails');
+				$DmiGrantCertificatesPdfs = TableRegistry::getTableLocator()->get('DmiGrantCertificatesPdfs');
+
+				$latestId = $this->find('list', array(
+					'valueField'=>'id',
+					'conditions'=>array(
+					'customer_id IS'=>$customerId
+				)))->toArray();
+					
+				if($latestId != null){
+					$formFields = $this->find('all', array(
+						'conditions'=>array(
+						'id'=>MAX($latestId
+					))))->first();
+					
+					$formFieldsDtails = $formFields;
+					
+				}else{
+				
+					$formFieldsDtails = array (
+						'id'=>"",
+						'customer_id' => "",
+						'reffered_back_comment' => "",
+						'reffered_back_date' => "",
+						'form_status' =>"",
+						'customer_reply' =>"",
+						'customer_reply_date' =>"",
+						'approved_date' => "",
+						'current_level' => "",
+						'mo_comment' =>"",
+						'mo_comment_date' => "",
+						'ro_reply_comment' =>"",
+						'ro_reply_comment_date' =>"",
+						'delete_mo_comment' =>"",
+						'delete_ro_reply' => "",
+						'delete_ro_referred_back' => "",
+						'delete_customer_reply' => "",
+						'ro_current_comment_to' => "",
+						'rb_comment_ul'=>"",
+						'mo_comment_ul'=>"",
+						'rr_comment_ul'=>"",
+						'cr_comment_ul'=>""
+					);
+				
+				}
+	
+				$addedFirms = $DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customerId)))->toArray();
+				$addedFirmField = $addedFirms[0];
+				$customerId = $addedFirmField['customer_id'];
+
+				$getLastGrantList = $DmiGrantCertificatesPdfs->find('list', array(
+    		'conditions' => array(
+        'customer_id IS' => $customerId
+				)))->toArray();
+				pr($getLastGrantList);die;
+				//added on 11-07-2023 by shankhpal//to get last 5 years from valid upto date
+				$CustomersController = new CustomersController;
+
 		
-			$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
-				
-			if($latest_id != null){
-				$form_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();		
-				
-				$form_fields_details = $form_fields;
-				
-			}else{
-				
-				$form_fields_details = Array ( 'id'=>"", 'customer_id' => "",
-				'reffered_back_comment' => "",
-				'reffered_back_date' => "", 'form_status' =>"", 'customer_reply' =>"", 'customer_reply_date' =>"", 'approved_date' => "",
-				'current_level' => "",'mo_comment' =>"", 'mo_comment_date' => "", 'ro_reply_comment' =>"", 'ro_reply_comment_date' =>"", 'delete_mo_comment' =>"", 'delete_ro_reply' => "",'delete_ro_referred_back' => "", 'delete_customer_reply' => "", 'ro_current_comment_to' => "",
-				'rb_comment_ul'=>"",'mo_comment_ul'=>"",'rr_comment_ul'=>"",'cr_comment_ul'=>""); 
-				
-			}
+				//taking id of multiple sub commodities	to show names in list
+				$subCommId = explode(',',(string) $addedFirmField['sub_commodity']); #For Deprecations
+				$subCommodityValue = $MCommodity->find('list',array(
+					'valueField'=>'commodity_name',
+					'conditions'=>array(
+					'commodity_code IN'=>$subCommId
+				)))->toList();
 
-
-		$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
-		$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
-	  $DmiBgrAnalysisAddMoreDetails = TableRegistry::getTableLocator()->get('DmiBgrAnalysisAddMoreDetails');
-		$added_firms = $DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->toArray();		
-		$added_firm_field = $added_firms[0];	
+	  
+    		$statementDetails = $DmiBgrStatementAddMoreDetails->statementDetails();
 		
-		//taking id of multiple sub commodities	to show names in list	
-		$sub_comm_id = explode(',',(string) $added_firm_field['sub_commodity']); #For Deprecations
-		$sub_commodity_value = $MCommodity->find('list',array('valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
+	  		$addedStatementDetails = $statementDetails[1];
 
-	  $DmiBgrStatementAddMoreDetails = TableRegistry::getTableLocator()->get('DmiBgrStatementAddMoreDetails');
-    $statement_details = $DmiBgrStatementAddMoreDetails->statementDetails();	
-		
-	  $added_statement_details = $statement_details[1];
-
-		return array($form_fields_details,$added_statement_details,$sub_commodity_value);
+				return array($formFieldsDtails,$addedStatementDetails,$subCommodityValue);
 				
 		}		
 		

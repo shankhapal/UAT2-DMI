@@ -15,7 +15,12 @@
 		{
 			$dmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
 			$mCommodity = TableRegistry::getTableLocator()->get('MCommodity');
-			$dmiBgrAnalysisAddMoreDetails = TableRegistry::getTableLocator()->get('DmiBgrAnalysisAddMoreDetails');
+			$DmiBgrAnalysisAddMoreDetails = TableRegistry::getTableLocator()->get('DmiBgrAnalysisAddMoreDetails');
+			$DmiGrantCertificatesPdfs = TableRegistry::getTableLocator()->get('DmiGrantCertificatesPdfs');
+			$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
+			$DmiChemistAllotments = TableRegistry::getTableLocator()->get('DmiChemistAllotments');
+			$DmiChemistRegistrations = TableRegistry::getTableLocator()->get('DmiChemistRegistrations');
+			$DmiChemistFinalSubmits = TableRegistry::getTableLocator()->get('DmiChemistFinalSubmits');
 			
 			$latestId = $this->find('list', array(
 					'valueField' => 'id',
@@ -40,8 +45,10 @@
 					'customer_reply_date' =>"",
 					'approved_date' => "",
 					'current_level' => "",
+					'dated'=>"",
 					'mo_comment' =>"",
 					'mo_comment_date' => "",
+					'certificate_valid_upto' => "",
 					'ro_reply_comment' =>"",
 					'ro_reply_comment_date' =>"",
 					'delete_mo_comment' =>"",
@@ -58,11 +65,32 @@
 			}
 
 			
-			
+		
 			$addedfirms = $dmiFirms->find('all', array('conditions' => array('customer_id IS' => $customerId)))->toArray();
 			
 			$addedFirmField = $addedfirms[0];
+			$customerId = $addedFirmField['customer_id'];
 
+			$get_last_grant_list = $DmiGrantCertificatesPdfs->find('list', array(
+    		'conditions' => array(
+        'customer_id IS' => $customerId
+			)))->toArray();
+
+			$get_last_grant_date = $DmiGrantCertificatesPdfs->find('all',array(
+				'conditions'=>array(
+				'id'=>max($get_last_grant_list
+			))))->first();
+
+			$last_grant_date = $get_last_grant_date['date'];
+			
+			//added on 11-07-2023 by shankhpal//to get last 5 years from valid upto date
+			$CustomersController = new CustomersController;
+			
+			$certificate_valid_upto = $CustomersController->Customfunctions->getCertificateValidUptoDate(
+    		$customerId,$last_grant_date
+			);
+		
+			//taking id of multiple sub commodities	to show names in list	
 			$subCommId = explode(',', (string) $addedFirmField['sub_commodity']); #For Deprecations
 			
 			$subCommodityValue = $mCommodity->find('list', array(
@@ -70,8 +98,8 @@
 				'conditions' => array(
 				'commodity_code IN' => $subCommId
 			)))->toList();
-
-			$analysisDetails = $dmiBgrAnalysisAddMoreDetails->analysisDetails();
+			
+			$analysisDetails = $DmiBgrAnalysisAddMoreDetails->analysisDetails();
 			$addedAnalysisDetails = $analysisDetails[1];
 
 			$dmiChemicalParameters = TableRegistry::getTableLocator()->get('DmiChemicalParameters');
@@ -83,20 +111,44 @@
 				'),
 				'order' => 'id'
 			))->toList();
+				
+			$alloc_allocated_chemists = $DmiChemistAllotments->find('all',array('conditions'=>array('customer_id IS'=>$customerId)))->toArray();
+			
+			$chemist_incharge = $DmiChemistAllotments->find('all',array(
+				'conditions'=>array('customer_id IS'=>$customerId,'incharge'=>'yes')))->first();
 
-     
+			if(!empty($alloc_allocated_chemists)){
+				$i=0;
+				foreach ($alloc_allocated_chemists as $allocated_chemist) {
+					$chemist_id = $allocated_chemist['chemist_id'];
 
-		return array($formFieldsDetails,$addedAnalysisDetails,$subCommodityValue,$chemical_parameters);
+					$isChemistApproved	= $DmiChemistFinalSubmits->find('all',array('fields'=>'status','conditions'=>array('customer_id IS'=>$chemist_id,'status'=>'approved'),'order'=>array('id'=>'desc')))->first();
+					
+					if (!empty($isChemistApproved)) {
+						$chemist_list = $DmiChemistRegistrations->find('all',array('conditions'=>array('chemist_id IS'=>$allocated_chemist['chemist_id'])))->toArray();
+						
+						//fetch chemist name
+						$alloc_chemist_name[$i] = $chemist_list[0]['chemist_fname']." ".$chemist_list[0]['chemist_lname'];
+						
+						$i=$i+1;
+					}
+				}	
+			}
+
+			return array(
+				$formFieldsDetails,
+				$addedAnalysisDetails,
+				$subCommodityValue,
+				$chemical_parameters,
+				$certificate_valid_upto,
+				$alloc_chemist_name
+			);
 				
 		}
 		
 		
 		// save or update form data and comment reply by applicant
 		public function saveFormDetails($customer_id,$forms_data){
-		//pr($forms_data);die;
-			$dataValidatation = $this->postDataValidation($customer_id,$forms_data);
-			
-			if ($dataValidatation == 1 ) {
 				
 				$Dmi_firm = TableRegistry::getTableLocator()->get('DmiFirms');
 				$CustomersController = new CustomersController;
@@ -105,42 +157,55 @@
 				$firm_details = $Dmi_firm->firmDetails($customer_id);
 			
 			
-				// If applicant have referred back on give section				
+				// If applicant have referred back on give section
 				if ($section_form_details[0]['form_status'] == 'referred_back') {
 					
 					$max_id = $section_form_details[0]['id'];
 					$htmlencoded_reply = htmlentities($forms_data['customer_reply'], ENT_QUOTES);
 					$customer_reply_date = date('Y-m-d H:i:s');
 					
-					if (!empty($forms_data['cr_comment_ul']->getClientFilename())) {				
+					if (!empty($forms_data['cr_comment_ul']->getClientFilename())) {
 						
 						$file_name = $forms_data['cr_comment_ul']->getClientFilename();
 						$file_size = $forms_data['cr_comment_ul']->getSize();
 						$file_type = $forms_data['cr_comment_ul']->getClientMediaType();
 						$file_local_path = $forms_data['cr_comment_ul']->getStream()->getMetadata('uri');
 						
-						$cr_comment_ul = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function
+						$cr_comment_ul = $CustomersController->Customfunctions->fileUploadLib(
+							$file_name,$file_size,
+							$file_type,$file_local_path
+						); // calling file uploading function
 				
 					} else { $cr_comment_ul = null; }
 						
-				} else { 	
+				} else {
 				
-					$htmlencoded_reply = ''; 
-					$max_id = ''; 
+					$htmlencoded_reply = '';
+					$max_id = '';
 					$customer_reply_date = '';
-					$cr_comment_ul = null;	
+					$cr_comment_ul = null;
 				}
 
-				if (empty($section_form_details[0]['created'])) {  
-					$created = date('Y-m-d H:i:s'); 
+				if (empty($section_form_details[0]['created'])) {
+					$created = date('Y-m-d H:i:s');
 				} else {
 					//added date function on 31-05-2021 by Amol to convert date format, as saving null
 					$created = $CustomersController->Customfunctions->changeDateFormat($section_form_details[0]['created']);
 				}
 				
-				$newEntity = $this->newEntity(array(			
+				$htmlentitiesDated =  htmlentities($forms_data['dated'],ENT_QUOTES);
+				$authorizedChemist = implode(', ', array_map('htmlentities', $forms_data[
+					'authorized_chemist'], array_fill(0, count($forms_data['authorized_chemist']), ENT_QUOTES)));
+				$periodForm = htmlentities($forms_data['period_form'],ENT_QUOTES);
+				$periodTo = htmlentities($forms_data['period_to'],ENT_QUOTES);
+
+				$newEntity = $this->newEntity(array(
 					'id'=>$max_id,
 					'customer_id'=>$customer_id,
+					'authorized_chemist'=>$authorizedChemist,
+					'period_form'=>$periodForm,
+					'period_to'=>$periodTo,
+					'dated'=>$htmlentitiesDated,
 					'form_status'=>'saved',
 					'customer_reply'=>$htmlencoded_reply,
 					'customer_reply_date'=>$customer_reply_date,
@@ -150,9 +215,9 @@
 					
 				));
 				
-				if ($this->save($newEntity)) { return 1; };	
+				if ($this->save($newEntity)) { return 1; };
 				
-			} else { return false; }	
+			
 			
 					
 		}
@@ -160,9 +225,8 @@
 		
 		
 		// To save 	RO/SO referred back  and MO reply comment
-		public function saveReferredBackComment ($customer_id,$forms_data,$comment,$comment_upload,$reffered_back_to)
-		{			
-			// Import another model in this model	
+		public function saveReferredBackComment ($customer_id,$forms_data,$comment,$comment_upload,$reffered_back_to){
+			// Import another model in this model
 			
 			$logged_in_user = $_SESSION['username'];
 			$current_level = $_SESSION['current_level'];
@@ -217,7 +281,7 @@
 				$ro_reply_comment_date = date('Y-m-d H:i:s');
 				$rr_comment_ul = $comment_upload;
 				
-			}		
+			}
 			
 			$newEntity = $this->newEntity(array(
 			
@@ -231,7 +295,7 @@
 				'user_email_id'=>$_SESSION['username'],
 				'user_once_no'=>$_SESSION['once_card_no'],
 				'current_level'=>$current_level,
-				'ro_current_comment_to'=>$ro_current_comment_to,	
+				'ro_current_comment_to'=>$ro_current_comment_to,
 				'mo_comment'=>$mo_comment,
 				'mo_comment_date'=>$mo_comment_date,
 				'mo_comment_ul'=>$mo_comment_ul,

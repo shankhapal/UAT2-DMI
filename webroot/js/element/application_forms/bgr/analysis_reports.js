@@ -277,33 +277,17 @@ function a_tbl_details_section() {
 //function to check empty fields of machinery details table on add/edit button
 
 function validate_analysis_reports_section() {
-  var date = $("#date").val();
-  var commodity = $("#commodity").val();
-  var batch_no = $("#batch_no").val();
-  var quantity = $("#quantity").val();
-  var chemical_parameters = $("#chemical_parameters").val();
-  var grade = $("#grade").val();
-  var analysis_date = $("#analysis_date").val();
-  var remark = $("#remark").val();
+  let date = $("#date").val();
+  let commodity = $("#commodity").val();
+  let batch_no = $("#batch_no").val();
+  let quantity = $("#quantity").val();
+  let chemical_parameters = $("#chemical_parameters").val();
+  let grade = $("#grade").val();
+  let analysis_date = $("#analysis_date").val();
+  let remark = $("#remark").val();
 
-  var value_return = "true";
+  let value_return = "true";
 
-  // if ($("#analysis_table tr td:first").text() == "") {
-  //   $("#error_analysis")
-  //     .show()
-  //     .text("Sorry. There should be minimum 1 TBL details added.");
-  //   $("#error_tbls").css({
-  //     color: "red",
-  //     "font-size": "14px",
-  //     "font-weight": "500",
-  //     "text-align": "right",
-  //   });
-  //   setTimeout(function () {
-  //     $("#error_tbls").fadeOut();
-  //   }, 8000);
-  //   value_return = "false";
-  // }
-  // if ($("#analysis_table tr td:first").text() == "") {
   if (date == "") {
     $("#error_date").show().text("Please Select date");
     setTimeout(function () {
@@ -360,7 +344,7 @@ function validate_analysis_reports_section() {
   if (chemical_parameters == "") {
     $("#error_chemical_parameters")
       .show()
-      .text("Please enter chemical parameters");
+      .text("Please select chemical parameters");
     setTimeout(function () {
       $("#error_chemical_parameters").fadeOut();
     }, 5000);
@@ -423,6 +407,11 @@ function validate_analysis_reports_section() {
 }
 
 $("#chemical_parameters").multiselect({
+  maxWidth: 200,
+  placeholder: "Select Option",
+});
+
+$("#authorized_chemist").multiselect({
   maxWidth: 200,
   placeholder: "Select Option",
 });

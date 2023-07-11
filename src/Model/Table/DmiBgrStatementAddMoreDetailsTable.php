@@ -12,34 +12,35 @@
 		var $name = "DmiBgrStatementAddMoreDetails";
 
 
-        public function statementDetails(){
-		
-      
+    public function statementDetails(){
      
-			if(strpos(base64_decode($_SESSION['username']), '@') !== false){//for email encoding
-				$customer_id = $_SESSION['customer_id'];
+			if(strpos(base64_decode($_SESSION['packer_id']), '@') !== false){//for email encoding
+				$customerId = $_SESSION['packer_id'];
 			}else{
-				$customer_id = $_SESSION['username'];
+				$customerId = $_SESSION['username'];
 			}
 		
-			if(isset($_SESSION['edit_analysis_id']))
-      { 
-        $hide_edit_id = array('id !='=>$_SESSION['edit_analysis_id']); 
-      }else{ 
-        $hide_edit_id = array('id IS NOT NULL'); 
-       }
-      $added_statement_details = $this->find('all', array('conditions'=>array('OR'=>$hide_edit_id,'customer_id IS'=>$customer_id,'delete_status IS NULL'),'order'=>'id'))->toArray();
+			if(isset($_SESSION['edit_analysis_id'])){
+				
+        $hide_edit_id = array('id !='=>$_SESSION['edit_analysis_id']);
+      }else{
+        
+				$hide_edit_id = array('id IS NOT NULL');
+      }
+			$customerId = $_SESSION['packer_id'];
+			
+      $added_statement_details = $this->find('all', array('conditions'=>array('OR'=>$hide_edit_id,'customer_id IS'=>$customerId,'delete_status IS NULL'),'order'=>'id'))->toArray();
 
-		$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
-		$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
-	  $DmiBgrAnalysisAddMoreDetails = TableRegistry::getTableLocator()->get('DmiBgrAnalysisAddMoreDetails');
-		$added_firms = $DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->toArray();		
-		$added_firm_field = $added_firms[0];	
+			$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+			$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
+	  	$DmiBgrAnalysisAddMoreDetails = TableRegistry::getTableLocator()->get('DmiBgrAnalysisAddMoreDetails');
+			$added_firms = $DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customerId)))->toArray();		
+			$added_firm_field = $added_firms[0];	
 
 		
-		//taking id of multiple sub commodities	to show names in list	
-		$sub_comm_id = explode(',',(string) $added_firm_field['sub_commodity']); #For Deprecations
-		$sub_commodity_value = $MCommodity->find('list',array('valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
+			//taking id of multiple sub commodities	to show names in list	
+			$sub_comm_id = explode(',',(string) $added_firm_field['sub_commodity']); #For Deprecations
+			$sub_commodity_value = $MCommodity->find('list',array('valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
 
 		  $abc = [];
 			return array($abc,$added_statement_details,$sub_commodity_value);

@@ -2620,5 +2620,119 @@ class AjaxFunctionsController extends AppController{
 		return $responce;
 		
 	}
+
+	// ADD BGR ANALYSIS DETAILS
+	// @AUTHOR : SHANKHPAL SHENDE
+	// DATE : 05/01/2023
+	public function addBgrAnalysisDetails(){
+		
+		$this->autoRender = false;
+		$this->loadModel('DmiBgrAnalysisAddMoreDetails');
+
+		$customer_id = $this->Customfunctions->sessionCustomerID();
+		$firm_type = $this->Customfunctions->firmType($customer_id);
+
+		$date = htmlentities($_POST['date'], ENT_QUOTES);
+		$commodity = htmlentities($_POST['commodity'], ENT_QUOTES);
+		$batch_no = htmlentities($_POST['batch_no'], ENT_QUOTES);
+		$quantity = htmlentities($_POST['quantity'], ENT_QUOTES);
+    $chemical_parameters = htmlentities($_POST['chemical_parameters'], ENT_QUOTES);
+		$analysis_grade = htmlentities($_POST['grade'], ENT_QUOTES);
+		$analysis_date = htmlentities($_POST['analysis_date'], ENT_QUOTES);
+		$analysis_remark = htmlentities($_POST['remark'], ENT_QUOTES);
+
+		$save_details_result = $this->DmiBgrAnalysisAddMoreDetails->saveAnalysisDetails($date,$commodity,$batch_no,$quantity,$chemical_parameters,$analysis_grade,$analysis_date,$analysis_remark);// call custome method from model
+		$added_analysis_details = $this->DmiBgrAnalysisAddMoreDetails->analysisDetails();
+		$this->Set('section_form_details',$added_analysis_details);
+		
+		//this below call is modified "Element" changed to "element" as it declining the path on server by AKASH THAKRE on 23-03-2022
+		$this->render('/element/application_forms/bgr/bgr_addmore_tbl/analysis_reports_form_tbl');
+	
+
+	}
+
+	// EDIT BGR ANALYSIS DETAILS
+	// @AUTHOR : SHANKHPAL SHENDE
+	// DATE : 05/01/2023
+	public function editAnalysisId(){
+
+		$this->autoRender = false;
+		$this->loadModel('DmiBgrAnalysisAddMoreDetails');
+
+		$customer_id = $this->Customfunctions->sessionCustomerID();
+		$firm_type = $this->Customfunctions->firmType($customer_id);
+
+		if ($this->Session->read('edit_analysis_id')==null) {
+
+			$edit_analysis_id = $_POST['edit_analysis_id'];
+			
+			$this->Session->write('edit_analysis_id',$edit_analysis_id);
+    
+		} elseif ($_POST['edit_analysis_id'] != $this->Session->read('edit_analysis_id')) {
+
+			if ($_POST['edit_analysis_id'] == '') {
+
+				$save_analysis_id = $_POST['save_analysis_id'];
+
+			} else {
+
+				$edit_analysis_id = $_POST['edit_analysis_id'];
+				$this->Session->write('edit_analysis_id',$edit_analysis_id);
+			}
+		}
+
+		if ($this->Session->read('edit_analysis_id') != null) {
+
+			if (!empty($edit_analysis_id)) {
+
+				$find_analysis_details = $this->DmiBgrAnalysisAddMoreDetails->find('all',array('conditions'=>array('id IS'=>$edit_analysis_id)))->first();
+				$find_analysis_details['chemical_parameters'] = explode(',',$find_analysis_details['chemical_parameters']);
+				//pr($find_analysis_details);die;
+				$this->set('find_analysis_details',$find_analysis_details);
+			}
+		}
+
+		if (!empty($save_analysis_id)) {
+
+			$record_id = $this->Session->read('edit_analysis_id');
+			$report_date = htmlentities($_POST['date'], ENT_QUOTES);
+			$commodity = htmlentities($_POST['commodity'], ENT_QUOTES);
+			$batch_no = htmlentities($_POST['batch_no'], ENT_QUOTES);
+			$quantity = htmlentities($_POST['quantity'], ENT_QUOTES);
+			$chemical_parameters = htmlentities($_POST['chemical_parameters'], ENT_QUOTES);
+			$analysis_grade = htmlentities($_POST['grade'], ENT_QUOTES);
+			$analysis_date = htmlentities($_POST['analysis_date'], ENT_QUOTES);
+			$analysis_remark = htmlentities($_POST['remark'], ENT_QUOTES);
+
+			$save_details_result = $this->DmiBgrAnalysisAddMoreDetails->editAnalysisDetails($record_id,$report_date,$commodity,$batch_no,$quantity,$chemical_parameters,$analysis_grade,$analysis_date,$analysis_remark);// call custome method from model
+			$this->Session->delete('edit_analysis_id');
+		}
+
+	  $added_analysis_details = $this->DmiBgrAnalysisAddMoreDetails->analysisDetails();
+		$this->Set('section_form_details',$added_analysis_details);
+		
+		$this->render('/element/application_forms/bgr/bgr_addmore_tbl/analysis_reports_form_tbl');
+	
+	}
+
+	// DELETE BGR ANALYSIS DETAILS
+	// @AUTHOR : SHANKHPAL SHENDE
+	// DATE : 12/01/2023
+	public function deleteAnalysisId(){
+
+		$this->Session->delete('delete_analysis_id');
+		$this->loadModel('DmiBgrAnalysisAddMoreDetails');
+
+		$customer_id = $this->Customfunctions->sessionCustomerID();
+
+		//$record_id = $id;
+		$record_id = $_POST['delete_analysis_id'];
+		$analysis_delete_result = $this->DmiBgrAnalysisAddMoreDetails->deleteAnalysisDetails($record_id);// call to custome function from model
+		$added_analysis_details = $this->DmiBgrAnalysisAddMoreDetails->analysisDetails();
+		$this->Set('section_form_details',$added_analysis_details);
+
+	  $this->render('/element/application_forms/bgr/bgr_addmore_tbl/analysis_reports_form_tbl');
+
+	}
 }
 ?>
