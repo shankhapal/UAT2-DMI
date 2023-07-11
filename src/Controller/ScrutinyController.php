@@ -287,6 +287,12 @@ class ScrutinyController extends AppController{
 			$this->Session->write('section_id',$section_id);
 		}
 
+		//added middle name type in array and set for view side like S/o, W/o, D/o by laxmi B on 11-07-2023
+		if ($_SESSION['application_type'] == 4) {
+			$middle_type = array('S/o'=>'S/o', 'D/o'=>'D/o', 'W/o'=>'W/o');
+			$this->set('middle_type', $middle_type);
+			}
+
 		// Predefine value
 		$business_type = $this->Mastertablecontent->allBusinessType();
 		$this->set('business_type',$business_type);
