@@ -1558,7 +1558,7 @@ class ReportsController extends AppController {
 
 
 
-	// Pending New Applications Report
+		// Pending New Applications Report
 	// Description : ----
 	// @Author : Pravin Bhakare
 	// #Contributer : Ankur Jangid (Migration)
@@ -1591,7 +1591,7 @@ class ReportsController extends AppController {
 		asort($user_roles_xy);
 		$this->set('user_roles_xy',$user_roles_xy);
 
-		$ro_office = $this->DmiRoOffices->find('all')->where(['office_type' => 'RO','delete_status IS NULL'])->order(['ro_office' => 'ASC'])->combine('id', 'ro_office')->toArray();
+		$ro_office = $this->DmiRoOffices->find('all')->where(['office_type' => 'RO','delete_status IS NULL'])->order(['ro_office' => 'ASC'])->combine('id', 'ro_office')->toArray(); 
 		$this->set('ro_office',$ro_office);
 
 		$search_application_type_id = $this->Session->read('search_application_type_id');
@@ -1658,7 +1658,7 @@ class ReportsController extends AppController {
 				$search_user_email_id = $this->Session->read('search_user_email_id');
 			}
 
-			$download_application_customer_id_list = $this->pendingApplicationSearchConditions($download_search_application_type_id,$download_search_user_role,$download_ro_office_id,$download_mo_office_id,$download_io_office_id,$download_search_from_date,$download_search_to_date,$download_search_user_email_id,$table,$pending_application_type,$application_pending_days,$selected_month=Null);
+			$download_application_customer_id_list = $this->pendingApplicationSearchConditions($download_search_application_type_id,$download_search_user_role,$download_ro_office_id,$download_mo_office_id,$download_io_office_id,$download_search_from_date,$download_search_to_date,$download_search_user_email_id,$table,$pending_application_type,$application_pending_days);
 
 			$this->Session->delete('search_application_type_id');
 			$this->Session->delete('search_user_role');
@@ -1688,11 +1688,11 @@ class ReportsController extends AppController {
 			$this->set('search_user_email_id',$search_user_email_id);
 
 
-			$application_customer_id_list = $this->pendingApplicationSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days,$selected_month=Null);
+			$application_customer_id_list = $this->pendingApplicationSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days);
 
 			if (!empty($application_customer_id_list)) {
 
-				$current_users_details = $this->$table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->order(['id' => 'DESC'])->toArray();
+				$current_users_details = $this->$table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->order(['id' => 'DESC'])->toArray(); 
 
 				//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
 				if ($download_report == 'yes') {
@@ -1703,10 +1703,10 @@ class ReportsController extends AppController {
 						$download_condition = ['customer_id IS' => ''];
 					}
 
-					$download_pending_application = $this->$table->find('all')->where($download_condition)->order(['id' => 'DESC'])->toArray();
+					$download_pending_application = $this->$table->find('all')->where($download_condition)->order(['id' => 'DESC'])->toArray(); 
 					$this->downloadPendingApplicationReport($download_pending_application,$pending_application_type,$table);
 				}
-
+				
 			} else {
 				$current_users_details = null;
 			}
@@ -1719,12 +1719,12 @@ class ReportsController extends AppController {
 
 			if (!empty($application_customer_id_list)) {
 
-				$current_users_details = $this->$table->find('all')->where(['customer_id IN' => $application_customer_id_list])->order(['id' => 'DESC'])->limit(['100'])->toArray();
+				$current_users_details = $this->$table->find('all')->where(['customer_id IN' => $application_customer_id_list])->order(['id' => 'DESC'])->limit(['100'])->toArray(); 
 				$this->set('current_users_details',$current_users_details);
 
 				//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
 				if ($download_report == 'yes') {
-					$download_pending_application = $this->$table->find('all')->where(['customer_id' => $application_customer_id_list])->order(['id' => 'DESC'])->toArray();
+					$download_pending_application = $this->$table->find('all')->where(['customer_id' => $application_customer_id_list])->order(['id' => 'DESC'])->toArray(); 
 					$this->downloadPendingApplicationReport($download_pending_application,$pending_application_type,$table);
 				}
 
@@ -1734,7 +1734,7 @@ class ReportsController extends AppController {
 
 			$this->pendingApplicationReportResults($current_users_details,$pending_application_type,$table);
 		}
-
+	
 	}
 
 
@@ -1994,7 +1994,7 @@ class ReportsController extends AppController {
 				$search_user_email_id = $this->Session->read('search_user_email_id');
 			}
 
-			$download_application_customer_id_list = $this->pendingApplicationSearchConditions($download_search_application_type_id,$download_search_user_role,$download_ro_office_id,$download_mo_office_id,$download_io_office_id,$download_search_from_date,$download_search_to_date,$download_search_user_email_id,$table,$pending_application_type,$application_pending_days,$data_id);
+			$download_application_customer_id_list = $this->pendingApplicationSearchConditions($download_search_application_type_id,$download_search_user_role,$download_ro_office_id,$download_mo_office_id,$download_io_office_id,$download_search_from_date,$download_search_to_date,$download_search_user_email_id,$table,$pending_application_type,$application_pending_days,$data_id,$selected_month=Null);
 
 			$this->Session->delete('search_application_type_id');
 			$this->Session->delete('search_user_role');
@@ -2049,7 +2049,7 @@ class ReportsController extends AppController {
 			$this->set('search_user_email_id',$search_user_email_id);
 
 
-			$application_customer_id_list = $this->pendingApplicationSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days,$data_id );
+			$application_customer_id_list = $this->pendingApplicationSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days,$data_id,$selected_month=Null);
 
 			if (!empty($application_customer_id_list)) {
 
@@ -2078,7 +2078,7 @@ class ReportsController extends AppController {
 		} else {
 
 
-			$application_customer_id_list = $this->pendingApplicationSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days,$data_id);
+			$application_customer_id_list = $this->pendingApplicationSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days,$data_id,$selected_month=Null);
 
 			if (!empty($application_customer_id_list)) {
 
@@ -2110,7 +2110,7 @@ class ReportsController extends AppController {
 	// #Contributer : Ankur Jangid (Migration)
 	// Date : 18-09-2017
 
-	public function pendingApplicationSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$application_array,$pending_application_type,$application_pending_days,$data_id=null)
+	public function pendingApplicationSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$application_array,$pending_application_type,$application_pending_days,$data_id=null,$selected_month=Null)
 	{
 		$current_date = new \DateTime(date("d-m-Y")); // Ankur updated new DateTime to new \DateTime as Class "App\Controller\DateTime" not found
 		$modify_date_obj = $current_date->modify('-15 day');
@@ -2914,7 +2914,7 @@ class ReportsController extends AppController {
 
 	public function approvedApplicationsReportForStats($cert_type) // $newappId replace $cert_type by Shreeya
 	{
-
+		
 		// $newappId replace $cert_type by Shreeya
 		$cert_type=base64_decode($cert_type);
 		$data_id =array($cert_type);
@@ -3311,7 +3311,7 @@ class ReportsController extends AppController {
 			$this->set('search_from_date', $search_from_date);
 			$this->set('search_to_date', $search_to_date);
 
-			$approved_application_lists = $this->approvedApplicationSearchConditions($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$data_id,$approved_application_type);
+			$approved_application_lists = $this->approvedApplicationSearchConditions($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$data_id,$approved_application_type,$selected_month=Null);
 			$approved_application_list = $approved_application_lists[0];
 			$download_approved_application_list = $approved_application_lists[1];
 
@@ -3351,7 +3351,7 @@ class ReportsController extends AppController {
 		} else {
 
 
-			$approved_application_lists = $this->approvedApplicationSearchConditions($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$data_id,$approved_application_type);
+			$approved_application_lists = $this->approvedApplicationSearchConditions($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$data_id,$approved_application_type,$selected_month=Null);
 
 			$approved_application_list = $approved_application_lists[0];
 
@@ -3387,6 +3387,7 @@ class ReportsController extends AppController {
 
 	public function approvedApplicationsReport() {
 
+	
 		$approved_application_type = $this->Session->read('approved_application_type');
 
 		if ($approved_application_type == 'new' || $approved_application_type =='') {
@@ -3478,7 +3479,7 @@ class ReportsController extends AppController {
 			$this->set('search_from_date', $search_from_date);
 			$this->set('search_to_date', $search_to_date);
 
-			$approved_application_lists = $this->approvedApplicationSearchConditions($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag);
+			$approved_application_lists = $this->approvedApplicationSearchConditions($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$selected_month=Null);
 			$approved_application_list = $approved_application_lists[0];
 			$download_approved_application_list = $approved_application_lists[1];
 
@@ -3506,7 +3507,7 @@ class ReportsController extends AppController {
 
 		} else {
 
-			$approved_application_lists = $this->approvedApplicationSearchConditions($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag);
+			$approved_application_lists = $this->approvedApplicationSearchConditions($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$selected_month=Null);
 
 			$approved_application_list = $approved_application_lists[0];
 
@@ -3528,7 +3529,7 @@ class ReportsController extends AppController {
 	// #Contributer : Ankur Jangid (Migration)
 	// Date : ----
 
-	public function approvedApplicationSearchConditions ($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$data_id=null,$approved_application_type=null)
+	public function approvedApplicationSearchConditions ($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$data_id=null,$approved_application_type=null,$selected_month=Null)
 	{
 
 		$approved_application_list = [];
@@ -4662,6 +4663,7 @@ class ReportsController extends AppController {
 		$mo_offices = $_POST['mo_offices'];
 		$io_offices = $_POST['io_offices'];
 
+		
 		if ($ro_offices != null) {
 			$ro_offices = explode(',', $ro_offices);
 			?><option value="<?php echo ''; ?>"><?php echo 'All'; ?></option><?php
@@ -4847,6 +4849,8 @@ class ReportsController extends AppController {
 			->order(['district_name' => 'ASC'])->combine('id', 'district_name')->toArray();
 		$this->set('all_district_name', $all_district_name);
 
+
+		
 		$company_id = null;
 		$application_type = null;
 		$state = null;
@@ -4930,6 +4934,7 @@ class ReportsController extends AppController {
 			if ($this->request->getData('download_report') =='') {
 				$download_report = 'no';
 			}
+			
 			$firms_data_details_result = $this->DmiFirms->newlyAddedFirmListReportConditionsForStats($application_type,$company_id,$state,$district,$search_from_date,$search_to_date,$search_flag,$cert_type);
 
 			$this->newlyAddedFirmReportResult($firms_data_details_result,$application_type_array);
@@ -12782,12 +12787,13 @@ class ReportsController extends AppController {
 
 			//Check and Pass the entry for "Search" or "Download Report as Excel" button click event (Done by pravin 14-03-2018)
 			if (null != ($this->request->getData('search_logs')) || null != ($this->request->getData('download_report'))) {
-
+				
 				
 				//Check not empty "Download Report as Excel" button Request, if condition TRUE then set value "yes" for "Download Report as Excel" click event
 				//and pass this value to "mo_io_ro_allocation_serach_conditions" function (Done by pravin 14-03-2018)
 				if (!empty($this->request->getData('download_report'))) {
 					$download_report = 'yes';
+					
 				}
 				
 				$application_array = $this->request->getData('application_array');
@@ -12811,7 +12817,7 @@ class ReportsController extends AppController {
 
 				// Change on 2/11/2018 - For download excel report, Take search filter field value from session variables instend of POST variable - By Pravin
 				if ($download_report == 'yes') {
-
+				
 					$search_application_type_id = $this->Session->read('search_application_type_id');
 					$search_user_role = $this->Session->read('search_user_role');
 					$ro_office_id = $this->Session->read('ro_office_id');
@@ -12821,10 +12827,10 @@ class ReportsController extends AppController {
 					$search_to_date = $this->Session->read('search_to_date');
 					$search_user_email_id = $this->Session->read('search_user_email_id');
 					$report_for = $this->Session->read('report_for');
-
+					
+					
 				}
 
-				//print_r($search_user_role); exit;
 				
 				$this->Session->delete('search_application_type_id');
 				$this->Session->delete('search_user_role');
@@ -12846,7 +12852,7 @@ class ReportsController extends AppController {
 				$this->Session->write('search_to_date',$search_to_date);
 				$this->Session->write('search_user_email_id',$search_user_email_id);
 				$this->Session->write('report_for',$report_for);
-
+				
 
 				$this->set('search_application_type_id',$search_application_type_id);
 				$this->set('search_user_role',$search_user_role);
@@ -12889,10 +12895,9 @@ class ReportsController extends AppController {
 
 
 
-					$i=0;
+					
 					$current_users_details = array();
-					$app_type = array();
-				
+					
 					foreach($applications_current_positions_tables as $each_table)
 					{
 						$key = array_search ($each_table, $applications_current_positions_tables);
@@ -12906,23 +12911,23 @@ class ReportsController extends AppController {
 							$current_users_details = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list,'current_level IS'=>$search_user_role])->toArray();
 						} else {//further condition
 							$current_users_details = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list,'current_level IS'=>$search_user_role])->toArray();
-							$app_type = $this->DmiFlowWiseTablesLists->find('all')->where(['application_type IN'=>$application_key])->toArray();
+							
 						}
 						
-						$i++;
+						
 					}
 
 					
 					//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
 					if ($download_report == 'yes') {
-
+						
 						if (!empty($application_customer_id_list)) {
 							$download_condition = ['customer_id IN' => $application_customer_id_list];
 						} else {
 							$download_condition = ['customer_id IS' => ''];
 						}
 
-						$current_users_details = array();
+						$download_pending_application = array();
 
 						foreach($applications_current_positions_tables as $each_table)
 						{
@@ -12930,16 +12935,27 @@ class ReportsController extends AppController {
 							$this->loadModel($each_table);
 							$this->loadModel($key);
 							
-						
-							// show the listion customer id and check status approve with livel by shreeya [08-07-2023]
-							$checkLastStatus = $this->$key->find('all',array('conditions'=>array('customer_id IN'=>$application_customer_id_list),'order'=>'id desc'))->first();
-							if(!empty($checkLastStatus) && (($checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_4')) ||
-							($checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_1')))){
-								$download_pending_application = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list,'current_level IS'=>$search_user_role])->toArray();
-							} else {//further condition
-								$download_pending_application = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list,'current_level IS'=>$search_user_role])->toArray();
-								$app_type = $this->DmiFlowWiseTablesLists->find('all')->where(['application_type IN'=>$application_key])->toArray();
+							$customer_id_list = $this->$each_table->find('all')->select(['id', 'customer_id'])
+							->combine('id', 'customer_id')->toArray();
+
+							// Show customer id and approve -> level condition check by shreeya on date [08-07-2023]
+							if (!empty($customer_id_list)) {
+								$checkLastStatus = $this->$key->find('all', [
+									'conditions' => ['customer_id IN' => $customer_id_list],
+									'order' => 'id desc'
+								])->first();
+							
+								if (!empty($checkLastStatus) && (
+									($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_4')) ||
+									($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_1'))
+								)) {
+									$download_pending_application = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list,'current_level IS'=>$search_user_role])->toArray();
+								}else{
+									$download_pending_application = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list,'current_level IS'=>$search_user_role])->toArray();
+								}
+							
 							}
+
 						}
 
 				
@@ -12953,7 +12969,7 @@ class ReportsController extends AppController {
 				$this->pendingMPRReportResults($applicn_type,$current_users_details,$application_array,$pending_application_type,$table);
 
 			} else {
-
+			
 				$application_customer_id_list = $this->applicationSearchConditions($applicn_type,$report_for,$search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$selected_month,$search_to_date,$search_user_email_id,$table,$application_array,$pending_application_type,$application_pending_days);
 
 				if (!empty($application_customer_id_list)) {	
@@ -12964,29 +12980,38 @@ class ReportsController extends AppController {
 
 						$applications_current_positions_tables = $this->DmiFlowWiseTablesLists->find('all')->select(['application_form','appl_current_pos'])->where(array('application_type IN'=>$application_key))->order(['id'])->combine('application_form','appl_current_pos')->toArray();
 					}
-					$i=0;
+					
 					$current_users_details = array();
-					// $app_type = array();
+				
 					foreach($applications_current_positions_tables as $each_table)
 					{
-
 
 						$key = array_search ($each_table, $applications_current_positions_tables);
 						$this->loadModel($each_table);
 						$this->loadModel($key);
 
-						// show customer id and approve ->level condtion check by shreeya on date [08-07-2023]
-						$checkLastStatus = $this->$key->find('all',array('conditions'=>array('customer_id IN'=>$application_customer_id_list),'order'=>'id desc'))->first();
-						if(!empty($checkLastStatus) && (($checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_4')) ||
-						($checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_1')))){
-							$current_users_details = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->toArray();
-						} else {//further condition
-							$current_users_details = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->toArray();
-							//$app_type = $this->DmiFlowWiseTablesLists->find('all')->where(['application_type IN'=>$application_key])->toArray();
+						$customer_id_list = $this->$each_table->find('all')->select(['id', 'customer_id'])
+						->combine('id', 'customer_id')->toArray();
+
+						// Show customer id and approve -> level condition check by shreeya on date [08-07-2023]
+						if (!empty($customer_id_list)) {
+							$checkLastStatus = $this->$key->find('all', [
+								'conditions' => ['customer_id IN' => $customer_id_list],
+								'order' => 'id desc'
+							])->first();
+						
+							if (!empty($checkLastStatus) && (
+								($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_4')) ||
+								($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_1'))
+							)) {
+								$current_users_details = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->toArray();
+							}else{
+								$current_users_details = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->toArray();
+							}
 						
 						}
+
 					
-						$i++;
 					}
 
 					
@@ -12995,20 +13020,60 @@ class ReportsController extends AppController {
 
 					//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
 					if ($download_report == 'yes') {
-						$download_pending_application = $this->$table->find('all')->where(['customer_id IN' => $application_customer_id_list])->order(['id' => 'DESC'])->toArray();
+						
+					
+						if (!empty($application_customer_id_list)) {
+							$download_condition = ['customer_id IN' => $application_customer_id_list];
+						} else {
+							$download_condition = ['customer_id IS' => ''];
+						}
+
+						$download_pending_application = array();
+
+						foreach($applications_current_positions_tables as $each_table)
+						{
+							$key = array_search ($each_table, $applications_current_positions_tables);
+							$this->loadModel($each_table);
+							$this->loadModel($key);
+							
+							$customer_id_list = $this->$each_table->find('all')->select(['id', 'customer_id'])
+							->combine('id', 'customer_id')->toArray();
+
+							// Show customer id and approve -> level condition check by shreeya on date [08-07-2023]
+							if (!empty($customer_id_list)) {
+								$checkLastStatus = $this->$key->find('all', [
+									'conditions' => ['customer_id IN' => $customer_id_list],
+									'order' => 'id desc'
+								])->first();
+							
+								if (!empty($checkLastStatus) && (
+									($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_4')) ||
+									($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_1'))
+								)) {
+									$download_pending_application = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->toArray();
+								}else{
+									$download_pending_application = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->toArray();
+								}
+							
+							}
+							
+						}
+
+				
 						$this->downloadPendingMprReport($download_pending_application,$application_array,$pending_application_type,$table);
 					}
 
 				} else {
+					
 					$current_users_details = null;
 				}
 
 				$this->pendingMPRReportResults($applicn_type,$current_users_details,$application_array,$pending_application_type,$table);
 			}
 
-				//$this->Session->delete('search_user_role');
-				//$this->Session->delete('ro_office_id');
-				//$this->Session->delete('selected_month');
+				// $this->Session->delete('search_user_role');
+				// $this->Session->delete('ro_office_id');
+				// $this->Session->delete('selected_month');
 
 		}
 
@@ -13149,7 +13214,8 @@ class ReportsController extends AppController {
 				//added for show data according to level ,offices & month by shreeya on date [04-07-2023]
 			if ($search_user_role != '' && $level_1_2_3_office != '' && $selected_month != '')
 			{
-
+			
+			
 				if($search_user_role == "AMA"){
 					$search_user_role ="level_4";
 				}elseif($search_user_role == 'RO/SO'){
@@ -13166,11 +13232,24 @@ class ReportsController extends AppController {
 					$search_user_role ="level_4";
 				}
 
+
+
 				//fetch the records of email id done by shreeya on date [30-06-2023]
 				$this->loadModel('DmiRoOffices');
-				$posted_off = $this->DmiRoOffices->find('all')->where(['id IN'=>$level_1_2_3_office])->first();
-				$posted_office = $posted_off['ro_email_id'];
+				// $posted_off = $this->DmiRoOffices->find('all')->where(['id IN'=>$level_1_2_3_office])->first();
+				// $posted_offices = $posted_off['ro_email_id'];
 
+				//Change condtion for show result in array format (ro-office) by shreeya on date [11-07-2023]
+				$posted_off = $this->DmiRoOffices->find('all')->where(['id IN' => $level_1_2_3_office])->toArray();
+				if (!empty($posted_off)) {
+					$posted_offices = [];
+					foreach ($posted_off as $off) {
+						$posted_offices[] = $off['ro_email_id'];
+					}
+					 
+				} 
+				
+				
 				$this->loadModel('DmiFlowWiseTablesLists');
 				$applications_current_positions_tables = $this->DmiFlowWiseTablesLists->find('all')->select(['application_form','appl_current_pos'])->where(array('application_type IN'=>$application_key))->order(['id'])->combine('application_form','appl_current_pos')->toArray();
 
@@ -13186,11 +13265,9 @@ class ReportsController extends AppController {
 					$key = array_search ($each_table, $applications_current_positions_tables);
 					$this->loadModel($each_table);
 					$this->loadModel($key);
-
+					/******************************** Perticular Month Wise List Start************************************** */
 					// Convert the selected month to the desired format
 					// $selected_month = date('d-m-Y', strtotime($selected_month));
-
-					
 					// $split_selected_month = explode('-', $selected_month);
 
 					// $day = $split_selected_month[0];
@@ -13207,21 +13284,18 @@ class ReportsController extends AppController {
 					// 	])
 					// 	->bind(':start', '01'. '-'. $month .'-' . $year)
 					// 	->bind(':end', '30'. '-'. $month . '-' . $year)
-
-							
-
 					// 	->combine('id', 'customer_id')
 					// 	->toArray(); 
-					
+					/******************************** Perticular Month Wise List End************************************** */
 
 
 					$firstDayOfMonth = date('01-m-Y');
 					$currentDate = date('d-m-Y');
-
+							
 					$customer_id_list = $this->$each_table->find('all')->select(['id', 'customer_id'])
 						->where([
 							'current_level' => $search_user_role,
-							'current_user_email_id' => $posted_office,
+							'current_user_email_id IN' => $posted_offices,
 							'created BETWEEN :start AND :end'
 						])
 						->bind(':start', '2023-04-01') // Replace '2023-04-01' with the desired starting date of April
@@ -13288,7 +13362,7 @@ class ReportsController extends AppController {
 			elseif($search_user_role != ''  || $selected_month != '')
 			{
 
-			
+				
 				if($search_user_role == "AMA"){
 					$search_user_role ="level_4";
 				}elseif($search_user_role == 'RO/SO'){
@@ -13307,8 +13381,18 @@ class ReportsController extends AppController {
 
 				//fetch the records of email id done by shreeya on date [30-06-2023]
 				$this->loadModel('DmiRoOffices');
-				$posted_off = $this->DmiRoOffices->find('all')->where(['id IN'=>$level_1_2_3_office])->first();
-				$posted_office = $posted_off['ro_email_id'];
+				// $posted_off = $this->DmiRoOffices->find('all')->where(['id IN'=>$level_1_2_3_office])->first();
+				// $posted_office = $posted_off['ro_email_id'];
+
+				//Change condtion for show result in array format (ro-office) by shreeya on date [11-07-2023]
+				$posted_off = $this->DmiRoOffices->find('all')->where(['id IN' => $level_1_2_3_office])->toArray();
+				if (!empty($posted_off)) {
+					$posted_offices = [];
+					foreach ($posted_off as $off) {
+						$posted_offices[] = $off['ro_email_id'];
+					}
+					 
+				} 
 
 				$this->loadModel('DmiFlowWiseTablesLists');
 				$applications_current_positions_tables = $this->DmiFlowWiseTablesLists->find('all')->select(['application_form','appl_current_pos'])->where(array('application_type IN'=>$application_key))->order(['id'])->combine('application_form','appl_current_pos')->toArray();
@@ -13333,7 +13417,7 @@ class ReportsController extends AppController {
 
 					$customer_id_list = $this->$each_table->find('all')->select(['id', 'customer_id'])
 						->where([
-							'current_level' => $search_user_role,
+							'current_level IS' => $search_user_role,
 							'created BETWEEN :start AND :end'
 						])
 						->bind(':start', '2023-04-01') // Replace '2023-04-01' with the desired starting date of April
@@ -13399,7 +13483,7 @@ class ReportsController extends AppController {
 			//added for show data according to Role shreeya on date [10-07-2023]
 			elseif($search_user_role != '')
 			{
-
+			
 				
 				if($search_user_role == "AMA"){
 					$search_user_role ="level_4";
@@ -13419,8 +13503,18 @@ class ReportsController extends AppController {
 
 				//fetch the records of email id done by shreeya on date [30-06-2023]
 				$this->loadModel('DmiRoOffices');
-				$posted_off = $this->DmiRoOffices->find('all')->where(['id IN'=>$level_1_2_3_office])->first();
-				$posted_office = $posted_off['ro_email_id'];
+				// $posted_off = $this->DmiRoOffices->find('all')->where(['id IN'=>$level_1_2_3_office])->first();
+				// $posted_office = $posted_off['ro_email_id'];
+
+				//Change condtion for show result in array format (ro-office) by shreeya on date [11-07-2023]
+				$posted_off = $this->DmiRoOffices->find('all')->where(['id IN' => $level_1_2_3_office])->toArray();
+				if (!empty($posted_off)) {
+					$posted_offices = [];
+					foreach ($posted_off as $off) {
+						$posted_offices[] = $off['ro_email_id'];
+					}
+					 
+				} 
 
 				$this->loadModel('DmiFlowWiseTablesLists');
 				$applications_current_positions_tables = $this->DmiFlowWiseTablesLists->find('all')->select(['application_form','appl_current_pos'])->where(array('application_type IN'=>$application_key))->order(['id'])->combine('application_form','appl_current_pos')->toArray();
@@ -13508,7 +13602,7 @@ class ReportsController extends AppController {
 			//added for show data according to Month shreeya on date [10-07-2023]
 			elseif($selected_month != '')
 			{
-
+				
 				
 				if($search_user_role == "AMA"){
 					$search_user_role ="level_4";
@@ -13526,10 +13620,7 @@ class ReportsController extends AppController {
 					$search_user_role ="level_4";
 				}
 
-				//fetch the records of email id done by shreeya on date [30-06-2023]
-				$this->loadModel('DmiRoOffices');
-				$posted_off = $this->DmiRoOffices->find('all')->where(['id IN'=>$level_1_2_3_office])->first();
-				$posted_office = $posted_off['ro_email_id'];
+				
 
 				$this->loadModel('DmiFlowWiseTablesLists');
 				$applications_current_positions_tables = $this->DmiFlowWiseTablesLists->find('all')->select(['application_form','appl_current_pos'])->where(array('application_type IN'=>$application_key))->order(['id'])->combine('application_form','appl_current_pos')->toArray();
@@ -13616,9 +13707,83 @@ class ReportsController extends AppController {
 
 
 			}
+			//null all record and search 
+			elseif($search_user_role == ''  || $selected_month == '' || $level_1_2_3_office == '')
+			{
+				
+
+				$this->loadModel('DmiFlowWiseTablesLists');
+				if(empty($report_for) || $report_for == ''){
+
+					$applications_current_positions_tables = $this->DmiFlowWiseTablesLists->find('all')->select(['application_form','appl_current_pos'])->where(array('application_type IN'=>$application_key))->order(['id'])->combine('application_form','appl_current_pos')->toArray();
+				}
+
+				$i=0;
+				$customer_id_details = array();
+				foreach($applications_current_positions_tables as $each_table)
+				{
+
+					$key = array_search ($each_table, $applications_current_positions_tables);
+					$this->loadModel($each_table);
+					$this->loadModel($key);
+
+
+					$customer_id_list = $this->$each_table->find('all')->select(['id', 'customer_id'])
+						->combine('id', 'customer_id')->toArray();
+
+					
+					// Show customer id and approve -> level condition check by shreeya on date [08-07-2023]
+					if (!empty($customer_id_list)) {
+						$checkLastStatus = $this->$key->find('all', [
+							'conditions' => ['customer_id IN' => $customer_id_list],
+							'order' => 'id desc'
+						])->first();
+					
+						if (!empty($checkLastStatus) && (
+							($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_4')) ||
+							($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_1'))
+						)) {
+							$customer_id_details[$i] = $customer_id_list;
+						}else{
+							$customer_id_details[$i] = $customer_id_list;
+						}
+					
+					}
+
+					
+					//fetch the customer_id
+					if (!empty($customer_id_list)) {
+
+						$customer_id_details[$i] = $this->DmiFirms->find('all')->where(['customer_id IN' => $customer_id_list])->order(['id' => 'DESC'])->toArray();
+						
+					} else {
+						$customer_id_details[$i] = array(); // Initialize as empty array if customer_id_list is empty
+						// $customer_id_details = null;
+					}
+
+					 
+					$final_customer_id_list = array();
+
+					if (!empty($customer_id_details[$i])) {
+						
+						$j=0;
+						foreach ($customer_id_details[$i] as $each_user){
+							$final_customer_id_list[$j] = $each_user['customer_id'];
+
+							$j++;
+						}
+
+					}
+					$i++;
+
+				}
+				
+
+			}
 			// show the by defalut data without search by shreeya on date [29-06-2023]
 			else
 			{
+				
 				$this->loadModel('DmiFlowWiseTablesLists');
 				if(empty($report_for) || $report_for == ''){
 
@@ -13692,7 +13857,7 @@ class ReportsController extends AppController {
 
 				
 			}
-
+			
 			//if data same data id exist in rejcted table it is not apper in report added by laxmi B. on 20-01-2023
 			$this->loadModel('DmiRejectedApplLogs');
 			$rejectedList = $this->DmiRejectedApplLogs->find('all', array('fields'=>array('customer_id')))->order(['id' => 'DESC'])->toArray();//

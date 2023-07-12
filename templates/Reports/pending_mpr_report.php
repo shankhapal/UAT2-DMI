@@ -60,14 +60,14 @@
 									<div class="col-sm-3">
 										<div class="form-group">
 											  <label>User Role</label>
-											<?php echo $this->form->input('user_role', array('type'=>'select', 'value'=>$search_user_role,'options'=>$user_roles_xy, 'label'=>false, 'id'=>'user_role', 'empty'=>'All', 'escape'=>false, 'class'=>'form-control form-control-sm search_field')); ?>
+											<?php echo $this->form->input('user_role', array('type'=>'select', 'value'=>$search_user_role,'options'=>$user_roles_xy, 'label'=>false, 'id'=>'user_role', 'empty'=>'Select RO/SO', 'escape'=>false, 'class'=>'form-control form-control-sm search_field')); ?>
 										</div>
 									</div>
 
 									<div class="col-sm-3" id="office_all">
 										<div class="form-group">
 											<label>Office</label>
-											<?php echo $this->form->input('office', array('type'=>'select', 'value'=>'', 'label'=>false,  'empty'=>'All', 'id'=>'office',  'escape'=>false, 'class'=>'form-control form-control-sm search_field')); ?>
+											<?php echo $this->form->input('office', array('type'=>'select', 'value'=>'', 'label'=>false,  'empty'=>'Select Office', 'id'=>'office',  'escape'=>false, 'class'=>'form-control form-control-sm search_field')); ?>
 										</div>
 									</div>
 									<div class="col-sm-3" id="office_ro">
@@ -119,7 +119,7 @@
 									<div class="col-sm-3">
 										<div class="form-group">
 											<label>Month</label>
-											<?php echo $this->form->input('selected_month', array('type'=>'text', 'value'=>'','label'=>false, 'id'=>'selected_month', 'empty'=>'select', 'escape'=>false, 'class'=>'form-control form-control-sm search_field', 'placeholder'=>'Month')); ?>
+											<?php echo $this->form->input('selected_month', array('type'=>'text', 'value'=>'','label'=>false, 'id'=>'selected_month', 'empty'=>'Select Month', 'escape'=>false, 'class'=>'form-control form-control-sm search_field', 'placeholder'=>'Month')); ?>
 										</div>
 									</div>
 								
@@ -273,7 +273,7 @@
 								<thead class="table-light">
 									<tr class="rounded">
 										<th><span class="table-heading">Sr.No</span></th>
-										<th><span class="table-heading">Application Submission Date</span></th>
+										<th><span class="table-heading">Submission Date</span></th>
 										<!-- <th><span class="table-heading">Application Type</span></th> -->
 										<th class="text-right"><span class="table-heading">Application Type</span></th>
 										<th><span class="table-heading">Application ID</span></th>
