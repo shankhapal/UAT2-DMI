@@ -5,6 +5,7 @@
 
 
 <!-- below if-else added by Ankur -->
+<!-- remove btn ->custom-btn by shreeya on date [10-07-2023] -->
 <button id="download_report" type="submit" name="download_report" value="<?php echo $buttonName; ?>" class="custom-btn text-light option-menu-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="<?php echo $buttonName; ?>">
 <?php if($buttonName == 'Download Report As PDF') { ?>
 		<i class="fas fa-file-pdf"></i>

@@ -1566,6 +1566,7 @@ class ReportsController extends AppController {
 
 	public function pendingNewApplicationsReport() {
 
+		
 		$application_pending_days = $this->Session->read('pending_days');
 
 		if (!empty($application_pending_days)) {
@@ -1631,7 +1632,7 @@ class ReportsController extends AppController {
 			if (!empty($this->request->getData('download_report'))) {
 				$download_report = 'yes';
 			}
-
+			
 			$search_application_type_id = $this->request->getData('application_type');
 			$search_user_role =  $this->request->getData('user_role');
 			$ro_office_id =  $this->request->getData('ro_office');
@@ -1714,8 +1715,8 @@ class ReportsController extends AppController {
 			$this->pendingApplicationReportResults($current_users_details,$pending_application_type,$table);
 
 		} else {
-
-			$application_customer_id_list = $this->pendingApplicationSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days,$selected_month=Null);
+			
+		$application_customer_id_list = $this->pendingApplicationSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days,$selected_month=Null);/*add new parameter by shreeya*/
 
 			if (!empty($application_customer_id_list)) {
 
@@ -1994,7 +1995,7 @@ class ReportsController extends AppController {
 				$search_user_email_id = $this->Session->read('search_user_email_id');
 			}
 
-			$download_application_customer_id_list = $this->pendingApplicationSearchConditions($download_search_application_type_id,$download_search_user_role,$download_ro_office_id,$download_mo_office_id,$download_io_office_id,$download_search_from_date,$download_search_to_date,$download_search_user_email_id,$table,$pending_application_type,$application_pending_days,$data_id,$selected_month=Null);
+			$download_application_customer_id_list = $this->pendingApplicationSearchConditions($download_search_application_type_id,$download_search_user_role,$download_ro_office_id,$download_mo_office_id,$download_io_office_id,$download_search_from_date,$download_search_to_date,$download_search_user_email_id,$table,$pending_application_type,$application_pending_days,$data_id,$selected_month=Null);/*add new parameter by shreeya*/ 
 
 			$this->Session->delete('search_application_type_id');
 			$this->Session->delete('search_user_role');
@@ -2049,7 +2050,7 @@ class ReportsController extends AppController {
 			$this->set('search_user_email_id',$search_user_email_id);
 
 
-			$application_customer_id_list = $this->pendingApplicationSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days,$data_id,$selected_month=Null);
+			$application_customer_id_list = $this->pendingApplicationSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days,$data_id,$selected_month=Null);/*add new parameter by shreeya*/
 
 			if (!empty($application_customer_id_list)) {
 
@@ -2078,7 +2079,7 @@ class ReportsController extends AppController {
 		} else {
 
 
-			$application_customer_id_list = $this->pendingApplicationSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days,$data_id,$selected_month=Null);
+			$application_customer_id_list = $this->pendingApplicationSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$pending_application_type,$application_pending_days,$data_id,$selected_month=Null);/*add new parameter by shreeya*/
 
 			if (!empty($application_customer_id_list)) {
 
@@ -2110,8 +2111,10 @@ class ReportsController extends AppController {
 	// #Contributer : Ankur Jangid (Migration)
 	// Date : 18-09-2017
 
-	public function pendingApplicationSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$application_array,$pending_application_type,$application_pending_days,$data_id=null,$selected_month=Null)
+	public function pendingApplicationSearchConditions($search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$search_from_date,$search_to_date,$search_user_email_id,$table,$application_array,$pending_application_type,$application_pending_days,$data_id=null,$selected_month=null)/*add new parameter by shreeya*/
 	{
+
+		
 		$current_date = new \DateTime(date("d-m-Y")); // Ankur updated new DateTime to new \DateTime as Class "App\Controller\DateTime" not found
 		$modify_date_obj = $current_date->modify('-15 day');
 		$modify_date = $modify_date_obj->format('d-m-Y H:i:s');
@@ -2507,7 +2510,9 @@ class ReportsController extends AppController {
 			}
 
 		} else {
+			
 			$application_customer_id = $this->$table->find('all')->select(['customer_id'])->where($conditions)->extract('customer_id')->toArray();
+			
 
 			// $i=0;
 			// foreach ($application_customer_id as $each_customer_id)
@@ -2517,13 +2522,16 @@ class ReportsController extends AppController {
 			// }
 			// replaced foreach with query by Ankur
 			$application_customer_id_list = $application_customer_id;
+			
 		}
 
 		if (!empty($application_customer_id_list)) {
-
+		
 			$i=0;
-			if ($pending_application_type == 'new') {
+			if ($pending_application_type = 'new') {
+				
 				foreach ($application_customer_id_list as $customer_id) {
+					
 					$customer_id_list = $this->DmiGrantCertificatesPdfs->find('all')->where(['customer_id IS' => $customer_id])->first();
 
 					if (empty($customer_id_list)) {
@@ -2531,11 +2539,13 @@ class ReportsController extends AppController {
 						$i=$i+1;
 					}
 				}
-
-			} elseif ($pending_application_type == 'renewal') {
+				
+				
+			} 
+			elseif ($pending_application_type = 'renewal') {
 
 				foreach ($application_customer_id_list as $customer_id ) {
-
+					
 					$customer_id_list = $this->DmiRenewalFinalSubmits->find('all')->where(['customer_id IS' => $customer_id, 'status' => 'approved'])->first();
 
 					if (empty($customer_id_list)) {
@@ -3311,7 +3321,7 @@ class ReportsController extends AppController {
 			$this->set('search_from_date', $search_from_date);
 			$this->set('search_to_date', $search_to_date);
 
-			$approved_application_lists = $this->approvedApplicationSearchConditions($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$data_id,$approved_application_type,$selected_month=Null);
+			$approved_application_lists = $this->approvedApplicationSearchConditions($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$data_id,$approved_application_type,$selected_month=Null);/*add new parameter by shreeya*/
 			$approved_application_list = $approved_application_lists[0];
 			$download_approved_application_list = $approved_application_lists[1];
 
@@ -3351,7 +3361,7 @@ class ReportsController extends AppController {
 		} else {
 
 
-			$approved_application_lists = $this->approvedApplicationSearchConditions($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$data_id,$approved_application_type,$selected_month=Null);
+			$approved_application_lists = $this->approvedApplicationSearchConditions($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$data_id,$approved_application_type,$selected_month=Null);/*add new parameter by shreeya*/
 
 			$approved_application_list = $approved_application_lists[0];
 
@@ -3479,7 +3489,7 @@ class ReportsController extends AppController {
 			$this->set('search_from_date', $search_from_date);
 			$this->set('search_to_date', $search_to_date);
 
-			$approved_application_lists = $this->approvedApplicationSearchConditions($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$selected_month=Null);
+			$approved_application_lists = $this->approvedApplicationSearchConditions($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$selected_month=Null);/*add new parameter by shreeya*/
 			$approved_application_list = $approved_application_lists[0];
 			$download_approved_application_list = $approved_application_lists[1];
 
@@ -3507,7 +3517,7 @@ class ReportsController extends AppController {
 
 		} else {
 
-			$approved_application_lists = $this->approvedApplicationSearchConditions($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$selected_month=Null);
+			$approved_application_lists = $this->approvedApplicationSearchConditions($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$selected_month=Null);/*add new parameter by shreeya*/
 
 			$approved_application_list = $approved_application_lists[0];
 
@@ -3529,7 +3539,7 @@ class ReportsController extends AppController {
 	// #Contributer : Ankur Jangid (Migration)
 	// Date : ----
 
-	public function approvedApplicationSearchConditions ($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$data_id=null,$approved_application_type=null,$selected_month=Null)
+	public function approvedApplicationSearchConditions ($search_application_type_id, $application_approved_office, $search_from_date, $search_to_date, $table, $search_flag,$data_id=null,$approved_application_type=null,$selected_month=Null)/*add new parameter by shreeya*/
 	{
 
 		$approved_application_list = [];
@@ -5653,6 +5663,7 @@ class ReportsController extends AppController {
 		//load models
 		$this->loadModel('DmiApplicationTypes');
 		$this->loadModel('DmiFlowWiseTablesLists');
+		//new model according to application type by shreeya on date [22-06-2023]
 		$this->loadModel('DmiChangePaymentDetails');
 		$this->loadModel('DmiRenewalApplicantPaymentDetails');
 		$this->loadModel('DmiChangePaymentDetails');
@@ -5675,6 +5686,7 @@ class ReportsController extends AppController {
 
 		//show the all application type added by shreeya on date 13-06-2023
 		$application_array = $this->DmiApplicationTypes->find('all')->select(['id', 'application_type'])->where(['delete_status IS NULL'])->order(['id'])->combine('id', 'application_type')->toArray();
+			//dynamically added application type by shreeya on date 14-06-2023
 
 
 
@@ -6179,7 +6191,7 @@ class ReportsController extends AppController {
 						$this->loadModel($tbl_data);
 
 						//$application_list_data[$j] = $this->$tbl_data->find('all',array('conditions'=>array('payment_confirmation'=>'confirmed','and'=>array('date(created) >=' => $from_date, 'date(created) <=' =>$to_date)),'order'=>'id desc'))->toArray();
-						//added for show paymet count of ca,pp,lab by shreeya on date [21-06-2023]
+						//added for show payment count of ca,pp,lab by shreeya on date [21-06-2023]
 						$application_list_data[$j] = $this->$tbl_data->find('all')->select(['id','customer_id','certificate_type','amount_paid','payment_confirmation'])->where(['payment_confirmation' =>'confirmed'])->toArray();
 
 						$j++;
@@ -12695,80 +12707,164 @@ class ReportsController extends AppController {
 	}
 
 
-		/*=================== This Function Used for AQCMS MPR Report Added By Shreeya [26-06-2023] ===========*/
-		public function pendingMprReport($applicn_type) {
+	/*=================== This Function Used for AQCMS MPR Report Added By Shreeya [26-06-2023] ===========*/
+	public function pendingMprReport($applicn_type) {
 
 
-			$application_pending_days = $this->Session->read('pending_days');
+		$application_pending_days = $this->Session->read('pending_days');
 
-			$applicn_type=base64_decode($applicn_type);
+		$applicn_type=base64_decode($applicn_type);
 
-			$this->loadModel('DmiApplicationTypes');
-			//show the all application type added by shreeya on date 13-06-2023
-			$application_type_data = $this->DmiApplicationTypes->find('all')->select(['id', 'application_type'])->where(['delete_status IS NULL','application_type'=>$applicn_type])->toArray();
-			$report_for = ''; // Initialize $report_for with a default value
-			if(!empty($application_type_data)){
-				$report_for = $application_type_data[0]['id'];
+		$this->loadModel('DmiApplicationTypes');
+		//show the all application type added by shreeya on date 13-06-2023
+		$application_type_data = $this->DmiApplicationTypes->find('all')->select(['id', 'application_type'])->where(['delete_status IS NULL','application_type'=>$applicn_type])->toArray();
+		$report_for = ''; // Initialize $report_for with a default value
+		if(!empty($application_type_data)){
+			$report_for = $application_type_data[0]['id'];
+		}
+		$this->set('report_for',$report_for);
+
+
+		//get application id array
+		$application_array = $this->DmiApplicationTypes->find('all')->select(['id', 'application_type'])->where(['delete_status IS NULL'])->order(['id'])->combine('id', 'application_type')->toArray();
+		$application_key = array_keys($application_array);
+
+		if (!empty($application_pending_days)) {
+			$report_name = 'AQCMS Pendency MPR';
+		} else {
+			$report_name ='AQCMS Pendency MPR';
+		}
+
+		$this->set('report_name',$report_name);
+
+		$table = 'DmiAllApplicationsCurrentPositions';
+		$pending_application_type = null ;
+
+
+		$application_type_xy = array('A'=>'CA (Form-A)', 'C'=>'Laboratory (Form-C)', 'E'=>'CA (Form-E)', 'B'=>'Printing Press (Form-B)', 'D'=>'Laboratory (Form-D)', 'F'=>'CA (Form-F)');
+
+		//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
+		asort($application_type_xy);
+		$this->set('application_type_xy',$application_type_xy);
+
+		//commented role not using by shreeya on date [08-07-2023]
+		$user_roles_xy = array('RO/SO'=>'RO/SO',/*'MO/SMO'=>'MO/SMO','IO'=>'IO','HO MO/SMO'=>'HO MO/SMO','DY.AMA'=>'DY.AMA','JT.AMA'=>'JT.AMA','AMA'=>'AMA'*/);
+
+		//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
+		asort($user_roles_xy);
+		$this->set('user_roles_xy',$user_roles_xy);
+
+		$ro_office = $this->DmiRoOffices->find('all')->where(['office_type IN' => ['SO', 'RO'], 'delete_status IS NULL'])->order(['ro_office' => 'ASC'])->combine('id', 'ro_office')->toArray();
+		$this->set('ro_office',$ro_office);
+
+		$search_application_type_id = $this->Session->read('search_application_type_id');
+		$search_user_role = $this->Session->read('search_user_role');
+		$ro_office_id = $this->Session->read('ro_office_id');
+		$mo_office_id = $this->Session->read('mo_office_id');
+		$io_office_id = $this->Session->read('io_office_id');
+		$selected_month = $this->Session->read('selected_month');
+		$search_to_date = $this->Session->read('search_to_date');
+		$search_user_email_id = $this->Session->read('search_user_email_id');
+		$application_array = $this->Session->read('application_array');
+		$report_for = $this->Session->read('report_for');
+
+
+
+
+		$download_search_application_type_id = $this->Session->read('search_application_type_id');
+		$download_search_user_role = $this->Session->read('search_user_role');
+		$download_ro_office_id = $this->Session->read('ro_office_id');
+		$download_mo_office_id = $this->Session->read('mo_office_id');
+		$download_io_office_id = $this->Session->read('io_office_id');
+		$download_selected_month = $this->Session->read('selected_month');
+		$download_search_to_date = $this->Session->read('search_to_date');
+		$download_search_user_email_id = $this->Session->read('search_user_email_id');
+		$download_report_for = $this->Session->read('report_for');
+
+
+		$this->set('search_application_type_id',$search_application_type_id);
+		$this->set('search_user_role',$search_user_role);
+		$this->set('ro_office_id',$ro_office_id);
+		$this->set('mo_office_id',$mo_office_id);
+		$this->set('io_office_id',$io_office_id);
+		$this->set('selected_month',$selected_month);
+		$this->set('search_to_date',$search_to_date);
+		$this->set('search_user_email_id',$search_user_email_id);
+		$this->set('report_for',$report_for);
+
+
+		// pr($search_application_type_id); exit;
+		// Set default value for download report click event (Done by pravin 14-03-2018)
+		$download_report = 'no';
+
+		//Check and Pass the entry for "Search" or "Download Report as Excel" button click event (Done by pravin 14-03-2018)
+		if (null != ($this->request->getData('search_logs')) || null != ($this->request->getData('download_report'))) {
+			
+			
+			//Check not empty "Download Report as Excel" button Request, if condition TRUE then set value "yes" for "Download Report as Excel" click event
+			//and pass this value to "mo_io_ro_allocation_serach_conditions" function (Done by pravin 14-03-2018)
+			if (!empty($this->request->getData('download_report'))) {
+				$download_report = 'yes';
+				
 			}
-			$this->set('report_for',$report_for);
+			
+			$application_array = $this->request->getData('application_array');
+			$search_application_type_id = $this->request->getData('application_type');
+			$search_user_role =  $this->request->getData('user_role');
+			$ro_office_id =  $this->request->getData('ro_office');
+			$mo_office_id =  $this->request->getData('mo_office');
+			$io_office_id =  $this->request->getData('io_office');
+			$report_for =  $this->request->getData('report_for');
 
+			
+			
+			$search_user_email_id =  $this->request->getData('user_id');
+			// $selected_month =  $this->request->getData('from_date');
+			$selected_month =  $this->request->getData('selected_month');
+			
+			$selected_month = $this->Customfunctions->dateFormatCheck($selected_month);
+			$search_to_date =  $this->request->getData('to_date');
+			$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
+			$this->date_comparison($selected_month,$search_to_date);
 
-			//get application id array
-			$application_array = $this->DmiApplicationTypes->find('all')->select(['id', 'application_type'])->where(['delete_status IS NULL'])->order(['id'])->combine('id', 'application_type')->toArray();
-			$application_key = array_keys($application_array);
-
-			if (!empty($application_pending_days)) {
-				$report_name = 'AQCMS Pendency MPR';
-			} else {
-				$report_name ='AQCMS Pendency MPR';
+			// Change on 2/11/2018 - For download excel report, Take search filter field value from session variables instend of POST variable - By Pravin
+			if ($download_report == 'yes') {
+			
+				$search_application_type_id = $this->Session->read('search_application_type_id');
+				$search_user_role = $this->Session->read('search_user_role');
+				$ro_office_id = $this->Session->read('ro_office_id');
+				$mo_office_id = $this->Session->read('mo_office_id');
+				$io_office_id = $this->Session->read('io_office_id');
+				$selected_month = $this->Session->read('selected_month');
+				$search_to_date = $this->Session->read('search_to_date');
+				$search_user_email_id = $this->Session->read('search_user_email_id');
+				$report_for = $this->Session->read('report_for');
+				
+				
 			}
 
-			$this->set('report_name',$report_name);
-
-			$table = 'DmiAllApplicationsCurrentPositions';
-			$pending_application_type = null ;
-
-
-			$application_type_xy = array('A'=>'CA (Form-A)', 'C'=>'Laboratory (Form-C)', 'E'=>'CA (Form-E)', 'B'=>'Printing Press (Form-B)', 'D'=>'Laboratory (Form-D)', 'F'=>'CA (Form-F)');
-
-			//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
-			asort($application_type_xy);
-			$this->set('application_type_xy',$application_type_xy);
-
-			//commented role not using by shreeya on date [08-07-2023]
-			$user_roles_xy = array('RO/SO'=>'RO/SO',/*'MO/SMO'=>'MO/SMO','IO'=>'IO','HO MO/SMO'=>'HO MO/SMO','DY.AMA'=>'DY.AMA','JT.AMA'=>'JT.AMA','AMA'=>'AMA'*/);
-
-			//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
-			asort($user_roles_xy);
-			$this->set('user_roles_xy',$user_roles_xy);
-
-			$ro_office = $this->DmiRoOffices->find('all')->where(['office_type IN' => ['SO', 'RO'], 'delete_status IS NULL'])->order(['ro_office' => 'ASC'])->combine('id', 'ro_office')->toArray();
-			$this->set('ro_office',$ro_office);
-
-			$search_application_type_id = $this->Session->read('search_application_type_id');
-			$search_user_role = $this->Session->read('search_user_role');
-			$ro_office_id = $this->Session->read('ro_office_id');
-			$mo_office_id = $this->Session->read('mo_office_id');
-			$io_office_id = $this->Session->read('io_office_id');
-			$selected_month = $this->Session->read('selected_month');
-			$search_to_date = $this->Session->read('search_to_date');
-			$search_user_email_id = $this->Session->read('search_user_email_id');
-			$application_array = $this->Session->read('application_array');
-			$report_for = $this->Session->read('report_for');
+			
+			$this->Session->delete('search_application_type_id');
+			$this->Session->delete('search_user_role');
+			$this->Session->delete('ro_office_id');
+			$this->Session->delete('mo_office_id');
+			$this->Session->delete('io_office_id');
+			$this->Session->delete('selected_month');
+			$this->Session->delete('search_to_date');
+			$this->Session->delete('search_user_email_id');
+			$this->Session->delete('report_for');
 
 
-
-
-			$download_search_application_type_id = $this->Session->read('search_application_type_id');
-			$download_search_user_role = $this->Session->read('search_user_role');
-			$download_ro_office_id = $this->Session->read('ro_office_id');
-			$download_mo_office_id = $this->Session->read('mo_office_id');
-			$download_io_office_id = $this->Session->read('io_office_id');
-			$download_selected_month = $this->Session->read('selected_month');
-			$download_search_to_date = $this->Session->read('search_to_date');
-			$download_search_user_email_id = $this->Session->read('search_user_email_id');
-			$download_report_for = $this->Session->read('report_for');
-
+			$this->Session->write('search_application_type_id',$search_application_type_id);
+			$this->Session->write('search_user_role',$search_user_role);
+			$this->Session->write('ro_office_id',$ro_office_id);
+			$this->Session->write('mo_office_id',$mo_office_id);
+			$this->Session->write('io_office_id',$io_office_id);
+			$this->Session->write('selected_month',$selected_month);
+			$this->Session->write('search_to_date',$search_to_date);
+			$this->Session->write('search_user_email_id',$search_user_email_id);
+			$this->Session->write('report_for',$report_for);
+			
 
 			$this->set('search_application_type_id',$search_application_type_id);
 			$this->set('search_user_role',$search_user_role);
@@ -12781,215 +12877,76 @@ class ReportsController extends AppController {
 			$this->set('report_for',$report_for);
 
 
-			// pr($search_application_type_id); exit;
-			// Set default value for download report click event (Done by pravin 14-03-2018)
-			$download_report = 'no';
 
-			//Check and Pass the entry for "Search" or "Download Report as Excel" button click event (Done by pravin 14-03-2018)
-			if (null != ($this->request->getData('search_logs')) || null != ($this->request->getData('download_report'))) {
+			$application_customer_id_list = $this->applicationSearchConditions($applicn_type,$report_for,$search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$selected_month,$search_to_date,$search_user_email_id,$table,$application_array,$pending_application_type,$application_pending_days);
+
+			if (!empty($application_customer_id_list)) {
+
+				$this->loadModel('DmiFlowWiseTablesLists');
+				if(empty($report_for) || $report_for == ''){
+
+					$applications_current_positions_tables = $this->DmiFlowWiseTablesLists->find('all')->select(['application_form','appl_current_pos'])->where(array('application_type IN'=>$application_key))->order(['id'])->combine('application_form','appl_current_pos')->toArray();
+
+				}
+
+					if($search_user_role == "AMA"){
+						$search_user_role ="level_4";
+					}elseif($search_user_role == 'RO/SO'){
+						$search_user_role ="level_3";
+					}elseif($search_user_role == 'MO/SO'){
+						$search_user_role ="level_1";
+					}elseif($search_user_role == 'IO'){
+						$search_user_role ="level_2";
+					}	elseif($search_user_role == 'DY.AMA'){
+							$search_user_role ="level_4";
+					}elseif($search_user_role == 'JT.AMA'){
+						$search_user_role ="level_4";
+					}elseif($search_user_role == 'HO MO/SMO'){
+						$search_user_role ="level_4";
+					}
+
+
+
 				
+				$current_users_details = array();
 				
-				//Check not empty "Download Report as Excel" button Request, if condition TRUE then set value "yes" for "Download Report as Excel" click event
-				//and pass this value to "mo_io_ro_allocation_serach_conditions" function (Done by pravin 14-03-2018)
-				if (!empty($this->request->getData('download_report'))) {
-					$download_report = 'yes';
+				foreach($applications_current_positions_tables as $each_table)
+				{
+					$key = array_search ($each_table, $applications_current_positions_tables);
+					$this->loadModel($each_table);
+					$this->loadModel($key);
+					
+					// show the listion customer id and check status approve with livel by shreeya [08-07-2023]
+					$checkLastStatus = $this->$key->find('all',array('conditions'=>array('customer_id IN'=>$application_customer_id_list),'order'=>'id desc'))->first();
+					if(!empty($checkLastStatus) && (($checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_4')) ||
+					($checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_1')))){
+						$current_users_details = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list,'current_level IS'=>$search_user_role])->toArray();
+					} else {//further condition
+						$current_users_details = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list,'current_level IS'=>$search_user_role])->toArray();
+						
+					}
+					
 					
 				}
-				
-				$application_array = $this->request->getData('application_array');
-				$search_application_type_id = $this->request->getData('application_type');
-				$search_user_role =  $this->request->getData('user_role');
-				$ro_office_id =  $this->request->getData('ro_office');
-				$mo_office_id =  $this->request->getData('mo_office');
-				$io_office_id =  $this->request->getData('io_office');
-				$report_for =  $this->request->getData('report_for');
 
 				
-				
-				$search_user_email_id =  $this->request->getData('user_id');
-				// $selected_month =  $this->request->getData('from_date');
-				$selected_month =  $this->request->getData('selected_month');
-				
-				$selected_month = $this->Customfunctions->dateFormatCheck($selected_month);
-				$search_to_date =  $this->request->getData('to_date');
-				$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
-				$this->date_comparison($selected_month,$search_to_date);
-
-				// Change on 2/11/2018 - For download excel report, Take search filter field value from session variables instend of POST variable - By Pravin
+				//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
 				if ($download_report == 'yes') {
-				
-					$search_application_type_id = $this->Session->read('search_application_type_id');
-					$search_user_role = $this->Session->read('search_user_role');
-					$ro_office_id = $this->Session->read('ro_office_id');
-					$mo_office_id = $this->Session->read('mo_office_id');
-					$io_office_id = $this->Session->read('io_office_id');
-					$selected_month = $this->Session->read('selected_month');
-					$search_to_date = $this->Session->read('search_to_date');
-					$search_user_email_id = $this->Session->read('search_user_email_id');
-					$report_for = $this->Session->read('report_for');
 					
-					
-				}
-
-				
-				$this->Session->delete('search_application_type_id');
-				$this->Session->delete('search_user_role');
-				$this->Session->delete('ro_office_id');
-				$this->Session->delete('mo_office_id');
-				$this->Session->delete('io_office_id');
-				$this->Session->delete('selected_month');
-				$this->Session->delete('search_to_date');
-				$this->Session->delete('search_user_email_id');
-				$this->Session->delete('report_for');
-
-
-				$this->Session->write('search_application_type_id',$search_application_type_id);
-				$this->Session->write('search_user_role',$search_user_role);
-				$this->Session->write('ro_office_id',$ro_office_id);
-				$this->Session->write('mo_office_id',$mo_office_id);
-				$this->Session->write('io_office_id',$io_office_id);
-				$this->Session->write('selected_month',$selected_month);
-				$this->Session->write('search_to_date',$search_to_date);
-				$this->Session->write('search_user_email_id',$search_user_email_id);
-				$this->Session->write('report_for',$report_for);
-				
-
-				$this->set('search_application_type_id',$search_application_type_id);
-				$this->set('search_user_role',$search_user_role);
-				$this->set('ro_office_id',$ro_office_id);
-				$this->set('mo_office_id',$mo_office_id);
-				$this->set('io_office_id',$io_office_id);
-				$this->set('selected_month',$selected_month);
-				$this->set('search_to_date',$search_to_date);
-				$this->set('search_user_email_id',$search_user_email_id);
-				$this->set('report_for',$report_for);
-
-
-
-				$application_customer_id_list = $this->applicationSearchConditions($applicn_type,$report_for,$search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$selected_month,$search_to_date,$search_user_email_id,$table,$application_array,$pending_application_type,$application_pending_days);
-
-				if (!empty($application_customer_id_list)) {
-
-					$this->loadModel('DmiFlowWiseTablesLists');
-					if(empty($report_for) || $report_for == ''){
-
-						$applications_current_positions_tables = $this->DmiFlowWiseTablesLists->find('all')->select(['application_form','appl_current_pos'])->where(array('application_type IN'=>$application_key))->order(['id'])->combine('application_form','appl_current_pos')->toArray();
-
+					if (!empty($application_customer_id_list)) {
+						$download_condition = ['customer_id IN' => $application_customer_id_list];
+					} else {
+						$download_condition = ['customer_id IS' => ''];
 					}
 
-						if($search_user_role == "AMA"){
-							$search_user_role ="level_4";
-						}elseif($search_user_role == 'RO/SO'){
-							$search_user_role ="level_3";
-						}elseif($search_user_role == 'MO/SO'){
-							$search_user_role ="level_1";
-						}elseif($search_user_role == 'IO'){
-							$search_user_role ="level_2";
-						}	elseif($search_user_role == 'DY.AMA'){
-								$search_user_role ="level_4";
-						}elseif($search_user_role == 'JT.AMA'){
-							$search_user_role ="level_4";
-						}elseif($search_user_role == 'HO MO/SMO'){
-							$search_user_role ="level_4";
-						}
+					$download_pending_application = array();
 
-
-
-					
-					$current_users_details = array();
-					
 					foreach($applications_current_positions_tables as $each_table)
 					{
 						$key = array_search ($each_table, $applications_current_positions_tables);
 						$this->loadModel($each_table);
 						$this->loadModel($key);
 						
-						// show the listion customer id and check status approve with livel by shreeya [08-07-2023]
-						$checkLastStatus = $this->$key->find('all',array('conditions'=>array('customer_id IN'=>$application_customer_id_list),'order'=>'id desc'))->first();
-						if(!empty($checkLastStatus) && (($checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_4')) ||
-						($checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_1')))){
-							$current_users_details = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list,'current_level IS'=>$search_user_role])->toArray();
-						} else {//further condition
-							$current_users_details = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list,'current_level IS'=>$search_user_role])->toArray();
-							
-						}
-						
-						
-					}
-
-					
-					//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
-					if ($download_report == 'yes') {
-						
-						if (!empty($application_customer_id_list)) {
-							$download_condition = ['customer_id IN' => $application_customer_id_list];
-						} else {
-							$download_condition = ['customer_id IS' => ''];
-						}
-
-						$download_pending_application = array();
-
-						foreach($applications_current_positions_tables as $each_table)
-						{
-							$key = array_search ($each_table, $applications_current_positions_tables);
-							$this->loadModel($each_table);
-							$this->loadModel($key);
-							
-							$customer_id_list = $this->$each_table->find('all')->select(['id', 'customer_id'])
-							->combine('id', 'customer_id')->toArray();
-
-							// Show customer id and approve -> level condition check by shreeya on date [08-07-2023]
-							if (!empty($customer_id_list)) {
-								$checkLastStatus = $this->$key->find('all', [
-									'conditions' => ['customer_id IN' => $customer_id_list],
-									'order' => 'id desc'
-								])->first();
-							
-								if (!empty($checkLastStatus) && (
-									($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_4')) ||
-									($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_1'))
-								)) {
-									$download_pending_application = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list,'current_level IS'=>$search_user_role])->toArray();
-								}else{
-									$download_pending_application = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list,'current_level IS'=>$search_user_role])->toArray();
-								}
-							
-							}
-
-						}
-
-				
-						$this->downloadPendingMprReport($download_pending_application,$application_array,$pending_application_type,$table);
-					}
-
-				} else {
-					$current_users_details = null;
-				}
-
-				$this->pendingMPRReportResults($applicn_type,$current_users_details,$application_array,$pending_application_type,$table);
-
-			} else {
-			
-				$application_customer_id_list = $this->applicationSearchConditions($applicn_type,$report_for,$search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$selected_month,$search_to_date,$search_user_email_id,$table,$application_array,$pending_application_type,$application_pending_days);
-
-				if (!empty($application_customer_id_list)) {	
-
-
-					$this->loadModel('DmiFlowWiseTablesLists');
-					if(empty($report_for) || $report_for == ''){
-
-						$applications_current_positions_tables = $this->DmiFlowWiseTablesLists->find('all')->select(['application_form','appl_current_pos'])->where(array('application_type IN'=>$application_key))->order(['id'])->combine('application_form','appl_current_pos')->toArray();
-					}
-					
-					$current_users_details = array();
-				
-					foreach($applications_current_positions_tables as $each_table)
-					{
-
-						$key = array_search ($each_table, $applications_current_positions_tables);
-						$this->loadModel($each_table);
-						$this->loadModel($key);
-
 						$customer_id_list = $this->$each_table->find('all')->select(['id', 'customer_id'])
 						->combine('id', 'customer_id')->toArray();
 
@@ -13004,185 +12961,240 @@ class ReportsController extends AppController {
 								($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_4')) ||
 								($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_1'))
 							)) {
-								$current_users_details = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->toArray();
+								$download_pending_application = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list,'current_level IS'=>$search_user_role])->toArray();
 							}else{
-								$current_users_details = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->toArray();
+								$download_pending_application = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list,'current_level IS'=>$search_user_role])->toArray();
 							}
 						
 						}
 
-					
 					}
-
-					
-					//$current_users_details = $this->$table->find('all')->where(['customer_id IN' => $application_customer_id_list])->order(['id' => 'DESC'])->toArray(); //->limit(['100'])
-					$this->set('current_users_details',$current_users_details);
-
-					//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
-					if ($download_report == 'yes') {
-						
-					
-						if (!empty($application_customer_id_list)) {
-							$download_condition = ['customer_id IN' => $application_customer_id_list];
-						} else {
-							$download_condition = ['customer_id IS' => ''];
-						}
-
-						$download_pending_application = array();
-
-						foreach($applications_current_positions_tables as $each_table)
-						{
-							$key = array_search ($each_table, $applications_current_positions_tables);
-							$this->loadModel($each_table);
-							$this->loadModel($key);
-							
-							$customer_id_list = $this->$each_table->find('all')->select(['id', 'customer_id'])
-							->combine('id', 'customer_id')->toArray();
-
-							// Show customer id and approve -> level condition check by shreeya on date [08-07-2023]
-							if (!empty($customer_id_list)) {
-								$checkLastStatus = $this->$key->find('all', [
-									'conditions' => ['customer_id IN' => $customer_id_list],
-									'order' => 'id desc'
-								])->first();
-							
-								if (!empty($checkLastStatus) && (
-									($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_4')) ||
-									($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_1'))
-								)) {
-									$download_pending_application = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->toArray();
-								}else{
-									$download_pending_application = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->toArray();
-								}
-							
-							}
-							
-						}
-
-				
-						$this->downloadPendingMprReport($download_pending_application,$application_array,$pending_application_type,$table);
-					}
-
-				} else {
-					
-					$current_users_details = null;
-				}
-
-				$this->pendingMPRReportResults($applicn_type,$current_users_details,$application_array,$pending_application_type,$table);
-			}
-
-				// $this->Session->delete('search_user_role');
-				// $this->Session->delete('ro_office_id');
-				// $this->Session->delete('selected_month');
-
-		}
-
-		//added by shreeya on date [27-06-202]
-		public function pendingMPRReportResults($applicn_type,$current_users_details,$application_array,$pending_application_type,$table) {
-
-			$applicn_type=base64_decode($applicn_type);
-
-			$date = [];
-			$user_list = null;
-			$application_type = null;
-			$user_roles = null;
-			$user_office = null;
-			$user_email_id =null;
-			$application_id = null;
-
-
-
-			if (!empty($current_users_details)) {
-
-
-					$i=0;
-					foreach ($current_users_details as $each_user) {
-
-
-						//$customer_id = $each_user['customer_id'];
-						// $each_user_detail = $each_user;
-						//$current_level = $each_user['current_level'];
-						$application_form_type = $this->Customfunctions->checkApplicantFormType($each_user['customer_id']);
-
-						if ($application_form_type == 'A') {
-							$application_type[$i]='CA (Form-A)';
-						} elseif ($application_form_type == 'B') {
-							$application_type[$i]='Printing Press (Form-B)';
-						} elseif ($application_form_type == 'C') {
-							$application_type[$i]='Laboratory (Form-C)';
-						} elseif ($application_form_type == 'D') {
-							$application_type[$i]='Laboratory (Form-D)';
-						} elseif ($application_form_type == 'E') {
-							$application_type[$i]='CA (Form-E)';
-						} elseif ($application_form_type == 'F') {
-							$application_type[$i]='CA (Form-F)';
-						}
-
-
-						$date[$i] = $each_user['created'];
-						$user_email_id[$i] = $each_user['current_user_email_id'];
-						$application_id[$i] = $each_user['customer_id'];
-
-
-						$user_posted_office_id=array();
-						if (!empty($user_email_id[$i])) {
-							$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IN' => $user_email_id[$i]])->first();
-
-						}
-						if (!empty($user_posted_office_id)) {
-							$user_office_details[$i] = $this->DmiRoOffices->find('all')->select(['ro_office'])->where(['id' => $user_posted_office_id['posted_ro_office']])->first();
-
-						}
-
-						if (!empty($user_office_details[$i])) {
-							$user_office[$i] = $user_office_details[$i]['ro_office'];
-						} else {
-							$user_office[$i] = '--';
-						}
-
-						$check_roles=array();
-						if (!empty($user_email_id[$i])) {
-							$check_roles = $this->DmiUserRoles->find('all')->where(['user_email_id IN' => $user_email_id[$i]])->first();
-						}
-
-						if (!empty($check_roles)) {
-							$user_list[$i] = $check_roles;
-						} else {
-							$user_list[$i] = '---';
-						}
-
-
-						// $apl_type =  $this->DmiApplicationTypes->find('all')->select(['id','application_type'])->where(['id' =>$application_array])->first();
-						// $apl_type_res[$i] = $apl_type['application_type'];
-
-
-						$user_roles[$i] = $this->checkUserRoleFromCurrentLevel($each_user['current_level'],$each_user['current_user_email_id']);
-
-
-					$i=$i+1;
-
-					}
-
-
-
-			}
-
-			$this->set('date',$date);
-			$this->set('user_list',$user_list);
-			$this->set('application_type',$application_type);
-			// $this->set('apl_type_res',$apl_type_res);
-			$this->set('user_roles',$user_roles);
-			$this->set('user_office',$user_office);
-			$this->set('user_email_id',$user_email_id);
-			$this->set('application_id',$application_id);
-
-		}
-
-		//added by shreeya on date [27-06-202]
-		public function applicationSearchConditions($applicn_type,$report_for,$search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$selected_month,$search_to_date,$search_user_email_id,$table,$application_array,$pending_application_type,$application_pending_days,$data_id=null,)
-		{
 
 			
+					$this->downloadPendingMprReport($download_pending_application,$application_array,$pending_application_type,$table);
+				}
+
+			} else {
+				$current_users_details = null;
+			}
+
+			$this->pendingMPRReportResults($applicn_type,$current_users_details,$application_array,$pending_application_type,$table);
+
+		} else {
+		
+			$application_customer_id_list = $this->applicationSearchConditions($applicn_type,$report_for,$search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$selected_month,$search_to_date,$search_user_email_id,$table,$application_array,$pending_application_type,$application_pending_days);
+
+			if (!empty($application_customer_id_list)) {	
+
+
+				$this->loadModel('DmiFlowWiseTablesLists');
+				if(empty($report_for) || $report_for == ''){
+
+					$applications_current_positions_tables = $this->DmiFlowWiseTablesLists->find('all')->select(['application_form','appl_current_pos'])->where(array('application_type IN'=>$application_key))->order(['id'])->combine('application_form','appl_current_pos')->toArray();
+				}
+				
+				$current_users_details = array();
+			
+				foreach($applications_current_positions_tables as $each_table)
+				{
+
+					$key = array_search ($each_table, $applications_current_positions_tables);
+					$this->loadModel($each_table);
+					$this->loadModel($key);
+
+					$customer_id_list = $this->$each_table->find('all')->select(['id', 'customer_id'])
+					->combine('id', 'customer_id')->toArray();
+
+					// Show customer id and approve -> level condition check by shreeya on date [08-07-2023]
+					if (!empty($customer_id_list)) {
+						$checkLastStatus = $this->$key->find('all', [
+							'conditions' => ['customer_id IN' => $customer_id_list],
+							'order' => 'id desc'
+						])->first();
+					
+						if (!empty($checkLastStatus) && (
+							($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_4')) ||
+							($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_1'))
+						)) {
+							$current_users_details = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->toArray();
+						}else{
+							$current_users_details = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->toArray();
+						}
+					
+					}
+
+				
+				}
+
+				
+				//$current_users_details = $this->$table->find('all')->where(['customer_id IN' => $application_customer_id_list])->order(['id' => 'DESC'])->toArray(); //->limit(['100'])
+				$this->set('current_users_details',$current_users_details);
+
+				//Fetch the all data that required for creating the downloading report as execel (Done by pravin 14-03-2018)
+				if ($download_report == 'yes') {
+					
+				
+					if (!empty($application_customer_id_list)) {
+						$download_condition = ['customer_id IN' => $application_customer_id_list];
+					} else {
+						$download_condition = ['customer_id IS' => ''];
+					}
+
+					$download_pending_application = array();
+
+					foreach($applications_current_positions_tables as $each_table)
+					{
+						$key = array_search ($each_table, $applications_current_positions_tables);
+						$this->loadModel($each_table);
+						$this->loadModel($key);
+						
+						$customer_id_list = $this->$each_table->find('all')->select(['id', 'customer_id'])
+						->combine('id', 'customer_id')->toArray();
+
+						// Show customer id and approve -> level condition check by shreeya on date [08-07-2023]
+						if (!empty($customer_id_list)) {
+							$checkLastStatus = $this->$key->find('all', [
+								'conditions' => ['customer_id IN' => $customer_id_list],
+								'order' => 'id desc'
+							])->first();
+						
+							if (!empty($checkLastStatus) && (
+								($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_4')) ||
+								($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_1'))
+							)) {
+								$download_pending_application = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->toArray();
+							}else{
+								$download_pending_application = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->toArray();
+							}
+						
+						}
+						
+					}
+
+			
+					$this->downloadPendingMprReport($download_pending_application,$application_array,$pending_application_type,$table);
+				}
+
+			} else {
+				
+				$current_users_details = null;
+			}
+
+			$this->pendingMPRReportResults($applicn_type,$current_users_details,$application_array,$pending_application_type,$table);
+		}
+
+			// $this->Session->delete('search_user_role');
+			// $this->Session->delete('ro_office_id');
+			// $this->Session->delete('selected_month');
+
+	}
+
+	//added by shreeya on date [27-06-202]
+	public function pendingMPRReportResults($applicn_type,$current_users_details,$application_array,$pending_application_type,$table) {
+
+		$applicn_type=base64_decode($applicn_type);
+
+		$date = [];
+		$user_list = null;
+		$application_type = null;
+		$user_roles = null;
+		$user_office = null;
+		$user_email_id =null;
+		$application_id = null;
+
+
+
+		if (!empty($current_users_details)) {
+
+
+				$i=0;
+				foreach ($current_users_details as $each_user) {
+
+
+					//$customer_id = $each_user['customer_id'];
+					// $each_user_detail = $each_user;
+					//$current_level = $each_user['current_level'];
+					$application_form_type = $this->Customfunctions->checkApplicantFormType($each_user['customer_id']);
+
+					if ($application_form_type == 'A') {
+						$application_type[$i]='CA (Form-A)';
+					} elseif ($application_form_type == 'B') {
+						$application_type[$i]='Printing Press (Form-B)';
+					} elseif ($application_form_type == 'C') {
+						$application_type[$i]='Laboratory (Form-C)';
+					} elseif ($application_form_type == 'D') {
+						$application_type[$i]='Laboratory (Form-D)';
+					} elseif ($application_form_type == 'E') {
+						$application_type[$i]='CA (Form-E)';
+					} elseif ($application_form_type == 'F') {
+						$application_type[$i]='CA (Form-F)';
+					}
+
+
+					$date[$i] = $each_user['created'];
+					$user_email_id[$i] = $each_user['current_user_email_id'];
+					$application_id[$i] = $each_user['customer_id'];
+
+
+					$user_posted_office_id=array();
+					if (!empty($user_email_id[$i])) {
+						$user_posted_office_id = $this->DmiUsers->find('all')->select(['posted_ro_office'])->where(['email IN' => $user_email_id[$i]])->first();
+
+					}
+					if (!empty($user_posted_office_id)) {
+						$user_office_details[$i] = $this->DmiRoOffices->find('all')->select(['ro_office'])->where(['id' => $user_posted_office_id['posted_ro_office']])->first();
+
+					}
+
+					if (!empty($user_office_details[$i])) {
+						$user_office[$i] = $user_office_details[$i]['ro_office'];
+					} else {
+						$user_office[$i] = '--';
+					}
+
+					$check_roles=array();
+					if (!empty($user_email_id[$i])) {
+						$check_roles = $this->DmiUserRoles->find('all')->where(['user_email_id IN' => $user_email_id[$i]])->first();
+					}
+
+					if (!empty($check_roles)) {
+						$user_list[$i] = $check_roles;
+					} else {
+						$user_list[$i] = '---';
+					}
+
+
+					// $apl_type =  $this->DmiApplicationTypes->find('all')->select(['id','application_type'])->where(['id' =>$application_array])->first();
+					// $apl_type_res[$i] = $apl_type['application_type'];
+
+
+					$user_roles[$i] = $this->checkUserRoleFromCurrentLevel($each_user['current_level'],$each_user['current_user_email_id']);
+
+
+				$i=$i+1;
+
+				}
+
+
+
+		}
+
+		$this->set('date',$date);
+		$this->set('user_list',$user_list);
+		$this->set('application_type',$application_type);
+		// $this->set('apl_type_res',$apl_type_res);
+		$this->set('user_roles',$user_roles);
+		$this->set('user_office',$user_office);
+		$this->set('user_email_id',$user_email_id);
+		$this->set('application_id',$application_id);
+
+	}
+
+	//added by shreeya on date [27-06-202]
+	public function applicationSearchConditions($applicn_type,$report_for,$search_application_type_id,$search_user_role,$ro_office_id,$mo_office_id,$io_office_id,$selected_month,$search_to_date,$search_user_email_id,$table,$application_array,$pending_application_type,$application_pending_days,$data_id=null,)
+	{
+
+		
 			$applicn_type=base64_decode($applicn_type);
 
 			$this->loadModel('DmiApplicationTypes');
@@ -13246,7 +13258,7 @@ class ReportsController extends AppController {
 					foreach ($posted_off as $off) {
 						$posted_offices[] = $off['ro_email_id'];
 					}
-					 
+						
 				} 
 				
 				
@@ -13391,7 +13403,7 @@ class ReportsController extends AppController {
 					foreach ($posted_off as $off) {
 						$posted_offices[] = $off['ro_email_id'];
 					}
-					 
+						
 				} 
 
 				$this->loadModel('DmiFlowWiseTablesLists');
@@ -13513,7 +13525,7 @@ class ReportsController extends AppController {
 					foreach ($posted_off as $off) {
 						$posted_offices[] = $off['ro_email_id'];
 					}
-					 
+						
 				} 
 
 				$this->loadModel('DmiFlowWiseTablesLists');
@@ -13761,7 +13773,7 @@ class ReportsController extends AppController {
 						// $customer_id_details = null;
 					}
 
-					 
+						
 					$final_customer_id_list = array();
 
 					if (!empty($customer_id_details[$i])) {
@@ -13883,7 +13895,7 @@ class ReportsController extends AppController {
 
 			}
 
-		}
+	}
 
 	//new function added by shreeya for download and generage exitseet [28-06-2023]
 	public function downloadPendingMprReport($download_pending_application,$pending_application_type,$table) {
