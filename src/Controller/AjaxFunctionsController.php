@@ -2734,5 +2734,273 @@ class AjaxFunctionsController extends AppController{
 	  $this->render('/element/application_forms/bgr/bgr_addmore_tbl/analysis_reports_form_tbl');
 
 	}
+
+		// ADD BGR Statement of Replica DETAILS
+	// @AUTHOR : SHANKHPAL SHENDE
+	// DATE : 16/01/2023
+	public function addStatementDetails(){
+
+		$this->autoRender = false;
+		$this->loadModel('DmiBgrStatementAddMoreDetails');
+
+		$customer_id = $this->Customfunctions->sessionCustomerID();
+		$firm_type = $this->Customfunctions->firmType($customer_id);
+   
+		$date = htmlentities($_POST['date'], ENT_QUOTES);
+		$commodity = htmlentities($_POST['commodity'], ENT_QUOTES);
+		$approved_tbl_brand = htmlentities($_POST['approved_tbl_brand'], ENT_QUOTES);
+		$agmark_grade = htmlentities($_POST['agmark_grade'], ENT_QUOTES);
+		$pack_size = htmlentities($_POST['pack_size'], ENT_QUOTES);
+		$from_a = htmlentities($_POST['from_a'], ENT_QUOTES);
+		$to_a = htmlentities($_POST['to_a'], ENT_QUOTES);
+		$total_a = htmlentities($_POST['total_a'], ENT_QUOTES);
+		$from_b = htmlentities($_POST['from_b'], ENT_QUOTES);
+		$to_b = htmlentities($_POST['to_b'], ENT_QUOTES);
+		$total_b = htmlentities($_POST['total_b'], ENT_QUOTES);
+		$from_c = htmlentities($_POST['from_c'], ENT_QUOTES);
+		$to_c = htmlentities($_POST['to_c'], ENT_QUOTES);
+		$total_c = htmlentities($_POST['total_c'], ENT_QUOTES);
+		$from_d = htmlentities($_POST['from_d'], ENT_QUOTES);
+		$to_d = htmlentities($_POST['to_d'], ENT_QUOTES);
+		$total_d = htmlentities($_POST['total_d'], ENT_QUOTES);
+		$from_e = htmlentities($_POST['from_e'], ENT_QUOTES);
+		$to_e = htmlentities($_POST['to_e'], ENT_QUOTES);
+		$total_e = htmlentities($_POST['total_e'], ENT_QUOTES);
+		$total_q = htmlentities($_POST['total_q'], ENT_QUOTES);
+		$remark = htmlentities($_POST['remark'], ENT_QUOTES);
+
+		$save_details_result = $this->DmiBgrStatementAddMoreDetails->saveStatementDetails($date,$commodity,$approved_tbl_brand,$agmark_grade,$pack_size,$from_a,$to_a,$total_a,$from_b,$to_b,$total_b,$from_c,$to_c,$total_c,$from_d,$to_d,$total_d,$from_e,$to_e,$total_e,$total_q,$remark);// call custome method from model
+		$added_statement_details = $this->DmiBgrStatementAddMoreDetails->statementDetails();
+		$this->Set('section_form_details',$added_statement_details);
+		
+		//this below call is modified "Element" changed to "element" as it declining the path on server by AKASH THAKRE on 23-03-2022
+		
+		$this->render('/element/application_forms/bgr/bgr_addmore_tbl/stement_of_replica_form_tbl');
+
+	}
+
+	public function editStatementId()
+	{
+
+		$this->autoRender = false;
+		$this->loadModel('DmiBgrStatementAddMoreDetails');
+
+		$customer_id = $this->Customfunctions->sessionCustomerID();
+		$firm_type = $this->Customfunctions->firmType($customer_id);
+
+		if ($this->Session->read('edit_statement_id')==null) {
+
+			$edit_statement_id = $_POST['edit_statement_id'];
+		
+			$this->Session->write('edit_statement_id',$edit_statement_id);
+    
+		} elseif ($_POST['edit_statement_id'] != $this->Session->read('edit_statement_id')) {
+
+			if ($_POST['edit_statement_id'] == '') {
+
+				$save_statement_id = $_POST['save_statement_id'];
+
+			} else {
+
+				$edit_statement_id = $_POST['edit_statement_id'];
+				
+				$this->Session->write('edit_statement_id',$edit_statement_id);
+			}
+		}
+   
+		if ($this->Session->read('edit_statement_id') != null) {
+
+			if (!empty($edit_statement_id)) {
+
+				$find_statement_details = $this->DmiBgrStatementAddMoreDetails->find('all',array('conditions'=>array('id IS'=>$edit_statement_id)))->first();
+
+				$this->set('find_statement_details',$find_statement_details);
+			}
+		}
+
+		if (!empty($save_statement_id)) {
+
+			$record_id = $this->Session->read('edit_statement_id');
+			$date = htmlentities($_POST['date'], ENT_QUOTES);
+			$commodity = htmlentities($_POST['commodity'], ENT_QUOTES);
+			$approved_tbl_brand = htmlentities($_POST['approved_tbl_brand'], ENT_QUOTES);
+			$agmark_grade = htmlentities($_POST['agmark_grade'], ENT_QUOTES);
+			$pack_size = htmlentities($_POST['pack_size'], ENT_QUOTES);
+			$from_a = htmlentities($_POST['from_a'], ENT_QUOTES);
+			$to_a = htmlentities($_POST['to_a'], ENT_QUOTES);
+			$total_a = htmlentities($_POST['total_a'], ENT_QUOTES);
+			$from_b = htmlentities($_POST['from_b'], ENT_QUOTES);
+			$to_b = htmlentities($_POST['to_b'], ENT_QUOTES);
+			$total_b = htmlentities($_POST['total_b'], ENT_QUOTES);
+			$from_c = htmlentities($_POST['from_c'], ENT_QUOTES);
+			$to_c = htmlentities($_POST['to_c'], ENT_QUOTES);
+			$total_c = htmlentities($_POST['total_c'], ENT_QUOTES);
+			$from_d = htmlentities($_POST['from_d'], ENT_QUOTES);
+			$to_d = htmlentities($_POST['to_d'], ENT_QUOTES);
+			$total_d = htmlentities($_POST['total_d'], ENT_QUOTES);
+			$from_e = htmlentities($_POST['from_e'], ENT_QUOTES);
+			$to_e = htmlentities($_POST['to_e'], ENT_QUOTES);
+			$total_e = htmlentities($_POST['total_e'], ENT_QUOTES);
+			$total_q = htmlentities($_POST['total_q'], ENT_QUOTES);
+			$remark = htmlentities($_POST['remark'], ENT_QUOTES);
+
+
+			$save_details_result = $this->DmiBgrStatementAddMoreDetails->editStatementDetails($record_id,$date,$commodity,$approved_tbl_brand,$agmark_grade,$pack_size,$from_a,$to_a,$total_a,$from_b,$to_b,$total_b,$from_c,$to_c,$total_c,$from_d,$to_d,$total_d,$from_e,$to_e,$total_e,$total_q,$remark);// call custome method from model
+			$this->Session->delete('edit_statement_id');
+		}
+
+	  $added_statement_details = $this->DmiBgrStatementAddMoreDetails->statementDetails();
+		
+		$this->Set('section_form_details',$added_statement_details);
+		
+	  $this->render('/element/application_forms/bgr/bgr_addmore_tbl/stement_of_replica_form_tbl');
+	}
+
+	// DELETE STATEMENT ID
+	// @AUTHOR : SHANKHPAL SHENDE
+	// DATE : 17/01/2023
+	
+	public function deleteStatementId() {
+		
+		$this->Session->delete('edit_statement_id');
+		$this->loadModel('DmiBgrStatementAddMoreDetails');
+
+		$customer_id = $this->Customfunctions->sessionCustomerID();
+		$firm_type = $this->Customfunctions->firmType($customer_id);
+
+		//$record_id = $id;
+		$record_id = $_POST['delete_statement_id'];
+		$statement_delete_result = $this->DmiBgrStatementAddMoreDetails->deleteStatementDetails($record_id);// call to custome function from model
+
+		 $added_statement_details = $this->DmiBgrStatementAddMoreDetails->statementDetails();
+		
+		$this->Set('section_form_details',$added_statement_details);
+		
+	  $this->render('/element/application_forms/bgr/bgr_addmore_tbl/stement_of_replica_form_tbl');
+		
+
+	}
+
+	// ADD BGR Revenue Statement for the Months DETAILS
+	// @AUTHOR : SHANKHPAL SHENDE
+	// DATE : 16/01/2023
+	public function addRevenueDetails(){
+		
+		$this->autoRender = false;
+		$this->loadModel('DmiBgrRevenueStatementAddMoreDetails');
+
+		$customer_id = $this->Customfunctions->sessionCustomerID();
+		$commodity = htmlentities($_POST['commodity'], ENT_QUOTES);
+		$approved_tbl_brand = htmlentities($_POST['approved_tbl_brand'], ENT_QUOTES);
+		$grade_designation = htmlentities($_POST['grade_designation'], ENT_QUOTES);
+		$bmlt_no = htmlentities($_POST['bmlt_no'], ENT_QUOTES);
+		$pack_size = htmlentities($_POST['pack_size'], ENT_QUOTES);
+		$total_quantity = htmlentities($_POST['total_quantity'], ENT_QUOTES);
+		$total_estimated_value = htmlentities($_POST['total_estimated_value'], ENT_QUOTES);
+		$agmark_advance_rc = htmlentities($_POST['agmark_advance_rc'], ENT_QUOTES);
+		$agmark_rc_fresh_amt_received = htmlentities($_POST['agmark_rc_fresh_amt_received'], ENT_QUOTES);
+		$total_amount = htmlentities($_POST['total_amount'], ENT_QUOTES);
+		$agmark_Revenue_closing_balance = htmlentities($_POST['agmark_Revenue_closing_balance'], ENT_QUOTES);
+		$remarks = htmlentities($_POST['remarks'], ENT_QUOTES);
+
+		$save_details_result = $this->DmiBgrRevenueStatementAddMoreDetails->saveRevenueDetails($commodity,$approved_tbl_brand,$grade_designation,$pack_size,$total_quantity,$bmlt_no,$total_estimated_value,$agmark_advance_rc,$agmark_rc_fresh_amt_received,$total_amount,$agmark_Revenue_closing_balance,$remarks);// call custome method from model
+		$added_revenue_details = $this->DmiBgrRevenueStatementAddMoreDetails->revenueDetails();
+		$this->Set('section_form_details',$added_revenue_details);
+		
+		//this below call is modified "Element" changed to "element" as it declining the path on server by AKASH THAKRE on 23-03-2022
+		
+		$this->render('/element/application_forms/bgr/bgr_addmore_tbl/revenue_statement_form_tbl');
+
+	}
+
+	// EDIT BGR Revenue Statement for the Months DETAILS
+	// @AUTHOR : SHANKHPAL SHENDE
+	// DATE : 16/01/2023
+	public function editRevenueId(){
+
+    $this->autoRender = false;
+		$this->loadModel('DmiBgrRevenueStatementAddMoreDetails');
+
+		$customer_id = $this->Customfunctions->sessionCustomerID();
+		$firm_type = $this->Customfunctions->firmType($customer_id);
+
+		if ($this->Session->read('edit_statement_id')==null) {
+
+			$edit_statement_id = $_POST['edit_statement_id'];
+		
+			$this->Session->write('edit_statement_id',$edit_statement_id);
+    
+		} elseif ($_POST['edit_statement_id'] != $this->Session->read('edit_statement_id')) {
+
+			if ($_POST['edit_statement_id'] == '') {
+
+				$save_statement_id = $_POST['save_statement_id'];
+
+			} else {
+
+				$edit_statement_id = $_POST['edit_statement_id'];
+				
+				$this->Session->write('edit_statement_id',$edit_statement_id);
+			}
+		}
+   
+		if ($this->Session->read('edit_statement_id') != null) {
+
+			if (!empty($edit_statement_id)) {
+
+				$find_statement_details = $this->DmiBgrRevenueStatementAddMoreDetails->find('all',array('conditions'=>array('id IS'=>$edit_statement_id)))->first();
+
+				$this->set('find_statement_details',$find_statement_details);
+			}
+		}
+
+		if (!empty($save_statement_id)) {
+
+			$record_id = $this->Session->read('edit_statement_id');
+			$commodity = htmlentities($_POST['commodity'], ENT_QUOTES);
+			$approved_tbl_brand = htmlentities($_POST['approved_tbl_brand'], ENT_QUOTES);
+			$grade_designation = htmlentities($_POST['grade_designation'], ENT_QUOTES);
+			$bmlt_no = htmlentities($_POST['bmlt_no'], ENT_QUOTES);
+			$pack_size = htmlentities($_POST['pack_size'], ENT_QUOTES);
+		  $total_quantity = htmlentities($_POST['total_quantity'], ENT_QUOTES);
+			$total_estimated_value = htmlentities($_POST['total_estimated_value'], ENT_QUOTES);
+			$agmark_advance_rc = htmlentities($_POST['agmark_advance_rc'], ENT_QUOTES);
+			$agmark_rc_fresh_amt = htmlentities($_POST['agmark_rc_fresh_amt'], ENT_QUOTES);
+			$total_amount = htmlentities($_POST['total_amount'], ENT_QUOTES);
+			$agmark_close_balance = htmlentities($_POST['agmark_close_balance'], ENT_QUOTES);
+			$remarks = htmlentities($_POST['remarks'], ENT_QUOTES);
+
+			$save_details_result = $this->DmiBgrRevenueStatementAddMoreDetails->editRevenueDetails($record_id,$commodity,$approved_tbl_brand,$grade_designation,$bmlt_no,$pack_size,$total_quantity,$total_estimated_value,$agmark_advance_rc,$agmark_rc_fresh_amt,$total_amount,$agmark_close_balance,$remarks);// call custome method from model
+			$this->Session->delete('edit_statement_id');
+		}
+
+	  $added_statement_details = $this->DmiBgrRevenueStatementAddMoreDetails->revenueDetails();
+		
+		$this->Set('section_form_details',$added_statement_details);
+		
+	  $this->render('/element/application_forms/bgr/bgr_addmore_tbl/revenue_statement_form_tbl');
+	}
+
+	// DELETE REVENUE STATEMENT ID
+	// @AUTHOR : SHANKHPAL SHENDE
+	// DATE : 17/01/2023
+	public function deleteRevenueId(){
+
+		$this->Session->delete('edit_statement_id');
+		$this->loadModel('DmiBgrRevenueStatementAddMoreDetails');
+
+		$customer_id = $this->Customfunctions->sessionCustomerID();
+
+		//$record_id = $id;
+		$record_id = $_POST['delete_statement_id'];
+		$statement_delete_result = $this->DmiBgrRevenueStatementAddMoreDetails->deleteRevenueDetails($record_id);// call to custome function from model
+
+		$added_statement_details = $this->DmiBgrRevenueStatementAddMoreDetails->revenueDetails();
+		
+		$this->Set('section_form_details',$added_statement_details);
+		
+	 $this->render('/element/application_forms/bgr/bgr_addmore_tbl/revenue_statement_form_tbl');
+
+	}
 }
 ?>

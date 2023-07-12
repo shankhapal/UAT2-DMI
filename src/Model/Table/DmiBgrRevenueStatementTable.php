@@ -11,45 +11,143 @@
 		var $name = "DmiBgrRevenueStatement";
 		
 		// Fetch form section all details
-		public function sectionFormDetails($customer_id)
-		{
+		public function sectionFormDetails($customer_id){
 		
-			$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
-				
-			if($latest_id != null){
-				$form_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();		
-				
-				$form_fields_details = $form_fields;
-				
-			}else{
-				
-				$form_fields_details = Array ( 'id'=>"", 'customer_id' => "",
-				'reffered_back_comment' => "",
-				'reffered_back_date' => "", 'form_status' =>"", 'customer_reply' =>"", 'customer_reply_date' =>"", 'approved_date' => "",
-				'current_level' => "",'mo_comment' =>"", 'mo_comment_date' => "", 'ro_reply_comment' =>"", 'ro_reply_comment_date' =>"", 'delete_mo_comment' =>"", 'delete_ro_reply' => "",'delete_ro_referred_back' => "", 'delete_customer_reply' => "", 'ro_current_comment_to' => "",
-				'rb_comment_ul'=>"",'mo_comment_ul'=>"",'rr_comment_ul'=>"",'cr_comment_ul'=>""); 
-				
-			}
+				$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+				$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
+	  		$DmiBgrAnalysisAddMoreDetails = TableRegistry::getTableLocator()->get('DmiBgrAnalysisAddMoreDetails');
+				$DmiChemistAllotments = TableRegistry::getTableLocator()->get('DmiChemistAllotments');
+				$DmiChemistRegistrations = TableRegistry::getTableLocator()->get('DmiChemistRegistrations');
+				$DmiChemistFinalSubmits = TableRegistry::getTableLocator()->get('DmiChemistFinalSubmits');
+				$DmiGrantCertificatesPdfs = TableRegistry::getTableLocator()->get('DmiGrantCertificatesPdfs');
 
 
-		$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
-		$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
-	  $DmiBgrAnalysisAddMoreDetails = TableRegistry::getTableLocator()->get('DmiBgrAnalysisAddMoreDetails');
-		$added_firms = $DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->toArray();		
-		$added_firm_field = $added_firms[0];	
+				$latest_id = $this->find('list', array(
+				'valueField'=>'id',
+				'conditions'=>array(
+				'customer_id IS'=>$customer_id)))->toArray();
+				
+				if($latest_id != null){
+					$form_fields = $this->find('all', array('conditions'=>array('id'=>MAX($latest_id))))->first();
+					
+					$form_fields_details = $form_fields;
+					
+				}else{
+				
+					$form_fields_details = array (
+						'id'=>"",
+						'customer_id' => "",
+						'reffered_back_comment' => "",
+						'reffered_back_date' => "",
+						'form_status' =>"",
+						'customer_reply' =>"",
+						'customer_reply_date' =>"",
+						'approved_date' => "",
+						'current_level' => "",
+						'mo_comment' =>"",
+						'mo_comment_date' => "",
+						'ro_reply_comment' =>"",
+						'ro_reply_comment_date' =>"",
+						'delete_mo_comment' =>"",
+						'delete_ro_reply' => "",
+						'delete_ro_referred_back' => "",
+						'delete_customer_reply' => "",
+						'ro_current_comment_to' => "",
+						'rb_comment_ul'=>"",
+						'mo_comment_ul'=>"",
+						'rr_comment_ul'=>"",
+						'cr_comment_ul'=>"",
+						'dated'=>"",
+						'authorized_chemist'=>"",
+						'period_from'=>"",
+						'period_to'=>""
+					);
+				
+				}
+
+
+	
+				$added_firms = $DmiFirms->find('all',array(
+					'conditions'=>array(
+					'customer_id IS'=>$customer_id)))->toArray();
+				$added_firm_field = $added_firms[0];
+				$customerId = $added_firm_field['customer_id'];
+
+				$get_last_grant_list = $DmiGrantCertificatesPdfs->find('list', array(
+    		'conditions' => array(
+        'customer_id IS' => $customerId
+				)))->toArray();
+
+				$get_last_grant_date = $DmiGrantCertificatesPdfs->find('all',array(
+				'conditions'=>array(
+				'id'=>max($get_last_grant_list
+				))))->first();
+
+				$last_grant_date = $get_last_grant_date['date'];
+				//added on 11-07-2023 by shankhpal//to get last 5 years from valid upto date
+				$CustomersController = new CustomersController;
+			
+				$certificate_valid_upto = $CustomersController->Customfunctions->getCertificateValidUptoDate(
+    			$customerId,$last_grant_date);
+
+				//taking id of multiple sub commodities	to show names in list
+				$subCommId = explode(',', (string) $added_firm_field['sub_commodity']); #For Deprecations
+			
+				$subCommodityValue = $MCommodity->find('list', array(
+					'valueField' => 'commodity_name',
+					'conditions' => array(
+					'commodity_code IN' => $subCommId
+				)))->toList();
+				
+	 		  $DmiBgrRevenueStatementAddMoreDetails = TableRegistry::getTableLocator()->get('DmiBgrRevenueStatementAddMoreDetails');
+
+   		  $revenue_details = $DmiBgrRevenueStatementAddMoreDetails->revenueDetails();
 		
-		//taking id of multiple sub commodities	to show names in list	
-		$sub_comm_id = explode(',',(string) $added_firm_field['sub_commodity']); #For Deprecations
-		$sub_commodity_value = $MCommodity->find('list',array('valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
+	  		$added_revenue_details = $revenue_details[1];
 
-	  $DmiBgrRevenueStatementAddMoreDetails = TableRegistry::getTableLocator()->get('DmiBgrRevenueStatementAddMoreDetails');
-    $revenue_details = $DmiBgrRevenueStatementAddMoreDetails->revenueDetails();	
-		
-	  $added_revenue_details = $revenue_details[1];
-
-		return array($form_fields_details,$added_revenue_details,$sub_commodity_value);
+				$dmiChemicalParameters = TableRegistry::getTableLocator()->get('DmiChemicalParameters');
+			
+				$chemical_parameters = $dmiChemicalParameters->find('list', array(
+					'valueField' => 'chemical_parameters',
+					'conditions' => array(
+					'delete_status IS NULL
+					'),
+					'order' => 'id'
+				))->toList();
 				
-		}		
+				$alloc_allocated_chemists = $DmiChemistAllotments->find('all',array('conditions'=>array('customer_id IS'=>$customerId)))->toArray();
+
+				$chemist_incharge = $DmiChemistAllotments->find('all',array(
+				'conditions'=>array('customer_id IS'=>$customerId,'incharge'=>'yes')))->first();
+
+				if(!empty($alloc_allocated_chemists)){
+					$i=0;
+					foreach ($alloc_allocated_chemists as $allocated_chemist) {
+						$chemist_id = $allocated_chemist['chemist_id'];
+
+						$isChemistApproved	= $DmiChemistFinalSubmits->find('all',array('fields'=>'status','conditions'=>array('customer_id IS'=>$chemist_id,'status'=>'approved'),'order'=>array('id'=>'desc')))->first();
+						
+						if (!empty($isChemistApproved)) {
+							$chemist_list = $DmiChemistRegistrations->find('all',array('conditions'=>array('chemist_id IS'=>$allocated_chemist['chemist_id'])))->toArray();
+							
+							//fetch chemist name
+							$alloc_chemist_name[$i] = $chemist_list[0]['chemist_fname']." ".$chemist_list[0]['chemist_lname'];
+							
+							$i=$i+1;
+						}
+					}
+				}
+
+
+				return array(
+					$form_fields_details,
+					$added_revenue_details,
+					$subCommodityValue,
+					$chemical_parameters,
+					$certificate_valid_upto,
+					$alloc_chemist_name);
+				
+		}
 		
 		
 		// save or update form data and comment reply by applicant
@@ -98,10 +196,20 @@
 					//added date function on 31-05-2021 by Amol to convert date format, as saving null
 					$created = $CustomersController->Customfunctions->changeDateFormat($section_form_details[0]['created']);
 				}
+
+				$htmlentitiesDated =  htmlentities($forms_data['dated'],ENT_QUOTES);
+				$authorizedChemist = implode(', ', array_map('htmlentities', $forms_data[
+					'authorized_chemist'], array_fill(0, count($forms_data['authorized_chemist']), ENT_QUOTES)));
+				$periodFrom = htmlentities($forms_data['period_from'],ENT_QUOTES);
+				$periodTo = htmlentities($forms_data['period_to'],ENT_QUOTES);
 				
 				$newEntity = $this->newEntity(array(			
 					'id'=>$max_id,
 					'customer_id'=>$customer_id,
+					'authorized_chemist'=>$authorizedChemist,
+					'period_from'=>$periodFrom,
+					'period_to'=>$periodTo,
+					'dated'=>$htmlentitiesDated,
 					'form_status'=>'saved',
 					'customer_reply'=>$htmlencoded_reply,
 					'customer_reply_date'=>$customer_reply_date,

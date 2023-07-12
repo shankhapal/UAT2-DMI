@@ -1,5 +1,4 @@
-
- <?php
+<?php
  ?>
 <div class="row">
   <div class="col-md-12 ">
@@ -43,7 +42,7 @@
                 <th class="tablehead">Action</th>
               </tr>
           <div id="statement_each_row">
-            <?php 
+            <?php
               $i=1;
               foreach ($section_form_details[1] as $each_statement) { ?>
                 <tr>

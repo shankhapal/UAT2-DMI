@@ -14,12 +14,9 @@
 
       public function revenueDetails(){
 		
-			if(strpos(base64_decode($_SESSION['username']), '@') !== false){//for email encoding
-				$customer_id = $_SESSION['customer_id'];
-			}else{
-				$customer_id = $_SESSION['username'];
-			}
 		
+			$customer_id = $_SESSION['packer_id'];
+
 			if(isset($_SESSION['edit_statement_id']))
       { 
         $hide_edit_id = array('id !='=>$_SESSION['edit_statement_id']); 
@@ -45,12 +42,8 @@
 
     public function saveRevenueDetails($commodity,$approved_tbl_brand,$grade_designation,$pack_size,$total_quantity,$bmlt_no,$total_estimated_value,$agmark_advance_rc,$agmark_rc_fresh_amt_received,$total_amount,$agmark_Revenue_closing_balance,$remarks){
 
-     
-			if(strpos(base64_decode($_SESSION['username']), '@') !== false){//for email encoding
-				$customer_id = $_SESSION['customer_id'];
-			}else{
-				$customer_id = $_SESSION['username'];
-			}
+			$customer_id = $_SESSION['packer_id'];
+			
                         
 			
 			$newEntity = $this->newEntity(array(
@@ -70,7 +63,7 @@
         'remarks'=>$remarks,
 				'created'=>date('Y-m-d H:i:s')
 			
-			)); 
+			));
 
 			if($this->save($newEntity)){
 				

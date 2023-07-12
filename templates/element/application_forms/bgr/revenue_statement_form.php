@@ -6,7 +6,8 @@ define('PLACEHOLDER_TEXT', 'Enter Valid upto');
 echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-data', 'id'=>$section)); ?>
 <section id="form_outer_main" class="content form-middle">
     <div class="container-fluid">
-        <h5 class="mt-1 mb-2">b) Detail Analysis Report of the Agmark Graded Commodity in Batch Wise</h5>
+      <?php $year = date("Y");$month = date("m");?>
+					<div class="card-header"><h5 class="mt-1 mb-2">d) Revenue Statement for the Months of [<?php echo $month; ?>] , [<?php echo $year; ?>]</h5></div>
         <div id="form_inner_main">
             <div class="row">
                 <div class="col-md-12">
@@ -211,7 +212,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                        
                         <div class="card card-success border p-2">
                           	<?php echo $this->element(
-                                'application_forms/bgr/bgr_addmore_tbl/analysis_reports_form_tbl'
+                                'application_forms/bgr/bgr_addmore_tbl/revenue_statement_form_tbl'
                             ); ?>
 
                         </div>
@@ -225,4 +226,6 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
 <?php
     echo $this->Html->script('element/application_forms/bgr/bianually_grading_validation');
     echo $this->Html->script('element/application_forms/bgr/analysis_reports');
+    echo $this->Html->script('element/application_forms/bgr/proceed_to_update.js');
+	  echo $this->Html->script('element/application_forms/bgr/revenue_statement_form');
 ?>

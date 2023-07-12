@@ -48,13 +48,9 @@
 
     	public function saveStatementDetails($date,$commodity,$approved_tbl_brand,$agmark_grade,$pack_size,$from_a,$to_a,$total_a,$from_b,$to_b,$total_b,$from_c,$to_c,$total_c,$from_d,$to_d,$total_d,$from_e,$to_e,$total_e,$total_q,$remark){
 	
-     
-			if(strpos(base64_decode($_SESSION['username']), '@') !== false){//for email encoding
-				$customer_id = $_SESSION['customer_id'];
-			}else{
-				$customer_id = $_SESSION['username'];
-			}
-                        
+               
+			$customer_id = $_SESSION['packer_id'];
+
 			
 			$newEntity = $this->newEntity(array(
 			

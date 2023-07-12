@@ -6,7 +6,8 @@ define('PLACEHOLDER_TEXT', 'Enter Valid upto');
 echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-data', 'id'=>$section)); ?>
 <section id="form_outer_main" class="content form-middle">
     <div class="container-fluid">
-        <h5 class="mt-1 mb-2">b) Detail Analysis Report of the Agmark Graded Commodity in Batch Wise</h5>
+        <h5 class="mt-1 mb-2">e) Details of Analysis of Food Safety Parameters Done from NABL 
+Accredited Laboratory During ……………</h5>
         <div id="form_inner_main">
             <div class="row">
                 <div class="col-md-12">

@@ -225,4 +225,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
 <?php
     echo $this->Html->script('element/application_forms/bgr/bianually_grading_validation');
     echo $this->Html->script('element/application_forms/bgr/analysis_reports');
+    echo $this->Html->script('element/application_forms/bgr/proceed_to_update.js');
+	echo $this->Html->script('element/application_forms/bgr/statement_of_replica_details');
+
 ?>
