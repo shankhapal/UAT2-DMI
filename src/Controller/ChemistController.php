@@ -1452,7 +1452,7 @@ class ChemistController extends AppController {
 			$from = date('d-m-Y',strtotime(str_replace('/','-',$reqData['shedule_from'])));
 			$to   = date('d-m-Y',strtotime(str_replace('/','-',$reqData['shedule_to'])));
 			
-			if($from < $to){
+			
 			$this->loadModel('DmiChemistRoToRalLogs');
 			$rescheduleDateData = $this->DmiChemistRoToRalLogs->newEntity( array('chemist_id' => $reqData['chemist_id'],
 			'chemist_first_name' => $reqData['chemist_first_name'],
@@ -1481,11 +1481,7 @@ class ChemistController extends AppController {
 			$message_theme = "warning";
 			$redirect_to = '../../chemist/listOfChemistApplRalToRo/';
 			}
-			}else{
-			$message ="Please select From Date always less than To Date!";
-			$message_theme = "warning";
-			$redirect_to = '../../chemist/trainingScheduleAtRo/'.$id.'';
-			}  
+			 
 			}
 
 			}else{

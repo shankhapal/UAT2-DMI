@@ -50,7 +50,14 @@
                     <?php echo $firm_address; ?>,<br>
                    <?php echo $district?>, <?php echo $state?> – <?php echo $pin_code?> <br> 
             </td>
+            <?php if(!empty($profile_photo)){ ?>
+            <td align="right"> <img src ="<?php echo $profile_photo; ?>" width="auto" height="80">
+           </td>
+            <?php } ?>
         </tr>
+        </table>
+
+      <table  width="100%">
 
         <tr>    
             <td><br>Subject: Relieving of <?php echo $chemist_fname."&nbsp;". $chemist_lname ;?> of <?php echo $firmName; ?>  <?php echo $firm_address; ?> after completion of training for analysis of  <?php echo $sub_commodities_list; ?> to be graded under Agmark –reg.</td>

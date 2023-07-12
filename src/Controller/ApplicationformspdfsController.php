@@ -4195,6 +4195,7 @@ class ApplicationformspdfsController extends AppController{
 				$this->loadModel('MCommodityCategory');
 				$this->loadModel('MCommodity');
 				$this->loadModel('DmiRoOffices');
+				$this->loadModel('DmiChemistProfileDetails');
 
 				$ro_fname = $this->Session->read('f_name');
 				$ro_lname = $this->Session->read('l_name');
@@ -4203,15 +4204,23 @@ class ApplicationformspdfsController extends AppController{
 				$this->set('ro_fname', $ro_fname);
 				$this->set('ro_lname', $ro_lname);
 				$this->set('role', $ro_role);
-
+                 
 				$chemistData = $this->DmiChemistTrainingAtRo->find('all',array('fields'=>array('chemist_id','chemist_fname','chemist_lname','ro_office_id')))->where(array('id IS'=>$id, 'training_completed IS'=>'1'))->first();
 				if(!empty($chemistData)){
-				$customer_id = $chemistData['chemist_id'];
+				$customer_id = $chemistData['chemist_id']; 
 				$this->set('customer_id',$chemistData['chemist_id']);
 				$this->set('chemist_fname',$chemistData['chemist_fname']);
 				$this->set('chemist_lname',$chemistData['chemist_lname']);
+                
+				// to set profile photo in letter added by laxmi on 12-07-2023
+                $chemist_profile= $this->DmiChemistProfileDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+				
+				if(!empty($chemist_profile)){
+					
+                    $this->set('profile_photo', $chemist_profile['profile_photo']);
+				}
 
-
+                   
 
 				$packer_id = $this->DmiChemistRegistrations->find('list', array('valueField'=>'created_by'))->where(array('chemist_id IS'=>$customer_id))->first();
 				if(!empty($packer_id)){
@@ -4436,11 +4445,12 @@ class ApplicationformspdfsController extends AppController{
 
 			$chemist_data = $this->DmiChemistRegistrations->find('all', array('fields'=>array('created_by','chemist_fname', 'chemist_lname') , 'conditions'=>array('chemist_id IS'=>$customer_id)))->first();
 
-			$chemist_address= $this->DmiChemistProfileDetails->find('all',array('fields'=>'address_1','conditions'=>array('customer_id IS'=>$customer_id)))->first();
-
+			$chemist_address= $this->DmiChemistProfileDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+           
 			$this->set('chemist_address',$chemist_address['address_1']);
 			$this->set('chemist_fname', $chemist_data['chemist_fname']);
 			$this->set('chemist_lname', $chemist_data['chemist_lname']);
+			$this->set('profile_photo', $chemist_address['profile_photo']);
 
 			//set packer id in session and level_3
 			$this->Session->write('packer_id',$chemist_data['created_by'] );
