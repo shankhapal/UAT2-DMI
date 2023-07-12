@@ -45,6 +45,9 @@
 					'customer_reply_date' =>"",
 					'approved_date' => "",
 					'current_level' => "",
+					'authorized_chemist'=>"",
+					'period_to'=>"",
+					'period_from'=>"",
 					'dated'=>"",
 					'mo_comment' =>"",
 					'mo_comment_date' => "",
@@ -90,7 +93,7 @@
     		$customerId,$last_grant_date
 			);
 		
-			//taking id of multiple sub commodities	to show names in list	
+			//taking id of multiple sub commodities	to show names in list
 			$subCommId = explode(',', (string) $addedFirmField['sub_commodity']); #For Deprecations
 			
 			$subCommodityValue = $mCommodity->find('list', array(

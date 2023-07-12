@@ -18,6 +18,9 @@
 	  		$DmiBgrAnalysisAddMoreDetails = TableRegistry::getTableLocator()->get('DmiBgrAnalysisAddMoreDetails');
 				$DmiBgrStatementAddMoreDetails = TableRegistry::getTableLocator()->get('DmiBgrStatementAddMoreDetails');
 				$DmiGrantCertificatesPdfs = TableRegistry::getTableLocator()->get('DmiGrantCertificatesPdfs');
+				$DmiChemistAllotments = TableRegistry::getTableLocator()->get('DmiChemistAllotments');
+				$DmiChemistRegistrations = TableRegistry::getTableLocator()->get('DmiChemistRegistrations');
+				$DmiChemistFinalSubmits = TableRegistry::getTableLocator()->get('DmiChemistFinalSubmits');
 
 				$latestId = $this->find('list', array(
 					'valueField'=>'id',
@@ -55,6 +58,10 @@
 						'delete_customer_reply' => "",
 						'ro_current_comment_to' => "",
 						'rb_comment_ul'=>"",
+						'authorized_chemist'=>"",
+						'period_to'=>"",
+						'period_from'=>"",
+						'dated'=>"",
 						'mo_comment_ul'=>"",
 						'rr_comment_ul'=>"",
 						'cr_comment_ul'=>""
@@ -70,11 +77,20 @@
     		'conditions' => array(
         'customer_id IS' => $customerId
 				)))->toArray();
-				pr($getLastGrantList);die;
+
+				$get_last_grant_date = $DmiGrantCertificatesPdfs->find('all',array(
+				'conditions'=>array(
+				'id'=>max($getLastGrantList
+				))))->first();
+				
+				$last_grant_date = $get_last_grant_date['date'];
+
 				//added on 11-07-2023 by shankhpal//to get last 5 years from valid upto date
 				$CustomersController = new CustomersController;
-
 		
+				$certificate_valid_upto = $CustomersController->Customfunctions->getCertificateValidUptoDate(
+    		$customerId,$last_grant_date);
+
 				//taking id of multiple sub commodities	to show names in list
 				$subCommId = explode(',',(string) $addedFirmField['sub_commodity']); #For Deprecations
 				$subCommodityValue = $MCommodity->find('list',array(
@@ -88,9 +104,54 @@
 		
 	  		$addedStatementDetails = $statementDetails[1];
 
-				return array($formFieldsDtails,$addedStatementDetails,$subCommodityValue);
+				$alloc_allocated_chemists = $DmiChemistAllotments->find('all',array(
+					'conditions'=>array(
+					'customer_id IS'=>$customerId
+				)))->toArray();
+			
+				$chemist_incharge = $DmiChemistAllotments->find('all',array(
+					'conditions'=>array(
+					'customer_id IS'=>$customerId,
+					'incharge'=>'yes'
+				)))->first();
+
+				if(!empty($alloc_allocated_chemists)){
+					$i=0;
+					foreach ($alloc_allocated_chemists as $allocated_chemist) {
+						$chemist_id = $allocated_chemist['chemist_id'];
+
+						$isChemistApproved	= $DmiChemistFinalSubmits->find('all',array(
+							'fields'=>'status',
+							'conditions'=>array(
+							'customer_id IS'=>$chemist_id,
+							'status'=>'approved'),
+							'order'=>array(
+							'id'=>'desc'
+						)))->first();
+						
+						if (!empty($isChemistApproved)) {
+							$chemist_list = $DmiChemistRegistrations->find('all',array(
+								'conditions'=>array(
+								'chemist_id IS'=>$allocated_chemist['chemist_id'
+							])))->toArray();
+							
+							//fetch chemist name
+							$alloc_chemist_name[$i] = $chemist_list[0]['chemist_fname']." ".$chemist_list[0]['chemist_lname'];
+							
+							$i=$i+1;
+						}
+					}
+				}
+
+				return array(
+					$formFieldsDtails,
+					$addedStatementDetails,
+					$subCommodityValue,
+					$certificate_valid_upto,
+					$alloc_chemist_name
+				);
 				
-		}		
+		}
 		
 		
 		// save or update form data and comment reply by applicant

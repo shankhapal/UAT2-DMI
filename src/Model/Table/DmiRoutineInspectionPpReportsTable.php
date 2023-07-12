@@ -233,14 +233,14 @@ class DmiRoutineInspectionPpReportsTable extends Table{
 
 		// this will be return hours and minutes dropdown
 		$time_array = ['' => 'Hour : Minute'];
-    for ($hour = 1; $hour <= 12; $hour++) {
-        for ($minute = 0; $minute <= 59; $minute++) {
-            $formattedHour = sprintf('%02d', $hour);
-            $formattedMinute = sprintf('%02d', $minute);
-            $time12HourFormat = date('h:i A', strtotime("$formattedHour:$formattedMinute"));
-            $time_array["$formattedHour:$formattedMinute"] = "$time12HourFormat";
-        }
-    }
+    for ($hour = 10; $hour <= 18; $hour++) {
+				for ($minute = 0; $minute <= 59; $minute++) {
+						$formattedHour = sprintf('%02d', $hour);
+						$formattedMinute = sprintf('%02d', $minute);
+						$time12HourFormat = date('h:i A', strtotime("$formattedHour:$formattedMinute"));
+						$time_array["$formattedHour:$formattedMinute"] = "$time12HourFormat";
+				}
+		}
 		return array($form_fields_details,$added_packaging_details,$find_ca_list,$all_packers_value,$registered_office_address,$printing_premises_address,$certificate_valid_upto,$packaging_materials_value,$total_suggestions,$time_array);
 	}
 

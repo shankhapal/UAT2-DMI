@@ -237,16 +237,15 @@ class DmiRtiLaboratoryDetailsTable extends Table{
 			);
 		}
 
-    $time_array = ['' => 'Hour : Minute'];
-    $time_array = ['' => 'Hour : Minute'];
-    for ($hour = 1; $hour <= 12; $hour++) {
-        for ($minute = 0; $minute <= 59; $minute++) {
-            $formattedHour = sprintf('%02d', $hour);
-            $formattedMinute = sprintf('%02d', $minute);
-            $time12HourFormat = date('h:i A', strtotime("$formattedHour:$formattedMinute"));
-            $time_array["$formattedHour:$formattedMinute"] = "$time12HourFormat";
-        }
-    }
+   $time_array = ['' => 'Hour : Minute'];
+    for ($hour = 10; $hour <= 18; $hour++) {
+				for ($minute = 0; $minute <= 59; $minute++) {
+						$formattedHour = sprintf('%02d', $hour);
+						$formattedMinute = sprintf('%02d', $minute);
+						$time12HourFormat = date('h:i A', strtotime("$formattedHour:$formattedMinute"));
+						$time_array["$formattedHour:$formattedMinute"] = "$time12HourFormat";
+				}
+		}
     
 		return array($form_fields_details,$sub_commodity_value,$chemist_full_name,$list_of_packer,$total_suggestions,$time_array);			
 	}
