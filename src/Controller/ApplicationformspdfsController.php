@@ -2669,16 +2669,16 @@ class ApplicationformspdfsController extends AppController{
 
 		//This is added to add the watermark on the pdf if the pdf for suspension or cancelletion - Akash [05-06-2023]
 		} elseif ($this->Session->check('for_module')) {
-	
 			$for_module = $this->Session->read('for_module');
 			if ($for_module === 'Suspension' || $for_module === 'Cancellation') {
 				$pdf = new PDF_Rotate(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 			}
 
-		}else{
+		}else{ 
 			$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);	
 		}
-			
+		
+		 
 			// set default monospaced font
 		//	$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
 
@@ -2705,9 +2705,35 @@ class ApplicationformspdfsController extends AppController{
 			
 			
 			$pdf->AddPage();
+			//added watermark image for chemist training approval certificate by laxmi on 13-07-2023
+			if($appl_type == 4){
+				$url_curl = $file_path;
+				$fileContent = file_get_contents($url_curl);
+                
+                $pageCount = preg_match_all("/\/Page\W/", $fileContent, $dummy);
+
+                     
+
+				//$pageCount = $pdf->getNumPages();
+				for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+				
+				
+				$watermarkImage = 'img/AdminLTELogo.png'; 
+				$ImageW = 85; //WaterMark Size
+                $ImageH = 70;
+				$myPageWidth = $pdf->getPageWidth();
+				$myPageHeight = $pdf->getPageHeight();
+				$myX = ($myPageWidth / 2) - 50;  //WaterMark Positioning
+				$myY = ($myPageHeight / 2) - 50;
+				$pdf->SetAlpha(0.20);
+				$pdf->Image($watermarkImage, $myX, $myY, $ImageW, $ImageH, '', '', 'C', true, 300); 
+				$pdf->SetAlpha(2.0);
+				$pdf->SetFooterMargin(5);
+				}
+			}
 			
 			$pdf->writeHTML($html, true, false, true, false, '');
-
+			
 			//get signer details
 			//if applicant
 			if(preg_match("/^[0-9]+\/[0-9]+\/[A-Z]+\/[0-9]+$/", $this->Session->read('username'),$matches)==1)
@@ -2766,7 +2792,7 @@ class ApplicationformspdfsController extends AppController{
 			if(ob_get_length() > 0) {
 				ob_end_clean();
 			}
-
+			
 			//Close and output PDF document
 			$pdf->my_output($file_path, $mode);
 			//generatin pdf ends here		
@@ -4340,11 +4366,16 @@ class ApplicationformspdfsController extends AppController{
 
 				$chemist_data = $this->DmiChemistRegistrations->find('all', array('fields'=>array('created_by','chemist_fname', 'chemist_lname') , 'conditions'=>array('chemist_id IS'=>$customer_id)))->first();
 
-				$chemist_address= $this->DmiChemistProfileDetails->find('all',array('fields'=>'address_1','conditions'=>array('customer_id IS'=>$customer_id)))->first();
-
-				$this->set('chemist_address',$chemist_address['address_1']);
+				$chemist_address= $this->DmiChemistProfileDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+               
+				$this->set('chemist_address',$chemist_address['address']);
 				$this->set('chemist_fname', $chemist_data['chemist_fname']);
 				$this->set('chemist_lname', $chemist_data['chemist_lname']);
+				$this->set('profile_photo', $chemist_address['profile_photo']);
+				$this->set('sign', $chemist_address['signature_photo']);
+				$this->set('middle_name_type', $chemist_address['middle_name_type']);
+				$this->set('middle_name', $chemist_address['middle_name']);
+				$this->set('profile_photo', $chemist_address['profile_photo']);
 
 				//set packer id in session and level_3
 				$this->Session->write('packer_id',$chemist_data['created_by'] );
@@ -4387,10 +4418,17 @@ class ApplicationformspdfsController extends AppController{
 				$this->set('sub_commodity_data',$sub_commodity_data);
 				//to fetch ral schedule training date
 				$roToRalData = $this->DmiChemistRalToRoLogs->find('all', array('conditions'=>array('chemist_id IS'=>$customer_id)))->last();
+				
 				if(!empty($roToRalData)){
 				$scheduleFrom = date('d-m-Y', strtotime(str_replace('/','.',$roToRalData['reshedule_from_date'])));
 				$scheduleTo = date('d-m-Y', strtotime(str_replace('/','.',$roToRalData['reshedule_to_date'])));
+                
 
+				//to fetch ral office name 
+				$raloffice = $this->DmiRoOffices->find('all',array('fields'=>'ro_office', 'conditions'=>array('id IS'=>$roToRalData['ral_office_id'])))->first();
+				if(!empty($raloffice)){
+                 $this->set('ral_office', $raloffice['ro_office']);
+				}
 				//to fetch RO schedule training date
 				$roToRalData = $this->DmiChemistRoToRalLogs->find('all', array('conditions'=>array('chemist_id IS'=>$customer_id)))->last();
 				
@@ -4403,8 +4441,11 @@ class ApplicationformspdfsController extends AppController{
 				$this->set('ro_shedule_to',$roscheduleTo);
 
 				//to fetch ro office name 
-				$office = $this->DmiRoOffices->find('all',array('fields'=>'ro_office', 'conditions'=>array('id IS'=>$roToRalData['ro_office_id'])))->first();
+				$office = $this->DmiRoOffices->find('all',array( 'conditions'=>array('id IS'=>$roToRalData['ro_office_id'])))->first();
+				
 				$this->set('ro_office',$office['ro_office']);
+				$this->set('office_type', $office['office_type']);
+				$this->set('ro_address', $office['ro_office_address']);
 				}
 
 				$ralToRoData = $this->DmiChemistRalToRoLogs->find('all', array('fields'=>array('ro_first_name', 'ro_last_name','ro_office_id'), 'conditions'=>array('chemist_id IS'=>$customer_id)))->first();
@@ -4447,7 +4488,7 @@ class ApplicationformspdfsController extends AppController{
 
 			$chemist_address= $this->DmiChemistProfileDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
            
-			$this->set('chemist_address',$chemist_address['address_1']);
+			$this->set('chemist_address',$chemist_address['address']);
 			$this->set('chemist_fname', $chemist_data['chemist_fname']);
 			$this->set('chemist_lname', $chemist_data['chemist_lname']);
 			$this->set('profile_photo', $chemist_address['profile_photo']);

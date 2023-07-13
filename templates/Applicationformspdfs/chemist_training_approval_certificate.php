@@ -42,7 +42,7 @@
 	</table>
 
     <table width="100%" border="1">
-        <tr><td align="center" style="padding:5px;"><h4>Certificate of Approval to Chemist Training</h4></td></tr>
+        <tr><td align="center" style="padding:5px;"><h4>Certificate of Approval of Chemist for grading and marking under AGMARK</h4></td></tr>
     </table>
 
     <table width="100%" border="1">
@@ -66,10 +66,16 @@
                   <?php echo $firm_state_name; ?> – <?php echo $customer_firm_data['postal_code']; ?>
 
             </td>
+            <?php if(!empty($profile_photo)){ ?>
+                   <td align = "right">
+                    <img src="<?php echo $profile_photo; ?>" width="100" height="80">
+                   </td>
+            <?php } ?>
         </tr>
-
+    </table>
+    <table  width="100%">
         <tr>    
-            <td><br>Subject: Application for approval of chemist for grading and marking of <?php echo $sub_commodities_list;?> under Agmark.</td>
+            <td><br>Subject: Approval of chemist for grading and marking of <?php echo $sub_commodities_list;?> under Agmark.</td>
         </tr>
                     
         <tr>
@@ -77,13 +83,15 @@
         </tr>   
 
         <tr>
-            <td>I am to inform that,<br>
-               Your chemist, <b><?php echo $chemist_fname;?> <?php echo $chemist_lname;?> </b>who has undergone necessary training in the analysis and grading of<b> <?php echo $sub_commodities_list;?> </b>under Agmark at the Regional Agmark Laboaratory, <b><?php echo $ro_first_name;?> <?php echo $ro_last_name;?> </b>for the period from <b><?php echo $schedule_from;?></b> to <b> <?php echo $shedule_to;?></b>  and procedural training in sampling, grading, packing and maintainance of records at the Regional Office, DMI, <b><?php echo $ro_office;?> </b>from the period from <b><?php echo $ro_schedule_from;?></b>  to <b><?php echo $ro_shedule_to;?></b> is hereby approved as chemist and permitted to take up the work relating to the analysis, grading and marking of <b><?php echo $sub_commodities_list;?> </b> under Agmark in accordance with the provisions in Agriculture Produce (Grading and Marking) Act, 1937,
+            <td>I am to inform that,
+               Your chemist, <b><?php echo $chemist_fname;?> <?php echo $chemist_lname;?> , <?php echo $middle_name_type ; ?> <?php echo $middle_name ; ?> </b>who has undergone necessary training in the analysis and grading of<b> <?php echo $sub_commodities_list;?> </b>under Agmark at the Regional Agmark Laboaratory, <b><?php echo $ral_office;?>  </b>
+               for the period from <b><?php echo $schedule_from;?></b> to <b> <?php echo $shedule_to;?></b>  and procedural training in sampling, grading, packing and maintainance of records at the <?php echo $office_type; ?>, DMI, <b><?php echo $ro_office;?> </b>from the period from <b><?php echo $ro_schedule_from;?></b>  to <b><?php echo $ro_shedule_to;?></b> 
+               is hereby approved as chemist and permitted to take up the work relating to the analysis, grading and marking of <b><?php echo $sub_commodities_list;?> </b> under Agmark in accordance with the provisions in Agriculture Produce (Grading and Marking) Act, 1937,
                <b><?php echo $sub_commodities_list;?></b> Grading & Marking (Amendment) Rules, [year] and the instructions issued in this connection from time to time by Agriculture Marketing Adviser to the Govt. of India.<br>
 
-               <b><?php echo $chemist_fname;?> <?php echo $chemist_lname;?></b> chemist shall be responsible, for safe custody of labels, replica bearing containers, maintenance of label account and label charges accounts, submission of regular monthly returns etc in the absence of chemist In-charge.<br>
+               <b><?php echo $chemist_fname;?> <?php echo $chemist_lname;?></b> chemist shall be responsible for safe custody of labels, replica bearing containers, maintenance of label account and label charges accounts, submission of regular monthly returns etc in the absence of chemist In-charge.<br>
 
-               It may be noted that as per the relevant instructions, the services of the approved chemist shall not be dispensed with without prior consent of the Agriculture Marketing Adviser to the Government of India or any person duly authorized by him.<br>	
+               It may be noted that as per the relevant instructions, the services of the approved chemist shall not be dispensed without prior consent of the Agriculture Marketing Adviser to the Government of India or any person duly authorized by him.<br>	
 			</td>
         </tr>
                     
@@ -99,7 +107,10 @@
 					
 		<tr>
 			<td>Your’s faithfully<br> 
-				<?php echo $ro_fname;?>  <?php echo $ro_lname;?>,<br> <?php echo $role;?><br> 
+				<?php echo $ro_fname;?>  <?php echo $ro_lname;?>,
+                <!-- <br> <?php //echo $role;?><br>  -->
+               
+                <br><?php echo str_replace(",","<br>",$ro_address); ?><br>
 				<?php echo $ro_office; ?>.<br>
 			</td>
 		</tr>
@@ -108,7 +119,7 @@
   <tr>
   	<td>
   		Copy to:<br>
-  		1.The Agriculture Marketing Adviser to the Govt. of India, DMI, Head Office, Faridabad for favour of information.<br>
+  		1.The Agricultural Marketing Adviser to the Govt. of India, DMI, Head Office, Faridabad for favour of information.<br>
   		2.<?php echo $chemist_fname;?> <?php echo $chemist_lname;?>, <?php echo $chemist_address;?>, for necessary action.<br>
 
   	</td>
