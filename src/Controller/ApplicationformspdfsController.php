@@ -4348,8 +4348,7 @@ class ApplicationformspdfsController extends AppController{
 				} 
 
 	          	//chemist training approval certificate added by laxmi B. on 03-01-2022
-				public function chemistTrainingApprovalCertificate()
-				{
+				public function chemistTrainingApprovalCertificate(){
 				$this->loadModel('DmiFirms');		
 				$this->loadModel('DmiUsers');
 				$this->loadModel('DmiStates');
@@ -4446,11 +4445,20 @@ class ApplicationformspdfsController extends AppController{
 				$this->set('ro_first_name',$ralToRoData['ro_first_name']);
 				$this->set('ro_last_name',$ralToRoData['ro_last_name']);
 
+				////////////////////////////////////////////////////////////////////////////////////////////
+				// This code added for printing QR code 
+				// @Author : Shankhpal Shende
+				// Date : 13/07/2023
+				$name = 'shankhpal';
+				$data = [$name];
+				$result_for_qr = $this->Customfunctions->getQrCode($data,$type="CHMT");
+				$this->set('result_for_qr',$result_for_qr);
+				///////////////////////////////////////////////////////////////////////////////////////////
 				$this->generateGrantCerticatePdf('/Applicationformspdfs/chemist_training_approval_certificate'); 
 
 				$this->redirect(array('controller'=>'dashboard','action'=>'home')); 
 
-				}
+			}
   
   
             //chemist training schedule letter at RO side added by laxmi on 10-1-2023	 

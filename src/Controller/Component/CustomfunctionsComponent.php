@@ -3597,7 +3597,7 @@ class CustomfunctionsComponent extends Component {
 	// Date : 12/08/2022
 	
 	public function getQrCode($result,$type=null){
-		
+
 		$customer_id = $this->Session->read('customer_id');
 		
 		#this condition is added if there is no customer_id in the session. - Akash [08-09-2022]
@@ -3652,7 +3652,10 @@ class CustomfunctionsComponent extends Component {
 
 			$data = "CA ID : ".$result[0]." ## "." CA Name : ".$result[1]."##"." Chemist Name : ".$result[2]."##"." Date : ".$result[3]."##"." Region : ".$result[4];		  
 		
-		}else{
+		}elseif($type == "CHMT"){  # For Chemist Training Flow (CHMT is use default type) -- by shankhpal on:13/07/2023
+			$data = "Name : ".$result[0];
+		}
+		else{
 
 			$data = "Certificate No :".$result[0]." ## "."Firm Name :".$result[3]." ## "."Grant Date :".$result[1]." ## "." Valid up to date: ".$result[2][max(array_keys($result[2]))];
 		}
@@ -3772,8 +3775,8 @@ class CustomfunctionsComponent extends Component {
 
 		public function monthcalForRti($createdDate){
 			
-			$currentDate = date("d/m/Y"); // current date
-			//$currentDate = "02/08/2023";
+			// $currentDate = date("d/m/Y"); // current date
+			$currentDate = "02/08/2023";
 			$date1 = Chronos::createFromFormat('d/m/Y', $createdDate); // Start date
 			$date2 = Chronos::createFromFormat('d/m/Y', $currentDate); // End date
 

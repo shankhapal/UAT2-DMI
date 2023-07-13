@@ -110,11 +110,16 @@
   		Copy to:<br>
   		1.The Agriculture Marketing Adviser to the Govt. of India, DMI, Head Office, Faridabad for favour of information.<br>
   		2.<?php echo $chemist_fname;?> <?php echo $chemist_lname;?>, <?php echo $chemist_address;?>, for necessary action.<br>
-
   	</td>
   </tr>
    <table>
 
+   <table width="100%">
+  <tr><!-- QR Code added by shankhpal shende on 13/07/2023 -->
+  	<td><img width="100" height="100" src="<?php echo $result_for_qr['qr_code_path']; ?>"></td>
+  </tr>
+   <table>
+    
 	
 	
         
