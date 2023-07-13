@@ -13,6 +13,14 @@
 		// Fetch form section all details
 		public function sectionFormDetails($customer_id){
 		
+			$dmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
+			$mCommodity = TableRegistry::getTableLocator()->get('MCommodity');
+			$DmiBgrAnalysisAddMoreDetails = TableRegistry::getTableLocator()->get('DmiBgrAnalysisAddMoreDetails');
+			$DmiGrantCertificatesPdfs = TableRegistry::getTableLocator()->get('DmiGrantCertificatesPdfs');
+			$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
+			$DmiChemistAllotments = TableRegistry::getTableLocator()->get('DmiChemistAllotments');
+			$DmiChemistRegistrations = TableRegistry::getTableLocator()->get('DmiChemistRegistrations');
+			$DmiChemistFinalSubmits = TableRegistry::getTableLocator()->get('DmiChemistFinalSubmits');
 			$DmiBgrAnalysisFoodSafetyAddMoreDetails = TableRegistry::getTableLocator()->get('DmiBgrAnalysisFoodSafetyAddMoreDetails');
 
 			$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
@@ -58,7 +66,12 @@
 	 
     	$analysis_details = $DmiBgrAnalysisFoodSafetyAddMoreDetails->foodSafetyDetails();
 	  	$added_analysis_details = $analysis_details[1];
-			$customerId = $added_firm_field['customer_id'];
+
+			$addedfirms = $dmiFirms->find('all', array('conditions' => array('customer_id IS' => $customer_id)))->toArray();
+			
+			$addedFirmField = $addedfirms[0];
+
+			$customerId = $addedFirmField['customer_id'];
 
 			$get_last_grant_list = $DmiGrantCertificatesPdfs->find('list', array(
     		'conditions' => array(
@@ -78,7 +91,7 @@
     		$customerId,$last_grant_date);
 			
 			//taking id of multiple sub commodities	to show names in list
-			$subCommId = explode(',', (string) $added_firm_field['sub_commodity']); #For Deprecations
+			$subCommId = explode(',', (string) $addedFirmField['sub_commodity']); #For Deprecations
 			
 			$subCommodityValue = $MCommodity->find('list', array(
 				'valueField' => 'commodity_name',

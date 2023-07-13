@@ -307,8 +307,8 @@ class DmiRtiLaboratoryDetailsTable extends Table{
     $htmlentities_name_of_inspecting_officer =  htmlentities($forms_data['name_of_inspecting_officer'],ENT_QUOTES);
     $htmlentities_designation_inspecting_officer =  htmlentities($forms_data['designation_inspecting_officer'],ENT_QUOTES);
     
-    $htmlentities_present_time_of_inspection =  $forms_data['present_time_of_inspection'];
-   
+    $htmlentities_present_time_of_inspection = implode(",", $forms_data['present_time_of_inspection']);
+  
     $time_p_inspection = htmlentities($forms_data['time_p_inspection'], ENT_QUOTES); // time_p_inspection added 
 
     if(!empty($forms_data['analytical_result_docs']->getClientFilename())){
