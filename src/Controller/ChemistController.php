@@ -699,9 +699,10 @@ class ChemistController extends AppController {
 		}
 
 
-         // set application type in session 
-		 $this->Session->write('application_type', 4);
-		 $application_type = $this->Session->read('application_type');
+         // set application type in 4 for chemist
+		 if($this->Session->read('application_dashboard') =='chemist'){
+            $application_type = 4;
+		 }
 
 		 //get packer id in session 
 		 $this->loadModel('DmiChemistRegistrations');
