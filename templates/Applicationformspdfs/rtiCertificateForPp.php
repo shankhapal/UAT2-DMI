@@ -1,4 +1,4 @@
-<?php pr($rti_pp_data['time_p_inspection']);die;?>
+<?php ?>
 <style>
 	h4 {
 		padding: 5px;
