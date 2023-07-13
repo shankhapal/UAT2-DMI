@@ -256,9 +256,6 @@
 
     $(document).ready(function () {
 
-
-        $('#fromdate').datepicker({format: "dd/mm/yyyy",orientation: "left top",autoclose: true,});
-        $('#todate').datepicker({ format: "dd/mm/yyyy", orientation: "left top", autoclose: true, });
         //added by shreeya show record month & year wise [06-07-2023]
         $('#selected_month').datepicker({
             orientation: "left top", autoclose: true, minViewMode: "months",
@@ -270,34 +267,13 @@
 
 
         $('#search_btn').click(function(){
-
-
-
-            var from = $("#fromdate").val()?.split("/");
-            var to = $("#todate").val()?.split("/");
-
-           // var month = $("#selected_month").val()?.split("/");
-
-
+           
             var date = $("#selected_month").val();
             var dateComponents = date.split("/");
             var day = dateComponents[0];
             var month = dateComponents[1];
             var year = dateComponents[2];
 
-
-
-
-            if(!(from==undefined || to==undefined)){
-                var fromdate = new Date(from[2], from[1] - 1, from[0]);
-                 var todate = new Date(to[2], to[1] - 1, to[0]);
-                if(todate < fromdate){
-
-                    alert('Invalid Date Range Selection');
-                    return false;
-                }
-
-            }
 
 
 
