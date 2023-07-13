@@ -3570,7 +3570,13 @@ class ApplicationformspdfsController extends AppController{
 		$customer_id = $this->Session->read('customer_id');
 		$this->set('customer_id',$customer_id);
 
-		$rti_ca_data = $this->DmiRtiCaPackerDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+		// condition updated fetch last inserted record on 13/07/2023-shankhpal
+		$rti_ca_data = $this->DmiRtiCaPackerDetails->find('all', [
+    	'conditions' => ['customer_id' => $customer_id],
+    	'order' => ['id' => 'DESC'],
+    	'limit' => 1
+		])->first();
+
 		$this->set('rti_ca_data',$rti_ca_data);
 
 		// data from DMI firm Table
@@ -3666,7 +3672,13 @@ class ApplicationformspdfsController extends AppController{
 		$customer_id = $this->Session->read('customer_id');
 		$this->set('customer_id',$customer_id);
 
-		$rti_pp_data = $this->DmiRoutineInspectionPpReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+		// condition updated fetch last inserted record on 13/07/2023-shankhpal
+		$rti_pp_data = $this->DmiRoutineInspectionPpReports->find('all', [
+    	'conditions' => ['customer_id' => $customer_id],
+    	'order' => ['id' => 'DESC'],
+    	'limit' => 1
+		])->first();
+
 		$this->set('rti_pp_data',$rti_pp_data);
 
 		$firm_details = $this->DmiFirms->firmDetails($customer_id);
@@ -3770,8 +3782,13 @@ class ApplicationformspdfsController extends AppController{
 		$customer_id = $this->Session->read('customer_id');
 		$this->set('customer_id',$customer_id);
 
-		// added DmiRtiLaboratoryDetails table by shankhpal on 26/05/2023
-		$rti_lab_data = $this->DmiRtiLaboratoryDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+		// condition updated fetch last inserted record on 13/07/2023-shankhpal
+		$rti_lab_data = $this->DmiRtiLaboratoryDetails->find('all', [
+    	'conditions' => ['customer_id' => $customer_id],
+    	'order' => ['id' => 'DESC'],
+    	'limit' => 1
+		])->first();
+
 		$this->set('rti_lab_data',$rti_lab_data);
 
 		$firm_details = $this->DmiFirms->firmDetails($customer_id);

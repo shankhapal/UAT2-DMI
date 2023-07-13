@@ -35,7 +35,8 @@
     		<td style="padding:10px; vertical-align:top;">Date & Time of present Inspection :</td>
     		<td style="padding:10px; vertical-align:top;">Date:
 				<?php echo isset($rti_lab_data['date_p_inspection']) ? $rti_lab_data['date_p_inspection'] : "NA"; ?>, Time:
-				 <?php echo isset($rti_lab_data['time_p_inspection']) ? $rti_lab_data['time_p_inspection'] : "NA"; ?></td>
+				<?php $time = date("h:i A", strtotime($rti_lab_data['time_p_inspection']));
+            echo isset($time) ? $time : "NA"; ?></td>
 		</tr>
 
     <tr>

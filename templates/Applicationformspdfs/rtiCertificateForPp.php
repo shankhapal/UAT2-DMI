@@ -1,4 +1,4 @@
-<?php //pr($packaging_materials_value);die;?>
+<?php pr($rti_pp_data['time_p_inspection']);die;?>
 <style>
 	h4 {
 		padding: 5px;
@@ -28,7 +28,8 @@
         <td style="padding:10px; vertical-align:top;">Date & Time of present Inspection :</td>
         <td style="padding:10px; vertical-align:top;">Date:
         <?php echo isset($rti_pp_data['date_p_inspection']) ? $rti_pp_data['date_p_inspection'] : "NA"; ?>, Time:
-            <?php echo isset($rti_pp_data['time_p_inspection']) ? $rti_pp_data['time_p_inspection'] : "NA"; ?>
+            <?php $time = date("h:i A", strtotime($rti_pp_data['time_p_inspection']));
+            echo isset($time) ? $time : "NA"; ?>
         </td>
       </tr>
       <tr>
@@ -62,8 +63,14 @@
 
       <tr>
           <td style="padding:10px; vertical-align:top;">4. Permitted packaging material :</td>
-          <td style="padding:10px; vertical-align:top;"><?php 
-          echo $this->Form->control('packaging_material', array('type'=>'select', 'options'=>$packaging_materials_value, 'multiple'=>'multiple', 'label'=>false, 'readonly'=>'readonly', 'class'=>'form-control')); ?></td>
+          <td style="padding:10px; vertical-align:top;">
+          <?php
+            if (!empty($packaging_materials_value)) {
+                echo implode(',', $packaging_materials_value);
+            } else {
+                echo 'NA';
+            }
+            ?></td>
       </tr>
 </table>  
 <table width="100%" border="1">
