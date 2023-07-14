@@ -60,16 +60,16 @@
 					<li class="nav-item">
 						<?php echo $this->Html->link('<i class="nav-icon far fa-dot-circle"></i></i><p class="nav-icon-p">Action Logs</p>', array('controller'=>'common', 'action'=>'user_action_history'), array('escape'=>false, 'class'=>'nav-link '.$menu_profile)); ?>
 					</li>						
-					<!-- The menu are added for BGR Module 
+					<!-- The menu are added for BGR Module    commented for by shankhpal for old BGR Modulw on 14/07/2023
 						Added by shankhpal shende on 21/06/2023 -->
-					<?php if($split_packer_name[1] == 1){ ?>
-						<li class="nav-item">
-							<a href="<?php echo $this->request->getAttribute("webroot");?>application/application-type/11" class="nav-link">
+					<?php //if($split_packer_name[1] == 1){ ?>
+						<!-- <li class="nav-item">
+							<a href="<?php// echo $this->request->getAttribute("webroot");?>application/application-type/11" class="nav-link">
 						<i class="nav-icon far fa-file-alt"></i>
 							<p class="nav-icon-p">Biannually Grading Report</p>
 							</a>
-					</li>	
-					<?php } ?>
+					</li>	 -->
+					<?php //} ?>
 						
 					<?php if (!empty($final_submit_status) && $final_submit_status == 'approved') { ?>
 						<li class="nav-item">
