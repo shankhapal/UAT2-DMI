@@ -869,7 +869,9 @@ class ApplicationController extends AppController{
 			if($application_type == 4){
 				$customer_id = $this->Session->read('username');
 			    $form_type='CHM';
+				
 			}	
+			
 
 			// Fetch submitted Payment Details and show // Done By pravin 13/10/2017
 			$this->Paymentdetails->applicantPaymentDetails($customer_id,$firm_details['district'],$payment_table);
@@ -879,7 +881,7 @@ class ApplicationController extends AppController{
 			$this->loadModel('MCommodityCategory');
 
 
-			$application_charge = $this->Customfunctions->applicationCharges($application_type,$firm_type);
+			$application_charge = $this->Customfunctions->applicationCharges($application_type,$firm_type); 
 			$this->set('application_charge',$application_charge);
 
 			$this->loadModel($payment_table);
@@ -905,7 +907,7 @@ class ApplicationController extends AppController{
 
 			}
 			$sub_commodity_array = explode(',',(string) $firm_details['sub_commodity']); #For Deprecations
-
+             
 			if (!empty($firm_details['sub_commodity'])) {
 				
 				$i=0;
@@ -920,7 +922,7 @@ class ApplicationController extends AppController{
 				$unique_commodity_id = array_unique($commodity_id);
 
 				$commodity_name_list = $this->MCommodityCategory->find('all',array('conditions'=>array('category_code IN'=>$unique_commodity_id, 'display'=>'Y')))->toArray();
-
+				
 				$this->set('commodity_name_list',$commodity_name_list);
 
 				$this->set('sub_commodity_data',$sub_commodity_data);
@@ -947,6 +949,16 @@ class ApplicationController extends AppController{
 			$this->set('allSectionDetails',$allSectionDetails);
 			$this->set('all_section_status',$all_section_status);
 			$this->set('section_details',$section_details);
+
+
+			if($application_type == 4){
+				//for auto filled payment  fetch payment from table by laxmi on 13-07-2023 , 
+				$this->loadModel('DmiChemistRegistrations');
+				$payment_amt = $this->DmiChemistRegistrations->find('all', array('fields'=>['payment'], 'conditions'=>['chemist_id IS'=>$customer_id]))->first();
+			   $this->set('payment_amt',$payment_amt['payment']);
+
+			   $this->set('application_charge',$payment_amt['payment']);
+			}
 
 			if (null !== ($this->request->getData('final_submit'))) {
 

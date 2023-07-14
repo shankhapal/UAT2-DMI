@@ -92,7 +92,8 @@
 														<label for="inputEmail3" class="col-sm-3 col-form-label">Category <span class="cRed">*</span></label>
 														<div class="col-sm-9">
 															<?php echo $this->Form->control('commodity', array('type'=>'select', 'id'=>'commodity_category', 'empty'=>'Select Category', 'options'=>$commodity_categories, 'label'=>false, 'class'=>'form-control')); ?>
-															<span id="error_commodity_category" class="error invalid-feedback"></span>
+															<input type="hidden" id="chemist_commodity_select" class="chemist_comoditites" value="application_type_4">
+                                                            <span id="error_commodity_category" class="error invalid-feedback"></span>
 														</div>
 													</div>
 													<div id="selected_bevo_nonbevo_msg"></div>
