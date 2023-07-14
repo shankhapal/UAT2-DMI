@@ -4451,8 +4451,7 @@ class ApplicationformspdfsController extends AppController{
 				// @Author : Shankhpal Shende
 				// Date : 13/07/2023
 				$full_name = $chemist_data['chemist_fname'] . ' ' . $chemist_data['chemist_lname'];
-				$dob = explode(" ",$chemist_data['dob']);
-				$dob = $dob[0];
+				$dob = explode(" ", $chemist_data['dob'])[0]; // Shortened the code to directly assign the first element
 				$ro_office = $office['ro_office'];
 				$commodityNames = [];
 				if(!empty($sub_commodity_data)){
@@ -4460,10 +4459,10 @@ class ApplicationformspdfsController extends AppController{
 						$commodityNames[] = $entity->commodity_name;
 					}
 					$commaSeparatedNames = implode(', ', $commodityNames);
+				}	else {
+    			$commaSeparatedNames = ''; // Added a default value if $sub_commodity_data is empty
 				}
-
 				$data = [$full_name,$dob,$commaSeparatedNames,$ro_office];
-				
 				$result_for_qr = $this->Customfunctions->getQrCode($data,$type="CHMT");
 				$this->set('result_for_qr',$result_for_qr);
 				///////////////////////////////////////////////////////////////////////////////////////////
