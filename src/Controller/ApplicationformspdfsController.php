@@ -4372,7 +4372,8 @@ class ApplicationformspdfsController extends AppController{
 				$this->set('ro_lname',$ro_lname);
 				$this->set('role',$role);
 
-				$chemist_data = $this->DmiChemistRegistrations->find('all', array('fields'=>array('created_by','chemist_fname', 'chemist_lname') , 'conditions'=>array('chemist_id IS'=>$customer_id)))->first();
+				// modify - by shankhpal shende [added dob field] - 14/07/2023
+				$chemist_data = $this->DmiChemistRegistrations->find('all', array('fields'=>array('created_by','chemist_fname', 'chemist_lname','dob') , 'conditions'=>array('chemist_id IS'=>$customer_id)))->first();
 
 				$chemist_address= $this->DmiChemistProfileDetails->find('all',array('fields'=>'address_1','conditions'=>array('customer_id IS'=>$customer_id)))->first();
 
@@ -4449,8 +4450,20 @@ class ApplicationformspdfsController extends AppController{
 				// This code added for printing QR code 
 				// @Author : Shankhpal Shende
 				// Date : 13/07/2023
-				$name = 'shankhpal';
-				$data = [$name];
+				$full_name = $chemist_data['chemist_fname'] . ' ' . $chemist_data['chemist_lname'];
+				$dob = explode(" ",$chemist_data['dob']);
+				$dob = $dob[0];
+				$ro_office = $office['ro_office'];
+				$commodityNames = [];
+				if(!empty($sub_commodity_data)){
+					foreach ($sub_commodity_data as $entity) {
+						$commodityNames[] = $entity->commodity_name;
+					}
+					$commaSeparatedNames = implode(', ', $commodityNames);
+				}
+
+				$data = [$full_name,$dob,$commaSeparatedNames,$ro_office];
+				
 				$result_for_qr = $this->Customfunctions->getQrCode($data,$type="CHMT");
 				$this->set('result_for_qr',$result_for_qr);
 				///////////////////////////////////////////////////////////////////////////////////////////

@@ -3653,7 +3653,7 @@ class CustomfunctionsComponent extends Component {
 			$data = "CA ID : ".$result[0]." ## "." CA Name : ".$result[1]."##"." Chemist Name : ".$result[2]."##"." Date : ".$result[3]."##"." Region : ".$result[4];		  
 		
 		}elseif($type == "CHMT"){  # For Chemist Training Flow (CHMT is use default type) -- by shankhpal on:13/07/2023
-			$data = "Name : ".$result[0];
+			$data = "Chemist Name: " . $result[0] . " ## " . "Date of Birth: " . $result[1] . " ## " . "Commodities: " . $result[2] . " ## " . "Certificate issued from: " . $result[3] . ".";
 		}
 		else{
 
