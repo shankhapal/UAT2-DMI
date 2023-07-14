@@ -3924,7 +3924,8 @@ class CustomfunctionsComponent extends Component {
 		
 		$DmiFlowWiseTablesLists = TableRegistry::getTableLocator()->get('DmiFlowWiseTablesLists');
 		$DmiApplicationTypes = TableRegistry::getTableLocator()->get('DmiApplicationTypes');
-		
+		$DmiRejectedApplLogs = TableRegistry::getTableLocator()->get('DmiRejectedApplLogs');
+
 		
 		if($user != null){
 	
@@ -3978,51 +3979,65 @@ class CustomfunctionsComponent extends Component {
 
 						if ($daysDifference > 5) {
 								
-							if ($eachLevel == 'level_1' || $eachLevel == 'level_2' || $eachLevel == 'level_4_ro' || $eachLevel == 'level_4_mo' || $eachLevel == "pao") {
-									
-								$appl_list[$i][$j][$k]['appl_type'] = $getApplType['application_type'];
-								$appl_list[$i][$j][$k]['appl_id'] = $eachAppl['customer_id'];
-
-								if ($eachLevel == 'level_1'){
-										$appl_list[$i][$j][$k]['process'] = 'Scrutiny';
-								} elseif ($eachLevel == 'level_2') {
-										$appl_list[$i][$j][$k]['process'] = 'Site Inspection';
-								} elseif ($eachLevel == 'level_4_ro') {
-										$appl_list[$i][$j][$k]['process'] = 'SO appl. communication';
-								} elseif ($eachLevel == 'level_4_mo') {
-										$appl_list[$i][$j][$k]['process'] = 'SO appl. Scrutiny at RO';
-								}elseif($eachLevel=='pao'){
-									$appl_list[$i][$j][$k]['process'] = 'Payment Verification';
-									$appl_list[$i][$j][$k]['last_trans_date'] = $eachAppl['created'];//intensionally taken created date for PAO
-								}
+							//check entry in rejected/junked table
+							$checkIfRejected = $DmiRejectedApplLogs->find('all',array('fields'=>'id','conditions'=>array('customer_id IS'=>$eachAppl['customer_id'],'appl_type IS'=>$eachflow['application_type'])))->first();
 							
-								$k++;
-								
-							} elseif ($eachLevel == 'level_3' || $eachLevel == 'level_4') {
+							if(empty($checkIfRejected)){
 
-								// check if appl submission and granted
-								$checkLastStatus = $finalSubmitTable->find('all', array('conditions' => array('customer_id IS' => $eachAppl['customer_id']),'order' => 'id desc'))->first();
-								
-								if ($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level']=='level_4')){
-								//nothing to do
-								}elseif ($eachLevel == 'level_3' || $eachLevel == 'level_4') {
-									
-									// check if appl submission and granted
-									$checkLastStatus = $finalSubmitTable->find('all', array('conditions' => array('customer_id IS' => $eachAppl['customer_id']),'order' => 'id desc'))->first();
-									
-									if ($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_4')) {
-										// check if grant certificate exists
-										$checkGrantCert = $this->$grantCertTable->find('all', array('conditions' => array('customer_id IS' => $eachAppl['customer_id'])))->toArray();
+								if ($eachLevel == 'level_1' || $eachLevel == 'level_2' || $eachLevel == 'level_4_ro' || $eachLevel == 'level_4_mo' || $eachLevel == "pao") {
 
-										if (!empty($checkGrantCert)) {
+										//check if appl submission and granted
+										$checkLastStatus = $finalSubmitTable->find('all',array('conditions'=>array('customer_id IS'=>$eachAppl['customer_id']),'order'=>'id desc'))->first();
+										
+										if(!empty($checkLastStatus) && (($checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_4')) ||
+										($eachflow['application_type'] == 4 && $checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_1')))){
+											//nothing
+												
+										}else{
 												$appl_list[$i][$j][$k]['appl_type'] = $getApplType['application_type'];
 												$appl_list[$i][$j][$k]['appl_id'] = $eachAppl['customer_id'];
-												$appl_list[$i][$j][$k]['process'] = 'Grant Certificate';
+
+												if ($eachLevel == 'level_1'){
+														$appl_list[$i][$j][$k]['process'] = 'Scrutiny';
+												} elseif ($eachLevel == 'level_2') {
+														$appl_list[$i][$j][$k]['process'] = 'Site Inspection';
+												} elseif ($eachLevel == 'level_4_ro') {
+														$appl_list[$i][$j][$k]['process'] = 'SO appl. communication';
+												} elseif ($eachLevel == 'level_4_mo') {
+														$appl_list[$i][$j][$k]['process'] = 'SO appl. Scrutiny at RO';
+												}elseif($eachLevel=='pao'){
+													$appl_list[$i][$j][$k]['process'] = 'Payment Verification';
+													$appl_list[$i][$j][$k]['last_trans_date'] = $eachAppl['created'];//intensionally taken created date for PAO
+												}
+	   
 												$k++;
 										}
+								}	elseif ($eachLevel == 'level_3' || $eachLevel == 'level_4') {
+
+									//check if appl submission and granted
+									$checkLastStatus = $finalSubmitTable->find('all',array('conditions'=>array('customer_id IS'=>$eachAppl['customer_id']),'order'=>'id desc'))->first();
+
+									if(!empty($checkLastStatus) && (($checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_4')) ||
+					   
+																	  
+		 
+												
+																																									 
+		 
+									($eachflow['application_type'] == 4 && $checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_1')))){
+										//nothing
+									}else{
+
+										
+										$appl_list[$i][$j][$k]['appl_type'] = $getApplType['application_type'];
+										$appl_list[$i][$j][$k]['appl_id'] = $eachAppl['customer_id'];
+										$appl_list[$i][$j][$k]['process'] = 'Grant Certificate';
+										$k++;
 									}
+
 								}
 							}
+		
 						} else {
 								// More than 5 days ago
 								$isWithinLast5Days = false;
@@ -4031,7 +4046,7 @@ class CustomfunctionsComponent extends Component {
 					}
 					$j++;
 				}
-			$i++;
+				$i++;
 			}
 			echo json_encode($appl_list);
 		}else{
@@ -4042,6 +4057,7 @@ class CustomfunctionsComponent extends Component {
 
 			$DmiUsers = TableRegistry::getTableLocator()->get('DmiUsers');
 			$DmiApplicationTypes = TableRegistry::getTableLocator()->get('DmiApplicationTypes');
+			$DmiRejectedApplLogs = TableRegistry::getTableLocator()->get('DmiRejectedApplLogs');
 
 			// Get all active users' emails
 			$all_active_users = $DmiUsers->find()->select(['email'])->where(['status' => 'active', 'division IN' => ['BOTH', 'DMI']])->toArray();
@@ -4116,40 +4132,59 @@ class CustomfunctionsComponent extends Component {
 								
 								foreach ($checkCurPosition as $eachAppl) {
 
-									if ($eachLevel == 'level_1' || $eachLevel == 'level_2' || $eachLevel == 'level_4_ro' || $eachLevel == 'level_4_mo') {
-											$appl_list['appl_type'] = $getApplType['application_type'];
-											$appl_list['appl_id'] = $eachAppl['customer_id'];
+									//check entry in rejected/junked table -- added on 06/07/2023 by shankhpal
+									$checkIfRejected = $DmiRejectedApplLogs->find('all',array('fields'=>'id','conditions'=>array('customer_id IS'=>$eachAppl['customer_id'],'appl_type IS'=>$eachflow['application_type'])))->first();
+
+									if(empty($checkIfRejected)){
+
+										if ($eachLevel == 'level_1' || $eachLevel == 'level_2' || $eachLevel == 'level_4_ro' || $eachLevel == 'level_4_mo') {
 											
-											if ($eachLevel == 'level_1') {
-													$appl_list['process'] = 'Scrutiny';
-											} elseif ($eachLevel == 'level_2') {
-													$appl_list['process'] = 'Site Inspection';
-											} elseif ($eachLevel == 'level_4_ro') {
-													$appl_list['process'] = 'SO appl. communication';
-											} elseif ($eachLevel == 'level_4_mo') {
-													$appl_list['process'] = 'SO appl. Scrutiny at RO';
-											}elseif($eachLevel=='pao'){
-													$appl_list['process'] = 'Payment Verification';
-													$appl_list['last_trans_date'] = $eachAppl['created'];//intensionally taken created date for PAO
+											//check if appl submission and granted
+											$checkLastStatus = $finalSubmitTable->find('all',array('conditions'=>array('customer_id IS'=>$eachAppl['customer_id']),'order'=>'id desc'))->first();
+											
+											if(!empty($checkLastStatus) && (($checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_4')) ||
+											($eachflow['application_type'] == 4 && $checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_1')))){
+												//nothing
+													
+											}else{
+												$appl_list['appl_type'] = $getApplType['application_type'];
+												$appl_list['appl_id'] = $eachAppl['customer_id'];
+												
+												if ($eachLevel == 'level_1') {
+														$appl_list['process'] = 'Scrutiny';
+												} elseif ($eachLevel == 'level_2') {
+														$appl_list['process'] = 'Site Inspection';
+												} elseif ($eachLevel == 'level_4_ro') {
+														$appl_list['process'] = 'SO appl. communication';
+												} elseif ($eachLevel == 'level_4_mo') {
+														$appl_list['process'] = 'SO appl. Scrutiny at RO';
+												}elseif($eachLevel=='pao'){
+														$appl_list['process'] = 'Payment Verification';
+														$appl_list['last_trans_date'] = $eachAppl['created'];//intensionally taken created date for PAO
+												}
+												
+												$levelCounts[$eachLevel] = isset($levelCounts[$eachLevel]) ? $levelCounts[$eachLevel] + 1 : 1;
+												$userApplicationCount++; // Increment application count for the user
 											}
 											
-											$levelCounts[$eachLevel] = isset($levelCounts[$eachLevel]) ? $levelCounts[$eachLevel] + 1 : 1;
-											$userApplicationCount++; // Increment application count for the user
-									}elseif($eachLevel=='level_3' || $eachLevel=='level_4'){
-										//check if appl submission and granted
-										$checkLastStatus = $finalSubmitTable->find('all',array('conditions'=>array('customer_id IS'=>$eachAppl['customer_id']),'order'=>'id desc'))->first();
-										if($checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_4')){
-											//nothing
-										}else{
-											$appl_list['appl_type'] = $getApplType['application_type'];
-											$appl_list['appl_id'] = $eachAppl['customer_id'];
+										}elseif($eachLevel=='level_3' || $eachLevel=='level_4'){
+											//check if appl submission and granted
+											$checkLastStatus = $finalSubmitTable->find('all',array('conditions'=>array('customer_id IS'=>$eachAppl['customer_id']),'order'=>'id desc'))->first();
 
-											if($eachLevel=='level_3'){	
-												$appl_list['process'] = 'with Nodal officer';
-				
-											}elseif($eachLevel=='level_4'){	
-												$appl_list['process'] = 'with HO Officer';
-				
+											if(!empty($checkLastStatus) && (($checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_4')) ||
+											($eachflow['application_type'] == 4 && $checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_1')))){
+												//nothing
+											}else{
+												$appl_list['appl_type'] = $getApplType['application_type'];
+												$appl_list['appl_id'] = $eachAppl['customer_id'];
+
+												if($eachLevel=='level_3'){	
+													$appl_list['process'] = 'with Nodal officer';
+					
+												}elseif($eachLevel=='level_4'){	
+													$appl_list['process'] = 'with HO Officer';
+					
+												}
 											}
 										}
 									}

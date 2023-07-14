@@ -433,13 +433,14 @@ class EsignController extends AppController {
 		//added condition  to set doc path by laxmi bhadade for chemist application [09-06-23]
 		$appl_type = $this->Session->read('application_type');
 		$application_dashboard = $this->Session->read('application_dashboard');
-		if($appl_type == 4 && $application_dashboard == 'chemist'){
+		$ca_unique_no = $this->Session->read('ca_unique_no');//moved here from below by Amol for condition
+		if($appl_type == 4 && $application_dashboard == 'chemist' && empty($ca_unique_no)){//added new condition by Amol for $ca_unique_no on 13-07-2023
           $doc_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/applications/CHM/'.$pdf_file_name;
 		}
 		
 		//added new condition for replica allotment esign
 		//on 30-07-2021 by Amol
-		$ca_unique_no = $this->Session->read('ca_unique_no');
+		
 		$ren_esign_process = $this->Session->read('ren_esign_process');
 		if(!empty($ca_unique_no)){			
 			$response_action = 'replica_allot_esign';//for replica allotment letter
@@ -946,7 +947,7 @@ public function renewalRequestReEsign(){
 		$pdf_file_name = $this->Session->read('pdf_file_name');	
 
 		//if response from ESP for esign request
-		if($this->request->is('post')){
+		//if($this->request->is('post')){
 
 		/*	$postData = $this->request->getData();
 			
@@ -966,7 +967,7 @@ public function renewalRequestReEsign(){
 					
 				//calling final submit process now after signature appended in pdf.
 
-				$main_domain_url = 'https://10.158.81.78/UAT-DMI/';
+				$main_domain_url = 'https://10.158.81.78/UAT2-DMI/';
 				$url_to_redirect =	$main_domain_url.$_SESSION['replica_for'].'/after_replica_allotment_esigned';				
 					
 				//this echo is used to redirect from CDAC to our Agarmark url.
@@ -976,10 +977,10 @@ public function renewalRequestReEsign(){
 			//by Amol to show esign failed message	
 			}else{
 				
-				$this->redirect('https://10.158.81.78/UAT-DMI/esign/esign_issue');//for Form Based Esign method by Amol
+				$this->redirect('https://10.158.81.78/UAT2-DMI/esign/esign_issue');//for Form Based Esign method by Amol
 			}
 			
-		}
+		//}
 		
 	}
 	
