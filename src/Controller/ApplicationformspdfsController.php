@@ -2619,7 +2619,7 @@ class ApplicationformspdfsController extends AppController{
 	//This is called at place of Mpdf output function with required parameteres.
 	//on 23-01-2020 by Amol
 	public function callTcpdf($html,$mode,$customer_id,$pdf_for,$file_path=null){
-	
+	  
 		$with_esign = $this->Session->read('with_esign');
 		$current_level = $this->Session->read('current_level');
 		$file_name = $this->Session->read('pdf_file_name');
@@ -2704,34 +2704,33 @@ class ApplicationformspdfsController extends AppController{
 		}
 			
 			
-			$pdf->AddPage();
-			//added watermark image for chemist training approval certificate by laxmi on 13-07-2023
-			if($appl_type == 4){
-				$url_curl = $file_path;
-				$fileContent = file_get_contents($url_curl);
-                
-                $pageCount = preg_match_all("/\/Page\W/", $fileContent, $dummy);
-
-                     
-
-				//$pageCount = $pdf->getNumPages();
-				for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-				
-				
-				$watermarkImage = 'img/AdminLTELogo.png'; 
-				$ImageW = 85; //WaterMark Size
-                $ImageH = 70;
-				$myPageWidth = $pdf->getPageWidth();
-				$myPageHeight = $pdf->getPageHeight();
-				$myX = ($myPageWidth / 2) - 50;  //WaterMark Positioning
-				$myY = ($myPageHeight / 2) - 50;
-				$pdf->SetAlpha(0.20);
-				$pdf->Image($watermarkImage, $myX, $myY, $ImageW, $ImageH, '', '', 'C', true, 300); 
-				$pdf->SetAlpha(2.0);
-				$pdf->SetFooterMargin(5);
-				}
-			}
+		$pdf->AddPage();
+		//added watermark image for chemist training approval certificate by laxmi on 13-07-2023
+		if($appl_type == 4 && $pdf_for == 'grant'){
+			$url_curl = $file_path;
+			$fileContent = file_get_contents($url_curl);
 			
+			$pageCount = preg_match_all("/\/Page\W/", $fileContent, $dummy);
+
+				 
+
+			//$pageCount = $pdf->getNumPages();
+			for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+			
+			
+			$watermarkImage = 'img/AdminLTELogo.png'; 
+			$ImageW = 85; //WaterMark Size
+			$ImageH = 70;
+			$myPageWidth = $pdf->getPageWidth();
+			$myPageHeight = $pdf->getPageHeight();
+			$myX = ($myPageWidth / 2) - 50;  //WaterMark Positioning
+			$myY = ($myPageHeight / 2) - 50;
+			$pdf->SetAlpha(0.20);
+			$pdf->Image($watermarkImage, $myX, $myY, $ImageW, $ImageH, '', '', 'C', true, 300); 
+			$pdf->SetAlpha(2.0);
+			$pdf->SetFooterMargin(5);
+			}
+		}
 			$pdf->writeHTML($html, true, false, true, false, '');
 			
 			//get signer details
@@ -4026,9 +4025,10 @@ class ApplicationformspdfsController extends AppController{
 					$this->set('state', $state['state_name']);
 					}
 					$this->set('pin_code', $firm_data['postal_code']);
-
-
-					$sub_commodity_array = explode(',',$firm_data['sub_commodity']);
+                    
+                    // to find commodity from registrtion table added code by laxmi on 14-07-2023
+					$commodities = $this->DmiChemistRegistrations->find('all', ['conditions'=>['chemist_id IS'=>$customer_id]])->first();
+					$sub_commodity_array = explode(',',$commodities['sub_commodities']);
 					$i=0;
 					foreach ($sub_commodity_array as $key => $sub_commodity) {
 
@@ -4126,7 +4126,10 @@ class ApplicationformspdfsController extends AppController{
 				$this->set('state', $state['state_name']);
 				}
 				// for multiple commodities select at export added by laxmi On 10-1-23
-				$sub_commodity_array = explode(',',$firmDetails['sub_commodity']);
+				// to find commodity from registrtion table added code by laxmi on 14-07-2023
+				$commodities = $this->DmiChemistRegistrations->find('all', ['conditions'=>['chemist_id IS'=>$customer_id]])->first();
+				$sub_commodity_array = explode(',',$commodities['sub_commodities']);
+				
 				$i=0;
 				foreach ($sub_commodity_array as $key => $sub_commodity) {
 
@@ -4262,7 +4265,9 @@ class ApplicationformspdfsController extends AppController{
 
 
 				// for multiple commodities select at export added by laxmi On 10-1-23
-				$sub_commodity_array = explode(',',$firmData['sub_commodity']);
+				// to find commodity from registrtion table added code by laxmi on 14-07-2023
+				$commodities = $this->DmiChemistRegistrations->find('all', ['conditions'=>['chemist_id IS'=>$customer_id]])->first();
+				$sub_commodity_array = explode(',',$commodities['sub_commodities']);
 				$i=0;
 				foreach ($sub_commodity_array as $key => $sub_commodity) {
 
@@ -4364,7 +4369,7 @@ class ApplicationformspdfsController extends AppController{
 				$this->set('ro_lname',$ro_lname);
 				$this->set('role',$role);
 
-				$chemist_data = $this->DmiChemistRegistrations->find('all', array('fields'=>array('created_by','chemist_fname', 'chemist_lname') , 'conditions'=>array('chemist_id IS'=>$customer_id)))->first();
+				$chemist_data = $this->DmiChemistRegistrations->find('all', array( 'conditions'=>array('chemist_id IS'=>$customer_id)))->first();
 
 				$chemist_address= $this->DmiChemistProfileDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
                
@@ -4402,7 +4407,7 @@ class ApplicationformspdfsController extends AppController{
 
 				//to show commodity name
 
-				$sub_commodity_array = explode(',',$customer_firm_data['sub_commodity']);
+				$sub_commodity_array = explode(',',$chemist_data['sub_commodities']);
 				$i=0;
 				foreach ($sub_commodity_array as $key => $sub_commodity) {
 

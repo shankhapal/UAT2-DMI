@@ -47,8 +47,9 @@ class CustomfunctionsComponent extends Component {
 		$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
 		$get_firm_details = $DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
 		$application_type = null;
-
-		if ($get_firm_details['is_already_granted']=='yes') {
+        
+		//added not empty condition by laxmi on 14-07-2023
+		if (!empty($$get_firm_details) && $get_firm_details['is_already_granted']=='yes') {
 			$application_type = 'old';
 		} else {
 			$application_type = 'new';
