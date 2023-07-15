@@ -215,6 +215,7 @@ class DmiRtiCaPackerDetailsTable extends Table{
 		$grade_units =$MUnitWeight->find('list',array('keyField'=>'unit_weight','valueField'=>'unit_weight','conditions' => array('display' => 'Y'),'order'=>'unit_id asc'))->toArray();
 		// this will be return hours and minutes dropdown
 		$time_array = ['' => 'Hour : Minute'];
+
     for ($hour = 10; $hour <= 18; $hour++) {
 				for ($minute = 0; $minute <= 59; $minute++) {
 						$formattedHour = sprintf('%02d', $hour);
@@ -226,8 +227,9 @@ class DmiRtiCaPackerDetailsTable extends Table{
 
 
 		return array($form_fields_details,$added_sample_details,$certificate_valid_upto,$sub_commodity_value,$lab_list,$printers_list,$self_registered_chemist,$total_suggestions,$grade_units,$time_array);			
-			
+
 	}
+	
 	
 	/* Comment
 	Reason : Updated saveFormDetails function as per change request 
@@ -235,7 +237,7 @@ class DmiRtiCaPackerDetailsTable extends Table{
 	Date: 13-05-2023
   */
 	public function saveFormDetails($customer_id,$forms_data){
-
+	
 		$CustomersController = new CustomersController;			
 		$ca_bevo_applicant = $CustomersController->Customfunctions->checkCaBevo($customer_id); 
 		$Dmi_flow_wise_tables_list = TableRegistry::getTableLocator()->get('DmiFlowWiseTablesLists');
@@ -508,7 +510,9 @@ class DmiRtiCaPackerDetailsTable extends Table{
 				'shortcomings_noticed_docs'=>$shortcomings_noticed_docs,
 				'signnature_of_packer_docs'=>$signnature_of_packer_docs,
 				'signnature_of_inspecting_officer_docs'=>$signnature_of_inspecting_officer_docs,
+
 				'version'=>$current_version,
+
 				'quantity'=>$quantity, // added on 27/06/2023 by shankhpal
 				'grade_units' => $grade_units, // added on 27/06/2023 by shankhpal
 				'time_p_inspection'=>$time_p_inspection, // added on 27/06/2023 by shankhpal

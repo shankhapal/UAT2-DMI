@@ -141,6 +141,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
             </div>
             <div class="col-md-6">
                 <?php echo $this->Form->control('approved_chemist', array('type'=>'select', 'options'=>$section_form_details[2], 'multiple'=>'multiple', 'label'=>false, 'disabled'=>'disabled', 'class'=>'form-control')); ?>
+
                  <?php if (empty($section_form_details[2])) : ?>
                     <ol class="badge">
                       <a target="_blank" href="/testdocs/DMI/manuals/applicant/Chemist Registration.pdf">Manual for Chemist Registration</a>
@@ -167,7 +168,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                 $chemst = $section_form_details[2];
                
                 $selectedOptions = explode(',', $section_form_details[0]['present_time_of_inspection']);
-                
+
                 $selectedValues = [];
                 if(!empty($chemst)){
                     foreach ($selectedOptions as $option) {
@@ -195,6 +196,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                 );
                 ?>
             </div>
+
         </div>
     </div>
 </div>

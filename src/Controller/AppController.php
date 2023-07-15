@@ -51,10 +51,10 @@ class AppController extends Controller
 
         $this->loadComponent('RequestHandler',['enableBeforeRedirect' => false,]);
         $this->loadComponent('Flash');
-		$this->loadComponent('Beforepageload');
-		$this->loadComponent('Createcaptcha');
-		$this->loadComponent('Customfunctions');
-		$this->loadComponent('Authentication');
+				$this->loadComponent('Beforepageload');
+				$this->loadComponent('Createcaptcha');
+				$this->loadComponent('Customfunctions');
+				$this->loadComponent('Authentication');
         $this->Session = $this->getRequest()->getSession();
 
 		//Load Model
@@ -90,6 +90,10 @@ class AppController extends Controller
 
 			Router::url('/');
 		}
+
+		/*$this->loadComponent('Customfunctions');
+		$check = $this->Customfunctions->getCertificateValidUptoDate('4894/3/SGL/002','31-07-2021 00:00:00');
+		print_r($check);exit;*/
 
 
 		//This Below we defined the Array for the Application Types from which dashboard will count and list will recognize 
@@ -159,7 +163,28 @@ class AppController extends Controller
 		$user_last_login = $this->Customfunctions->userLastLogins();
 		$this->set('user_last_login',$user_last_login);
 
-		
+		// this condition added for sending sms and email for daily basis 
+		// the custome function call once in a day and added new entry in db 
+		// added by shankhpal shende on 04/07/2023
+    //temp. commented
+		/*$DmiPendingSmsEmailSendStatus = TableRegistry::getTableLocator()->get('DmiPendingSmsEmailSendStatus');
+		$today = date('d/m/Y'); // Get today's date in the format matching your database field (without time)
+
+		$todayCount = $DmiPendingSmsEmailSendStatus->find()
+				->where(['DATE(created)' => $today])
+				->count();
+			
+		if ($todayCount == 0) {
+				$responce = $this->Customfunctions->getSingleOrAllUserAppliResult();
+				$Dmi_pending_count_Entity = $DmiPendingSmsEmailSendStatus->newEntity([
+						'created' => date('Y-m-d H:i:s')
+				]);
+				$DmiPendingSmsEmailSendStatus->save($Dmi_pending_count_Entity);
+				//to call sms and email
+		} else {
+				// nothing
+		}*/
+
 
 	}
 

@@ -233,6 +233,7 @@ class DmiRoutineInspectionPpReportsTable extends Table{
 
 		// this will be return hours and minutes dropdown
 		$time_array = ['' => 'Hour : Minute'];
+
     for ($hour = 10; $hour <= 18; $hour++) {
 				for ($minute = 0; $minute <= 59; $minute++) {
 						$formattedHour = sprintf('%02d', $hour);
@@ -241,6 +242,7 @@ class DmiRoutineInspectionPpReportsTable extends Table{
 						$time_array["$formattedHour:$formattedMinute"] = "$time12HourFormat";
 				}
 		}
+
 		return array($form_fields_details,$added_packaging_details,$find_ca_list,$all_packers_value,$registered_office_address,$printing_premises_address,$certificate_valid_upto,$packaging_materials_value,$total_suggestions,$time_array);
 	}
 
@@ -304,6 +306,7 @@ class DmiRoutineInspectionPpReportsTable extends Table{
 		$htmlencoded_name_of_inspecting_officer = htmlentities($forms_data['name_of_inspecting_officer'], ENT_QUOTES);
 				
 		$time_p_inspection = htmlentities($forms_data['time_p_inspection'], ENT_QUOTES); // time_p_inspection added on 27/06/2023 by shankhpal
+
 		if(!empty($forms_data['shortcomings_noticed_docs']->getClientFilename())){
 
 			$file_name = $forms_data['shortcomings_noticed_docs']->getClientFilename();

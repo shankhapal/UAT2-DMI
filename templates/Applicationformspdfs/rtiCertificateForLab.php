@@ -32,12 +32,15 @@
 				<?php echo isset($rti_lab_data['date_last_inspection'])?$rti_lab_data['date_last_inspection']:"NA"; ?></td>
 		</tr>
     <tr>
+
 		<td style="padding:10px; vertical-align:top;">Date & Time of present Inspection :</td>
     		<td style="padding:10px; vertical-align:top;">Date:
 				<?php echo isset($rti_lab_data['date_p_inspection']) ? $rti_lab_data['date_p_inspection'] : "NA"; ?>, Time:
 				<?php $time = date("h:i A", strtotime($rti_lab_data['time_p_inspection']));
             echo isset($time) ? $time : "NA"; ?></td>
+
 		</tr>
+
     <tr>
         <td style="padding:10px; vertical-align:top;">1. Name and addres of the laboratory Contact details :</td>
 			  <td style="padding:10px; vertical-align:top;"><?php echo 
@@ -69,6 +72,7 @@
 			<td style="padding:10px; vertical-align:top;">3. Name of the approved chemist Present at the time of inspection :</td>
 			<td style="padding:10px; vertical-align:top;"><?php $approved_chemist = implode(",", $chemist_full_name);
 			echo isset($approved_chemist) && !empty($approved_chemist) ? $approved_chemist : "NA"; ?></td>
+
 	</tr>
 
 

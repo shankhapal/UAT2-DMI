@@ -1869,8 +1869,36 @@ class MastersController extends AppController {
 
 				//get current In-charge
 				$this->loadModel('DmiRoOffices');
-				$splitId = explode('/',(string) $customer_id); #For Deprecations
-				$curIncharge = $this->DmiRoOffices->find('all',array('fields'=>'ro_email_id','conditions'=>array('short_code IS'=>$splitId[2])))->first();
+				$splitId = explode('/',(string) $customer_id); #For Deprecations				
+
+				//the below code and conditions updated on 04-07-2023 by Amol
+				//If SO then show incharge ids for re-esign as per their grant roles and power
+				//else RO incharge will re-esign
+				$curIncharge = $this->DmiRoOffices->find('all',array('fields'=>array('ro_email_id','office_type','ro_id_for_so'),'conditions'=>array('short_code IS'=>$splitId[2])))->first();
+
+				if($curIncharge['office_type']=='SO'){
+					if($splitId[1] == 1){					
+						//if appl is CA BEVO
+						$form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
+						if($form_type=='E'){
+							//get RO incharge id
+							$curIncharge = $this->DmiRoOffices->find('all',array('fields'=>array('ro_email_id'),'conditions'=>array('id IS'=>$curIncharge['ro_id_for_so'])))->first();
+						}
+
+					}elseif($splitId[1] == 2){
+						//check user SO incharge role
+						$this->loadModel('DmiUserRoles');
+						$getRoles = $this->DmiUserRoles->find('all',array('fields'=>'so_grant_pp','conditions'=>array('user_email_id IS'=>$curIncharge['ro_email_id'])))->first();					
+						if($getRoles['so_grant_pp'] != 'yes'){
+							//get RO incharge id
+							$curIncharge = $this->DmiRoOffices->find('all',array('fields'=>array('ro_email_id'),'conditions'=>array('id IS'=>$curIncharge['ro_id_for_so'])))->first();
+						}
+
+					}elseif($splitId[1] == 3){					
+						//get RO incharge id
+						$curIncharge = $this->DmiRoOffices->find('all',array('fields'=>array('ro_email_id'),'conditions'=>array('id IS'=>$curIncharge['ro_id_for_so'])))->first();
+					}
+				}
 
 				if($curIncharge['ro_email_id'] != $lastGrantBy['user_email_id']){					
 					echo '~'.base64_decode($curIncharge['ro_email_id']).'~';

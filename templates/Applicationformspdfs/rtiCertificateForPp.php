@@ -28,8 +28,10 @@
         <td style="padding:10px; vertical-align:top;">Date & Time of present Inspection :</td>
         <td style="padding:10px; vertical-align:top;">Date:
         <?php echo isset($rti_pp_data['date_p_inspection']) ? $rti_pp_data['date_p_inspection'] : "NA"; ?>, Time:
+
             <?php $time = date("h:i A", strtotime($rti_pp_data['time_p_inspection']));
             echo isset($time) ? $time : "NA"; ?>
+
         </td>
       </tr>
       <tr>

@@ -122,12 +122,76 @@ class OthermodulesController extends AppController{
 		$this->LoadModel('DmiRoOffices');
 		$getOffCode = $this->DmiRoOffices->find('list',array('valueField'=>'short_code','conditions'=>array('ro_email_id IS'=>$this->Session->read('username'))))->toList();
 		
+		//get short code of the sub offices if current user is RO incharge
+		$getRoOfficeAsIncharge = $this->DmiRoOffices->find('list',array('valueField'=>'id','conditions'=>array('ro_email_id IS'=>$this->Session->read('username'),'office_type IS'=>'RO')))->toArray();
+		if(!empty($getRoOfficeAsIncharge)){
+			//get all sub office where RO id for SO id is present
+			$subOfficeShortCodes = $this->DmiRoOffices->find('list',array('valueField'=>'short_code','conditions'=>array('ro_id_for_so IN'=>$getRoOfficeAsIncharge,'office_type IS'=>'SO')))->toList();
+			$getOffCode = array_merge($getOffCode,$subOfficeShortCodes);
+		}
+
 		//get application added by Admin from master
 		$this->LoadModel('DmiApplAddedForReEsigns');
 		$appl_list = array();
 		foreach($getOffCode as $scode){
 			$get_appl = $this->DmiApplAddedForReEsigns->find('list',array('keyField'=>'customer_id','valueField'=>'customer_id','conditions'=>array('customer_id LIKE'=>'%'.$scode.'%','action_status'=>'active','re_esign_status'=>'Pending')))->toArray();
 			$appl_list = array_merge($appl_list,$get_appl);
+		}
+
+		//the below code and conditions updated on 04-07-2023 by Amol
+		//If application is from SO jurisdiction check SO grant power else list appl in RO dashboard
+		//else RO incharge will re-esign
+		$tempAssignArr = $appl_list;
+		$appl_list = array();
+		foreach($tempAssignArr as $each){
+
+			$this->loadModel('DmiRoOffices');
+			$customer_id = $each;
+			$splitId = explode('/',(string) $customer_id);
+			$curIncharge = $this->DmiRoOffices->find('all',array('fields'=>array('ro_email_id','office_type','ro_id_for_so'),'conditions'=>array('short_code IS'=>$splitId[2])))->first();
+
+			//if application comes under SO jurisdiction, check SO grant power
+			if($curIncharge['office_type']=='SO'){
+				if($splitId[1] == 1){					
+					//if appl is CA BEVO
+					$form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
+					if($form_type=='E'){
+						//get RO incharge id
+						$curIncharge = $this->DmiRoOffices->find('all',array('fields'=>array('ro_email_id'),'conditions'=>array('id IS'=>$curIncharge['ro_id_for_so'])))->first();
+						if($curIncharge['ro_email_id']==$this->Session->read('username')){
+							$appl_list[$customer_id]=$customer_id;
+						}
+					}else{
+						//show to sub office
+						$appl_list[$customer_id]=$customer_id;
+					}
+
+				}elseif($splitId[1] == 2){
+					//check user SO incharge role
+					$this->loadModel('DmiUserRoles');
+					$getRoles = $this->DmiUserRoles->find('all',array('fields'=>'so_grant_pp','conditions'=>array('user_email_id IS'=>$curIncharge['ro_email_id'])))->first();					
+					if($getRoles['so_grant_pp'] != 'yes'){
+						//get RO incharge id
+						$curIncharge = $this->DmiRoOffices->find('all',array('fields'=>array('ro_email_id'),'conditions'=>array('id IS'=>$curIncharge['ro_id_for_so'])))->first();
+						if($curIncharge['ro_email_id']==$this->Session->read('username')){
+							$appl_list[$customer_id]=$customer_id;
+						}
+					//else show appl to sub office
+					}elseif($curIncharge['office_type']=='SO' && $curIncharge['ro_email_id']==$this->Session->read('username')){				
+						$appl_list[$customer_id]=$customer_id;
+					}
+
+				}elseif($splitId[1] == 3){					
+					//get RO incharge id
+					$curIncharge = $this->DmiRoOffices->find('all',array('fields'=>array('ro_email_id'),'conditions'=>array('id IS'=>$curIncharge['ro_id_for_so'])))->first();
+					if($curIncharge['ro_email_id']==$this->Session->read('username')){
+						$appl_list[$customer_id]=$customer_id;
+					}
+				}
+			//else if application comes under RO jurisdiction, no change
+			}else{
+				$appl_list[$customer_id]=$customer_id;
+			}
 		}
 
 		$this->set('appl_list',$appl_list);
@@ -2987,21 +3051,63 @@ class OthermodulesController extends AppController{
 	//on 22-06-2023 by Amol
 	public function getOfficerWisePendingAppl(){
 
-		$InchargeId = $this->Session->read('username');
+		$InchargeId = $this->Session->read('username');		
+		$result = $this->commonMethodForOfficersPendingAppl($InchargeId);
+		$this->set('appl_list',$result[0]);
+		$this->set('checkCurPosition',$result[1]);
+		$this->set('getOfficerUnderIncharge',$result[2]);
+	
+	}
+
+	//to show RO's wise pending application list on HO QC dashboard
+	//on 22-06-2023 by Amol
+	public function getRoWisePendingAppl(){
+
+		//get list of all RO offices
+		$this->loadModel('DmiRoOffices');
+		$roOffices = $this->DmiRoOffices->find('all',array('fields'=>array('ro_office','ro_email_id'),'conditions'=>array('office_type IS'=>'RO','delete_status IS NULL'),'order'=>'id asc'))->toArray();
+		
+		$roWisePendingResult = array();
+		$roWiseCurPosResult = array();
+		$getOfficerUnderIncharge = array();
+		$roOffice = array();
+
+		foreach($roOffices as $each){
+			$roOffice[] = $each['ro_office'];
+			$InchargeId = $each['ro_email_id'];
+			$result = $this->commonMethodForOfficersPendingAppl($InchargeId);
+			$roWisePendingResult[] = $result[0];
+			$roWiseCurPosResult[] = $result[1];
+			$getOfficerUnderIncharge[] = $result[2];
+		}
+
+		$this->set('roOffice',$roOffice);
+		$this->set('roWisePendingResult',$roWisePendingResult);
+		$this->set('roWiseCurPosResult',$roWiseCurPosResult);
+		$this->set('getOfficerUnderIncharge',$getOfficerUnderIncharge);
+	
+	}
+
+
+	//created common method to get the officer's pending appl office wise under RO
+	//27-06-2023 by Amol
+	public function commonMethodForOfficersPendingAppl($InchargeId){
+
 		//get list of offices under this incharge
 		$this->loadModel('DmiRoOffices');
 		$this->loadModel('DmiUsers');
 		//get RO Incharge Posted Office
+		$getOfficesUnderIncharge = array();
 		$getROInchargeOffice = $this->DmiUsers->find('all',array('fields'=>array('posted_ro_office'),'conditions'=>array('email IS'=>$InchargeId,'status IS'=>'active')))->first();
-		$getOfficesUnderIncharge = $this->DmiRoOffices->find('list',array('valueField'=>'id','conditions'=>array('OR'=>array('ro_email_id IS'=>$InchargeId,'ro_id_for_so IS'=>$getROInchargeOffice['posted_ro_office']),'delete_status IS NULL')))->toArray();
+		if(!empty($getROInchargeOffice)){
+			$getOfficesUnderIncharge = $this->DmiRoOffices->find('list',array('valueField'=>'id','conditions'=>array('OR'=>array('ro_email_id IS'=>$InchargeId,'ro_id_for_so IS'=>$getROInchargeOffice['posted_ro_office']),'delete_status IS NULL')))->toArray();
+		}
+
 		//get all officers under this Incharge
-		
 		$getOfficerUnderIncharge = array();
 		if(!empty($getOfficesUnderIncharge)){
 			$getOfficerUnderIncharge = $this->DmiUsers->find('all',array('fields'=>array('f_name','l_name','email','posted_ro_office'),'conditions'=>array('posted_ro_office IN'=>$getOfficesUnderIncharge,'status IS'=>'active')))->toArray();
 		}
-		
-		$this->set('getOfficerUnderIncharge',$getOfficerUnderIncharge);
 
 		$this->loadModel('DmiFlowWiseTablesLists');
 		$flow_wise_tables = $this->DmiFlowWiseTablesLists->find('all',array('conditions'=>array('application_type IN'=>$this->Session->read('applTypeArray')),'order'=>'id ASC'))->toArray();
@@ -3009,7 +3115,7 @@ class OthermodulesController extends AppController{
 
 		$this->loadModel('DmiApplicationTypes');
 
-		$level_arr = array('level_1','level_2','level_3','level_4','level_4_ro','level_4_mo');
+		$level_arr = array('level_1','level_2','level_3','level_4','level_4_ro','level_4_mo','pao');
 		$this->set('level_arr',$level_arr);
 
 		$appl_list = array();
@@ -3046,50 +3152,76 @@ class OthermodulesController extends AppController{
 					$k=0;
 					foreach($checkCurPosition[$l][$i][$j] as $eachAppl){
 
-						if($eachLevel=='level_1' || $eachLevel=='level_2' || $eachLevel=='level_4_ro' || $eachLevel=='level_4_mo'){
+						//check entry in rejected/junked table
+						$this->loadModel('DmiRejectedApplLogs');
+						$checkIfRejected = $this->DmiRejectedApplLogs->find('all',array('fields'=>'id','conditions'=>array('customer_id IS'=>$eachAppl['customer_id'],'appl_type IS'=>$eachflow['application_type'])))->first();
 
-							$appl_list[$l][$i][$j][$k]['appl_type'] = $getApplType['application_type'];
-							$appl_list[$l][$i][$j][$k]['appl_id'] = $eachAppl['customer_id'];
-							$appl_list[$l][$i][$j][$k]['last_trans_date'] = $eachAppl['modified'];
-							$appl_list[$l][$i][$j][$k]['office_name'] = $getOfficeName['ro_office'];
+						if(empty($checkIfRejected)){
+							if($eachLevel=='level_1' || $eachLevel=='level_2' || $eachLevel=='level_4_ro' || $eachLevel=='level_4_mo' || $eachLevel=='pao'){
 
-							if($eachLevel=='level_1'){	
-								$appl_list[$l][$i][$j][$k]['process'] = 'Scrutiny';
+								//check if appl submission and granted
+								$checkLastStatus = $this->$finalSubmitTable->find('all',array('conditions'=>array('customer_id IS'=>$eachAppl['customer_id']),'order'=>'id desc'))->first();
+								if(!empty($checkLastStatus) && (($checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_4')) ||
+									($eachflow['application_type'] == 4 && $checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_1')))){
+									//nothing
+								}else{
+									$appl_list[$l][$i][$j][$k]['appl_type'] = $getApplType['application_type'];
+									$appl_list[$l][$i][$j][$k]['appl_id'] = $eachAppl['customer_id'];
+									$appl_list[$l][$i][$j][$k]['last_trans_date'] = $eachAppl['modified'];
+									if(empty($eachAppl['modified'])){
+										$appl_list[$l][$i][$j][$k]['last_trans_date'] = $eachAppl['created'];
+									}
+									
+									$appl_list[$l][$i][$j][$k]['office_name'] = $getOfficeName['ro_office'];
 
-							}elseif($eachLevel=='level_2'){
-								$appl_list[$l][$i][$j][$k]['process'] = 'Site Inspection';
+									if($eachLevel=='level_1'){	
+										$appl_list[$l][$i][$j][$k]['process'] = 'Scrutiny';
 
-							}elseif($eachLevel=='level_4_ro'){
-								$appl_list[$l][$i][$j][$k]['process'] = 'SO appl. communication';
+									}elseif($eachLevel=='level_2'){
+										$appl_list[$l][$i][$j][$k]['process'] = 'Site Inspection';
 
-							}elseif($eachLevel=='level_4_mo'){
-								$appl_list[$l][$i][$j][$k]['process'] = 'SO appl. Scrutiny at RO';
+									}elseif($eachLevel=='level_4_ro'){
+										$appl_list[$l][$i][$j][$k]['process'] = 'SO appl. communication';
 
-							}
-							$k=$k+1;
-						
-						}elseif($eachLevel=='level_3' || $eachLevel=='level_4'){
+									}elseif($eachLevel=='level_4_mo'){
+										$appl_list[$l][$i][$j][$k]['process'] = 'SO appl. Scrutiny at RO';
 
-							//check if appl submission and granted
-							$checkLastStatus = $this->$finalSubmitTable->find('all',array('conditions'=>array('customer_id IS'=>$eachAppl['customer_id']),'order'=>'id desc'))->first();
-							if($checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_4')){
-								//nothing
-							}else{
-								$appl_list[$l][$i][$j][$k]['appl_type'] = $getApplType['application_type'];
-								$appl_list[$l][$i][$j][$k]['appl_id'] = $eachAppl['customer_id'];
-								$appl_list[$l][$i][$j][$k]['last_trans_date'] = $eachAppl['modified'];
-								$appl_list[$l][$i][$j][$k]['office_name'] = $getOfficeName['ro_office'];
+									}elseif($eachLevel=='pao'){
+										$appl_list[$l][$i][$j][$k]['process'] = 'Payment Verification';
+										$appl_list[$l][$i][$j][$k]['last_trans_date'] = $eachAppl['created'];//intensionally taken created date for PAO
 
-								if($eachLevel=='level_3'){	
-									$appl_list[$l][$i][$j][$k]['process'] = 'with Nodal officer';
-	
-								}elseif($eachLevel=='level_4'){	
-									$appl_list[$l][$i][$j][$k]['process'] = 'with HO Officer';
-	
+									}
+									$k=$k+1;
 								}
-								$k=$k+1;
-							}
 							
+							}elseif($eachLevel=='level_3' || $eachLevel=='level_4'){
+
+								//check if appl submission and granted
+								$checkLastStatus = $this->$finalSubmitTable->find('all',array('conditions'=>array('customer_id IS'=>$eachAppl['customer_id']),'order'=>'id desc'))->first();
+								if(!empty($checkLastStatus) && (($checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_4')) ||
+									($eachflow['application_type'] == 4 && $checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_1')))){
+									//nothing
+								}else{
+									$appl_list[$l][$i][$j][$k]['appl_type'] = $getApplType['application_type'];
+									$appl_list[$l][$i][$j][$k]['appl_id'] = $eachAppl['customer_id'];
+									$appl_list[$l][$i][$j][$k]['last_trans_date'] = $eachAppl['modified'];
+									if(empty($eachAppl['modified'])){
+										$appl_list[$l][$i][$j][$k]['last_trans_date'] = $eachAppl['created'];
+									}
+									
+									$appl_list[$l][$i][$j][$k]['office_name'] = $getOfficeName['ro_office'];
+
+									if($eachLevel=='level_3'){	
+										$appl_list[$l][$i][$j][$k]['process'] = 'Nodal Officer';
+		
+									}elseif($eachLevel=='level_4'){	
+										$appl_list[$l][$i][$j][$k]['process'] = 'HO QC Officer';
+		
+									}
+									$k=$k+1;
+								}
+								
+							}
 						}
 
 						
@@ -3102,9 +3234,7 @@ class OthermodulesController extends AppController{
 		$l=$l+1;
 		}
 
-		$this->set('appl_list',$appl_list);
-		$this->set('checkCurPosition',$checkCurPosition);
-	
+		return array($appl_list,$checkCurPosition,$getOfficerUnderIncharge);
 	}
 
 
