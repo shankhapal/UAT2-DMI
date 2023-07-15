@@ -140,7 +140,8 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                 </div>
             </div>
             <div class="col-md-6">
-                <?php echo $this->Form->control('approved_chemist', array('type'=>'select', 'options'=>$section_form_details[0]['approved_chemist'], 'multiple'=>'multiple', 'label'=>false, 'disabled'=>'disabled', 'class'=>'form-control')); ?>
+                <?php echo $this->Form->control('approved_chemist', array('type'=>'select', 'options'=>$section_form_details[2], 'multiple'=>'multiple', 'label'=>false, 'disabled'=>'disabled', 'class'=>'form-control')); ?>
+
                  <?php if (empty($section_form_details[2])) : ?>
                     <ol class="badge">
                       <a target="_blank" href="/testdocs/DMI/manuals/applicant/Chemist Registration.pdf">Manual for Chemist Registration</a>
@@ -164,7 +165,8 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
             </div>
             <div class="col-md-6">
           <?php
-                $chemst = $section_form_details[0]['approved_chemist'];
+                $chemst = $section_form_details[2];
+               
                 $selectedOptions = explode(',', $section_form_details[0]['present_time_of_inspection']);
 
                 $selectedValues = [];
@@ -193,7 +195,8 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                     ]
                 );
                 ?>
-            </div>                    
+            </div>
+
         </div>
     </div>
 </div>
@@ -743,7 +746,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group row">
-                                <label for="field3" class="col-sm col-form-label"><span><?php if ($current_level == 'level_2' && $application_mode == 'edit' ) { echo 'Signature'; } else { echo 'Signature'; } ?></span></label>
+                                <label for="field3" class="col-sm col-form-label"><span><?php if ($current_level == 'level_2' && $application_mode == 'edit' ) { echo 'Signature'; } else { echo 'Signature'; } ?></span><span class="cRed"> *</span></label>
 
                                 <span class="float-left"><?php if ($current_level == 'level_2' && $application_mode == 'edit' && empty($section_form_details[0]['signnature_of_inspecting_officer_docs'])) { echo 'Attach docs'; }else{ echo 'Attached docs'; } ?> :
                                 <?php if (!empty($section_form_details[0]['signnature_of_inspecting_officer_docs'])) { ?>

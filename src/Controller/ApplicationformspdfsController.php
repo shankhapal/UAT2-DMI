@@ -3570,7 +3570,13 @@ class ApplicationformspdfsController extends AppController{
 		$customer_id = $this->Session->read('customer_id');
 		$this->set('customer_id',$customer_id);
 
-		$rti_ca_data = $this->DmiRtiCaPackerDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+		// condition updated fetch last inserted record on 13/07/2023-shankhpal
+		$rti_ca_data = $this->DmiRtiCaPackerDetails->find('all', [
+    	'conditions' => ['customer_id' => $customer_id],
+    	'order' => ['id' => 'DESC'],
+    	'limit' => 1
+		])->first();
+		
 		$this->set('rti_ca_data',$rti_ca_data);
 
 		// data from DMI firm Table
@@ -3666,7 +3672,13 @@ class ApplicationformspdfsController extends AppController{
 		$customer_id = $this->Session->read('customer_id');
 		$this->set('customer_id',$customer_id);
 
-		$rti_pp_data = $this->DmiRoutineInspectionPpReports->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+		// condition updated fetch last inserted record on 13/07/2023-shankhpal
+		$rti_pp_data = $this->DmiRoutineInspectionPpReports->find('all', [
+    	'conditions' => ['customer_id' => $customer_id],
+    	'order' => ['id' => 'DESC'],
+    	'limit' => 1
+		])->first();
+	
 		$this->set('rti_pp_data',$rti_pp_data);
 
 		$firm_details = $this->DmiFirms->firmDetails($customer_id);
@@ -3770,8 +3782,12 @@ class ApplicationformspdfsController extends AppController{
 		$customer_id = $this->Session->read('customer_id');
 		$this->set('customer_id',$customer_id);
 
-		// added DmiRtiLaboratoryDetails table by shankhpal on 26/05/2023
-		$rti_lab_data = $this->DmiRtiLaboratoryDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+		// condition updated fetch last inserted record on 13/07/2023-shankhpal
+		$rti_lab_data = $this->DmiRtiLaboratoryDetails->find('all', [
+    	'conditions' => ['customer_id' => $customer_id],
+    	'order' => ['id' => 'DESC'],
+    	'limit' => 1
+		])->first();
 		$this->set('rti_lab_data',$rti_lab_data);
 
 		$firm_details = $this->DmiFirms->firmDetails($customer_id);
@@ -3784,6 +3800,32 @@ class ApplicationformspdfsController extends AppController{
 		$sub_commodity_value = $this->MCommodity->find('list',array('valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
 		$this->set('sub_commodity_value',$sub_commodity_value);
 
+		$conn = ConnectionManager::get('default');
+
+    $approved_chemist = "SELECT  cr.chemist_fname, cr.chemist_lname, cr.chemist_id,cr. created_by
+    FROM dmi_chemist_registrations AS cr
+    INNER JOIN dmi_chemist_final_submits AS cfs ON cfs.customer_id = cr.chemist_id
+    WHERE cr.created_by = '$customer_id' AND 
+    (((cr.is_training_completed IS NULL OR cr.is_training_completed='yes') AND status = 'approved' AND current_level = 'level_1')
+    OR (cr.is_training_completed='no' AND status = 'approved' AND current_level = 'level_3'))";
+
+    $q = $conn->execute($approved_chemist);
+
+    $all_approved_chemist = $q->fetchAll('assoc');
+		 $chemist_full_name = [];
+			
+    if (!empty($all_approved_chemist)) {
+      $chemist_full_name = [];
+      foreach ($all_approved_chemist as $each_chemist) {
+          $full_name = $each_chemist['chemist_fname'] . ' ' . $each_chemist['chemist_lname'];
+          $chemist_full_name[$full_name] = $full_name;
+      }
+    }else{
+        $chemist_full_name = [];
+        // Add other manual options if needed
+      
+    }
+		$this->set('chemist_full_name',$chemist_full_name);
 		$this->generateReportPdf('/Applicationformspdfs/rtiCertificateForLab'); 
 		$this->redirect(array('controller'=>'dashboard','action'=>'home'));
 	
