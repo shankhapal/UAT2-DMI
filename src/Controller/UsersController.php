@@ -156,6 +156,7 @@ class UsersController extends AppController {
 		$this->set('message', $message);
 		$this->set('message_theme', $message_theme);
 		$this->set('redirect_to', $redirect_to);
+		$this->set('return_error_msg',$return_error_msg);
 	
 	}
 
