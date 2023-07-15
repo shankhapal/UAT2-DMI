@@ -28,12 +28,17 @@
   <table width="100%" border="1">
 	
 		<tr>
-			  <td style="padding:10px; vertical-align:top;">Date of Last Inspection :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_ca_data['date_last_inspection'])?$rti_ca_data['date_last_inspection']:"NA"; ?></td>
+         <td style="padding:10px; vertical-align:top;">Date of Last Inspection :</td>
+			  <td style="padding:10px; vertical-align:top;">Date:
+				<?php echo isset($rti_ca_data['date_last_inspection'])?$rti_ca_data['date_last_inspection']:"NA"; ?>
+      </td>
 		</tr>
     <tr>
-			  <td style="padding:10px; vertical-align:top;">Date & Time of present Inspection :</td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo isset($rti_ca_data['date_p_inspection'])?$rti_ca_data['date_p_inspection']:"NA"; ?></td>
+        <td style="padding:10px; vertical-align:top;">Date & Time of present Inspection :</td>
+    		<td style="padding:10px; vertical-align:top;">Date:
+				<?php echo isset($rti_ca_data['date_p_inspection']) ? $rti_ca_data['date_p_inspection'] : "NA"; ?>, Time:
+				<?php $time = date("h:i A", strtotime($rti_ca_data['time_p_inspection']));
+            echo isset($time) ? $time : "NA"; ?></td>
 		</tr>
     <tr>
         <td style="padding:10px; vertical-align:top;">1. Name of Authorized Packer :</td>
@@ -169,8 +174,9 @@
 		</tr>
     <tr>
         <td style="padding:10px; vertical-align:top;">13. Quantity graded during current month Upto </td>
-			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['month_upto']; ?></td>
-		</tr>
+			 <td style="padding:10px; vertical-align:top;">Date:<?php echo isset($rti_ca_data['month_upto'])?$rti_ca_data['month_upto']:"NA"; ?>, Quantity:<?php echo isset($rti_ca_data['quantity'])?$rti_ca_data['quantity']:"NA"; ?>, Units:<?php echo isset($rti_ca_data['grade_units'])?$rti_ca_data['grade_units']:"NA"; ?>
+      </td>
+	   </tr>
     <tr>
         <td style="padding:10px; vertical-align:top;">14. Is the Agmark Replica account correct?</td>
 			  <td style="padding:10px; vertical-align:top;"><?php echo $rti_ca_data['replica_account_correct']; ?></td>

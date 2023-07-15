@@ -3593,7 +3593,7 @@ class CustomfunctionsComponent extends Component {
 	// Date : 12/08/2022
 	
 	public function getQrCode($result,$type=null){
-	
+		
 		$customer_id = $this->Session->read('customer_id');
 		
 		#this condition is added if there is no customer_id in the session. - Akash [08-09-2022]

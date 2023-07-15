@@ -572,7 +572,6 @@ class DmiRtiCaPackerDetailsTable extends Table{
 			'signnature_of_inspecting_officer_docs'=> $report_details['signnature_of_inspecting_officer_docs'],
 			'quantity'=>$report_details['quantity'],  // added on 27/06/2023 by shankhpal
 			'grade_units' => $report_details['grade_units'], // added on 27/06/2023 by shankhpal
-			'time_p_inspection'=>$report_details['time_p_inspection'], // added on 27/06/2023 by shankhpal
 			'referred_back_comment'=>$reffered_back_comment,
 			'rb_comment_ul'=>$rb_comment_ul,
 			'referred_back_date'=>date('Y-m-d H:i:s'),

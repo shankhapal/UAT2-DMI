@@ -37,10 +37,25 @@
                                             <label for="inputEmail3" class="col-sm col-form-label">Date & Time of present Inspection <span class="cRed">*</span></label>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-3">
                                     <?php echo $this->Form->control('date_p_inspection', array('type'=>'text', 'id'=>'date_p_inspection', 'value'=>$section_form_details[0]['date_p_inspection'], 'class'=>'form-control input-field', 'placeholder'=>'Enter DD/MM/YYYY', 'label'=>false)); ?>
                                     <span id="error_date_p_inspection" class="error invalid-feedback"></span>
-                                        </div>
+                                </div>
+                                <div class="col-md-3">
+                                        <!-- added time field as per change req and suggestions on date 27/06/2023
+                                        added by shankhpal shende -->
+                                       <?php
+                                        echo $this->Form->control('time_p_inspection', [
+                                            'type' => 'select',
+                                            'id' => 'time_p_inspection',
+                                            'options' => $section_form_details[9],
+                                            'default' => $section_form_details[0]['time_p_inspection'],
+                                            'class' => 'form-control input-field',
+                                            'label' => false
+                                        ]);
+                                        ?>
+                                        <span id="error_time_p_inspection" class="error invalid-feedback"></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -225,20 +240,25 @@
                                                                 <label for="inputEmail3" class="col-sm col-form-label">Whether the printing press is printing<span class="cRed">*</span></label>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-6">
+                                                    <div class="col-md-8">
                                                         <?php
                                                         $i=1;
                                                         $is_printing = $section_form_details[0]['is_printing'];
                                                         
-                                                            if($is_printing == 'Bar code'){
-                                                                $checked_yes = 'checked';
-                                                                $checked_no = '';
-                                                            } else {
-
-                                                                $checked_yes = '';
-                                                                $checked_no = 'checked';
-                                                            }
-                                                            $i++;
+                                                        if($is_printing == 'Bar code'){
+                                                            $checked_yes = 'checked';
+                                                            $checked_no = '';
+                                                            $checked_both = '';
+                                                        } elseif($is_printing == 'Agmark replica serial number') {
+                                                            $checked_yes = '';
+                                                            $checked_no = 'checked';
+                                                            $checked_both = '';
+                                                        }else{
+                                                            $checked_yes = '';
+                                                            $checked_no = '';
+                                                            $checked_both = 'checked';
+                                                        }
+                                                        $i++;
                                                         ?>
                                                     <div class="col-sm-12">
                                                         <div class=" d-inline">
@@ -250,6 +270,10 @@
                                                             <input type="radio" name="is_printing" id="is_printing-rn" value="Agmark replica serial number" <?php echo $checked_no; ?>>
                                                             <label for="is_printing-rn">Agmark replica serial number.
                                                             </label>
+                                                        </div>
+                                                        <div class="d-inline">
+                                                             <input type="radio" name="is_printing" id="is_printing-both" value="Both" <?php echo $checked_both; ?>>
+                                                             <label for="is_printing-both">Both</label>
                                                         </div>
                                                         <span id="error_is_printing-rn" class="error invalid-feedback"></span>
                                                     </div>
@@ -584,14 +608,14 @@
                                                     </div>
                                                 </div>                                          
                                         <!-- Signnature and Name of the Inspecting Officer -->     
-                                        <div class="card-header sub-card-header-firm"><h3 class="card-title">Signature and name of the authorized person Officer of the printing press or any representative</h3></div>
+                                        <div class="card-header sub-card-header-firm"><h3 class="card-title">Signnature and Name of the Inspecting Officer</h3></div>
                                             <div class="form-horizontal">
                                                 <div class="form-horizontal">
                                                     <div class="card-body border">
                                                         <div class="row">
                                                         <div class="col-md-6">
                                                             <div class="form-group row">
-                                                                <label for="inputEmail3" class="col-sm col-form-label">Name of the authorized person Officer of the printing press or any representative<span class="cRed"> * </span></label>
+                                                                <label for="inputEmail3" class="col-sm col-form-label">Name of the Inspecting Officer<span class="cRed"> * </span></label>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6">
@@ -609,7 +633,7 @@
                                                                 <div class="row">
                                                                     <div class="col-md-6">
                                                                         <div class="form-group row">
-                                                                            <label for="field3" class="col-sm col-form-label"><span><?php if ($current_level == 'level_2' && $application_mode == 'edit' ) { echo 'Signature of Inspection with official Stamp'; } else { echo 'Signature of Inspection with official Stamp'; } ?></span></label>
+                                                                            <label for="field3" class="col-sm col-form-label"><span><?php if ($current_level == 'level_2' && $application_mode == 'edit' ) { echo 'Signature'; } else { echo 'Signature'; } ?><span class="cRed"> *</span></span></label>
 
                                                                             <span class="float-left"><?php if ($current_level == 'level_2' && $application_mode == 'edit' && empty($section_form_details[0]['signnature_io_docs'])) { echo 'Attach docs'; }else{ echo 'Attached docs'; } ?> :
                                                                             <?php if (!empty($section_form_details[0]['signnature_io_docs'])) { ?>
@@ -647,6 +671,8 @@
 	echo $this->Html->script('routininspection/routin_inspection');
     echo $this->Html->script('routininspection/routine_inspection_add_more_pp');
     echo $this->Html->script('routininspection/rti_file_uploads_validation');
+    echo $this->Html->script('routininspection/rti_other_validation');
     echo $this->Html->css('RoutineInspection/routine_inspection_style');
+
 ?>
 
