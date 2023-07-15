@@ -1,23 +1,26 @@
 <!-- Added new fields to upload for change in premises on 17-05-2023 by Amol -->
     <!-- for FSSAI cert. -->
-    <div class="d-inline-block">
-        <p class="bg-info pl-2 p-1 rounded text-sm"><i class="fa fa-info-circle"></i> FSSAI Related Document</p>
-            <div class="form-group row">
-                <label for="inputEmail3" class="col-sm-3 col-form-label">Attach File: <span class="cRed">*</span></label>
-                    <?php if(!empty($section_form_details[0]['premises_fssai_doc'])){?>
-                        <a id="premises_fssai_doc_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['premises_fssai_doc']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['premises_fssai_doc'])), -1))[0],23);?></a>
-                    <?php } ?>
-                
-                <div class="custom-file col-sm-9">
-                    <input type="file" name="premises_fssai_doc" class="form-control" id="premises_fssai_doc", multiple='multiple'>
-                    <span id="error_premises_fssai_doc" class="error invalid-feedback"></span>
-                    <span id="error_type_premises_fssai_doc" class="error invalid-feedback"></span>
-                    <span id="error_size_premises_fssai_doc" class="error invalid-feedback"></span>
+    <!-- added $firm_type==1 cond. on 15-07-2023 as said fssai upload will be only for CA -->
+    <?php if ($firm_type==1) { ?>
+        <div class="d-inline-block">
+            <p class="bg-info pl-2 p-1 rounded text-sm"><i class="fa fa-info-circle"></i> FSSAI Related Document</p>
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm-3 col-form-label">Attach File: <span class="cRed">*</span></label>
+                        <?php if(!empty($section_form_details[0]['premises_fssai_doc'])){?>
+                            <a id="premises_fssai_doc_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['premises_fssai_doc']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['premises_fssai_doc'])), -1))[0],23);?></a>
+                        <?php } ?>
+                    
+                    <div class="custom-file col-sm-9">
+                        <input type="file" name="premises_fssai_doc" class="form-control" id="premises_fssai_doc", multiple='multiple'>
+                        <span id="error_premises_fssai_doc" class="error invalid-feedback"></span>
+                        <span id="error_type_premises_fssai_doc" class="error invalid-feedback"></span>
+                        <span id="error_size_premises_fssai_doc" class="error invalid-feedback"></span>
+                    </div>
                 </div>
-            </div>
-        <p class="lab_form_note"><i class="fa fa-info-circle"></i> File type: PDF, jpg &amp; max size upto 2 MB</p>
-    </div>
-    <div class="clearfix"></div>
+            <p class="lab_form_note"><i class="fa fa-info-circle"></i> File type: PDF, jpg &amp; max size upto 2 MB</p>
+        </div>
+        <div class="clearfix"></div>
+    <?php } ?>
 
     <!-- for GST cert. -->
     <div class="d-inline-block">
