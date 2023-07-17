@@ -156,6 +156,7 @@ class UsersController extends AppController {
 		$this->set('message', $message);
 		$this->set('message_theme', $message_theme);
 		$this->set('redirect_to', $redirect_to);
+		$this->set('return_error_msg',null);
 	
 	}
 
@@ -350,6 +351,7 @@ class UsersController extends AppController {
 		$message = '';
 		$message_theme = '';
 		$redirect_to = '';
+		$already_loggedin_msg = 'no'; // added by shankhpal
 		//Set the Layout
 		$this->viewBuilder()->setLayout('form_layout');
 		//Load Models
@@ -371,9 +373,23 @@ class UsersController extends AppController {
 				$table = 'DmiUsers';
 				$username = $user_email_id;
 				$password = $this->request->getData('password');
+
+				//calling login library function added by shankhpal on 17/07/2023
+				$login_result = $this->Authentication->userLoginLib($table, $username, $password, $randsalt);
+
 				$PassFromdb = $this->$table->find('all', array('fields' => 'password', 'conditions' => array('email IS' => $username)))->first();
 
-				if ($PassFromdb != null && $PassFromdb != '') {
+				// condition added for captcha code on 15/07/2023 by shankhpal
+				if ($login_result == 3) {
+
+					$return_error_msg = 'Sorry... Wrong Code Entered';
+					$message_theme = 'failed';
+					$this->set('return_error_msg', $return_error_msg);
+					$this->set('already_loggedin_msg',$already_loggedin_msg);
+					return null;
+					exit;
+
+				}elseif ($PassFromdb != null && $PassFromdb != '') {
 
 					$passarray = $PassFromdb['password'];
 					$PassFromdbsalted = $randsalt . $passarray; //adding random salt value to password
