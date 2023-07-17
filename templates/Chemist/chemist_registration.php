@@ -31,7 +31,8 @@
     <section class="content form-middle">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-8">
+                <!-- change 8 to 12 below by laxmi on 10-07-2023 -->
+                <div class="col-md-12">
                     <?php echo $this->Form->create(null, array('type'=>'file', 'id'=>'reg_customer_form', 'enctype'=>'multipart/form-data')); ?>
                         <div class="card card-secondary" id="form_outer_main">
                             <div class="card-header"><h3 class="card-title-new">Chemist Registration</h3></div>
@@ -70,27 +71,73 @@
                                         </div>
 										<!-- is chemist new/ old added by laxmi on 12-12-22-->
 										<div class="col-sm-6">
-										<label for="newoldsignup" class="uapproved">Is training completed?  <span class="cRed">*</span></label><br>
+										 <label for="newoldsignup" class="uapproved">Is training completed?  <span class="cRed">*</span></label><br>
 
-										<input type="radio" name="is_training_completed" id="approved" value="yes">Training Completed
-										<input type="radio" name="is_training_completed" id="approved" value="no" checked>Apply for training
+										 <input type="radio" name="is_training_completed" id="approved" value="yes">Training Completed
+										 <input type="radio" name="is_training_completed" id="approved" value="no" checked>Apply for training
 
-										<span class="error invalid-feedback" id="error_is_training_completed"></span>
+										  <span class="error invalid-feedback" id="error_is_training_completed"></span>
 										</div>
+									</div>
+
+                                   <!-- to select commodity  added below code by laxmi on 10-07-2023-->
+                                    <div class="col-sm-12">
+                                    <div id="commodity_box" class ="card-secondary">
+									<div class="card-header card-header"><h3 class="card-title"><i class="fa fa-tree"></i> Commodities</h3></div>
+									<div class="form-horizontal">
+										<div class="card-body">
+											<div class="row">
+												<div class="col-sm-6">
+													<div class="form-group row">
+														<label for="inputEmail3" class="col-sm-3 col-form-label">Category <span class="cRed">*</span></label>
+														<div class="col-sm-9">
+															<?php echo $this->Form->control('commodity', array('type'=>'select', 'id'=>'commodity_category', 'empty'=>'Select Category', 'options'=>$commodity_categories, 'label'=>false, 'class'=>'form-control')); ?>
+															<input type="hidden" id="chemist_commodity_select" class="chemist_comoditites" value="application_type_4">
+                                                            <span id="error_commodity_category" class="error invalid-feedback"></span>
+														</div>
+													</div>
+													<div id="selected_bevo_nonbevo_msg"></div>
+														<div class="form-group row">
+															<label for="inputEmail3" class="col-sm-3 col-form-label">Commodities <span class="cRed">*</span></label>
+															<div class="col-sm-9">
+																<?php echo $this->Form->control('sub_commodity', array('type'=>'select', 'empty'=>'Select Commodity', 'id'=>'commodity','options'=>array(), 'label'=>false, 'class'=>'form-control')); ?>
+																<span id="error_commodity" class="error invalid-feedback"></span>
+															</div>
+														</div>
+													</div>
+												<div class="col-sm-6">
+													<div class="form-group row">
+														<label for="inputEmail3" class="col-sm-3 col-form-label">Selected Commodities </label>
+														<div class="col-sm-9">
+															<?php echo $this->Form->control('selected_commodity', array('type'=>'select', 'id'=>'selected_commodity', 'empty'=>'--Selected--', 'multiple'=>true, 'label'=>false, 'class'=>'form-control')); ?>
+															<span id="error_selected_commodity" class="error invalid-feedback"></span>
+														</div>
+													</div>
+													<p class="commodity-note-txt"><i class="fa fa-info-circle"></i> To remove from list click on the item</p>
+												</div>
+											</div>
 										</div>
-										</div>
-                                       <div class="card-body cardFooterBackground">
-                                    <?php echo $this->Form->control('Register', array('type'=>'button', 'id'=>'add_chemist', 'label'=>false, 'class'=>'btn btn-success mtminus12pb7')); ?>
-                                </div>
-                            </div>
-                        </div>
-                    <?php echo $this->Form->end(); ?>
+									</div>
+								</div>
+                                    </div>
+								</div>
+                            <div class="card-body cardFooterBackground">
+                                 <?php echo $this->Form->control('Register', array('type'=>'button', 'id'=>'add_chemist', 'label'=>false, 'class'=>'btn btn-success mtminus12pb7')); ?>
+                         </div>
+                     </div>
                 </div>
+
+
+             <?php echo $this->Form->end(); ?>
+            </div>
             </div>
         </div>
     </section>
 </div>
 
     <?php echo $this->Html->script('chemist_module_validations'); ?>
-
+    <!-- below scripts and links added by laxmi for select commodities on 10-07-2023 -->
+   <?php  echo $this->Html->css('multiselect/jquery.multiselect');
+	echo $this->Html->script('multiselect/jquery.multiselect'); 
+    echo $this->Html->script('forms/add_firms');?>
 <?php } ?>

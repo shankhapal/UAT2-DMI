@@ -16,6 +16,7 @@ use Cake\Utility\Xml;
 use FR3D;
 use Cake\View;
 use PDF_Rotate;
+use MyCustomPDFWithWatermark;
 
 class ApplicationformspdfsController extends AppController{
 	
@@ -2619,7 +2620,7 @@ class ApplicationformspdfsController extends AppController{
 	//This is called at place of Mpdf output function with required parameteres.
 	//on 23-01-2020 by Amol
 	public function callTcpdf($html,$mode,$customer_id,$pdf_for,$file_path=null){
-	
+		
 		$with_esign = $this->Session->read('with_esign');
 		$current_level = $this->Session->read('current_level');
 		$file_name = $this->Session->read('pdf_file_name');
@@ -2641,11 +2642,11 @@ class ApplicationformspdfsController extends AppController{
 		#For SCN moved file directly to the Specific Folder - Akash[03-01-2022]
 		}elseif($pdf_for == 'showcause_notice'){
 			$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/showcause_notice/'.$file_name;
-		}elseif($pdf_for == 'chemist'){
+		}elseif( $appl_type == 4 && $pdf_for == 'grant'){
 			//elseif section added by laxmi B. on 30-12-2022
 			//for this file path is sent from the pdf function
 			//it will take default file path from the argument, if pdf for is chemist
-		
+			$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/certificates/CHM/'.$file_name;
 																		 
 										  
 																					   
@@ -2659,6 +2660,8 @@ class ApplicationformspdfsController extends AppController{
 		//below line is added on 23-05-2023 by Amol, to print water mark on pdf
 		require_once(ROOT . DS . 'vendor' . DS . 'tcpdf' . DS . 'tcpdf_text.php');
 
+		require_once(ROOT . DS . 'vendor' . DS . 'tcpdf' . DS . 'tcpdf_watermark.php');
+
 		
 
 		//This below condition is updated for the Surrender (SOC) Application PDFs watermarks - Akash [12-05-2023]
@@ -2669,16 +2672,18 @@ class ApplicationformspdfsController extends AppController{
 
 		//This is added to add the watermark on the pdf if the pdf for suspension or cancelletion - Akash [05-06-2023]
 		} elseif ($this->Session->check('for_module')) {
-	
 			$for_module = $this->Session->read('for_module');
 			if ($for_module === 'Suspension' || $for_module === 'Cancellation') {
 				$pdf = new PDF_Rotate(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 			}
 
+		}elseif($appl_type == 4 && $pdf_for == 'grant'){ 
+			$pdf = new MyCustomPDFWithWatermark(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);	
 		}else{
-			$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);	
+			$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 		}
-			
+		
+		 
 			// set default monospaced font
 		//	$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
 
@@ -2702,11 +2707,30 @@ class ApplicationformspdfsController extends AppController{
 				$pdf->my_set_sign('', '', '', '', 2, $info);
 			}
 		}
+		$pdf->AddPage();
+		//added watermark image for chemist training approval certificate by laxmi on 13-07-2023
+		// if ($appl_type == 4 && $pdf_for == 'grant') { 
+		// 	$watermarkImage = 'img/AdminLTELogo.png'; 
+		// 	$ImageW = 85; // Watermark Size 
+		// 	$ImageH = 70; 
+		// 	$opacity = 1.0; // Opacity level (0.0 - 1.0)
+		// 	$pdf->SetAlpha(0.5);
+			 
+		// 	$pageCount = $pdf->getNumPages(); 
 			
-			
-			$pdf->AddPage();
-			
+		// 	for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) { 
+		// 		$pdf->setPage($pageNo); 
+		// 		$pdf->Image($watermarkImage, $pdf->GetX() + (($pdf->getPageWidth() - $ImageW) / 2), $pdf->GetY() + (($pdf->getPageHeight() - $ImageH) / 2), $ImageW, $ImageH); 
+		// 		//$pdf->Image($watermarkImage, $pdf->GetX(), $pdf->GetY(), $ImageW, $ImageH, '', '', '', false, 300, '', false, $opacity);
+		// 	 } 
+		// 	 $pdf->SetAlpha(1);
+		// 	}
+		
+		 
 			$pdf->writeHTML($html, true, false, true, false, '');
+			
+           
+
 
 			//get signer details
 			//if applicant
@@ -2766,7 +2790,7 @@ class ApplicationformspdfsController extends AppController{
 			if(ob_get_length() > 0) {
 				ob_end_clean();
 			}
-
+			
 			//Close and output PDF document
 			$pdf->my_output($file_path, $mode);
 			//generatin pdf ends here		
@@ -4042,9 +4066,10 @@ class ApplicationformspdfsController extends AppController{
 					$this->set('state', $state['state_name']);
 					}
 					$this->set('pin_code', $firm_data['postal_code']);
-
-
-					$sub_commodity_array = explode(',',$firm_data['sub_commodity']);
+                    
+                    // to find commodity from registrtion table added code by laxmi on 14-07-2023
+					$commodities = $this->DmiChemistRegistrations->find('all', ['conditions'=>['chemist_id IS'=>$customer_id]])->first();
+					$sub_commodity_array = explode(',',$commodities['sub_commodities']);
 					$i=0;
 					foreach ($sub_commodity_array as $key => $sub_commodity) {
 
@@ -4142,7 +4167,10 @@ class ApplicationformspdfsController extends AppController{
 				$this->set('state', $state['state_name']);
 				}
 				// for multiple commodities select at export added by laxmi On 10-1-23
-				$sub_commodity_array = explode(',',$firmDetails['sub_commodity']);
+				// to find commodity from registrtion table added code by laxmi on 14-07-2023
+				$commodities = $this->DmiChemistRegistrations->find('all', ['conditions'=>['chemist_id IS'=>$customer_id]])->first();
+				$sub_commodity_array = explode(',',$commodities['sub_commodities']);
+				
 				$i=0;
 				foreach ($sub_commodity_array as $key => $sub_commodity) {
 
@@ -4237,6 +4265,7 @@ class ApplicationformspdfsController extends AppController{
 				$this->loadModel('MCommodityCategory');
 				$this->loadModel('MCommodity');
 				$this->loadModel('DmiRoOffices');
+				$this->loadModel('DmiChemistProfileDetails');
 
 				$ro_fname = $this->Session->read('f_name');
 				$ro_lname = $this->Session->read('l_name');
@@ -4245,15 +4274,23 @@ class ApplicationformspdfsController extends AppController{
 				$this->set('ro_fname', $ro_fname);
 				$this->set('ro_lname', $ro_lname);
 				$this->set('role', $ro_role);
-
+                 
 				$chemistData = $this->DmiChemistTrainingAtRo->find('all',array('fields'=>array('chemist_id','chemist_fname','chemist_lname','ro_office_id')))->where(array('id IS'=>$id, 'training_completed IS'=>'1'))->first();
 				if(!empty($chemistData)){
-				$customer_id = $chemistData['chemist_id'];
+				$customer_id = $chemistData['chemist_id']; 
 				$this->set('customer_id',$chemistData['chemist_id']);
 				$this->set('chemist_fname',$chemistData['chemist_fname']);
 				$this->set('chemist_lname',$chemistData['chemist_lname']);
+                
+				// to set profile photo in letter added by laxmi on 12-07-2023
+                $chemist_profile= $this->DmiChemistProfileDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+				
+				if(!empty($chemist_profile)){
+					
+                    $this->set('profile_photo', $chemist_profile['profile_photo']);
+				}
 
-
+                   
 
 				$packer_id = $this->DmiChemistRegistrations->find('list', array('valueField'=>'created_by'))->where(array('chemist_id IS'=>$customer_id))->first();
 				if(!empty($packer_id)){
@@ -4269,7 +4306,9 @@ class ApplicationformspdfsController extends AppController{
 
 
 				// for multiple commodities select at export added by laxmi On 10-1-23
-				$sub_commodity_array = explode(',',$firmData['sub_commodity']);
+				// to find commodity from registrtion table added code by laxmi on 14-07-2023
+				$commodities = $this->DmiChemistRegistrations->find('all', ['conditions'=>['chemist_id IS'=>$customer_id]])->first();
+				$sub_commodity_array = explode(',',$commodities['sub_commodities']);
 				$i=0;
 				foreach ($sub_commodity_array as $key => $sub_commodity) {
 
@@ -4371,13 +4410,18 @@ class ApplicationformspdfsController extends AppController{
 				$this->set('ro_lname',$ro_lname);
 				$this->set('role',$role);
 
-				$chemist_data = $this->DmiChemistRegistrations->find('all', array('fields'=>array('created_by','chemist_fname', 'chemist_lname') , 'conditions'=>array('chemist_id IS'=>$customer_id)))->first();
-
-				$chemist_address= $this->DmiChemistProfileDetails->find('all',array('fields'=>'address_1','conditions'=>array('customer_id IS'=>$customer_id)))->first();
-
-				$this->set('chemist_address',$chemist_address['address_1']);
+				$chemist_data = $this->DmiChemistRegistrations->find('all', array( 'conditions'=>array('chemist_id IS'=>$customer_id)))->first();
+                  
+				$chemist_address= $this->DmiChemistProfileDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+               
+				$this->set('chemist_address',$chemist_address['address']);
 				$this->set('chemist_fname', $chemist_data['chemist_fname']);
 				$this->set('chemist_lname', $chemist_data['chemist_lname']);
+				$this->set('profile_photo', $chemist_address['profile_photo']);
+				$this->set('sign', $chemist_address['signature_photo']);
+				$this->set('middle_name_type', $chemist_address['middle_name_type']);
+				$this->set('middle_name', $chemist_address['middle_name']);
+				$this->set('profile_photo', $chemist_address['profile_photo']);
 
 				//set packer id in session and level_3
 				$this->Session->write('packer_id',$chemist_data['created_by'] );
@@ -4404,7 +4448,7 @@ class ApplicationformspdfsController extends AppController{
 
 				//to show commodity name
 
-				$sub_commodity_array = explode(',',$customer_firm_data['sub_commodity']);
+				$sub_commodity_array = explode(',',$chemist_data['sub_commodities']);
 				$i=0;
 				foreach ($sub_commodity_array as $key => $sub_commodity) {
 
@@ -4420,10 +4464,17 @@ class ApplicationformspdfsController extends AppController{
 				$this->set('sub_commodity_data',$sub_commodity_data);
 				//to fetch ral schedule training date
 				$roToRalData = $this->DmiChemistRalToRoLogs->find('all', array('conditions'=>array('chemist_id IS'=>$customer_id)))->last();
+				
 				if(!empty($roToRalData)){
 				$scheduleFrom = date('d-m-Y', strtotime(str_replace('/','.',$roToRalData['reshedule_from_date'])));
 				$scheduleTo = date('d-m-Y', strtotime(str_replace('/','.',$roToRalData['reshedule_to_date'])));
+                
 
+				//to fetch ral office name 
+				$raloffice = $this->DmiRoOffices->find('all',array('fields'=>'ro_office', 'conditions'=>array('id IS'=>$roToRalData['ral_office_id'])))->first();
+				if(!empty($raloffice)){
+                 $this->set('ral_office', $raloffice['ro_office']);
+				}
 				//to fetch RO schedule training date
 				$roToRalData = $this->DmiChemistRoToRalLogs->find('all', array('conditions'=>array('chemist_id IS'=>$customer_id)))->last();
 				
@@ -4436,14 +4487,37 @@ class ApplicationformspdfsController extends AppController{
 				$this->set('ro_shedule_to',$roscheduleTo);
 
 				//to fetch ro office name 
-				$office = $this->DmiRoOffices->find('all',array('fields'=>'ro_office', 'conditions'=>array('id IS'=>$roToRalData['ro_office_id'])))->first();
+				$office = $this->DmiRoOffices->find('all',array( 'conditions'=>array('id IS'=>$roToRalData['ro_office_id'])))->first();
+				
 				$this->set('ro_office',$office['ro_office']);
+				$this->set('office_type', $office['office_type']);
+				$this->set('ro_address', $office['ro_office_address']);
 				}
 
 				$ralToRoData = $this->DmiChemistRalToRoLogs->find('all', array('fields'=>array('ro_first_name', 'ro_last_name','ro_office_id'), 'conditions'=>array('chemist_id IS'=>$customer_id)))->first();
 				$this->set('ro_first_name',$ralToRoData['ro_first_name']);
 				$this->set('ro_last_name',$ralToRoData['ro_last_name']);
-
+				
+			////////////////////////////////////////////////////////////////////////////////////////////
+				// This code added for printing QR code 
+				// @Author : Shankhpal Shende
+				// Date : 13/07/2023
+				$full_name = $chemist_data['chemist_fname'] . ' ' . $chemist_data['chemist_lname'];
+				$dob = explode(" ", $chemist_data['dob'])[0]; // Shortened the code to directly assign the first element
+				$ro_office = $office['ro_office'];
+				$commodityNames = [];
+				if(!empty($sub_commodity_data)){
+					foreach ($sub_commodity_data as $entity) {
+						$commodityNames[] = $entity->commodity_name;
+					}
+					$commaSeparatedNames = implode(', ', $commodityNames);
+				}	else {
+    			$commaSeparatedNames = ''; // Added a default value if $sub_commodity_data is empty
+				}
+				$data = [$full_name,$dob,$commaSeparatedNames,$ro_office];
+				$result_for_qr = $this->Customfunctions->getQrCode($data,$type="CHMT");
+				$this->set('result_for_qr',$result_for_qr);
+				///////////////////////////////////////////////////////////////////////////////////////////																					   
 				$this->generateGrantCerticatePdf('/Applicationformspdfs/chemist_training_approval_certificate'); 
 
 				$this->redirect(array('controller'=>'dashboard','action'=>'home')); 
@@ -4476,13 +4550,14 @@ class ApplicationformspdfsController extends AppController{
 			$this->set('ro_lname',$ro_lname);
 			$this->set('role',$role);
 
-			$chemist_data = $this->DmiChemistRegistrations->find('all', array('fields'=>array('created_by','chemist_fname', 'chemist_lname') , 'conditions'=>array('chemist_id IS'=>$customer_id)))->first();
-
-			$chemist_address= $this->DmiChemistProfileDetails->find('all',array('fields'=>'address_1','conditions'=>array('customer_id IS'=>$customer_id)))->first();
-
-			$this->set('chemist_address',$chemist_address['address_1']);
+			$chemist_data = $this->DmiChemistRegistrations->find('all', array('conditions'=>array('chemist_id IS'=>$customer_id)))->first();
+               
+			$chemist_address= $this->DmiChemistProfileDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+           
+			$this->set('chemist_address',$chemist_address['address']);
 			$this->set('chemist_fname', $chemist_data['chemist_fname']);
 			$this->set('chemist_lname', $chemist_data['chemist_lname']);
+			$this->set('profile_photo', $chemist_address['profile_photo']);
 
 			//set packer id in session and level_3
 			$this->Session->write('packer_id',$chemist_data['created_by'] );
@@ -4510,7 +4585,7 @@ class ApplicationformspdfsController extends AppController{
 
 			//to show commodity name
 
-			$sub_commodity_array = explode(',',$customer_firm_data['sub_commodity']);
+			$sub_commodity_array = explode(',',$chemist_data['sub_commodities']);
 			$i=0;
 			foreach ($sub_commodity_array as $key => $sub_commodity) {
 

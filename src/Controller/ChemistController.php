@@ -313,6 +313,8 @@ class ChemistController extends AppController {
 	// DATE : 25-06-2021 
 	
 	public function chemistRegistration() {
+		$this->loadModel('MCommodityCategory');
+		$this->loadModel('MCommodity');
 
 		$this->Session->write('application_dashboard','packer');
 		$this->validUser();
@@ -333,7 +335,38 @@ class ChemistController extends AppController {
 		$present_email  = '';
 		$present_mobile = '';
 
+       // $commodity_categories = $this->MCommodityCategory->find('list',array('valueField'=>'category_name','conditions'=>array('display'=>'Y'),'order'=>array('category_name asc')))->toArray();
+		//$this->set('commodity_categories',$commodity_categories);
 		$username = $this->Session->read('username');
+        $this->loadModel('DmiFirms'); 
+        $fetchedFirmCategory= $this->DmiFirms->find('all' , array('conditions'=>['customer_id IS'=>$username]))->first();
+		
+         $sub_commodities = $fetchedFirmCategory['sub_commodity'];
+         $sub_commodity_array = explode(',',$sub_commodities);
+		      $i=0;
+				foreach ($sub_commodity_array as $sub_commodity_id)
+				{
+					$fetch_commodity_id = $this->MCommodity->find('all',array('conditions'=>array('commodity_code IS'=>$sub_commodity_id)))->first();
+					
+					$commodity_id[$i] = $fetch_commodity_id['category_code'];
+ 
+					$sub_commodity_data[$i] =  $fetch_commodity_id;
+					
+					$i=$i+1;
+					
+				}
+
+				$unique_commodity_id = array_unique($commodity_id);
+				
+				//$commodity_name_list = $this->MCommodityCategory->find('all',array('conditions'=>array('category_code IN'=>$unique_commodity_id, 'display'=>'Y')))->toArray();
+				 $commodity_categories = $this->MCommodityCategory->find('all')->select(['category_code', 'category_name'])->where(array('category_code IN'=>$unique_commodity_id, 'display'=>'Y'))->combine('category_code', 'category_name')->toArray();
+				
+				$this->set('commodity_categories',$commodity_categories);
+
+				$this->set('sub_commodity_data',$sub_commodity_data);
+		   
+		
+		
 
 		if ($this->request->is('post')) {
 
@@ -341,10 +374,35 @@ class ChemistController extends AppController {
 			if (!empty($this->request->getData('email')) && !empty($this->request->getData('mobile')) && !empty($this->request->getData('dob'))) {
 
 				$usersData = $this->request->getData();
-
+                
 				$checkEmailExist =  $this->DmiChemistRegistrations->find('all', array('fields' => 'email', 'conditions' => array('email IS' => base64_encode($usersData['email']))))->first();
 				$checkMobileExist =  $this->DmiChemistRegistrations->find('all', array('fields' => 'mobile', 'conditions' => array('mobile IS' => $usersData['mobile'])))->first();
-
+                //below added for payment by laxmi 10-07-2023
+				$post_subcommodities = $this->request->getData('selected_commodity');
+				$i=0;
+				foreach ($post_subcommodities as $sub_commodity_id)
+				{
+					$fetch_commodity_id = $this->MCommodity->find('all',array('conditions'=>array('commodity_code IS'=>$sub_commodity_id)))->first();
+					
+					$commodity_id[$i] = $fetch_commodity_id['category_code'];
+					
+					$sub_commodity_data[$i] =  $fetch_commodity_id;
+					
+					$i=$i+1;
+					
+				}
+			
+				$unique_commodity_id = array_unique($commodity_id);
+				$count_subcommodities = count($unique_commodity_id);
+			
+				if(!empty($count_subcommodities)){
+                   $payment_amnt = 5000* $count_subcommodities;
+				}
+				$sub_commodities = $this->request->getData('selected_commodity');
+                
+				$subcsubcommoditities = implode(', ', $sub_commodities);
+				
+			
 				if ($this->request->getData('chemist_fname') !="" && $this->request->getData('chemist_lname') !="" && $this->request->getData('email') !="" && $this->request->getData('mobile') !="" && $this->request->getData('dob') !="") {
 
 					if ($checkEmailExist == null) {
@@ -372,7 +430,7 @@ class ChemistController extends AppController {
 							$htmlEncoded_chemistLastname = htmlentities($this->request->getData('chemist_lname'), ENT_QUOTES);
 
 							$certificationType = explode('/',(string) $username); #For Deprecations
-						$DmiChemistRegistrationsEntity = $this->DmiChemistRegistrations->newEntity(array(
+						    $DmiChemistRegistrationsEntity = $this->DmiChemistRegistrations->newEntity(array(
 
 								'chemist_fname'=>$htmlEncoded_chemistFirstname,
 								'chemist_lname'=>$htmlEncoded_chemistLastname,
@@ -387,10 +445,14 @@ class ChemistController extends AppController {
 								'created_by'=>$username,
 								'usertype'=>$certificationType[1],
 								'created'=>date('Y-m-d H:i:s'),
-								'modified'=>date('Y-m-d H:i:s')
+								'modified'=>date('Y-m-d H:i:s'),
+								'commodity'=>$usersData['commodity'],
+								'sub_commodities'=>$subcsubcommoditities,
+								'payment'=>$payment_amnt,
 							));
-
-
+							
+                            
+                             
 							if ($this->DmiChemistRegistrations->save($DmiChemistRegistrationsEntity)) {
 
 								//Save Chemist Logs
@@ -681,9 +743,10 @@ class ChemistController extends AppController {
 		}
 
 
-         // set application type in session 
-		 $this->Session->write('application_type', 4);
-		 $application_type = $this->Session->read('application_type');
+         // set application type in 4 for chemist
+		 if($this->Session->read('application_dashboard') =='chemist'){
+            $application_type = 4;
+		 }
 
 		 //get packer id in session 
 		 $this->loadModel('DmiChemistRegistrations');
@@ -991,7 +1054,7 @@ class ChemistController extends AppController {
 				$this->DmiChemistAllCurrentPositions->currentUserUpdate($customer_id,$user_email_id,$current_level);//call to custom function from model
 				}
 
-				$message ="Chemist Application Forwarded to RAL Office ".$find_office_email_id['ro_office'].". And the email id is ".base64_decode($office_incharge_id)."  ";
+				$message ="Chemist Application Forwarded to RAL".$find_office_email_id['ro_office'].". And the email id is ".base64_decode($office_incharge_id)."  ";
 				$message_theme = "success";
 
 				// for rescheduling chemist training at RAL and generate letter pdf so comment this redirect url and redirect on  chemist module  by laxmi B. on 10-05-2023  for chemist modeule
@@ -1434,7 +1497,7 @@ class ChemistController extends AppController {
 			$from = date('d-m-Y',strtotime(str_replace('/','-',$reqData['shedule_from'])));
 			$to   = date('d-m-Y',strtotime(str_replace('/','-',$reqData['shedule_to'])));
 			
-			if($from < $to){
+			
 			$this->loadModel('DmiChemistRoToRalLogs');
 			$rescheduleDateData = $this->DmiChemistRoToRalLogs->newEntity( array('chemist_id' => $reqData['chemist_id'],
 			'chemist_first_name' => $reqData['chemist_first_name'],
@@ -1463,11 +1526,7 @@ class ChemistController extends AppController {
 			$message_theme = "warning";
 			$redirect_to = '../../chemist/listOfChemistApplRalToRo/';
 			}
-			}else{
-			$message ="Please select From Date always less than To Date!";
-			$message_theme = "warning";
-			$redirect_to = '../../chemist/trainingScheduleAtRo/'.$id.'';
-			}  
+			 
 			}
 
 			}else{
@@ -1537,6 +1596,26 @@ class ChemistController extends AppController {
 
 			}
 			}
+
+	//to ftech subcommodity after selected commodity category alery selected by CA added by laxmi 14-07-2023
+	public function showCommodityDropdown(){
+		$this->autoRender = false;
+		$this->loadModel('MCommodity');
+		$category_id = $_POST['commodity'];
+		//fetch subcommodities first from firm table
+		$this->loadModel('DmiFirms');
+		$sub_commodities = $this->DmiFirms->find('all', array('fields'=>['sub_commodity'], 'conditions'=>['customer_id IS'=>$_SESSION['username']]))->first();
+		$sub_commodities_array = explode(',',$sub_commodities['sub_commodity']);
+		
+		$commodities = $this->MCommodity->find('all', array('fields'=>array('commodity_code','commodity_name'), 'conditions'=>array('category_code IS'=>$category_id,'display'=>'Y', 'commodity_code IN'=>$sub_commodities_array),'order'=>array('commodity_name asc')))->toArray();
+		?>
+				<option value=""><?php echo "Select Commodity";?></option>
+		<?php foreach ($commodities as $commodity) { ?>
+				<option value="<?php echo $commodity['commodity_code'];?>"><?php echo $commodity['commodity_name'];?></option>
+		<?php }
+		exit;
+	}	
+
 
 }
 

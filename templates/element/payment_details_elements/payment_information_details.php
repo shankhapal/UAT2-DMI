@@ -21,7 +21,10 @@
 				</label>
 			</div>
 		</div>
-		
+		<!-- for auto filled payment amnt added by laxmi on 13-07-2023 -->
+		<?php if(!empty($_SESSION['application_type']) && $_SESSION['application_type'] == 4){ 
+		         $payment_amount = $payment_amt;
+		} ?>
 			<div id="payment_details">
 				<div class="card card-cyan col-md-12 p-0">
 					<div class="card-header"><h3 class="card-title-new"><?php if(!empty($_SESSION['advancepayment']) && $_SESSION['advancepayment']=='no'){ echo 'Payment Details'; }else{ echo 'Advance Payment Details'; } ?></h3></div>

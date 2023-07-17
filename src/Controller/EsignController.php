@@ -436,6 +436,8 @@ class EsignController extends AppController {
 		$ca_unique_no = $this->Session->read('ca_unique_no');//moved here from below by Amol for condition
 		if($appl_type == 4 && $application_dashboard == 'chemist' && empty($ca_unique_no)){//added new condition by Amol for $ca_unique_no on 13-07-2023
           $doc_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/applications/CHM/'.$pdf_file_name;
+		}elseif($appl_type == 4 && $application_dashboard == 'ro'){
+			$doc_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/certificates/CHM/'.$pdf_file_name;
 		}
 		
 		//added new condition for replica allotment esign

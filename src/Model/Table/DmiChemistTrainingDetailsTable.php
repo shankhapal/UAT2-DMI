@@ -27,7 +27,8 @@ class DmiChemistTrainingDetailsTable extends Table{
 				$result[0]['customer_id'] = '';
 				$result[0]['name_of_training'] = '';
 				$result[0]['name_of_institute'] = '';
-				$result[0]['division'] = '';
+				//comment below line because in chemist changes no need of dision added by laxmi [07-07-2023]
+				//$result[0]['division'] = '';
 				$result[0]['from_dt'] = '';
 				$result[0]['to_dt'] = '';
 				$result[0]['form_status'] = '';
@@ -93,12 +94,13 @@ class DmiChemistTrainingDetailsTable extends Table{
 					'colspan' 	=> '1',
 					'rowspan' 	=> '2'
 				),
-				'3' => array(
+				//comment below array because in chemist changes no need of dision added by laxmi [07-07-2023]
+				/*'3' => array(
 					'col' 		=> 'Division /Grade',
 					'colspan' 	=> '1',
 					'rowspan' 	=> '2'
-				),
-				'4' => array(
+				),*/
+				'3' => array(
 					'col' 		=> 'Duration Of Training',
 					'colspan' 	=> '2',
 					'rowspan' 	=> '1'
@@ -151,7 +153,8 @@ class DmiChemistTrainingDetailsTable extends Table{
 					'class'		=> 'cvOn cvNotReq cvMaxLen',
 					'id'		=> 'name_of_institute'
 				),
-				'3' => array(
+				//comment below array because in chemist changes no need of dision added by laxmi [07-07-2023]
+				/*'3' => array(
 					'name'		=> 'division',
 					'type'		=> 'select',
 					'valid'		=> 'text',
@@ -159,8 +162,8 @@ class DmiChemistTrainingDetailsTable extends Table{
 					'selected'	=> $row['division'],
 					'class'		=> 'cvOn cvNotReq',
 					'id'		=> 'division'
-				),
-				'4' => array(
+				),*/
+				'3' => array(
 					'name'		=> 'from_dt',
 					'type'		=> 'text',
 					'valid'		=> 'text',
@@ -168,7 +171,7 @@ class DmiChemistTrainingDetailsTable extends Table{
 					'class'		=> 'cvOn cvNotReq cvDate cvMaxLen',
 					'id'		=> 'from_dt'
 				),
-				'5' => array(
+				'4' => array(
 					'name'		=> 'to_dt',
 					'type'		=> 'text',
 					'valid'		=> 'text',
@@ -204,7 +207,10 @@ class DmiChemistTrainingDetailsTable extends Table{
 			$created = date('Y-m-d H:i:s');
 			$CustomersController = new CustomersController;
 
-			$row_count = count($forms_data['division']);
+            //comment count division and added another beacuse in chemist changes division is not needed added by laxmi [07-07-2023]
+			//$row_count = count($forms_data['division']);
+			$row_count = count($forms_data['name_of_training']);
+			
 			
 			$section_id = $_SESSION['section_id'];
 			$Dmi_chemist_comment = TableRegistry::getTableLocator()->get('DmiChemistComments');
@@ -239,7 +245,8 @@ class DmiChemistTrainingDetailsTable extends Table{
 			for ($i=0;$i<$row_count;$i++) {
 
 				$table = 'DmiDivisionGrades';
-				$division = $forms_data['division'][$i];
+				//comment below line because in chemist changes no need of dision added by laxmi [07-07-2023]
+				//$division = $forms_data['division'][$i];
 				//$division = $this->dropdownSelectInputCheck($table,$post_input_request);//calling library function
 
 				$name_of_training = htmlentities($forms_data['name_of_training'][$i], ENT_QUOTES);
@@ -254,7 +261,8 @@ class DmiChemistTrainingDetailsTable extends Table{
 					'customer_id'=>$chemist_id,
 					'name_of_training'=>$name_of_training,
 					'name_of_institute'=>$name_of_institute,
-					'division'=>$division,
+					//comment below line because in chemist changes no need of dision added by laxmi [07-07-2023]
+					//'division'=>$division,
 					'from_dt'=>$from_dt,
 					'to_dt'=>$to_dt,
 					'form_status'=>$status,					
@@ -262,7 +270,7 @@ class DmiChemistTrainingDetailsTable extends Table{
 					'modified'=>date('Y-m-d H:i:s'),
 					'is_latest'=>1
 				));
-
+                        
 				if($this->save($DmiChemistTrainingDetailsEntity)){
 
 					$return = "true";
@@ -349,7 +357,7 @@ class DmiChemistTrainingDetailsTable extends Table{
 			'customer_id'=>$customer_id,
 			'name_of_training'=>$forms_data['name_of_training'],
 			'name_of_institute'=>$forms_data['name_of_institute'],
-			'division'=>$forms_data['division'],
+			#'division'=>$forms_data['division'],  this is comment by laxmi
 			'from_dt'=>$forms_data['from_dt'],
 			'to_dt'=>$forms_data['to_dt'],
 			'marks'=>$forms_data['marks'],

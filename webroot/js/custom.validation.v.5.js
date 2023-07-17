@@ -1,15 +1,29 @@
 $(function(){
 
     $(document).on('keyup keypress blur change','.cvcalyear',function(){
-
+   
+     
 		//tis logic is used for calculate year difference beeteween two dates added by shankhpal shende on 27/09/2022
 		var id_No = this.id.split("-");//to get dynamic id of element for each row, and split to get no.
 		$("#ta-total-"+id_No).val();
 		id_No = id_No[2];
 		var date1 = $("#ta-from_dt-"+id_No).val();
-		var date2 = $("#ta-to_dt-"+id_No).val();
+		var date2 = $("#ta-to_dt-"+id_No).val(); 
 		var yearsDiff =  new Date(date2).getFullYear() - new Date(date1).getFullYear();
-		$("#ta-total-"+id_No).val(yearsDiff);
+    //calculated experience difference with basis  of mont and year by laxmi 10-07-2023
+     const split = date1.split('/');
+     const split1 = date2.split('/');
+     var monthsDiff = split1[1]-split[1];
+     debugger;
+    
+     if(yearsDiff == 0 || yearsDiff == NaN){
+      yearsDiff =  0;
+     }
+     if(monthsDiff == 0 || monthsDiff == NaN){
+      monthsDiff =  0;
+     }
+		
+    $("#ta-total-"+id_No).val(yearsDiff +"."+ monthsDiff);
     })
   
 	$('#value1, #value2').keyup(function(){
@@ -100,7 +114,7 @@ $(function(){
   
     });
   
-    function getErrorText(className, inputMinMax, inputFloatVal){
+    function getErrorText(className, inputMinMax, inputFloatVal){ 
       var txt;
       switch(className){
         case 'cvReq':
@@ -334,9 +348,24 @@ $(function(){
   
   
   $(document).ready(function(){
-  
+   // added below  function by laxmi to view profile and sign after upload without save on [06-07-2023]
+    $('.file_profile').change(function(){
+     var upload_view_src = $('.chemist_doc').attr('src');
+    //  if(upload_view_src == '' || upload_view_src == undefined){
+    //        $('.chemist_doc').hide();
+    //  }
+      var path = URL.createObjectURL(event.target.files[0]);
+      $("<img src width=auto height=80px >").insertAfter( $("#profile_img") ).fadeIn("fast").attr('src',path);
+    });
+    $('.file_sign').change(function(){
+      var path = URL.createObjectURL(event.target.files[0]);
+      $("<img src width=auto height=80px >").insertAfter( $("#sign_img") ).fadeIn("fast").attr('src',path);
+    });
+
+    //End by Laxmi
+
       $('.form_name').on('submit', function(){
-          
+         
           var returnFormStatus = true;
           var formSelStatus = 'valid';
           var returnEmptyStatus = formEmptyStatus('.form_name');
@@ -344,20 +373,39 @@ $(function(){
           
           //select field validations
           var selRw = $('.form_name').find('select').not(':hidden,.cvNotReq').not('select[disabled]').length;
+          
+           
           for(var i=0;i<selRw;i++){
               var selField = $('.form_name').find('select').not(':hidden,.cvNotReq').not('select[disabled]').eq(i).val();
               if(selField == ''){
                   showElAlrt('.form_name', 'select', i);
                   formSelStatus = 'invalid';
+                 
               }
           }
+
+          // added for file upload validation by laxmi on 06-07-2023
+          var selfile = $('.form-for-file-too').find('.filetype').length;
+          
+          for(var i=0;i<selRw;i++){
+            var selfile = $('.form-for-file-too').find(".selectedFile").eq(i).val();
+            var selfileselect = $('.form-for-file-too').find('.filetype').eq(i).val();
+            if( selfileselect == ''){ 
+              if(selfile == ''){  
+                showElAlrt('.form-for-file-too', '.filetype', i);
+                formSelStatus = 'invalid';
+              }
+                
+            }
+        }
+        //end Laxmi
   
           if(formSelStatus == 'invalid'){
               //showAlrt('Select value from dropdown!');
               returnFormStatus = false;
           }
-          
-          return returnFormStatus;
+        
+          return returnFormStatus; 
       });
   
   });

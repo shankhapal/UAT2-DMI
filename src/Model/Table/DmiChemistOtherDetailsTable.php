@@ -38,6 +38,8 @@ class DmiChemistOtherDetailsTable extends Table{
 				$result[0]['ro_reply_comment'] = '';
 				$result[0]['delete_mo_comment'] = '';
 				$result[0]['customer_reply_date'] = '';
+				//added other option attachment by laxmi on 10-07-2023
+				$result[0]['other_details_attachment'] = '';
 
 		}else{
 
@@ -84,9 +86,11 @@ class DmiChemistOtherDetailsTable extends Table{
 			$created = date('Y-m-d H:i:s');
 
 			$social_work = htmlentities($forms_data['social_work'], ENT_QUOTES);
-			$prest_instit = htmlentities($forms_data['prest_instit'], ENT_QUOTES);
-			$academic_focus = htmlentities($forms_data['academic_focus'], ENT_QUOTES);
-			$articles_pub = htmlentities($forms_data['articles_pub'], ENT_QUOTES);
+			//below line comment by laxmi due to suggestion  on 10-07-2023
+
+			//$prest_instit = htmlentities($forms_data['prest_instit'], ENT_QUOTES);
+			//$academic_focus = htmlentities($forms_data['academic_focus'], ENT_QUOTES);
+			//$articles_pub = htmlentities($forms_data['articles_pub'], ENT_QUOTES);
 
 			$section_id = $_SESSION['section_id'];
 			$Dmi_chemist_comment = TableRegistry::getTableLocator()->get('DmiChemistComments');
@@ -114,20 +118,41 @@ class DmiChemistOtherDetailsTable extends Table{
 				));
 				$Dmi_chemist_comment->save($newEntity);
 			}
+             
+			//added other attachment option by laxmi on 10-07-2023
+			$CustomersController = new CustomersController;
+			if (!empty($forms_data['other_details_attachment']->getClientFilename())) {
 
+				$attchment = $forms_data['other_details_attachment'];
+				$file_name = $attchment->getClientFilename();
+				
+				$file_size = $attchment->getSize();
+				$file_type = $attchment->getClientMediaType();
+				$file_local_path = $attchment->getStream()->getMetadata('uri');
+				// calling file uploading function
+				$other_details_attachment = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path);
+				
+			} else {
+                // comment above line and set empty if profile phot not selected because it mendatory by laxmi [06-07-2023]
+				$other_details_attachment = $section_form_details[0]['other_details_attachment'];
+				
+			}
 
 			$DmiChemistOtherDetailsEntity = $this->newEntity(array(
 
 				'id'=>$id,
 				'customer_id'=>$chemist_id,
 				'social_work'=>$social_work,
-				'prest_instit'=>$prest_instit,
-				'academic_focus'=>$academic_focus,
-				'articles_pub'=>$articles_pub,
+				#below line comment by laxmi on suggestion dated 10-07-2023
+				//'prest_instit'=>$prest_instit,
+				//'academic_focus'=>$academic_focus,
+				//'articles_pub'=>$articles_pub,
 				'form_status'=>$status,				
 				'created'=>$created,
 				'modified'=>date('Y-m-d H:i:s'),
-				'is_latest'=>1
+				'is_latest'=>1,
+				// added other option attachment by laxmi on 10-07-2023
+				'other_details_attachment' => $other_details_attachment
 			));
 
 			if ($this->save($DmiChemistOtherDetailsEntity)) {
@@ -206,9 +231,10 @@ class DmiChemistOtherDetailsTable extends Table{
 
 			'customer_id'=>$customer_id,
 			'social_work'=>$forms_data['social_work'],
-			'prest_instit'=>$forms_data['prest_instit'],
-			'academic_focus'=>$forms_data['academic_focus'],
-			'articles_pub'=>$forms_data['articles_pub'],
+			#below line comment by laxmi on suggestion dated 10-07-2023
+			//'prest_instit'=>$forms_data['prest_instit'],
+			//'academic_focus'=>$forms_data['academic_focus'],
+			//'articles_pub'=>$forms_data['articles_pub'],
 			'form_status'=>$forms_data['form_status'],
 			'is_latest'=>$forms_data['is_latest'],
 			'created'=>$created_date,
@@ -225,7 +251,8 @@ class DmiChemistOtherDetailsTable extends Table{
 			'mo_comment_ul'=>$mo_comment_ul,
 			'ro_reply_comment'=>$ro_reply_comment,
 			'ro_reply_comment_date'=>$ro_reply_comment_date,
-			'rr_comment_ul'=>$rr_comment_ul
+			'rr_comment_ul'=>$rr_comment_ul,
+			'other_details_attachment' => $forms_data['other_details_attachment'] #this is added by laxmi10-7-23
 
 		));
 

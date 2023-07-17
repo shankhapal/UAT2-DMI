@@ -67,7 +67,14 @@
 
 		$("#commodity").find('option').remove();
 		var commodity = $("#commodity_category").val();
-
+		//added below variable  and conditions for chemist commodity by laxmi on 14-07-2023
+		var checkForChemist = $("#chemist_commodity_select").val();
+		var checkForChemist = $("#chemist_commodity_select").val();
+        if((checkForChemist !='' || checkForChemist !=undefined) && checkForChemist == 'application_type_4'){
+         var url = "../Chemist/show-commodity-dropdown";
+		}else{
+			var url = "../AjaxFunctions/show-commodity-dropdown";
+		}
 		//applied check on 08-06-2021 by Amol, CA export can not apply for BEVO category -> THIS MESSAGE AND CONDITION IS CHANGED FOR THE EXPORT FLOW UPADTES (AKASH [30-08-2022])
 		if(/*$('#certification_type option:selected').val()=='1' && */$('#radioSuccess1').is(':checked') && commodity != '14'){
 			$.alert('As you have selected the Export option, you can not select category other than <b>Fruits & Vegetable</b>.');
@@ -77,7 +84,7 @@
 		$.ajax({
 			type: "POST",
 			async:true,
-			url:"../AjaxFunctions/show-commodity-dropdown",
+			url:url,//change this by laxmi and set above conditionally 
 			data: {commodity:commodity},
 			beforeSend: function (xhr) { // Add this line
 				xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());

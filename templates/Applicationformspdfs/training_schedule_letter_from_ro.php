@@ -1,4 +1,4 @@
-<?php // added new template file for chemist training approval certificate pdf by laxmi Bhadade on 10-1-2023 ?>
+<?php  // added new template file for chemist training approval certificate pdf by laxmi Bhadade on 10-1-2023 ?>
 <style>
     h4 {
         padding: 5px;
@@ -51,8 +51,13 @@
                   <?php echo $firm_district_name;?>,
                   <?php echo $firm_state_name; ?> – <?php echo $customer_firm_data['postal_code']; ?>
             </td>
+            <?php if(!empty($profile_photo)){ ?>
+                <td align = "right"><img src="<?php echo $profile_photo; ?>" width= "auto" height="80">
+            </td>
+                <?php }?>
         </tr>
-
+     </table>
+     <table  width="100%">
         <tr>    
             <td><br>Subject: Chemist Training Scheduled of  <?php echo $chemist_fname."&nbsp;". $chemist_lname ;?> in the analysis of <?php echo $sub_commodities_list; ?>.</td>
         </tr>

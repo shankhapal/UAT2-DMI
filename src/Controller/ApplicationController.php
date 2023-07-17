@@ -335,7 +335,7 @@ class ApplicationController extends AppController{
 		$this->set('firm_details',$firm_details);
 		$document_lists = $this->Mastertablecontent->allDocumentsList();
 		$this->set('document_lists',$document_lists);
-
+         
 		//get commodity details, for option to update commodities
 		//applied on 02-07-2021 by Amol
 		$this->Randomfunctions->getCommodityDetails($firm_details,$firm_type);
@@ -384,7 +384,7 @@ class ApplicationController extends AppController{
 
 		// get section details
 		$section_form_details = $this->$section_model->sectionFormDetails($customer_id);
-
+        
 
 		// if return value 1 (all forms saved), return value 2 (all forms approved), return value 0 (all forms not saved or approved)
 		$all_section_status = $this->Customfunctions->formStatusValue($allSectionDetails,$customer_id);
@@ -399,7 +399,15 @@ class ApplicationController extends AppController{
 
 		// get previous and next button id
 		$nextPreviousBtn =	$this->Customfunctions->getNextPreSec($allSectionDetails);
-		
+
+
+
+		//added middle name type in array and set for view side like S/o, W/o, D/o by laxmi B on 06-07-2023
+		if ($application_type == 4) {
+		$middle_type = array('S/o'=>'S/o', 'D/o'=>'D/o', 'W/o'=>'W/o');
+        $this->set('middle_type', $middle_type);
+		}
+
 		$this->set('section',$section);
 		$this->set('tablename',$section_model);
 		$this->set('current_form_data',$section_form_details[0]);
@@ -511,7 +519,7 @@ class ApplicationController extends AppController{
 
 		
 		if (null !== $this->request->getData('save')) {
-
+            
 			$result = $this->$section_model->saveFormDetails($customer_id,$this->request->getData());
 			
 			if (is_array($result)=='') {
@@ -869,7 +877,9 @@ class ApplicationController extends AppController{
 			if($application_type == 4){
 				$customer_id = $this->Session->read('username');
 			    $form_type='CHM';
+				
 			}	
+			
 
 			// Fetch submitted Payment Details and show // Done By pravin 13/10/2017
 			$this->Paymentdetails->applicantPaymentDetails($customer_id,$firm_details['district'],$payment_table);
@@ -879,7 +889,7 @@ class ApplicationController extends AppController{
 			$this->loadModel('MCommodityCategory');
 
 
-			$application_charge = $this->Customfunctions->applicationCharges($application_type,$firm_type);
+			$application_charge = $this->Customfunctions->applicationCharges($application_type,$firm_type); 
 			$this->set('application_charge',$application_charge);
 
 			$this->loadModel($payment_table);
@@ -905,7 +915,7 @@ class ApplicationController extends AppController{
 
 			}
 			$sub_commodity_array = explode(',',(string) $firm_details['sub_commodity']); #For Deprecations
-
+             
 			if (!empty($firm_details['sub_commodity'])) {
 				
 				$i=0;
@@ -920,7 +930,7 @@ class ApplicationController extends AppController{
 				$unique_commodity_id = array_unique($commodity_id);
 
 				$commodity_name_list = $this->MCommodityCategory->find('all',array('conditions'=>array('category_code IN'=>$unique_commodity_id, 'display'=>'Y')))->toArray();
-
+				
 				$this->set('commodity_name_list',$commodity_name_list);
 
 				$this->set('sub_commodity_data',$sub_commodity_data);
@@ -947,6 +957,16 @@ class ApplicationController extends AppController{
 			$this->set('allSectionDetails',$allSectionDetails);
 			$this->set('all_section_status',$all_section_status);
 			$this->set('section_details',$section_details);
+
+
+			if($application_type == 4){
+				//for auto filled payment  fetch payment from table by laxmi on 13-07-2023 , 
+				$this->loadModel('DmiChemistRegistrations');
+				$payment_amt = $this->DmiChemistRegistrations->find('all', array('fields'=>['payment'], 'conditions'=>['chemist_id IS'=>$customer_id]))->first();
+			   $this->set('payment_amt',$payment_amt['payment']);
+
+			   $this->set('application_charge',$payment_amt['payment']);
+			}
 
 			if (null !== ($this->request->getData('final_submit'))) {
 

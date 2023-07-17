@@ -86,6 +86,10 @@
 			//variable set by laxmi for chemist_training completed or not radio 
             var is_training_completed = $("#approved").val();
 			var value_return = 'true';
+			//category and commodity added by laxmi on 10-07-2023
+			var selectedCom = $("#selected_commodity").val();
+			var category = $("commodity_category").val();
+			var commodity = $("commodity").val();
 
 
 			if(check_alpha_character_validation(fname).result == false){
@@ -184,6 +188,22 @@
 				$("#approved").click(function(){$("#error_is_training_completed").hide().text;$("#approved").removeClass("is-invalid");});
 				value_return = 'false';
 			}
+            //commodity and category not empty validation added by laxmi on 10-07-2023
+			if(selectedCom == '' || selectedCom == undefined){
+			  if(category == '' || category == undefined){
+				$("#error_commodity_category").show().text("Please select commodity category");
+				$("#commodity_category").addClass("is-invalid");
+				$("#commodity_category").click(function(){$("#error_commodity_category").hide().text;$("#commodity_category").removeClass("is-invalid");});
+				value_return = 'false';
+			  }
+
+			   if(commodity == '' || commodity == undefined){
+				 $("#error_commodity").show().text("Please select commodity category");
+				 $("#commodity").addClass("is-invalid");
+				 $("#commodity").click(function(){$("#error_commodity").hide().text;$("#commodity").removeClass("is-invalid");});
+				 value_return = 'false';
+			    }
+		    }
 			   
 			if(value_return == 'false'){
 				var msg = "Please check some fields are missing or not proper.";
