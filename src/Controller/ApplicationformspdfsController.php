@@ -16,6 +16,7 @@ use Cake\Utility\Xml;
 use FR3D;
 use Cake\View;
 use PDF_Rotate;
+use MyCustomPDFWithWatermark;
 
 class ApplicationformspdfsController extends AppController{
 	
@@ -2659,6 +2660,8 @@ class ApplicationformspdfsController extends AppController{
 		//below line is added on 23-05-2023 by Amol, to print water mark on pdf
 		require_once(ROOT . DS . 'vendor' . DS . 'tcpdf' . DS . 'tcpdf_text.php');
 
+		require_once(ROOT . DS . 'vendor' . DS . 'tcpdf' . DS . 'tcpdf_watermark.php');
+
 		
 
 		//This below condition is updated for the Surrender (SOC) Application PDFs watermarks - Akash [12-05-2023]
@@ -2674,8 +2677,10 @@ class ApplicationformspdfsController extends AppController{
 				$pdf = new PDF_Rotate(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 			}
 
-		}else{ 
-			$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);	
+		}elseif($appl_type == 4 && $pdf_for == 'grant'){ 
+			$pdf = new MyCustomPDFWithWatermark(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);	
+		}else{
+			$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 		}
 		
 		 
@@ -2702,31 +2707,31 @@ class ApplicationformspdfsController extends AppController{
 				$pdf->my_set_sign('', '', '', '', 2, $info);
 			}
 		}
-			
-			
 		$pdf->AddPage();
-		  //added watermark image for chemist training approval certificate by laxmi on 13-07-2023
-		if($appl_type == 4 && $pdf_for == 'grant'){
-			$url_curl = $file_path;
-			$pageCount = $pdf->getNumPages(); 
-			for ($pageNo = 0; $pageNo <= $pageCount; $pageNo++) {
+		//added watermark image for chemist training approval certificate by laxmi on 13-07-2023
+		// if ($appl_type == 4 && $pdf_for == 'grant') { 
+		// 	$watermarkImage = 'img/AdminLTELogo.png'; 
+		// 	$ImageW = 85; // Watermark Size 
+		// 	$ImageH = 70; 
+		// 	$opacity = 1.0; // Opacity level (0.0 - 1.0)
+		// 	$pdf->SetAlpha(0.5);
+			 
+		// 	$pageCount = $pdf->getNumPages(); 
 			
-			
-			$watermarkImage = 'img/AdminLTELogo.png'; 
-			$ImageW = 85; //WaterMark Size
-			$ImageH = 70;
-			$myPageWidth = $pdf->getPageWidth();
-			$myPageHeight = $pdf->getPageHeight();
-			$myX = ($myPageWidth / 2) - 50;  //WaterMark Positioning
-			$myY = ($myPageHeight / 2) - 50;
-			$pdf->SetAlpha(0.20);
-			$pdf->Image($watermarkImage, $myX, $myY, $ImageW, $ImageH, '', '', 'C', true, 300); 
-			$pdf->SetAlpha(2.0);
-			$pdf->SetFooterMargin(5);
-			}
-		}
+		// 	for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) { 
+		// 		$pdf->setPage($pageNo); 
+		// 		$pdf->Image($watermarkImage, $pdf->GetX() + (($pdf->getPageWidth() - $ImageW) / 2), $pdf->GetY() + (($pdf->getPageHeight() - $ImageH) / 2), $ImageW, $ImageH); 
+		// 		//$pdf->Image($watermarkImage, $pdf->GetX(), $pdf->GetY(), $ImageW, $ImageH, '', '', '', false, 300, '', false, $opacity);
+		// 	 } 
+		// 	 $pdf->SetAlpha(1);
+		// 	}
+		
+		 
 			$pdf->writeHTML($html, true, false, true, false, '');
 			
+           
+
+
 			//get signer details
 			//if applicant
 			if(preg_match("/^[0-9]+\/[0-9]+\/[A-Z]+\/[0-9]+$/", $this->Session->read('username'),$matches)==1)

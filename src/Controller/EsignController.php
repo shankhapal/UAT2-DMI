@@ -435,6 +435,8 @@ class EsignController extends AppController {
 		$application_dashboard = $this->Session->read('application_dashboard');
 		if($appl_type == 4 && $application_dashboard == 'chemist'){
           $doc_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/applications/CHM/'.$pdf_file_name;
+		}elseif($appl_type == 4 && $application_dashboard == 'ro'){
+			$doc_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/certificates/CHM/'.$pdf_file_name;
 		}
 		
 		//added new condition for replica allotment esign
