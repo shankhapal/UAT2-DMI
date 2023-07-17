@@ -57,9 +57,6 @@
 					</li>
 
 					<li class="nav-item">
-						<?php echo $this->Html->link('<i class="nav-icon far fa-dot-circle"></i></i><p class="nav-icon-p">Action Logs</p>', array('controller'=>'common', 'action'=>'user_action_history'), array('escape'=>false, 'class'=>'nav-link '.$menu_profile)); ?>
-					</li>
-
 					<?php if (!empty($final_submit_status) && $final_submit_status == 'approved') { ?>
 						<li class="nav-item">
 							<?php echo $this->Html->link('<i class="nav-icon fas fa-user"></i><p class="nav-icon-p">Confirm Replica Serial</p>', array('controller'=>'replica', 'action'=>'replica_appl_list'), array('escape'=>false, 'class'=>'nav-link '.$menu_profile)); ?>

@@ -125,6 +125,14 @@ class ApplicationController extends AppController{
 		$results = $connection->execute($query, ['firmType' => $firm_type])->fetchAll('assoc');
 
 		$changeFieldsList = (new Collection($results))->combine('field_id', 'change_field')->toArray();
+
+		//changing commodity and packing type text in the list as per firm type
+		//on 15-07-2023 by Amol
+		if($firm_type==1 || $firm_type==3){
+			$changeFieldsList[7] = 'Commodity Group/ Commodity';
+		}else{
+			$changeFieldsList[7] = 'Packing Type';
+		}
 	
 		$this->set('changeFieldsList',$changeFieldsList);
 

@@ -113,12 +113,15 @@
 			}
 
 			//new validation script added for upload fields required for premises change, 17-05-2023
-			if($("#premises_fssai_doc_value").text() == ''){	
-				if(check_file_upload_validation(premises_fssai_doc).result == false){			
-					$("#error_premises_fssai_doc").show().text("Please select related file");
-					$("#premises_fssai_doc").addClass("is-invalid");
-					$("#premises_fssai_doc").click(function(){$("#error_premises_fssai_doc").hide().text; $("#premises_fssai_doc").removeClass("is-invalid");});
-					value_return = 'false';
+			//added $firm_type==1 cond. on 15-07-2023 as said fssai upload will be only for CA
+			if (firm_type == 1) {
+				if($("#premises_fssai_doc_value").text() == ''){	
+					if(check_file_upload_validation(premises_fssai_doc).result == false){			
+						$("#error_premises_fssai_doc").show().text("Please select related file");
+						$("#premises_fssai_doc").addClass("is-invalid");
+						$("#premises_fssai_doc").click(function(){$("#error_premises_fssai_doc").hide().text; $("#premises_fssai_doc").removeClass("is-invalid");});
+						value_return = 'false';
+					}
 				}
 			}
 

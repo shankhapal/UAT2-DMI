@@ -546,7 +546,7 @@ class ReplicaController extends AppController {
 				$cur_year = $year_ar[date('Y')];
 				$cur_month = $month_ar[date('m')];
 				$ca_unique_no = $this->request->getData('ca_unique_no');
-				
+					
 				//initial replica pattern
 				$init_rep = $ca_unique_no.$cur_year.$cur_month;
 				
@@ -562,6 +562,23 @@ class ReplicaController extends AppController {
 				//replica range from value, initial stage for first time
 				$cur_rep_no_from[$i] = $init_rep.$crore_ar[1].$lakh_ar[1].$thou_ar[1].'000';
 				$postData = $this->request->getData();
+		
+				//added new variable to collect packet counts
+				//on 12-07-2023 by Amol $packCnt logic
+				//to resolve the counts issue for 'upto' replica number
+				$last_allotment_counts = $this->DmiReplicaAllotmentDetails->find('all',array('fields'=>array('no_of_packets','alloted_rep_to'),'conditions'=>array('customer_id IS'=>$customer_id,'allot_status'=>'1','delete_status IS Null'),'order'=>'id asc'))->toArray(); 
+				$packCnt = 0;
+				foreach($last_allotment_counts as $eachCnt){
+					//check month condition, if same month then add counts
+					$last_allt_month = substr($eachCnt['alloted_rep_to'],6,1);
+					if($cur_month == $last_allt_month){
+						$packCnt = $eachCnt['no_of_packets']+$packCnt;
+					}
+					
+				}
+				if($packCnt!=0){
+					$packCnt = $packCnt-1;//to set last count upto 999
+				}
 
 				foreach ($postData['commodity'] as $key=>$val) {
 					
@@ -582,14 +599,15 @@ class ReplicaController extends AppController {
 							//if month not matched then reset the series to initial position, for each year or month
 							$last_allt_month = substr($alloted_rep_to,6,1);
 							if ($cur_month != $last_allt_month) {
-								
+								//added $packCnt = 0 12-07-2023 by Amol, if new month then no need for $packCnt value first time
+								$packCnt = 0;
 								$cur_rep_no_from[$i] = $init_rep.$crore_ar[1].$lakh_ar[1].$thou_ar[1].'000';
 								
 								//required no. of packets for each row, for first time, deducted 1 because started from 000
 								$req_cnt = $postData['no_of_packets'][$key]-1;
 							
 							} else {
-							
+									
 								$crNum = array_search(substr($alloted_rep_to,7,1),$crore_ar);//crore digit
 								$lkNum = array_search(substr($alloted_rep_to,8,1),$lakh_ar);//lakh digit
 								$thNum = array_search(substr($alloted_rep_to,9,1),$thou_ar);//thousand digit
@@ -609,10 +627,19 @@ class ReplicaController extends AppController {
 						}
 					}
 					
-					
-					
+					//taking reqcnt in new variable $packCnt to generate rep. for 0 to count for every commodity loop
+					//bcoz while generating rep. from our provided start point it get mismatched at some point and 'to' value disturbed
+					//therefore setting all cr, lks, ths and hund count to initail 1 position every time when 'upto' repl. no. is generating.
+					//to resolve the counts issue for 'upto' replica number 
+					//on 12-07-2023 by Amol
+					$packCnt = $packCnt+$req_cnt;
+					$crNum = 1;
+					$lkNum = 1;
+					$thNum = 1;
+					$hdNum = 1;
+
 					//calculate and get replica for required no. of packets
-					$cur_rep_no_upto[$i] = $this->replicaGenerationLogic($init_rep,$req_cnt,$crNum,$lkNum,$thNum,$hdNum,$crore_ar,$lakh_ar,$thou_ar,$month_ar2,$year_ar);
+					$cur_rep_no_upto[$i] = $this->replicaGenerationLogic($init_rep,$packCnt,$crNum,$lkNum,$thNum,$hdNum,$crore_ar,$lakh_ar,$thou_ar,$month_ar2,$year_ar);
 					
 					$last_row_rep_no = $cur_rep_no_upto[$i];
 					
@@ -1573,7 +1600,7 @@ class ReplicaController extends AppController {
 			$thNum = $thNum*1000;
 			$lkNum = $lkNum*26000;
 			$crNum = $crNum*676000;
-			
+
 			$serial_no = $hun_val;
 			if ($thNum != 0) {				
 				$serial_no = $serial_no+$thNum;

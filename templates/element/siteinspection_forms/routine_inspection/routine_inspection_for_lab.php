@@ -5,11 +5,12 @@
 	    Date: 24-05-2023
 */ -->
 <?php //pr($section_form_details);die;
+echo $this->Html->css('../multiselect/jquery.multiselect');
+echo $this->Html->script('../multiselect/jquery.multiselect');
 echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-data', 'id'=>$section)); ?>
 <section id="form_outer_main" class="content form-middle">
 <div class="container-fluid">
 <h5 class="mt-1 mb-2">Routine Inspection Report (Approved Laboratory)</h5>
-
 <div id='form_inner_main'>
 <div class="row">
 <div class="col-md-12">
@@ -46,8 +47,17 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
             <div class="col-md-3">
                 <!-- added time field as per change req and suggestions on date 27/06/2023
                 added by shankhpal shende -->
-                <?php echo $this->Form->control('time_p_inspection', array('type'=>'time', 'id'=>'time_p_inspection', 'value'=>$section_form_details[0]['time_p_inspection'], 'class'=>'form-control input-field', 'placeholder'=>'Enter time', 'label'=>false)); ?>
-                <span id="error_time_p_inspection" class="error invalid-feedback"></span>
+                <?php
+                    echo $this->Form->control('time_p_inspection', [
+                        'type' => 'select',
+                        'id' => 'time_p_inspection',
+                        'options' => $section_form_details[5],
+                        'default' => $section_form_details[0]['time_p_inspection'],
+                        'class' => 'form-control input-field',
+                        'label' => false
+                    ]);
+                    ?>
+                    <span id="error_time_p_inspection" class="error invalid-feedback"></span>
             </div>
         </div>
     </div>
@@ -68,7 +78,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
             </div>
             <div class="col-md-3">
                 <div class="form-group row">
-                    <label for="inputEmail3" class="col-sm col-form-label">Address of the laboratory </label>
+                    <label for="inputEmail3" class="col-sm col-form-label">Addres of the laboratory </label>
                 </div>
             </div>
             <div class="col-md-3">
@@ -130,19 +140,8 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                 </div>
             </div>
             <div class="col-md-6">
-                <?php
-                    
-                    $options = $section_form_details[2];
-                    $options = ['' => 'Select Approved Chemist'] + $options;
-                    $selectedValues = $section_form_details[0]['approved_chemist']; // Provide the values you 
-                    echo $this->Form->control('approved_chemist', [
-                        'type' => 'select',
-                        'options' => $options,
-                        'id' => 'approved_chemist',
-                        'class' => 'form-control input-field',
-                        'label' => false,
-                        'value' => $selectedValues,
-                    ]);?>
+                <?php echo $this->Form->control('approved_chemist', array('type'=>'select', 'options'=>$section_form_details[2], 'multiple'=>'multiple', 'label'=>false, 'disabled'=>'disabled', 'class'=>'form-control')); ?>
+
                  <?php if (empty($section_form_details[2])) : ?>
                     <ol class="badge">
                       <a target="_blank" href="/testdocs/DMI/manuals/applicant/Chemist Registration.pdf">Manual for Chemist Registration</a>
@@ -155,7 +154,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
     </div>
 </div>
 <!-- 4.  Present at the time of inspection -->
-<div class="card-header sub-card-header-firm"><h3 class="card-title">4.Whether present at the time of Inspection </h3></div>
+<div class="card-header sub-card-header-firm"><h3 class="card-title">4.Name of the approved chemist Present at the time of inspection </h3></div>
 <div class="form-horizontal">
     <div class="card-body">
         <div class="row">
@@ -165,34 +164,39 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="form-group row">
-                    <?php 
-                        $i=1;
-                        $present_time_of_inspection = isset($section_form_details[0]['present_time_of_inspection'])?$section_form_details[0]['present_time_of_inspection']:"";
-                
-                            if($present_time_of_inspection == 'yes'){
-                                $checked_yes = 'checked';
-                                $checked_no = '';
-                            } else {
+          <?php
+                $chemst = $section_form_details[2];
+               
+                $selectedOptions = explode(',', $section_form_details[0]['present_time_of_inspection']);
 
-                                $checked_yes = '';
-                                $checked_no = 'checked';
+                $selectedValues = [];
+                if(!empty($chemst)){
+                    foreach ($selectedOptions as $option) {
+                        foreach ($chemst as $key => $value) {
+                            if ($option == $key) {
+                                $selectedValues[] = $option;
+                                break; // Exit the inner loop since the value has been found
                             }
-                        $i++;
-                    ?>
-                    
-                <div class=" d-inline">
-                    <input type="radio" name="present_time_of_inspection" checked="" id="present_time_of_inspection-yes" value="yes"<?php echo $checked_yes; ?>>
-                    <label for="present_time_of_inspection-yes">Yes
-                    </label>
-                </div>
-                <div class=" d-inline">
-                    <input type="radio" name="present_time_of_inspection" id="present_time_of_inspection-no" value="no" <?php echo $checked_no; ?>>
-                    <label for="present_time_of_inspection-no">No
-                    </label>
-                </div>
-                <span id="error_present_time_of_inspection" class="error invalid-feedback"></span>
+                        }
+                    }
+                }
+            
+                echo $this->Form->control(
+                    'present_time_of_inspection',
+                    [
+                        'type' => 'select',
+                        'options' => $chemst,
+                        'default' => $selectedValues,
+                        'multiple' => 'multiple',
+                        'escape' => false,
+                        'id' => 'present_time_of_inspection',
+                        'label' => false,
+                        'class' => 'form-control wd120'
+                    ]
+                );
+                ?>
             </div>
+
         </div>
     </div>
 </div>
@@ -456,7 +460,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
             </div>
             <div class="col-md-2">
                 <div class="form-group row">
-                    <label for="inputEmail3" class="col-sm col-form-label">Name of the Packers : <span class="cRed">*</span></label>
+                    <label for="inputEmail3" class="col-sm col-form-label">Name of the Packers : </label>
                 </div>
             </div>
             <div class="col-md-4">
@@ -742,7 +746,7 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group row">
-                                <label for="field3" class="col-sm col-form-label"><span><?php if ($current_level == 'level_2' && $application_mode == 'edit' ) { echo 'Signature'; } else { echo 'Signature'; } ?></span></label>
+                                <label for="field3" class="col-sm col-form-label"><span><?php if ($current_level == 'level_2' && $application_mode == 'edit' ) { echo 'Signature'; } else { echo 'Signature'; } ?></span><span class="cRed"> *</span></label>
 
                                 <span class="float-left"><?php if ($current_level == 'level_2' && $application_mode == 'edit' && empty($section_form_details[0]['signnature_of_inspecting_officer_docs'])) { echo 'Attach docs'; }else{ echo 'Attached docs'; } ?> :
                                 <?php if (!empty($section_form_details[0]['signnature_of_inspecting_officer_docs'])) { ?>
@@ -780,5 +784,6 @@ echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-
       echo $this->Html->script('routininspection/want_to_edit_rti'); 
       echo $this->Html->script('routininspection/rti_file_uploads_validation');
       echo $this->Html->css('RoutineInspection/routine_inspection_style');
+      echo $this->Html->script('routininspection/rti_other_validation');
 ?>
 

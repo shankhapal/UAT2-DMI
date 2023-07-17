@@ -280,7 +280,8 @@
 				if(in_array(5,$selectedValues)){
 
 					//added new fields for uploads required for premises change, on 17-05-2023
-					if(!empty($forms_data['premises_fssai_doc']->getClientFilename())){
+					//added $firm_type==1 cond. on 15-07-2023 as said fssai upload will be only for CA
+					if($firm_type==1 && !empty($forms_data['premises_fssai_doc']->getClientFilename())){
 						$file_name = $forms_data['premises_fssai_doc']->getClientFilename();
 						$file_size = $forms_data['premises_fssai_doc']->getSize();
 						$file_type = $forms_data['premises_fssai_doc']->getClientMediaType();
