@@ -13,16 +13,25 @@ $salt_server = $_SESSION['randSalt'];
 							<h4 class="login-box-msg">Common User Login Redirect</h4>
 							<div class="input-group mb-3">
 								<label for="field3" class="col-md-3"><span> Password <span class="cRed">*</span></span></label>
-								<?php echo $this->Form->control('password', array('label' => '', 'id' => 'passwordValidation', 'placeholder' => 'Please enter your Password', 'class' => 'form-control')); ?>
+								<?php echo $this->Form->control('password', array(
+									'label' => '',
+									'id' => 'passwordValidation',
+									'placeholder' =>
+									'Please enter your Password',
+									'class' => 'form-control')); ?>
 								<div class="input-group-append">
 									<div class="input-group-text">
 										<span class="fas fa-lock"></span>
 									</div>
 								</div>
 								<span id="error_password" class="error invalid-feedback"></span>
-								<?php echo $this->Form->control('salt_value', array('label' => '', 'id' => 'hiddenSaltvalue', 'type' => 'hidden', 'value' => $salt_server)); ?>
+								<?php echo $this->Form->control('salt_value', array(
+									'label' => '',
+									'id' => 'hiddenSaltvalue',
+									'type' => 'hidden',
+									'value' => $salt_server)); ?>
 							</div>
-						</div>
+						
 						<!-- added by shankhpal shende for captcha code on 15/07/2023 -->
 						<div class="input-group mb-3">
 							<label for="field3" class="col-md-3">
@@ -31,10 +40,18 @@ $salt_server = $_SESSION['randSalt'];
 							<div class="col-md-9">
 								<div class="input-group">
 									<span id="captcha_img" class="col-4 mr-2 rounded p-0 d-flex">
-										<?php echo $this->Html->image(array('controller' => 'users', 'action' => 'create_captcha'), array('class' => 'rounded')); ?>
+										<?php echo $this->Html->image(array(
+											'controller' => 'users',
+											'action' => 'create_captcha
+											'), array(
+												'class' => 'rounded'
+												)); ?>
 									</span>
 									<div class="col-2 btn m-0 p-0">
-										<img class="img-responsive img-thumbnail border-0 shadow-none" id="new_captcha" src="<?php echo $this->request->getAttribute('webroot'); ?>img/refresh.png" />
+									<img class="img-responsive img-thumbnail border-0 shadow-none"
+												alt="img-captcha"
+												id="new_captcha"
+												src="<?php echo $this->request->getAttribute('webroot'); ?>img/refresh.png" />
 									</div>
 								</div>
 							</div>
@@ -47,7 +64,12 @@ $salt_server = $_SESSION['randSalt'];
 							</label>
 							<div class="col-md-9">
 								<div class="input-group">
-									<?php echo $this->Form->control('captcha', array('label' => false, 'id' => 'captchacode', 'type' => 'text', 'placeholder' => 'Please enter captcha code', 'class' => 'form-control col-12')); ?>
+									<?php echo $this->Form->control('captcha', array(
+										'label' => false,
+										'id' => 'captchacode',
+										'type' => 'text',
+										'placeholder' => 'Please enter captcha code',
+										'class' => 'form-control col-12')); ?>
 									<div class="input-group-append">
 										<div class="input-group-text">
 											<span class="fas fa-lock"></span>
@@ -59,7 +81,11 @@ $salt_server = $_SESSION['randSalt'];
 						</div>
 					</div>
 					<div class="card-footer">
-						<?php echo $this->Form->control('Submit', array('type' => 'submit', 'name' => 'submit', 'label' => false, 'class' => 'btn btn-success submit_btn')); ?>
+						<?php echo $this->Form->control('Submit', array(
+							'type' => 'submit',
+							'name' => 'submit',
+							'label' => false,
+							'class' => 'btn btn-success submit_btn')); ?>
 					</div>
 				<?php echo $this->Form->end(); ?>
 			</div>
