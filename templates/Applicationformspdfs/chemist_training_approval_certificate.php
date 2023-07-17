@@ -66,11 +66,10 @@
                   <?php echo $firm_state_name; ?> – <?php echo $customer_firm_data['postal_code']; ?>
 
             </td>
-            <?php if(!empty($profile_photo)){ ?>
-                   <td align = "right">
-                    <img src="<?php echo $profile_photo; ?>" width="100" height="80">
-                   </td>
-            <?php } ?>
+         
+            <td align = "right">
+                <img src="<?php echo $profile_photo; ?>" width="80" height="80">
+            </td>
         </tr>
     </table>
     <table  width="100%">
@@ -126,6 +125,11 @@
   </tr>
    <table>
 
+	 <table width="100%">
+  <tr><!-- QR Code added by shankhpal shende on 13/07/2023 -->
+  	<td><img width="100" height="100" src="<?php echo $result_for_qr['qr_code_path']; ?>"></td>
+  </tr>
+   <table>
 	
 	
         

@@ -2619,7 +2619,7 @@ class ApplicationformspdfsController extends AppController{
 	//This is called at place of Mpdf output function with required parameteres.
 	//on 23-01-2020 by Amol
 	public function callTcpdf($html,$mode,$customer_id,$pdf_for,$file_path=null){
-	  
+		
 		$with_esign = $this->Session->read('with_esign');
 		$current_level = $this->Session->read('current_level');
 		$file_name = $this->Session->read('pdf_file_name');
@@ -2641,11 +2641,11 @@ class ApplicationformspdfsController extends AppController{
 		#For SCN moved file directly to the Specific Folder - Akash[03-01-2022]
 		}elseif($pdf_for == 'showcause_notice'){
 			$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/showcause_notice/'.$file_name;
-		}elseif($pdf_for == 'chemist'){
+		}elseif( $appl_type == 4 && $pdf_for == 'grant'){
 			//elseif section added by laxmi B. on 30-12-2022
 			//for this file path is sent from the pdf function
 			//it will take default file path from the argument, if pdf for is chemist
-		
+			$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/certificates/CHM/'.$file_name;
 																		 
 										  
 																					   
@@ -2705,17 +2705,11 @@ class ApplicationformspdfsController extends AppController{
 			
 			
 		$pdf->AddPage();
-		//added watermark image for chemist training approval certificate by laxmi on 13-07-2023
+		  //added watermark image for chemist training approval certificate by laxmi on 13-07-2023
 		if($appl_type == 4 && $pdf_for == 'grant'){
 			$url_curl = $file_path;
-			$fileContent = file_get_contents($url_curl);
-			
-			$pageCount = preg_match_all("/\/Page\W/", $fileContent, $dummy);
-
-				 
-
-			//$pageCount = $pdf->getNumPages();
-			for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+			$pageCount = $pdf->getNumPages(); 
+			for ($pageNo = 0; $pageNo <= $pageCount; $pageNo++) {
 			
 			
 			$watermarkImage = 'img/AdminLTELogo.png'; 
@@ -4370,7 +4364,7 @@ class ApplicationformspdfsController extends AppController{
 				$this->set('role',$role);
 
 				$chemist_data = $this->DmiChemistRegistrations->find('all', array( 'conditions'=>array('chemist_id IS'=>$customer_id)))->first();
-
+                  
 				$chemist_address= $this->DmiChemistProfileDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
                
 				$this->set('chemist_address',$chemist_address['address']);
@@ -4456,7 +4450,27 @@ class ApplicationformspdfsController extends AppController{
 				$ralToRoData = $this->DmiChemistRalToRoLogs->find('all', array('fields'=>array('ro_first_name', 'ro_last_name','ro_office_id'), 'conditions'=>array('chemist_id IS'=>$customer_id)))->first();
 				$this->set('ro_first_name',$ralToRoData['ro_first_name']);
 				$this->set('ro_last_name',$ralToRoData['ro_last_name']);
-
+				
+			////////////////////////////////////////////////////////////////////////////////////////////
+				// This code added for printing QR code 
+				// @Author : Shankhpal Shende
+				// Date : 13/07/2023
+				$full_name = $chemist_data['chemist_fname'] . ' ' . $chemist_data['chemist_lname'];
+				$dob = explode(" ", $chemist_data['dob'])[0]; // Shortened the code to directly assign the first element
+				$ro_office = $office['ro_office'];
+				$commodityNames = [];
+				if(!empty($sub_commodity_data)){
+					foreach ($sub_commodity_data as $entity) {
+						$commodityNames[] = $entity->commodity_name;
+					}
+					$commaSeparatedNames = implode(', ', $commodityNames);
+				}	else {
+    			$commaSeparatedNames = ''; // Added a default value if $sub_commodity_data is empty
+				}
+				$data = [$full_name,$dob,$commaSeparatedNames,$ro_office];
+				$result_for_qr = $this->Customfunctions->getQrCode($data,$type="CHMT");
+				$this->set('result_for_qr',$result_for_qr);
+				///////////////////////////////////////////////////////////////////////////////////////////																					   
 				$this->generateGrantCerticatePdf('/Applicationformspdfs/chemist_training_approval_certificate'); 
 
 				$this->redirect(array('controller'=>'dashboard','action'=>'home')); 
@@ -4489,8 +4503,8 @@ class ApplicationformspdfsController extends AppController{
 			$this->set('ro_lname',$ro_lname);
 			$this->set('role',$role);
 
-			$chemist_data = $this->DmiChemistRegistrations->find('all', array('fields'=>array('created_by','chemist_fname', 'chemist_lname') , 'conditions'=>array('chemist_id IS'=>$customer_id)))->first();
-
+			$chemist_data = $this->DmiChemistRegistrations->find('all', array('conditions'=>array('chemist_id IS'=>$customer_id)))->first();
+               
 			$chemist_address= $this->DmiChemistProfileDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
            
 			$this->set('chemist_address',$chemist_address['address']);
@@ -4524,7 +4538,7 @@ class ApplicationformspdfsController extends AppController{
 
 			//to show commodity name
 
-			$sub_commodity_array = explode(',',$customer_firm_data['sub_commodity']);
+			$sub_commodity_array = explode(',',$chemist_data['sub_commodities']);
 			$i=0;
 			foreach ($sub_commodity_array as $key => $sub_commodity) {
 

@@ -9,7 +9,7 @@ use Cake\Datasource\EntityInterface;
 use QRcode;
 use Cake\Chronos\Chronos;  // Chronos library is use for DateTime by shankhpal on 08/06/2023 
 use Cake\Datasource\ConnectionManager;
-
+use Cake\Http\Response; //added by shankhpal on 04/07/2023
 
 class CustomfunctionsComponent extends Component {
 
@@ -3649,6 +3649,8 @@ class CustomfunctionsComponent extends Component {
 
 			$data = "CA ID : ".$result[0]." ## "." CA Name : ".$result[1]."##"." Chemist Name : ".$result[2]."##"." Date : ".$result[3]."##"." Region : ".$result[4];		  
 		
+		}elseif($type == "CHMT"){  # For Chemist Training Flow (CHMT is use default type) -- by shankhpal on:13/07/2023
+			$data = "Chemist Name: " . $result[0] . " ## " . "Date of Birth: " . $result[1] . " ## " . "Commodities: " . $result[2] . " ## " . "Certificate issued from: " . $result[3] . ".";
 		}else{
 
 			$data = "Certificate No :".$result[0]." ## "."Firm Name :".$result[3]." ## "."Grant Date :".$result[1]." ## "." Valid up to date: ".$result[2][max(array_keys($result[2]))];
