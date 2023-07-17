@@ -16,22 +16,26 @@ $salt_server = $_SESSION['randSalt'];
 								<?php echo $this->Form->control('password', array(
 									'label' => '',
 									'id' => 'passwordValidation',
-									'placeholder' =>
-									'Please enter your Password',
-									'class' => 'form-control')); ?>
+									'placeholder' => 'Please enter your Password',
+									'class' => 'form-control',
+									'error' => ['attributes' => ['wrap' => 'div', 'class' => 'error invalid-feedback']]
+								)); ?>
 								<div class="input-group-append">
 									<div class="input-group-text">
 										<span class="fas fa-lock"></span>
 									</div>
 								</div>
-								<span id="error_password" class="error invalid-feedback"></span>
 								<?php echo $this->Form->control('salt_value', array(
 									'label' => '',
 									'id' => 'hiddenSaltvalue',
 									'type' => 'hidden',
-									'value' => $salt_server)); ?>
+									'value' => $salt_server
+								)); ?>
+								<div class="col-md-9 offset-md-3">
+									<span id="error_password" class="error invalid-feedback"></span>
+								</div>
 							</div>
-						
+
 						<!-- added by shankhpal shende for captcha code on 15/07/2023 -->
 						<div class="input-group mb-3">
 							<label for="field3" class="col-md-3">
