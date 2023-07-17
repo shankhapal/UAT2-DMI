@@ -33,7 +33,8 @@
 								<li class="nav-item row pt-2">
 									<label for="field3" class="col-md-5 "><span class="col-form-label">Payment Amount<span class="cRed">*</span></span></label>
 										<div class="col-sm-6">
-											<?php echo $this->Form->control('payment_amount', array('type'=>'text', 'escape'=>false, 'value'=>$payment_amount, 'id'=>'payment_amount', 'label'=>false, 'placeholder'=>'Please Enter Payment Amount','class'=>'form-control')); ?>
+											<!-- added maxlength="10" property by shankhpal on 17/07/2023 -->
+											<?php echo $this->Form->control('payment_amount', array('type'=>'text', 'escape'=>false, 'value'=>$payment_amount, 'id'=>'payment_amount',"maxlength"=>"10", 'label'=>false, 'placeholder'=>'Please Enter Payment Amount','class'=>'form-control')); ?>
 										</div>
 									<div id="error_payment_amount"></div>
 								</li>
