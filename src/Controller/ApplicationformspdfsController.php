@@ -2649,7 +2649,7 @@ class ApplicationformspdfsController extends AppController{
 			//it will take default file path from the argument, if pdf for is chemist
 																					   
 		} elseif($appl_type == 4 && $pdf_for == 'grant'){
-			$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/certificates/CHM/'.$file_name;
+			$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/temp/'.$file_name;
 		}
 		else{
 			$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/temp/'.$file_name;
