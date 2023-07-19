@@ -16,7 +16,7 @@ use Cake\Utility\Xml;
 use FR3D;
 use Cake\View;
 use PDF_Rotate;
-use MyCustomPDFWithWatermark;
+use MyCustomPDFWithWatermark; //added this by laxmi for watermark img 18-07/2023
 
 class ApplicationformspdfsController extends AppController{
 	
@@ -2660,7 +2660,7 @@ class ApplicationformspdfsController extends AppController{
 		require_once(ROOT . DS .'vendor' . DS . 'tcpdf' . DS . 'tcpdf.php');
 		//below line is added on 23-05-2023 by Amol, to print water mark on pdf
 		require_once(ROOT . DS . 'vendor' . DS . 'tcpdf' . DS . 'tcpdf_text.php');
-
+        //below line is added on 19-07-2023 by laxmi  for watermark image on pdf
 		require_once(ROOT . DS . 'vendor' . DS . 'tcpdf' . DS . 'tcpdf_watermark.php');
 
 		
