@@ -14,7 +14,7 @@ $(function(){
      const split = date1.split('/');
      const split1 = date2.split('/');
      var monthsDiff = split1[1]-split[1];
-     debugger;
+     
     
      if(yearsDiff === 0 || yearsDiff === NaN){
       yearsDiff =  0;
