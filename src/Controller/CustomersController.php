@@ -2327,7 +2327,8 @@ class CustomersController extends AppController {
 			if($maptype == "lab"){
 						
 				$lab_id = $postData['lab_id'];
-				// // to check if customer are already exist but is lab is deleted.
+				if(!empty($lab_id)){
+					// // to check if customer are already exist but is lab is deleted.
 				$check_customer_record_is_exist = $this->DmiCaPpLabMapings->find('all')->where(array('customer_id IS' => $customer_id,'map_type IN' => $maptype,'delete_status IS NULL'))->first();
 		
 				if(!empty($check_customer_record_is_exist)){
@@ -2364,100 +2365,123 @@ class CustomersController extends AppController {
 						$redirect_to = 'attache_pp_lab';
 					}
 				}
+				}else{
+							$message = 'Please Select Laboratory';
+							$message_theme = 'info';
+							$redirect_to = 'attache_pp_lab';
+				}
 			}elseif($maptype == "pp"){
 
 				$pp_id = $postData['pp_id'];
 				// to check if respective printing press already attach or not
-				$get_record_pp =  $this->DmiCaPpLabMapings->find('all')->where(array('customer_id IS' => $customer_id,'pp_id IS' => $pp_id,'delete_status IS'=>null))->first();
+				if(!empty($pp_id)){
+					
+					$get_record_pp =  $this->DmiCaPpLabMapings->find('all')->where(array('customer_id IS' => $customer_id,'pp_id IS' => $pp_id,'delete_status IS'=>null))->first();
 
-				if(!empty($get_record_pp)){
-					$message = 'Printing Press alredy Attached with you';
-					$message_theme = 'failed';
-					$redirect_to = 'attache_pp_lab';
-				}else{
-
-					$DmiCaPpLabMapings = $this->DmiCaPpLabMapings->newEntity(array(
-
-						'customer_id'=>$customer_id,
-						'pp_id'=>$pp_id,
-						'map_type'=> $maptype,
-						'created'=>date('Y-m-d H:i:s'),
-						'modified'=>date('Y-m-d H:i:s'),
-					));
-		
-					//Save pp Logs Status
-					$DmiCaPpLabActionLogsEntity = $this->DmiCaPpLabActionLogs->newEntity(
-						['customer_id'=>$customer_id,
-						'ipaddress'=>$current_ip,
-						'action_perform'=>'Priinting Press (Attached)',
-						'created'=>date('Y-m-d H:i:s'),
-						'status'=>'Success']
-					);
-			
-					$this->DmiCaPpLabActionLogs->save($DmiCaPpLabActionLogsEntity);	
-					if ($this->DmiCaPpLabMapings->save($DmiCaPpLabMapings) && $maptype == 'pp' ) {
-						$message = 'Printing Press Attached successfully';
-						$message_theme = 'success';
+					if(!empty($get_record_pp)){
+						$message = 'Printing Press alredy Attached with you';
+						$message_theme = 'failed';
 						$redirect_to = 'attache_pp_lab';
+					}else{
+
+						$DmiCaPpLabMapings = $this->DmiCaPpLabMapings->newEntity(array(
+
+							'customer_id'=>$customer_id,
+							'pp_id'=>$pp_id,
+							'map_type'=> $maptype,
+							'created'=>date('Y-m-d H:i:s'),
+							'modified'=>date('Y-m-d H:i:s'),
+						));
+			
+						//Save pp Logs Status
+						$DmiCaPpLabActionLogsEntity = $this->DmiCaPpLabActionLogs->newEntity(
+							['customer_id'=>$customer_id,
+							'ipaddress'=>$current_ip,
+							'action_perform'=>'Priinting Press (Attached)',
+							'created'=>date('Y-m-d H:i:s'),
+							'status'=>'Success']
+						);
+				
+						$this->DmiCaPpLabActionLogs->save($DmiCaPpLabActionLogsEntity);	
+						if ($this->DmiCaPpLabMapings->save($DmiCaPpLabMapings) && $maptype == 'pp' ) {
+							$message = 'Printing Press Attached successfully';
+							$message_theme = 'success';
+							$redirect_to = 'attache_pp_lab';
+						}
 					}
+				}else{
+							$message = 'Please Select Printing Press';
+							$message_theme = 'info';
+							$redirect_to = 'attache_pp_lab';
 				}
 			}elseif($maptype == "wonlab"){
 				
 				$won_id = $postData['won_id']; // for own laboratory
-				$won_lab_name = $postData['won_lab_name']; // for own laboratory name
-				
-				if($maptype == 'wonlab'){
-						$lab_id = $postData['won_id'];
-						$maptype = 'lab';
-				}
-									
-				// // to check if customer are already exist but is lab is deleted.
-				$check_customer_record_is_exist = $this->DmiCaPpLabMapings->find('all')->where(array('customer_id IS' => $customer_id,'map_type IN' => $maptype,'delete_status IS NULL'))->first();
-				
-				if(!empty($check_customer_record_is_exist)){
-					//	if lab is already exists then this condition stop adding new lab
-					$message = 'Packer can attach only one laboratory.';
-					$message_theme = 'failed';
-					$redirect_to = 'attache_pp_lab';
-				}else{
-							
-					$DmiCaMappingOwnLabDetails = $this->DmiCaMappingOwnLabDetails->newEntity(array(
 
-						'own_lab_id'=>$lab_id,
-						'ca_id'=>$customer_id,
-						'lab_name'=>$won_lab_name,
-						'map_type'=> $maptype,
-						'created'=>date('Y-m-d H:i:s'),
-						'modified'=>date('Y-m-d H:i:s'),
-					));
-
-					$this->DmiCaMappingOwnLabDetails->save($DmiCaMappingOwnLabDetails);
-						
-					$DmiCaPpLabMapings = $this->DmiCaPpLabMapings->newEntity(array(
-						'customer_id'=>$customer_id,
-						'lab_id'=>$lab_id,
-						'map_type'=> $maptype,
-						'is_own_lab'=>'yes',
-						'created'=>date('Y-m-d H:i:s'),
-						'modified'=>date('Y-m-d H:i:s'),
-					));
-					$this->DmiCaPpLabMapings->save($DmiCaPpLabMapings);	
-					//Save laboratory Logs Status
-					$DmiCaPpLabActionLogsEntity = $this->DmiCaPpLabActionLogs->newEntity([
-						'customer_id'=>$customer_id,
-						'ipaddress'=>$current_ip,
-						'action_perform'=>'Laboratory (Attached)',
-						'created'=>date('Y-m-d H:i:s'),
-						'status'=>'Success'
-					]);
-							
-					$this->DmiCaPpLabActionLogs->save($DmiCaPpLabActionLogsEntity);	
-					if ($this->DmiCaPpLabMapings->save($DmiCaPpLabMapings) && $maptype == 'lab' ) {
-						$message = 'Laboratory Attached successfully';
-						$message_theme = 'success';
-						$redirect_to = 'attache_pp_lab';
+				if(!empty($won_id)){
+					
+					$won_lab_name = $postData['won_lab_name']; // for own laboratory name
+				
+					if($maptype == 'wonlab'){
+							$lab_id = $postData['won_id'];
+							$maptype = 'lab';
 					}
+										
+					// // to check if customer are already exist but is lab is deleted.
+					$check_customer_record_is_exist = $this->DmiCaPpLabMapings->find('all')->where(array('customer_id IS' => $customer_id,'map_type IN' => $maptype,'delete_status IS NULL'))->first();
+					
+					if(!empty($check_customer_record_is_exist)){
+						//	if lab is already exists then this condition stop adding new lab
+						$message = 'Packer can attach only one laboratory.';
+						$message_theme = 'failed';
+						$redirect_to = 'attache_pp_lab';
+					}else{
+								
+						$DmiCaMappingOwnLabDetails = $this->DmiCaMappingOwnLabDetails->newEntity(array(
+
+							'own_lab_id'=>$lab_id,
+							'ca_id'=>$customer_id,
+							'lab_name'=>$won_lab_name,
+							'map_type'=> $maptype,
+							'created'=>date('Y-m-d H:i:s'),
+							'modified'=>date('Y-m-d H:i:s'),
+						));
+
+						$this->DmiCaMappingOwnLabDetails->save($DmiCaMappingOwnLabDetails);
+							
+						$DmiCaPpLabMapings = $this->DmiCaPpLabMapings->newEntity(array(
+							'customer_id'=>$customer_id,
+							'lab_id'=>$lab_id,
+							'map_type'=> $maptype,
+							'is_own_lab'=>'yes',
+							'created'=>date('Y-m-d H:i:s'),
+							'modified'=>date('Y-m-d H:i:s'),
+						));
+						$this->DmiCaPpLabMapings->save($DmiCaPpLabMapings);	
+						//Save laboratory Logs Status
+						$DmiCaPpLabActionLogsEntity = $this->DmiCaPpLabActionLogs->newEntity([
+							'customer_id'=>$customer_id,
+							'ipaddress'=>$current_ip,
+							'action_perform'=>'Laboratory (Attached)',
+							'created'=>date('Y-m-d H:i:s'),
+							'status'=>'Success'
+						]);
+								
+						$this->DmiCaPpLabActionLogs->save($DmiCaPpLabActionLogsEntity);	
+						if ($this->DmiCaPpLabMapings->save($DmiCaPpLabMapings) && $maptype == 'lab' ) {
+							$message = 'Laboratory Attached successfully';
+							$message_theme = 'success';
+							$redirect_to = 'attache_pp_lab';
+						}
+					}
+				}else{
+							$message = 'Please Select Laboratory';
+							$message_theme = 'info';
+							$redirect_to = 'attache_pp_lab';
 				}
+
+
+				
 			}
 		}
 		    

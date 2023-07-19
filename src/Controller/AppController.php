@@ -166,24 +166,56 @@ class AppController extends Controller
 		// this condition added for sending sms and email for daily basis 
 		// the custome function call once in a day and added new entry in db 
 		// added by shankhpal shende on 04/07/2023
-    //temp. commented
-		/*$DmiPendingSmsEmailSendStatus = TableRegistry::getTableLocator()->get('DmiPendingSmsEmailSendStatus');
+    
+		$DmiPendingSmsEmailSendStatus = TableRegistry::getTableLocator()->get('DmiPendingSmsEmailSendStatus');
 		$today = date('d/m/Y'); // Get today's date in the format matching your database field (without time)
 
 		$todayCount = $DmiPendingSmsEmailSendStatus->find()
 				->where(['DATE(created)' => $today])
 				->count();
-			
+
 		if ($todayCount == 0) {
-				$responce = $this->Customfunctions->getSingleOrAllUserAppliResult();
-				$Dmi_pending_count_Entity = $DmiPendingSmsEmailSendStatus->newEntity([
-						'created' => date('Y-m-d H:i:s')
-				]);
-				$DmiPendingSmsEmailSendStatus->save($Dmi_pending_count_Entity);
-				//to call sms and email
+
+			$json = $this->Customfunctions->getSingleOrAllUserAppliResult();
+
+			$data = json_decode($json, true);
+
+			if($data !== null){
+				
+				foreach ($data as $eachValue) {
+
+					$userEmail = $item['userEmail'];
+					$count = $item['count'];
+					$phone = $item['phone'];
+					$appl_id = $item['appl_id'];
+					
+					#SMS:
+					
+					
+
+				}
+			}
+
+			$Dmi_pending_count_Entity = $DmiPendingSmsEmailSendStatus->newEntity([
+					'created' => date('Y-m-d H:i:s')
+			]);
+			
+			$DmiPendingSmsEmailSendStatus->save($Dmi_pending_count_Entity);
+			
 		} else {
 				// nothing
-		}*/
+		}
+
+
+		
+		
+		
+		
+		
+	
+	
+		
+		
 
 
 	}

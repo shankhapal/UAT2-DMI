@@ -504,6 +504,9 @@ class CustomfunctionsComponent extends Component {
 		} elseif ($appl_type==10) {		#For Routine Inspection (RTI) - Shankhpal [12/12/2022] 
 			
 			$form_type = 'RTI';
+		}elseif ($appl_type==11) {		#For Bianually Grading Report (BGR) - Shankhpal [21/06/2023] 
+			
+			$form_type = 'BGR';
 		}
 
 		return $form_type;
@@ -4231,9 +4234,8 @@ class CustomfunctionsComponent extends Component {
 						if (!$this->response instanceof Response) {
 								$this->response = new Response();
 						}
-						// Return the response without printing JSON data on the screen
-						return $this->response->withType('application/json')->withStringBody(json_encode($applicationList));
-						
+
+						return json_encode($applicationList);
 					}
 				}
 			}
