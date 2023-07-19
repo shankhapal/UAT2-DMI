@@ -16,10 +16,10 @@ $(function(){
      var monthsDiff = split1[1]-split[1];
      debugger;
     
-     if(yearsDiff == 0 || yearsDiff == NaN){
+     if(yearsDiff === 0 || yearsDiff === NaN){
       yearsDiff =  0;
      }
-     if(monthsDiff == 0 || monthsDiff == NaN){
+     if(monthsDiff === 0 || monthsDiff === NaN){
       monthsDiff =  0;
      }
 		
