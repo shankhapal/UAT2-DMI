@@ -39,24 +39,13 @@ $salt_server = $_SESSION['randSalt'];
 						<!-- added by shankhpal shende for captcha code on 15/07/2023 -->
 						<div class="input-group mb-3">
 							<label for="field3" class="col-md-3">
-								<span> Verify <span class="required-star">*</span></span>
+								<span> Verify <span class="required-star cRed">*</span></span>
 							</label>
 							<div class="col-md-9">
 								<div class="input-group">
-									<span id="captcha_img" class="col-4 mr-2 rounded p-0 d-flex">
-										<?php echo $this->Html->image(array(
-											'controller' => 'users',
-											'action' => 'create_captcha
-											'), array(
-												'class' => 'rounded'
-												)); ?>
-									</span>
-									<div class="col-2 btn m-0 p-0">
-									<img class="img-responsive img-thumbnail border-0 shadow-none"
-												alt="img-captcha"
-												id="new_captcha"
-												src="<?php echo $this->request->getAttribute('webroot'); ?>img/refresh.png" />
-									</div>
+									<span id="captcha_img" class="col-4 mr-2 rounded p-0 d-flex"><?php echo $this->Html->image(array('controller'=>'users','action'=>'create_captcha'), array('class'=>'rounded')); ?></span>
+									<div class="col-2 btn m-0 p-0"><img class="img-responsive img-thumbnail border-0 shadow-none" id="new_captcha" src="<?php echo $this->request->getAttribute('webroot');?>img/refresh.png"/>
+								</div>
 								</div>
 							</div>
 						</div>
@@ -64,7 +53,7 @@ $salt_server = $_SESSION['randSalt'];
 						<!-- added captcha by shankhpal shende on 14/07/2023 -->
 						<div class="input-group mb-3">
 							<label for="field3" class="col-md-3">
-								<span> Enter Captcha <span class="required-star">*</span></span>
+								<span> Enter Captcha <span class="required-star cRed">*</span></span>
 							</label>
 							<div class="col-md-9">
 								<div class="input-group">

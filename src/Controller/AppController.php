@@ -147,7 +147,7 @@ class AppController extends Controller
 		$IsApproved=null;
 		$final_submit_id = $this->DmiFinalSubmits->find('all', array('conditions' => array('customer_id IS' => $username),'order'=>'id desc'))->first();
 		if (!empty($final_submit_id)) {
-			//get grant status		
+			//get grant status
 			if ($final_submit_id['status']=='approved' && $final_submit_id['current_level']=='level_3') {
 				$IsApproved='yes';
 			}
@@ -163,8 +163,8 @@ class AppController extends Controller
 		$user_last_login = $this->Customfunctions->userLastLogins();
 		$this->set('user_last_login',$user_last_login);
 
-		// this condition added for sending sms and email for daily basis 
-		// the custome function call once in a day and added new entry in db 
+		// this condition added for sending sms and email for daily basis
+		// the custome function call once in a day and added new entry in db
 		// added by shankhpal shende on 04/07/2023
     
 		$DmiPendingSmsEmailSendStatus = TableRegistry::getTableLocator()->get('DmiPendingSmsEmailSendStatus');
@@ -174,37 +174,42 @@ class AppController extends Controller
 				->where(['DATE(created)' => $today])
 				->count();
 
-		if ($todayCount == 0) {
+		//if ($todayCount == 0) {
 
 			$json = $this->Customfunctions->getSingleOrAllUserAppliResult();
-
-			$data = json_decode($json, true);
-
-			if($data !== null){
+		
+			
+			if ($json !== null) {
+   			 $data = json_decode($json, true);
 				
-				foreach ($data as $eachValue) {
+				
+				 foreach ($data as $key => $count) {
 
-					$userEmail = $item['userEmail'];
-					$count = $item['count'];
-					$phone = $item['phone'];
-					$appl_id = $item['appl_id'];
-					
+					$userEmail = ($key);
+				
+					$appliCount = $count;
 					#SMS:
-					
-					
+					$get_user_name = $this->DmiUsers->getFullName($userEmail);
 
+					#Email
+					$email_message = 'Hello, ' . $get_user_name .', please check your AQCMS dashboard. The number of applications ' . $appliCount .' is still pending for more than 5 days with your account. AGMARK';
+					$this->Authentication->sendEmail($userEmail,$email_message,'Temp05','Temp06','Alert for more than 5 Days pending application');
 				}
-			}
 
-			$Dmi_pending_count_Entity = $DmiPendingSmsEmailSendStatus->newEntity([
+				$Dmi_pending_count_Entity = $DmiPendingSmsEmailSendStatus->newEntity([
 					'created' => date('Y-m-d H:i:s')
-			]);
+				]);
 			
-			$DmiPendingSmsEmailSendStatus->save($Dmi_pending_count_Entity);
+				$DmiPendingSmsEmailSendStatus->save($Dmi_pending_count_Entity);
+
+			}
+		
 			
-		} else {
-				// nothing
-		}
+		
+				
+				
+			
+		 //}
 
 
 		
