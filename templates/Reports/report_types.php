@@ -124,9 +124,16 @@
 										<td><a class="badge title text-info" href="payment_details_report">Payment Details Report</a></td>
 										<td><span class="subtitle">Report includes list of all applications with payment detail.</span></td>
 									</tr>
+									<!-- added by shreeya pending report mpr on date [26-06-2023] -->
+									<tr>
+										<td><span class="badge subtitle">16</span></td>
+										<td><a class="badge title text-info" href="pending_mpr_report">AQCMS Pendency MPR Report</a></td>
+										<td><span class="subtitle">Report includes list of all applications according to month.</span></td>
+									</tr>
 								</tbody>
 							</table>
 						</div>
+					</div>
 					</div>
 				</div>
 			</div>

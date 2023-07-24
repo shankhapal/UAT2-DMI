@@ -88,7 +88,7 @@
 														<span class="badge borderless">Address : <?php echo $address_of_the_firm[$i];?></span></br>
 														<span class="badge borderless">Contact : <?php echo $contact_details_of_the_firm[$i];?></span>
 													</td>
-													
+												
 													<?php if ($approved_TBL_details_tbl_name[$i][0] == '--') { ?>
 														<td>--</td>
 													<?php }else{ ?>
