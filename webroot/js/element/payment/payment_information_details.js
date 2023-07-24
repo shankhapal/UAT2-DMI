@@ -114,6 +114,7 @@ $(document).ready(function () {
       $("#error_payment_amount")
         .text("Value cannot exceed 100 crores.")
         .css("color", "blue");
+      return false;
     } else {
       $("#error_payment_amount").text("");
     }

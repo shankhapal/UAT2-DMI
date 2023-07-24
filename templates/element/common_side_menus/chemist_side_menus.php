@@ -26,7 +26,8 @@
 	  $menu_dashboard = 'active';
 
 ?>
-
+<!-- split_packer_name is added by shankhpal on 19/07/2023 for BGR flow -->
+<?php $split_packer_name = explode('/',$this->getRequest()->getSession()->read('packer_id')); ?>
 	<aside class="main-sidebar sidebar-dark-primary elevation-4">
 		<?php echo $this->element('common_side_menus/common_top_left_logo'); ?>
 			<div class="sidebar">
@@ -67,6 +68,17 @@
 						<li class="nav-item">
 							<?php echo $this->Html->link('<i class="nav-icon fas fa-user"></i><p class="nav-icon-p">Confirm E-Code Replica</p>', array('controller'=>'ecode', 'action'=>'replica_appl_list'), array('escape'=>false, 'class'=>'nav-link '.$menu_profile)); ?>
 						</li>
+
+						<!-- The menu are added for BGR Module 
+						Added by shankhpal shende on 21/06/2023 -->
+					<?php if($split_packer_name[1] == 1){ ?>
+						<li class="nav-item">
+							<a href="<?php echo $this->request->getAttribute("webroot");?>application/application-type/11" class="nav-link">
+						<i class="nav-icon far fa-file-alt"></i>
+							<p class="nav-icon-p">Biannually Grading Report</p>
+							</a>
+					</li>	
+					<?php } ?>
 
 						<li class="nav-item">
 							<?php echo $this->Html->link('<i class="nav-icon fas fa-user"></i><p class="nav-icon-p">Replica Alloted List</p>', array('controller'=>'chemist', 'action'=>'replica_alloted_list'), array('escape'=>false, 'class'=>'nav-link '.$menu_profile)); ?>

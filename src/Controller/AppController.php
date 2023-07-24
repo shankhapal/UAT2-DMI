@@ -174,7 +174,7 @@ class AppController extends Controller
 				->where(['DATE(created)' => $today])
 				->count();
 
-		//if ($todayCount == 0) {
+		if ($todayCount == 0) {
 
 			$json = $this->Customfunctions->getSingleOrAllUserAppliResult();
 		
@@ -209,7 +209,7 @@ class AppController extends Controller
 				
 				
 			
-		 //}
+		 }
 
 
 		
