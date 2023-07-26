@@ -1,5 +1,5 @@
 /* Apply custom width for each th element */
 
-th.tablehead {
-  width: 150px; /* Adjust the width as needed */
+.wdth {
+  width: 150px; 
 }
