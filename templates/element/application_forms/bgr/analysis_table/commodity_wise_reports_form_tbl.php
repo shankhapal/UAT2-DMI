@@ -25,10 +25,16 @@
                   </th>
                   </th>
                   <th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
               </tr>
                <tr>
                   <th colspan="6" class="border-bottom">Total Revenue (In. Rs.):</th>
                   <th colspan="6" class="border-bottom">Progressive Revenue (In Rs.):</th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
                   <th></th>
               </tr>
               
@@ -45,6 +51,9 @@
                 <th class="tablehead wdth">Estimated value (in Rs.)</th>
                 <th class="tablehead wdth">No. of Agmark Replica/labels issued</th>
                 <th class="tablehead wdth">Replica Charges</th>
+                <th class="tablehead wdth">Name of Laboratory which tested the samples</th>
+                <th class="tablehead wdth">Report no. and Date</th>
+                <th class="tablehead wdth">Remark</th>
                 <th class="tablehead wdth">Action</th>
               </tr>
           <div id="statement_each_row">
@@ -62,6 +71,9 @@
                   <td><?php //echo $each_statement['to_a']; ?></td>
                   <td><?php //echo $each_statement['total_a']; ?></td>
                   <td><?php //echo $each_statement['from_b']; ?></td>
+                  <td><?php //echo $each_statement['to_b']; ?></td>
+                  <td><?php //echo $each_statement['to_b']; ?></td>
+                  <td><?php //echo $each_statement['to_b']; ?></td>
                   <td><?php //echo $each_statement['to_b']; ?></td>
                   <td><?php //echo $each_statement['to_b']; ?></td>
                   <td>
@@ -96,6 +108,10 @@
 
                   <td><?php echo $this->Form->control('from_b', array('type'=>'text', 'id'=>'from_b', 'value'=>'', 'escape'=>false, 'class'=>'form-control input-field wd120', 'label'=>false)); ?></td>
 
+                  <td><?php echo $this->Form->control('to_b', array('type'=>'text', 'id'=>'to_b', 'value'=>'', 'escape'=>false, 'class'=>'form-control input-field wd120', 'label'=>false)); ?></td>
+
+                  <td><?php echo $this->Form->control('to_b', array('type'=>'text', 'id'=>'to_b', 'value'=>'', 'escape'=>false, 'class'=>'form-control input-field wd120', 'label'=>false)); ?></td>
+                  <td><?php echo $this->Form->control('to_b', array('type'=>'text', 'id'=>'to_b', 'value'=>'', 'escape'=>false, 'class'=>'form-control input-field wd120', 'label'=>false)); ?></td>
                   <td><?php echo $this->Form->control('to_b', array('type'=>'text', 'id'=>'to_b', 'value'=>'', 'escape'=>false, 'class'=>'form-control input-field wd120', 'label'=>false)); ?></td>
 
                   <td>
@@ -145,6 +161,18 @@
                   <td>
                         <?php echo $this->Form->control('from_b', array('type'=>'text', 'escape'=>false, 'id'=>'from_b', 'label'=>false, 'class'=>'form-control input-field wd120','placeholder'=>'From')); ?>
                       <span id="error_from_b" class="error invalid-feedback"></span>
+                  </td>
+                  <td>
+                      <?php echo $this->Form->control('to_b', array('type'=>'text', 'escape'=>false, 'id'=>'to_b', 'label'=>false, 'class'=>'form-control input-field wd120','placeholder'=>'To')); ?>
+                      <span id="error_to_b" class="error invalid-feedback"></span>
+                  </td>
+                  <td>
+                      <?php echo $this->Form->control('to_b', array('type'=>'text', 'escape'=>false, 'id'=>'to_b', 'label'=>false, 'class'=>'form-control input-field wd120','placeholder'=>'To')); ?>
+                      <span id="error_to_b" class="error invalid-feedback"></span>
+                  </td>
+                  <td>
+                      <?php echo $this->Form->control('to_b', array('type'=>'text', 'escape'=>false, 'id'=>'to_b', 'label'=>false, 'class'=>'form-control input-field wd120','placeholder'=>'To')); ?>
+                      <span id="error_to_b" class="error invalid-feedback"></span>
                   </td>
                   <td>
                       <?php echo $this->Form->control('to_b', array('type'=>'text', 'escape'=>false, 'id'=>'to_b', 'label'=>false, 'class'=>'form-control input-field wd120','placeholder'=>'To')); ?>
