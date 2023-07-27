@@ -905,7 +905,17 @@ class ScrutinyController extends AppController{
 
 				$this->set('sub_commodity_data',$sub_commodity_data);
 			}
+            
 
+			if($application_type == 4){
+				//for auto filled payment  fetch payment from table by laxmi on 13-07-2023 , 
+				$this->loadModel('DmiChemistRegistrations');
+				$payment_amt = $this->DmiChemistRegistrations->find('all', array('fields'=>['payment'], 'conditions'=>['chemist_id IS'=>$customer_id]))->first();
+			   $this->set('payment_amt',$payment_amt['payment']);
+
+			   $this->set('application_charge',$payment_amt['payment']);
+			}
+			
 			//to hide firm details from application type 4 in checmist flow apply condition on or section by laxmi Bhadade on date 21-12-22									 
 			if(!empty($firm_details['packaging_materials']) && $application_type != 4){
 
