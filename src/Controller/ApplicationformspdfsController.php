@@ -16,7 +16,7 @@ use Cake\Utility\Xml;
 use FR3D;
 use Cake\View;
 use PDF_Rotate;
-use MyCustomPDFWithWatermark;
+use MyCustomPDFWithWatermark; //added this by laxmi for watermark img 18-07/2023
 
 class ApplicationformspdfsController extends AppController{
 	
@@ -2629,7 +2629,7 @@ class ApplicationformspdfsController extends AppController{
 		//added on 16-09-2021 by Amol
 		$appl_type = $this->Session->read('application_type');
 		$current_level = $this->Session->read('current_level');
-	
+		
 		//if application is for old or w/o esign then store pdf in files folder directly.
 		if($pdf_for == 'old' || $with_esign == 'no'){
 			
@@ -2642,15 +2642,16 @@ class ApplicationformspdfsController extends AppController{
 		#For SCN moved file directly to the Specific Folder - Akash[03-01-2022]
 		}elseif($pdf_for == 'showcause_notice'){
 			$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/showcause_notice/'.$file_name;
-		}elseif( $appl_type == 4 && $pdf_for == 'grant'){
+
+		}elseif( $appl_type == 4 && $pdf_for == 'chemist'){
 			//elseif section added by laxmi B. on 30-12-2022
 			//for this file path is sent from the pdf function
 			//it will take default file path from the argument, if pdf for is chemist
-			$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/certificates/CHM/'.$file_name;
-																		 
-										  
 																					   
-		}else{
+		} elseif($appl_type == 4 && $pdf_for == 'grant'){
+			$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/temp/'.$file_name;
+		}
+		else{
 			$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/temp/'.$file_name;
 		}
 		
@@ -2659,11 +2660,11 @@ class ApplicationformspdfsController extends AppController{
 		require_once(ROOT . DS .'vendor' . DS . 'tcpdf' . DS . 'tcpdf.php');
 		//below line is added on 23-05-2023 by Amol, to print water mark on pdf
 		require_once(ROOT . DS . 'vendor' . DS . 'tcpdf' . DS . 'tcpdf_text.php');
-
+        //below line is added on 19-07-2023 by laxmi  for watermark image on pdf
 		require_once(ROOT . DS . 'vendor' . DS . 'tcpdf' . DS . 'tcpdf_watermark.php');
 
 		
-
+                
 		//This below condition is updated for the Surrender (SOC) Application PDFs watermarks - Akash [12-05-2023]
 		if ($appl_type == 9 && $current_level != 'applicant') { 
 
@@ -2730,7 +2731,7 @@ class ApplicationformspdfsController extends AppController{
 			$pdf->writeHTML($html, true, false, true, false, '');
 			
            
-
+			
 
 			//get signer details
 			//if applicant
@@ -4601,7 +4602,7 @@ class ApplicationformspdfsController extends AppController{
 			$this->set('sub_commodity_data',$sub_commodity_data);
 			//to fetch ral name
 			$roToRalData = $this->DmiChemistRoToRalLogs->find('all', array('conditions'=>array('chemist_id IS'=>$customer_id)))->last(); 
-			
+			$this->Session->write('application_type',$roToRalData['appliaction_type'] );
 			if(!empty($roToRalData)){
 			$scheduleFrom = date('d-m-Y', strtotime(str_replace('/','-',$roToRalData['ro_schedule_from'])));
 			$scheduleTo = date('d-m-Y', strtotime(str_replace('/','-',$roToRalData['ro_schedule_to'])));
@@ -4623,11 +4624,12 @@ class ApplicationformspdfsController extends AppController{
 			$rearranged_id = $pdfPrefix.'('.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].')';
 
 			//check applicant last record version to increment		
-			$list_id = $this->DmiChemistRoToRalLogs->find('list', array('valueField'=>'id', 'conditions'=>array('chemist_id IS'=>$customer_id)))->toArray();
-
+			$list_id = $this->DmiChemistRoToRalLogs->find('list', array('valueField'=>'id', 'conditions'=>array('chemist_id IS'=>$customer_id)))->last();
+		
 			if(!empty($list_id))
 			{
-			$max_id = $this->DmiChemistRoToRalLogs->find('all', array('fields'=>'pdf_version', 'conditions'=>array('id'=>max($list_id))))->first();																	
+			$max_id = $this->DmiChemistRoToRalLogs->find('all', array('fields'=>'pdf_version', 'conditions'=>array('id'=>$list_id)))->first();																	
+			
 			$last_pdf_version 	=	$max_id['pdf_version'];
 
 			}
@@ -4635,20 +4637,21 @@ class ApplicationformspdfsController extends AppController{
 
 			$current_pdf_version = $last_pdf_version; //increment last version by 1//taking complete file name in session, which will be use in esign controller to esign the file.
 			$this->Session->write('pdf_file_name',$rearranged_id.'('.$current_pdf_version.')'.'.pdf');
-
+			
 			//creating filename and file path to save				
 			$file_path = '/testdocs/DMI/chemist_training/training_schedule_letter_at_ro/'.$rearranged_id.'('.$current_pdf_version.')'.'.pdf';
-
+			
 			$filename = $_SERVER["DOCUMENT_ROOT"].$file_path;
 			//creating filename and file path to save				
-
+			
 			$file_name = $rearranged_id.'('.$current_pdf_version.')'.'.pdf';
-
+			$$current_pdf_version = $current_pdf_version + 1;
 			$this->DmiChemistRoToRalLogs->updateAll(
-			array('ro_schedule_letter' => $file_path),
+			array('ro_schedule_letter' => $file_path,'pdf_version'=>$current_pdf_version),
 			array('chemist_id'=>$customer_id));
 
 			$file_path = $_SERVER["DOCUMENT_ROOT"].$file_path;
+		
 			//to preview application
 			$this->callTcpdf($all_data_pdf,'F',$customer_id,'chemist',$file_path);//with save mode
 			//$this->callTcpdf($all_data_pdf,'I',$customer_id,'chemist',$file_path);//on with preview mode
