@@ -2620,5 +2620,34 @@ class AjaxFunctionsController extends AppController{
 		return $responce;
 		
 	}
+
+	
+	//created method to get commodity wise replica charge for BGR Module
+	//Added by shankhpal shende on 28/07/2023
+	public function getCommodityWiseCharge(){
+		
+		$this->autoRender = false;
+
+		$commodity_id = $_POST['commodity_id'];
+		//get charge from table
+		$this->loadModel('DmiReplicaChargesDetails');
+
+		$get_charge = $this->DmiReplicaChargesDetails->find('all',array('conditions'=>array('commodity_code IS'=>$commodity_id)))->first();
+		
+		if(!empty($get_charge)){
+
+			$result = [
+				'charge' => $get_charge['charges'],
+				'min_qty' => $get_charge['min_qty'],
+				'unit' => $get_charge['unit']
+			];
+
+			echo '~'.json_encode($result).'~';
+		}else{
+			echo '~No Charge~';
+		}
+		exit;
+	}
+
 }
 ?>

@@ -1,63 +1,105 @@
  <!-- start table -->
  <?php
-  //  pr($section_form_details);die;
+//  pr($section_form_details);die;
+ // Define the constant with the message
+define('DATE_FORMAT_MESSAGE', 'Enter DD/MM/YYYY');
+define('INPUT_FIELD_CLASSES', 'form-control input-field wd120');
+$placeholder = DATE_FORMAT_MESSAGE;
+$class1 = INPUT_FIELD_CLASSES;
+
+
  ?>
 <div class="row">
   <div class="col-md-12 ">
     <div class="table-format">
-        <table id="grading_table" class="table table-bordered table-striped table-responsive">
+       <table id="table_1" class="table table-bordered table-striped table-responsive">
+         <caption></caption>
               <tr>
-                  <th colspan="6" class="border-bottom">Regional Office/Sub-Office: <?php echo isset($section_form_details[5])?$section_form_details[5]:"NA"; ?></th>
-                  <th colspan="6" class="border-bottom">State : <?php echo isset($section_form_details[4])?$section_form_details[4]:"NA"; ?></th>
-                  <th colspan="6" class="border-bottom"></th>
+                  <th
+                    colspan="6"
+                    scope="col"
+                    class="border-bottom">
+                    Regional Office/Sub-Office:
+                    <?php echo isset($section_form_details[5])?$section_form_details[5]:"NA"; ?></th>
+                  <th
+                    colspan="6"
+                    class="border-bottom"
+                    scope="col">State :
+                    <?php echo isset($section_form_details[4])?$section_form_details[4]:"NA"; ?></th>
+                  <th colspan="6" class="border-bottom" scope="col"></th>
               </tr>
               <tr>
-                  <th colspan="3" class="border-bottom">Name of Packer with address and e-mail id:</th>
-                  <th colspan="3" class="border-bottom ">Name : <?php echo isset($section_form_details[1])?$section_form_details[1]:"NA"; ?></th>
-                  <th colspan="3" class="border-bottom ">Email : <?php echo base64_decode(isset($section_form_details[2])?$section_form_details[2]:"NA"); ?></th>
-                  <th colspan="3" class="border-bottom ">Address : <?php echo isset($section_form_details[3])?$section_form_details[3]:"NA" ?></th>
+                  <th colspan="3" class="border-bottom" scope="col">Name of Packer with address and e-mail id:</th>
+                  <th
+                    colspan="3"
+                    class="border-bottom"
+                    scope="col">Name :
+                    <?php echo isset($section_form_details[1])?$section_form_details[1]:"NA"; ?></th>
+                  <th
+                    colspan="3"
+                    class="border-bottom"
+                    scope="col">Email :
+                    <?php echo base64_decode(isset($section_form_details[2])?$section_form_details[2]:"NA"); ?></th>
+                  <th
+                    colspan="3"
+                    class="border-bottom"
+                    scope="col">Address :
+                    <?php echo isset($section_form_details[3])?$section_form_details[3]:"NA" ?></th>
               </tr>
               <tr>
-                  <th colspan="3" class="border-bottom">Period: From <?php echo $section_form_details[7]; ?> </th>
-                  <th colspan="3" class="border-bottom">Period: To <?php echo $section_form_details[7]; ?> </th>
-                  <th colspan="6" class="border-bottom">
-                     Type: <?php echo ($section_form_details[6] == "yes") ? "Export" : "Domestic"; ?>
+                  <th
+                    colspan="3"
+                    class="border-bottom"
+                    scope="col">Period: From
+                    <?php echo $section_form_details[7]; ?>
+                 </th>
+                  <th
+                    colspan="3"
+                    class="border-bottom" scope="col">Period: To
+                    <?php echo $section_form_details[7]; ?> </th>
+                  <th
+                    colspan="6"
+                    class="border-bottom"
+                    scope="col">Type:
+                    <?php echo ($section_form_details[6] == "yes") ? "Export" : "Domestic"; ?>
                   </th>
                   </th>
-                  <th></th>
-                  <th></th>
-                  <th></th>
-                  <th></th>
+                  <th scope="col"></th>
+                  <th scope="col"></th>
+                  <th scope="col"></th>
+                  <th scope="col"></th>
+                  <th scope="col"></th>
               </tr>
                <tr>
-                  <th colspan="6" class="border-bottom">Total Revenue (In. Rs.):</th>
-                  <th colspan="6" class="border-bottom">Progressive Revenue (In Rs.):</th>
-                  <th></th>
-                  <th></th>
-                  <th></th>
-                  <th></th>
+                  <th colspan="6" class="border-bottom" scope="col">Total Revenue (In. Rs.):</th>
+                  <th colspan="6" class="border-bottom" scope="col">Progressive Revenue (In Rs.):</th>
+                  <th scope="col"></th>
+                  <th scope="col"></th>
+                  <th scope="col"></th>
+                  <th scope="col"></th>
+                  <th scope="col"></th>
               </tr>
               
               <tr>
-                <th class="tablehead">Sr.No.</th>
-                <th class="tablehead wdth">Commodity</th>
-                <th class="tablehead wdth">Lot No.TF No./M. No.</th>
-                <th class="tablehead wdth">Date of sampling</th>
-                <th class="tablehead wdth">Date of packing</th>
-                <th class="tablehead wdth">Grade assigned</th>
-                <th class="tablehead wdth">Pack Size</th>
-                <th class="tablehead wdth">Total No. of packages</th>
-                <th class="tablehead wdth">Total Qty. graded in Quintal</th>
-                <th class="tablehead wdth">Estimated value (in Rs.)</th>
-                <th class="tablehead wdth">No. of Agmark Replica/labels issued</th>
-                <th class="tablehead wdth">Replica Charges</th>
-                <th class="tablehead wdth">Name of Laboratory which tested the samples</th>
-                <th class="tablehead wdth">Report no. and Date</th>
-                <th class="tablehead wdth">Remark</th>
-                <th class="tablehead wdth">Action</th>
+                <th class="tablehead" scope="col">Sr.No.</th>
+                <th class="tablehead wdth" scope="col">Commodity</th>
+                <th class="tablehead wdth" scope="col">Lot No.TF No./M. No.</th>
+                <th class="tablehead wdth" scope="col">Date of sampling</th>
+                <th class="tablehead wdth" scope="col">Date of packing</th>
+                <th class="tablehead wdth" scope="col">Grade assigned</th>
+                <th class="tablehead wdth" scope="col">Pack Size</th>
+                <th class="tablehead wdth" scope="col">Total No. of packages</th>
+                <th class="tablehead wdth" scope="col">Total Qty. graded in Quintal</th>
+                <th class="tablehead wdth" scope="col">Estimated value (in Rs.)</th>
+                <th class="tablehead wdth" scope="col">No. of Agmark Replica/labels issued</th>
+                <th class="tablehead wdth" scope="col">Replica Charges</th>
+                <th class="tablehead wdth" scope="col">Name of Laboratory which tested the samples</th>
+                <th class="tablehead wdth" scope="col"  colspan="2">Report no. and Date</th>
+                <th class="tablehead wdth" scope="col">Remark</th>
+                <th class="tablehead wdth" scope="col">Action</th>
               </tr>
           <div id="statement_each_row">
-            <?php 
+            <?php
               $i=1;$section_form_details[1] = [];
               foreach ($section_form_details[1] as $each_statement) { ?>
                 <tr>
@@ -89,34 +131,158 @@
               <?php if ($this->request->getSession()->read('edit_bgr_id') != null) { ?>
                 <tr>
                   <td></td>
-                  <td><?php echo $this->Form->control('date', array('type'=>'text', 'id'=>'date', 'value'=>'', 'escape'=>false, 'class'=>'form-control wd120 input-field', 'label'=>false)); ?></td>
-
-                  <td><?php $abc = ['asd','asdasd'];
-                  echo $this->Form->control('commodity', array('type'=>'select', 'empty'=>'Select Commodity', 'id'=>'commodity','options'=>$abc,'value'=>'', 'label'=>false, 'class'=>'form-control wd120')); ?></td>
-
-                  <td><?php echo $this->Form->control('approved_tbl_brand', array('type'=>'text', 'id'=>'approved_tbl_brand', 'value'=>'', 'escape'=>false, 'class'=>'form-control input-field wd120', 'label'=>false)); ?></td>
-
-                  <td><?php echo $this->Form->control('agmark_grade', array('type'=>'text', 'id'=>'agmark_grade', 'value'=>'', 'escape'=>false, 'class'=>'form-control input-field wd120', 'label'=>false)); ?></td>
-
-                  <td><?php echo $this->Form->control('pack_size', array('type'=>'text', 'id'=>'pack_size', 'value'=>'', 'escape'=>false, 'class'=>'form-control input-field wd120', 'label'=>false)); ?></td>
-
-                  <td><?php echo $this->Form->control('from_a', array('type'=>'text', 'id'=>'from_a', 'value'=>'', 'escape'=>false, 'class'=>'form-control input-field wd120', 'label'=>false)); ?></td>
-
-                  <td><?php echo $this->Form->control('to_a', array('type'=>'text', 'id'=>'to_a', 'value'=>'', 'escape'=>false, 'class'=>'form-control input-field wd120', 'label'=>false)); ?></td>
-
-                  <td><?php echo $this->Form->control('total_a', array('type'=>'text', 'id'=>'total_a', 'value'=>'', 'escape'=>false, 'class'=>'form-control input-field wd120', 'label'=>false)); ?></td>
-
-                  <td><?php echo $this->Form->control('from_b', array('type'=>'text', 'id'=>'from_b', 'value'=>'', 'escape'=>false, 'class'=>'form-control input-field wd120', 'label'=>false)); ?></td>
-
-                  <td><?php echo $this->Form->control('to_b', array('type'=>'text', 'id'=>'to_b', 'value'=>'', 'escape'=>false, 'class'=>'form-control input-field wd120', 'label'=>false)); ?></td>
-
-                  <td><?php echo $this->Form->control('to_b', array('type'=>'text', 'id'=>'to_b', 'value'=>'', 'escape'=>false, 'class'=>'form-control input-field wd120', 'label'=>false)); ?></td>
-                  <td><?php echo $this->Form->control('to_b', array('type'=>'text', 'id'=>'to_b', 'value'=>'', 'escape'=>false, 'class'=>'form-control input-field wd120', 'label'=>false)); ?></td>
-                  <td><?php echo $this->Form->control('to_b', array('type'=>'text', 'id'=>'to_b', 'value'=>'', 'escape'=>false, 'class'=>'form-control input-field wd120', 'label'=>false)); ?></td>
+                  <td>
+                    <?php echo $this->Form->control('date', array(
+                      'type'=>'text',
+                      'id'=>'date',
+                      'value'=>'',
+                      'escape'=>false,
+                      'class'=>$class1,
+                      'label'=>false
+                    )); ?>
+                  </td>
 
                   <td>
-                    <div class="form-buttons"><a href="#" id="save_statement_details" class="btn btn-info btn-sm">Save</a></div>
-                    <?php echo $this->form->submit('save', array('name'=>'edit_machine_details', 'id'=>'edit_machine_details', 'onclick'=>'validate_machinery_details();return false', 'label'=>false)); ?>
+                    <?php echo $this->Form->control('date', array(
+                      'type'=>'text',
+                      'id'=>'date',
+                      'value'=>'',
+                      'escape'=>false,
+                      'class'=>$class1,
+                      'label'=>false
+                    )); ?>
+                  </td>
+
+                  <td>
+                    <?php echo $this->Form->control('date', array(
+                      'type'=>'text',
+                      'id'=>'date',
+                      'value'=>'',
+                      'escape'=>false,
+                      'class'=>$class1,
+                      'label'=>false
+                    )); ?>
+                  </td>
+
+                  <td>
+                    <?php echo $this->Form->control('date', array(
+                      'type'=>'text',
+                      'id'=>'date',
+                      'value'=>'',
+                      'escape'=>false,
+                      'class'=>$class1,
+                      'label'=>false
+                    )); ?>
+                  </td>
+
+                  <td>
+                    <?php echo $this->Form->control('date', array(
+                      'type'=>'text',
+                      'id'=>'date',
+                      'value'=>'',
+                      'escape'=>false,
+                      'class'=>$class1,
+                      'label'=>false
+                    )); ?>
+                  </td>
+
+                  <td>
+                    <?php echo $this->Form->control('date', array(
+                      'type'=>'text',
+                      'id'=>'date',
+                      'value'=>'',
+                      'escape'=>false,
+                      'class'=>$class1,
+                      'label'=>false
+                    )); ?>
+                  </td>
+
+                  <td>
+                    <?php echo $this->Form->control('date', array(
+                      'type'=>'text',
+                      'id'=>'date',
+                      'value'=>'',
+                      'escape'=>false,
+                      'class'=>$class1,
+                      'label'=>false
+                    )); ?>
+                  </td>
+
+                  <td>
+                    <?php echo $this->Form->control('date', array(
+                      'type'=>'text',
+                      'id'=>'date',
+                      'value'=>'',
+                      'escape'=>false,
+                      'class'=>$class1,
+                      'label'=>false
+                    )); ?>
+                  </td>
+
+                  <td>
+                    <?php echo $this->Form->control('date', array(
+                      'type'=>'text',
+                      'id'=>'date',
+                      'value'=>'',
+                      'escape'=>false,
+                      'class'=>$class1,
+                      'label'=>false
+                    )); ?>
+                  </td>
+
+                  <td>
+                    <?php echo $this->Form->control('date', array(
+                      'type'=>'text',
+                      'id'=>'date',
+                      'value'=>'',
+                      'escape'=>false,
+                      'class'=>$class1,
+                      'label'=>false
+                    )); ?>
+                  </td>
+
+                  <td>
+                    <?php echo $this->Form->control('date', array(
+                      'type'=>'text',
+                      'id'=>'date',
+                      'value'=>'',
+                      'escape'=>false,
+                      'class'=>$class1,
+                      'label'=>false
+                    )); ?>
+                  </td>
+
+                  <td>
+                    <?php echo $this->Form->control('date', array(
+                      'type'=>'text',
+                      'id'=>'date',
+                      'value'=>'',
+                      'escape'=>false,
+                      'class'=>$class1,
+                      'label'=>false
+                    )); ?>
+                  </td>
+
+                  <td>
+                    <?php echo $this->Form->control('date', array(
+                      'type'=>'text',
+                      'id'=>'date',
+                      'value'=>'',
+                      'escape'=>false,
+                      'class'=>$class1,
+                      'label'=>false
+                    )); ?>
+                  </td>
+
+                  <td>
+                    <div class="form-buttons">
+                      <a href="#" id="save_statement_details" class="btn btn-info btn-sm">Save</a>
+                    </div>
+                    <?php echo $this->form->submit('save', array(
+                      'name'=>'edit_machine_details',
+                      'id'=>'edit_machine_details',
+                      'label'=>false));
+                    ?>
                   </td>
                 </tr>
 
@@ -126,64 +292,179 @@
                     <tr>
                       <td></td>
                       <td >
-                      <?php echo $this->Form->control('date', array('type'=>'text', 'escape'=>false, 'id'=>'date', 'label'=>false, 'class'=>'form-control input-field wd120','placeholder'=>'Select date')); ?>
-                      <span id="error_date" class="error invalid-feedback"></span>
-                  </td>
-                  <td>
-                        <?php $section_form_details[2] = ['abc'];
-                        echo $this->Form->control('commodity', array('type'=>'select', 'empty'=>'Select Commodity', 'id'=>'commodity','options'=>$section_form_details[2], 'label'=>false, 'class'=>'form-control wd120')); ?>
+                      <?php
+                        echo $this->Form->control('commodity', array(
+                          'type'=>'select',
+                          'empty'=>'Select Commodity',
+                          'id'=>'ta-commodity-',
+                          'options'=>$section_form_details[9],
+                          'label'=>false,
+                          'class'=>'form-control wd120 commodity'
+                        )); ?>
                         <span id="error_commodity" class="error invalid-feedback"></span>
                   </td>
                   <td>
-                        <?php echo $this->Form->control('approved_tbl_brand', array('type'=>'text', 'escape'=>false, 'id'=>'approved_tbl_brand', 'label'=>false, 'class'=>'form-control input-field wd120','placeholder'=>'Enter Approved tbl brand')); ?>
-                        <span id="error_approved_tbl_brand" class="error invalid-feedback"></span>
+                        <?php echo $this->Form->control('lot_no_tf_no_m_no', array(
+                          'type'=>'text',
+                          'escape'=>false,
+                          'id'=>'lot_no_tf_no_m_no',
+                          'label'=>false,
+                          'class'=>$class1,
+                          'placeholder'=>'Enter Lot No.TF No./M. No.'
+                        )); ?>
+                        <span id="error_lot_no_tf_no_m_no" class="error invalid-feedback"></span>
                   </td>
                   <td>
-                        <?php echo $this->Form->control('agmark_grade', array('type'=>'text', 'escape'=>false, 'id'=>'agmark_grade', 'label'=>false, 'class'=>'form-control input-field wd120','placeholder'=>'Enter Agmark Grade')); ?>
-                        <span id="error_agmark_grade" class="error invalid-feedback"></span>
+                        <?php echo $this->Form->control('date_of_sampling', array(
+                          'type'=>'text',
+                          'escape'=>false,
+                          'id'=>'date_of_sampling',
+                          'label'=>false,
+                          'class'=>$class1,
+                          'placeholder'=>$placeholder
+                        )); ?>
+                        <span id="error_date_of_sampling" class="error invalid-feedback"></span>
                   </td>
                   <td>
-                        <?php echo $this->Form->control('pack_size', array('type'=>'text', 'escape'=>false, 'id'=>'pack_size', 'label'=>false, 'class'=>'form-control input-field wd120','placeholder'=>'Enter pack size')); ?>
-                        <span id="error_pack_size" class="error invalid-feedback"></span>
+                        <?php echo $this->Form->control('date_of_packing', array(
+                          'type'=>'text',
+                          'escape'=>false,
+                          'id'=>'date_of_packing',
+                          'label'=>false,
+                          'class'=>$class1,
+                          'placeholder'=>$placeholder
+                        )); ?>
+                        <span id="error_date_of_packing" class="error invalid-feedback"></span>
                   </td>
                   <td>
-                      <?php echo $this->Form->control('from_a', array('type'=>'text', 'escape'=>false, 'id'=>'from_a', 'label'=>false, 'class'=>'form-control input-field wd120','placeholder'=>'From')); ?>
-                      <span id="error_from_a" class="error invalid-feedback"></span>
+                       <?php
+                        echo $this->Form->control('grade', array(
+                          'type'=>'select',
+                          'empty'=>'Select grade',
+                          'id'=>'grade',
+                          'options'=>$section_form_details[10],
+                          'label'=>false,
+                          'class'=>'form-control wd120'
+                        )); ?>
+                        <span id="error_grade" class="error invalid-feedback"></span>
                   </td>
                   <td>
-                      <?php echo $this->Form->control('to_a', array('type'=>'text', 'escape'=>false, 'id'=>'to_a', 'label'=>false, 'class'=>'form-control input-field wd120','placeholder'=>'To')); ?>
-                      <span id="error_to_a" class="error invalid-feedback"></span>
+                      <?php echo $this->Form->control('pack_size', array(
+                        'type'=>'text',
+                        'escape'=>false,
+                        'id'=>'from_a',
+                        'label'=>false,
+                        'class'=>$class1,
+                        'placeholder'=>'Enter Pack Size'
+                      )); ?>
+                      <span id="error_pack_size" class="error invalid-feedback"></span>
                   </td>
                   <td>
-                      <?php echo $this->Form->control('total_a', array('type'=>'text', 'escape'=>false, 'id'=>'total_a', 'label'=>false, 'class'=>'form-control input-field txtCal wd120','placeholder'=>'0.00')); ?>
-                      <span id="error_total_a" class="error invalid-feedback"></span>
+                      <?php echo $this->Form->control('total_no_packages', array(
+                        'type'=>'text',
+                        'escape'=>false,
+                        'id'=>'total_no_packages',
+                        'label'=>false,
+                        'class'=>$class1,
+                        'placeholder'=>'Enter Total No. of packages'
+                      )); ?>
+                      <span id="error_total_no_packages" class="error invalid-feedback"></span>
                   </td>
                   <td>
-                        <?php echo $this->Form->control('from_b', array('type'=>'text', 'escape'=>false, 'id'=>'from_b', 'label'=>false, 'class'=>'form-control input-field wd120','placeholder'=>'From')); ?>
-                      <span id="error_from_b" class="error invalid-feedback"></span>
+                      <?php echo $this->Form->control('total_qty_graded_quintal', array(
+                        'type'=>'text',
+                        'escape'=>false,
+                        'id'=>'total_qty_graded_quintal',
+                        'label'=>false,
+                        'class'=>'form-control input-field txtCal wd120',
+                        'readonly'=>'readonly',
+                        'placeholder'=>'0.00'
+                      )); ?>
+                      <span id="error_total_qty_graded_quintal" class="error invalid-feedback"></span>
                   </td>
                   <td>
-                      <?php echo $this->Form->control('to_b', array('type'=>'text', 'escape'=>false, 'id'=>'to_b', 'label'=>false, 'class'=>'form-control input-field wd120','placeholder'=>'To')); ?>
-                      <span id="error_to_b" class="error invalid-feedback"></span>
+                        <?php echo $this->Form->control('estimated_value', array(
+                          'type'=>'number',
+                          'escape'=>false,
+                          'id'=>'estimated_value',
+                          'label'=>false,
+                          'class'=>$class1,
+                          'placeholder'=>'0.00'
+                        )); ?>
+                      <span id="error_estimated_value" class="error invalid-feedback"></span>
                   </td>
                   <td>
-                      <?php echo $this->Form->control('to_b', array('type'=>'text', 'escape'=>false, 'id'=>'to_b', 'label'=>false, 'class'=>'form-control input-field wd120','placeholder'=>'To')); ?>
-                      <span id="error_to_b" class="error invalid-feedback"></span>
+                      <?php echo $this->Form->control('no_of_agmark_replica', array(
+                        'type'=>'number',
+                        'escape'=>false,
+                        'id'=>'no_of_agmark_replica',
+                        'label'=>false,
+                        'class'=>$class1,
+                      )); ?>
+                      <span id="error_no_of_agmark_replica" class="error invalid-feedback"></span>
                   </td>
                   <td>
-                      <?php echo $this->Form->control('to_b', array('type'=>'text', 'escape'=>false, 'id'=>'to_b', 'label'=>false, 'class'=>'form-control input-field wd120','placeholder'=>'To')); ?>
-                      <span id="error_to_b" class="error invalid-feedback"></span>
+                      <?php echo $this->Form->control('replica_charges', array(
+                          'type'=>'text',
+                          'escape'=>false,
+                          'id'=>'replica_charges',
+                          'label'=>false,
+                          'class'=>$class1,
+                          'readonly'=>'readonly',
+                          'placeholder'=>'0.00'
+                        )); ?>
+                      <span id="error_replica_charges" class="error invalid-feedback"></span>
                   </td>
                   <td>
-                      <?php echo $this->Form->control('to_b', array('type'=>'text', 'escape'=>false, 'id'=>'to_b', 'label'=>false, 'class'=>'form-control input-field wd120','placeholder'=>'To')); ?>
-                      <span id="error_to_b" class="error invalid-feedback"></span>
+                     <?php echo $this->Form->control('laboratory_name', array(
+                          'type'=>'text',
+                          'escape'=>false,
+                          'id'=>'laboratory_name',
+                          'readonly'=>'readonly',
+                          'value'=>$section_form_details[11],
+                          'label'=>false,
+                          'class'=>$class1,
+                        )); ?>
+                      <span id="error_laboratory_name" class="error invalid-feedback"></span>
                   </td>
                   <td>
-                      <?php echo $this->Form->control('to_b', array('type'=>'text', 'escape'=>false, 'id'=>'to_b', 'label'=>false, 'class'=>'form-control input-field wd120','placeholder'=>'To')); ?>
-                      <span id="error_to_b" class="error invalid-feedback"></span>
+                      <?php echo $this->Form->control('report_no', array(
+                        'type'=>'text',
+                        'escape'=>false,
+                        'id'=>'to_b',
+                        'label'=>false,
+                        'class'=>$class1,
+                        'placeholder'=>'Enter Report No.'
+                      )); ?>
+                      <span id="error_report_no" class="error invalid-feedback"></span>
+                  </td>
+                  <td>
+                      <?php echo $this->Form->control('report_date', array(
+                          'type'=>'text',
+                          'escape'=>false,
+                          'id'=>'report_date',
+                          'label'=>false,
+                          'class'=>$class1,
+                          'placeholder'=>$placeholder
+                        )); ?>
+                      <span id="error_report_date" class="error invalid-feedback"></span>
+                  </td>
+                  <td>
+                      <?php echo $this->Form->control('remarks', array(
+                        'type'=>'text',
+                        'escape'=>false,
+                        'id'=>'remarks',
+                        'label'=>false,
+                        'class'=>$class1,
+                        'placeholder'=>'Enter Remarks'
+                      )); ?>
+                      <span id="error_remarks" class="error invalid-feedback"></span>
                   </td>
                       <td>
-                        <div class="form-buttons"><a href="#" id="add_replica_details" class='table_record_add_btn btn btn-info btn-sm'><i class="fa fa-plus"></i> Add</a></div>
+                        <div class="form-buttons">
+                          <a href="#" id="add_replica_details" class='table_record_add_btn btn btn-info btn-sm'>
+                          <i class="fa fa-plus"></i> Add</a>
+                        </div>
                       </td>
                     </tr>
                  

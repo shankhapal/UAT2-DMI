@@ -17,6 +17,6 @@
          </div>
     </div>
   <?php
-    echo $this->Html->script('element/application_forms/bgr/analysis_reports');
+    echo $this->Html->script('element/application_forms/bgr/commodity_wise_report_form_script');
     echo $this->Html->css('element/application_forms/bgr/bianually_report_style');
   ?>
