@@ -31,14 +31,14 @@
 				<div class="col-md-12 row">
                      <!-- added middle name type and middle name by laxmi on 04-07-2023 -->
                     <div class="col-md-2">
-						<label for="field3"><span>Middle Name<span class="cRed">*</span></span>	</label>
+						<label for="field3"><span>Parent Name<span class="cRed">*</span></span>	</label>
 					</div>
 					<div class="col-md-2">
 						<?php echo $this->Form->control('middle_name_type', array('type'=>'select', 'id'=>'middle_name_type', 'escape'=>false, 'options'=>$middle_type, 'empty'=>'Select type','value'=>$section_form_details[0]['middle_name_type'], 'class'=>'cvOn cvReq form-control', 'label'=>false)); ?>
 						<div class="err_cv"></div>
 					</div>
 					<div class="col-md-2">
-					<?php echo $this->Form->control('middle_name', array('type'=>'text', 'id'=>'middle_name', 'escape'=>false, 'value'=>$section_form_details[0]['middle_name'], 'placeholder'=>'Enter Middle Name', 'class'=>'cvOn cvReq cvAlphaNum cvAlpha form-control', 'maxlength'=>255,  'label'=>false)); ?>
+					<?php echo $this->Form->control('middle_name', array('type'=>'text', 'id'=>'middle_name', 'escape'=>false, 'value'=>$section_form_details[0]['middle_name'], 'placeholder'=>'Enter Parent Name', 'class'=>'cvOn cvReq cvAlphaNum cvAlpha form-control', 'maxlength'=>255,  'label'=>false)); ?>
 						<div class="err_cv"></div>
 					</div>
 
