@@ -2680,7 +2680,7 @@ class ApplicationformspdfsController extends AppController{
 			}
 
 		}elseif($appl_type == 4 && $pdf_for == 'grant'){ 
-			$pdf = new MyCustomPDFWithWatermark(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);	
+			$pdf = new MyCustomPDFWithWatermark(PDF_PAGE_ORIENTATION, PDF_UNIT, array(250, 320), true, 'UTF-8', false);	
 		}else{
 			$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 		}
@@ -4419,7 +4419,7 @@ class ApplicationformspdfsController extends AppController{
 				$chemist_data = $this->DmiChemistRegistrations->find('all', array( 'conditions'=>array('chemist_id IS'=>$customer_id)))->first();
                   
 				$chemist_address= $this->DmiChemistProfileDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
-               
+                
 				$this->set('chemist_address',$chemist_address['address']);
 				$this->set('chemist_fname', $chemist_data['chemist_fname']);
 				$this->set('chemist_lname', $chemist_data['chemist_lname']);
@@ -4427,7 +4427,8 @@ class ApplicationformspdfsController extends AppController{
 				$this->set('sign', $chemist_address['signature_photo']);
 				$this->set('middle_name_type', $chemist_address['middle_name_type']);
 				$this->set('middle_name', $chemist_address['middle_name']);
-				$this->set('profile_photo', $chemist_address['profile_photo']);
+				
+				
 
 				//set packer id in session and level_3
 				$this->Session->write('packer_id',$chemist_data['created_by'] );
@@ -4463,9 +4464,9 @@ class ApplicationformspdfsController extends AppController{
 				$sub_commodity_data[$i] =  $fetch_commodity_id;		
 				$i=$i+1;
 				}
-				$unique_commodity_id = array_unique($commodity_id); 
+				$unique_commodity_id = array_unique($commodity_id);
 				$commodity_name_list = $this->MCommodityCategory->find('all',array('conditions'=>array('category_code IN'=>$unique_commodity_id, 'display'=>'Y')))->toArray();
-
+				
 				$this->set('commodity_name_list',$commodity_name_list);		
 				$this->set('sub_commodity_data',$sub_commodity_data);
 				//to fetch ral schedule training date
