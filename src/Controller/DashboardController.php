@@ -856,7 +856,7 @@ class DashboardController extends AppController{
 										//application must not be with applicant while allocation
 										//added on 03-02-2023 by Amol
 										$finalSubmitStatus = $this->$final_submit_table->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
-										if($finalSubmitStatus['status'] != 'referred_back'){
+										if(!empty($finalSubmitStatus) && $finalSubmitStatus['status'] != 'referred_back'){
 											$creat_array = true;
 										}
 										

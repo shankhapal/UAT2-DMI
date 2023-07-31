@@ -15,18 +15,24 @@
 <!-- for multiple commodities added by laxmi on 10-1-2023 -->
 <?php
     $i=0;
-    $sub_commodities_array = array();   
+    $sub_commodities_array = array();
+    $commodities_cate_array = array();   
     foreach($sub_commodity_data as $sub_commodity){
         
         $sub_commodities_array[$i] = $sub_commodity['commodity_name'];
+        if(!empty($commodity_name_list[$i]['category_name'])){
+            $commodities_cate_array[$i] = $commodity_name_list[$i]['category_name'];
+        }
+       
     $i=$i+1;
     } 
     
     $sub_commodities_list = implode(',',$sub_commodities_array);
+    $commodities_list = implode(',',$commodities_cate_array);
 ?>
 	
     <table width="100%" border="1">
-        <tr><td align="center" style="padding:5px;"><h4>Letter from RO To schedule Training</h4></td></tr>
+        <tr><td align="center" style="padding:5px;"><h4>Letter from RO To Chemist for Training schedule</h4></td></tr>
     </table>
 
     <table width="100%" border="1">
@@ -59,20 +65,20 @@
      </table>
      <table  width="100%">
         <tr>    
-            <td><br>Subject: Chemist Training Scheduled of  <?php echo $chemist_fname."&nbsp;". $chemist_lname ;?> in the analysis of <?php echo $sub_commodities_list; ?>.</td>
+            <td><br>Subject: Scheduled for training of chemist for analysis, grading and marking of  <?php echo $commodities_list; ?> (<?php echo $sub_commodities_list; ?>) under Agmark.</td>
         </tr>
           <br>
 
 
         <tr>
-            <td><br>Dear Sir,</td><br>
-        </tr>   
+            <td><br>Dear Sir/Madam,</td><br>
+        </tr>                                                                                                                                                                                                                                                                                                                        
 
         <tr>
-            <td>I am to refer to above cited subject & inform that the chemist <b> <?php echo $chemist_fname."&nbsp;". $chemist_lname ;?> </b> for the firm <b><?php echo $customer_firm_data['firm_name']; ?>, <?php echo $customer_firm_data['street_address']; ?> </b> has sponsored for training in <?php echo $sub_commodities_list; ?> to be graded under Agmark.<br>
+            <td>I am to refer to above cited subject & inform that the procedural training of <b> <?php echo $chemist_fname."&nbsp;". $chemist_lname ;?> <?php echo $middle_name_type; ?> <?php echo $parent_name; ?> </b> for analysis, grading & marking of <b><?php echo $commodities_list; ?> (<?php echo $sub_commodities_list; ?>) </b> under Agmark is Scheduled
+             from <?php echo $schedule_from; ?> to  <?php echo $shedule_to;?> at <?php echo $office_type;?> office <?php echo $ro_office;?><br>
 			
-			In this connection it is requested to <b><?php echo $chemist_fname."&nbsp;". $chemist_lname ;?> </b> to impart necessary training from <?php echo $schedule_from;?> to <?php echo $shedule_to;?> in RO/SO Office <?php echo $ro_office; ?>.<br>
-           The training has been scheduled from  <?php echo $schedule_from;?> to <?php echo $shedule_to;?> in RO/SO Office <?php echo $ro_office; ?>.
+			It is requested to attend the said training at <b><?php echo $office_type;?> office</b>  <?php echo $ro_office;?>.
 	
 			</td>
         </tr>
@@ -89,9 +95,10 @@
 					
 		<tr>
 			<td>Your’s faithfully<br> 
-				<?php echo $ro_fname;?>  <?php echo $ro_lname;?>,<br> <?php echo $role;?><br> 
-                <?php echo $ro_office; ?>.<br>
-				RO/SO Office.<br>
+				<?php echo $ro_fname;?>  <?php echo $ro_lname;?>,<br> 
+               Incharge, <?php echo $office_type;?> office <br>
+               Directorate of Marketing and Inspection <br>
+				 <?php echo $ro_office;?>
 			</td>
 		</tr>
 		<tr>
