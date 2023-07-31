@@ -2643,13 +2643,15 @@ class ApplicationformspdfsController extends AppController{
 		}elseif($pdf_for == 'showcause_notice'){
 			$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/showcause_notice/'.$file_name;
 		}elseif( $appl_type == 4 && $pdf_for == 'grant'){
-			//elseif section added by laxmi B. on 30-12-2022
-			//for this file path is sent from the pdf function
-			//it will take default file path from the argument, if pdf for is chemist
+			
 			$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/certificates/CHM/'.$file_name;
 																		 
 										  
 																					   
+		}elseif($pdf_for == 'chemist'){
+			//elseif section added by laxmi B. on 30-12-2022
+			//for this file path is sent from the pdf function
+			//it will take default file path from the argument, if pdf for is chemist
 		}else{
 			$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/temp/'.$file_name;
 		}
@@ -4288,6 +4290,9 @@ class ApplicationformspdfsController extends AppController{
 				if(!empty($chemist_profile)){
 					
                     $this->set('profile_photo', $chemist_profile['profile_photo']);
+					$this->set('address', $chemist_profile['address']);
+					$this->set('middle_name_type', $chemist_profile['middle_name_type']);
+					$this->set('middle_name', $chemist_profile['middle_name']);
 				}
 
                    
@@ -4335,9 +4340,10 @@ class ApplicationformspdfsController extends AppController{
 
 				}
 
-				$ro_office = $this->DmiRoOffices->find('list', array('valueField'=>'ro_office'))->where(array('id IS'=>$chemistData['ro_office_id']))->first();
-				$this->set('ro_office',$ro_office);
-
+				$ro_office = $this->DmiRoOffices->find('all', array('valueField'=>'ro_office'))->where(array('id IS'=>$chemistData['ro_office_id']))->first();
+				$this->set('ro_office',$ro_office['ro_office']);
+				$this->set('office_type',$ro_office['office_type']);
+				
 				}
 
 
@@ -4553,11 +4559,14 @@ class ApplicationformspdfsController extends AppController{
 			$chemist_data = $this->DmiChemistRegistrations->find('all', array('conditions'=>array('chemist_id IS'=>$customer_id)))->first();
                
 			$chemist_address= $this->DmiChemistProfileDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
-           
+			
 			$this->set('chemist_address',$chemist_address['address']);
 			$this->set('chemist_fname', $chemist_data['chemist_fname']);
 			$this->set('chemist_lname', $chemist_data['chemist_lname']);
 			$this->set('profile_photo', $chemist_address['profile_photo']);
+			$this->set('middle_name_type', $chemist_address['middle_name_type']);
+			$this->set('parent_name', $chemist_address['middle_name']);
+			$this->set('address', $chemist_address['address']);
 
 			//set packer id in session and level_3
 			$this->Session->write('packer_id',$chemist_data['created_by'] );
@@ -4596,7 +4605,7 @@ class ApplicationformspdfsController extends AppController{
 			}
 			$unique_commodity_id = array_unique($commodity_id); 
 			$commodity_name_list = $this->MCommodityCategory->find('all',array('conditions'=>array('category_code IN'=>$unique_commodity_id, 'display'=>'Y')))->toArray();
-
+			
 			$this->set('commodity_name_list',$commodity_name_list);		
 			$this->set('sub_commodity_data',$sub_commodity_data);
 			//to fetch ral name
@@ -4610,8 +4619,10 @@ class ApplicationformspdfsController extends AppController{
 			$this->set('shedule_to',$scheduleTo);
 
 			//to fetch ro office name 
-			$office = $this->DmiRoOffices->find('all',array('fields'=>'ro_office', 'conditions'=>array('id IS'=>$roToRalData['ro_office_id'])))->first();
+			$office = $this->DmiRoOffices->find('all',array( 'conditions'=>array('id IS'=>$roToRalData['ro_office_id'])))->first();
 			$this->set('ro_office',$office['ro_office']);
+			$this->set('office_type',$office['office_type']);
+			
 			}
 
 
@@ -4647,7 +4658,7 @@ class ApplicationformspdfsController extends AppController{
 			$this->DmiChemistRoToRalLogs->updateAll(
 			array('ro_schedule_letter' => $file_path),
 			array('chemist_id'=>$customer_id));
-
+                         
 			$file_path = $_SERVER["DOCUMENT_ROOT"].$file_path;
 			//to preview application
 			$this->callTcpdf($all_data_pdf,'F',$customer_id,'chemist',$file_path);//with save mode

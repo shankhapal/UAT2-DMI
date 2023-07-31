@@ -1321,6 +1321,7 @@ class ChemistController extends AppController {
 			$this->set('chemist_fname',$roToRalData['chemist_first_name']);
 			$this->set('chemist_lname',$roToRalData['chemist_last_name']);
 			$this->set('chemist_id',$roToRalData['chemist_id']);
+			$this->Session->write('customer_id', $roToRalData['chemist_id']);
 			$ro_id = $roToRalData['ro_office_id'];
 			$customer_id =$roToRalData['chemist_id'];
 			}
