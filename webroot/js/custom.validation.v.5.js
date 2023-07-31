@@ -10,16 +10,16 @@ $(function(){
 		var date1 = $("#ta-from_dt-"+id_No).val();
 		var date2 = $("#ta-to_dt-"+id_No).val(); 
 		var yearsDiff =  new Date(date2).getFullYear() - new Date(date1).getFullYear();
-    //calculated experience difference with basis  of mont and year by laxmi 10-07-2023
+    //calculated experience difference with basis  of month and year by laxmi 10-07-2023
      const split = date1.split('/');
      const split1 = date2.split('/');
      var monthsDiff = split1[1]-split[1];
-     debugger;
+     console.log((new Date(split1[1]+'/'+split1[0]+'/'+split1[2]).getMonth()+1)-(new Date(split[1]+'/'+split[0]+'/'+split[2]).getMonth()+1));
     
-     if(yearsDiff == 0 || yearsDiff == NaN){
+     if(yearsDiff === 0 || yearsDiff === NaN){
       yearsDiff =  0;
      }
-     if(monthsDiff == 0 || monthsDiff == NaN){
+     if(monthsDiff === 0 || monthsDiff === NaN){
       monthsDiff =  0;
      }
 		
