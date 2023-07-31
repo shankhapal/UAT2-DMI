@@ -16,6 +16,7 @@
 						</div>
          </div>
     </div>
+		<input type="hidden" id="custemer_id" value='<?php echo $_SESSION['packer_id']; ?>'>
   <?php
     echo $this->Html->script('element/application_forms/bgr/commodity_wise_report_form_script');
     echo $this->Html->css('element/application_forms/bgr/bianually_report_style');

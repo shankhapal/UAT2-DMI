@@ -2631,23 +2631,99 @@ class AjaxFunctionsController extends AppController{
 		$commodity_id = $_POST['commodity_id'];
 		//get charge from table
 		$this->loadModel('DmiReplicaChargesDetails');
+		$this->loadModel('DmiReplicaUnitDetails');
+	
+		$get_charge = $this->DmiReplicaChargesDetails
+    ->find('all', [
+        'conditions' => ['commodity_code' => $commodity_id]
+    ])
+    ->first();
+	
+		if (!empty($get_charge)) {
+   
+			$charge = $get_charge['charges'];
+			$min_qty = $get_charge['min_qty'];
+			$unit = $get_charge['unit'];
 
-		$get_charge = $this->DmiReplicaChargesDetails->find('all',array('conditions'=>array('commodity_code IS'=>$commodity_id)))->first();
-		
-		if(!empty($get_charge)){
+			$unit_list = $this->DmiReplicaUnitDetails->find('list',array('keyField'=>'id','valueField'=>'sub_unit','conditions'=>array('unit IS'=>$unit),'order'=>'id asc'))->toArray();
 
-			$result = [
-				'charge' => $get_charge['charges'],
-				'min_qty' => $get_charge['min_qty'],
-				'unit' => $get_charge['unit']
-			];
-
+			$result = array('charge'=>$charge,'unit_list'=>$unit_list,'min_qty'=>$min_qty);
 			echo '~'.json_encode($result).'~';
-		}else{
-			echo '~No Charge~';
+			
+		} else {
+				echo json_encode(['message' => 'No Charge']);
 		}
 		exit;
 	}
+
+	//to get gross quantity and total charges when enter no. of packets
+	public function getGrossQuantityAndTotalCharge() {
+			
+		$this->autoRender = false;
+		$packet_size = $_POST['packet_size'];
+		$sub_unit_id = $_POST['sub_unit_id'];
+		$no_of_packets = $_POST['no_of_packets'];
+	
+		$this->loadModel('DmiReplicaChargesDetails');
+		
+		$commodity_id = $_POST['commodity_id'];
+		
+		$get_charge = $this->DmiReplicaChargesDetails
+    ->find('all', [
+        'conditions' => ['commodity_code' => $commodity_id]
+    ])
+    ->first();
+
+		$label_charge = $get_charge['charges'];
+		
+		//get conversion factor as per sub unit
+		$this->loadModel('DmiReplicaUnitDetails');
+		$get_factor = $this->DmiReplicaUnitDetails->find('all',array('fields'=>'conversion_factor', 'conditions'=>array('id IS'=>$sub_unit_id)))->first();
+		
+		$conversion_factor = $get_factor['conversion_factor'];
+		
+		//get min gross quantity for selected commodity to campair
+		$this->loadModel('DmiReplicaChargesDetails');
+		$get_charge = $this->DmiReplicaChargesDetails->find('all',array('fields'=>'min_qty','conditions'=>array('commodity_code IS'=>$commodity_id)))->first();
+		
+		$min_grpss_qty = $get_charge['min_qty'];
+		
+		$gross_quantity = ($packet_size*$no_of_packets)/$conversion_factor;
+		
+		//if calulated gross qty is more tahn min qty, then get new total, else calculate total with min qty
+		if ($gross_quantity > $min_grpss_qty) {				
+			$total_charges = $gross_quantity*$label_charge;			
+		} else {
+			$total_charges = $min_grpss_qty*$label_charge;
+			$gross_quantity = $min_grpss_qty;
+		}
+		
+		$result = array('gross_quantity'=>$gross_quantity,'total_charges'=>$total_charges);
+		
+		echo '~'.json_encode($result).'~';
+		exit;
+	}
+
+	// public function getReplicaAllotmentDetails(){
+
+	// 		// pr($_POST);die;
+	// 		$this->loadModel('DmiReplicaAllotmentDetails');
+	// 		$this->autoRender = false;
+	// 		$custemer_id = $_POST['custemer_id'];
+	// 		$to_input = $_POST['to_input'];
+	// 		$from_input = $_POST['from_input'];
+
+	// 		//$get_factor = $this->DmiReplicaUnitDetails->find('all',array('fields'=>'conversion_factor', 'conditions'=>array('id IS'=>$sub_unit_id)))->first();
+
+	// 		$replica_appl_list = $this->DmiReplicaAllotmentDetails->find('all', array(
+	// 				'fields' => array('customer_id', 'alloted_rep_from', 'alloted_rep_to', 'created'),
+	// 				'conditions' => array(
+	// 					'customer_id IN'=>$custemer_id,
+	// 					'alloted_rep_from'=>$from_input,
+	// 					'alloted_rep_to'=>$to_input,
+	// 					'delete_status IS NULL')))->toList();
+			
+	// }
 
 }
 ?>
