@@ -10,46 +10,52 @@ $(function(){
 		var date1 = $("#ta-from_dt-"+id_No).val();
 		var date2 = $("#ta-to_dt-"+id_No).val(); 
 		var yearsDiff =  new Date(date2).getFullYear() - new Date(date1).getFullYear();
-    //calculated experience difference with basis  of month and year by laxmi 01-08-2023
-      const split = date1.split('/');
-      const split1 = date2.split('/');
+    //calculated experience difference with basis  of month and year by laxmi 10-07-2023
+     const split = date1.split('/');
+     const split1 = date2.split('/');
+     var monthsDiff;
+   
      
-      const start = new Date(split[2]+','+split[1]);
-      const end = new Date(split1[2]+','+split1[1]);
-      var month= end.getMonth() - start.getMonth() + 
-        (12 * (end.getFullYear() - start.getFullYear()));
+    const start = new Date(split[2]+','+split[1]);
+    const end = new Date(split1[2]+','+split1[1]);
+    let month= end.getMonth() - start.getMonth() + 
+    (12 * (end.getFullYear() - start.getFullYear()));
 
-        if(month == 12 || month > 12){
-          if(month == 12){
-            
-            yearsDiff = 1;
-            monthsDiff = 0;
-          }else if(month > 12){
-            var i = 10;
-            var calMonth = 12;
-            var calculated_years;
-            var calculatedMonth;
-            for (var k = 1; k<=i; k++){
-              calculated_years = month / calMonth;
-              calculatedMonth =  month % calMonth;
-            }
-            yearsDiff = Math.trunc(calculated_years);
-            monthsDiff = calculatedMonth;
-          }else{
-            yearsDiff = 0;
-            monthsDiff = month;
-          }    
-        }
     
-        if(yearsDiff === 0 || yearsDiff === NaN){
-          yearsDiff =  0;
+    if(month == 12){
+        yearsDiff = 1;
+        monthsDiff = 0;
+      }else if(month > 12){
+        var i = 10;
+        var calMonth = 12;
+        var calculated_years;
+        var calculatedMonth;
+        for (var k = 1; k<=i; k++){
+          calculated_years = month / calMonth;
+          calculatedMonth =  month % calMonth;
         }
-        if(monthsDiff === 0 || monthsDiff === NaN){
-          monthsDiff =  0;
-        }
+         yearsDiff = Math.trunc(calculated_years);
+         monthsDiff = calculatedMonth;
+      }else{
+         yearsDiff = 0;
+         monthsDiff = month;
+      }    
+    
+   
+    
+    
+    
+     if( (isNaN(yearsDiff)) || yearsDiff === 0 || yearsDiff === undefined){
+            yearsDiff =  0;
+       }
+     if((isNaN(monthsDiff)) || monthsDiff === 0 || monthsDiff === undefined ){
+              monthsDiff =  0;
+     }
+     
 		
-      $("#ta-total-"+id_No).val(yearsDiff +"."+ monthsDiff);
-      })
+    $("#ta-total-"+id_No).val(yearsDiff +"."+ monthsDiff);
+    
+    })
   
 	$('#value1, #value2').keyup(function(){
 
