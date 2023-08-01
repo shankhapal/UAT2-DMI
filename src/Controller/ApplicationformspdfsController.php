@@ -2644,8 +2644,8 @@ class ApplicationformspdfsController extends AppController{
 			$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/showcause_notice/'.$file_name;
 		}elseif( $appl_type == 4 && $pdf_for == 'grant'){
 			
-			$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/certificates/CHM/'.$file_name;
-																		 
+			//$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/certificates/CHM/'.$file_name;
+			$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/temp/'.$file_name;															 
 										  
 																					   
 		}elseif($pdf_for == 'chemist'){
@@ -2680,7 +2680,8 @@ class ApplicationformspdfsController extends AppController{
 			}
 
 		}elseif($appl_type == 4 && $pdf_for == 'grant'){ 
-			$pdf = new MyCustomPDFWithWatermark(PDF_PAGE_ORIENTATION, PDF_UNIT, array(250, 320), true, 'UTF-8', false);	
+			// for chemist certificate page height and width specify manually by laxmi on 01-08-2023
+			$pdf = new MyCustomPDFWithWatermark(PDF_PAGE_ORIENTATION, PDF_UNIT, array(250, 335), true, 'UTF-8', false);	
 		}else{
 			$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 		}
@@ -4071,6 +4072,7 @@ class ApplicationformspdfsController extends AppController{
                     
                     // to find commodity from registrtion table added code by laxmi on 14-07-2023
 					$commodities = $this->DmiChemistRegistrations->find('all', ['conditions'=>['chemist_id IS'=>$customer_id]])->first();
+					
 					$sub_commodity_array = explode(',',$commodities['sub_commodities']);
 					$i=0;
 					foreach ($sub_commodity_array as $key => $sub_commodity) {
@@ -4084,6 +4086,7 @@ class ApplicationformspdfsController extends AppController{
 					$commodity_name_list = $this->MCommodityCategory->find('all',array('conditions'=>array('category_code IN'=>$unique_commodity_id, 'display'=>'Y')))->toArray();	
 					$this->set('commodity_name_list',$commodity_name_list);		
 					$this->set('sub_commodity_data',$sub_commodity_data);
+					$this->set('payment',$commodities['payment']);
 
 
 					$chemist_fname = $this->Session->read('f_name');
@@ -4097,8 +4100,11 @@ class ApplicationformspdfsController extends AppController{
 					} 
 
 					$chemist_profile_details = $this->DmiChemistProfileDetails->find('all')->where(array('customer_id IS'=>$customer_id))->first();
+				
 					if(!empty($chemist_profile_details) && !empty($chemist_profile_details['address'])){
 					$this->set('chemist_address', $chemist_profile_details['address']);
+					$this->set('middle_name_type', $chemist_profile_details['middle_name_type']);
+					$this->set('middle_name', $chemist_profile_details['middle_name']);
 					}
 
 					$this->generateApplicationPdf('/Applicationformspdfs/chemistApplPdf'); 

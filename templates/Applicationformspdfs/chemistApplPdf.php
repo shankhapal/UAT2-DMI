@@ -18,19 +18,24 @@
 <?php
 	$i=0;
 	$sub_commodities_array = array();	
+	$commodities_cate_array = array();
 	foreach($sub_commodity_data as $sub_commodity){
 		
 		$sub_commodities_array[$i] = $sub_commodity['commodity_name'];
+		if(!empty($commodity_name_list[$i]['category_name'])){
+			$commodities_cate_array[$i] = $commodity_name_list[$i]['category_name'];
+		}
 	$i=$i+1;
 	} 
 	
 	$sub_commodities_list = implode(',',$sub_commodities_array);
+	$commodities_cate_list = implode(',',$commodities_cate_array);
 	?>
 
 <table width="100%" border="1">
 		<tr>
 		<td align="center" style="padding:5px;">		
-			<h4> Chemist Application Form </h4>
+			<h4>Application For Chemist Training </h4>
 		</td>
 		</tr>
 </table>
@@ -43,7 +48,8 @@
 <table  width="100%">
     <tr>
         <td>
-         The Asstt. Agriculture Marketing Adviser,<br>
+         The <br>
+		 Dy. AMA/Asstt. AMA/SMO,<br>
          Directorate of Marketing & Inspection,<br>
          RO/SO Office,<br>
          <?php echo $ro_office_address ?>.<br><br>
@@ -51,7 +57,7 @@
 	 </tr>
 
     <tr>
-		<td><br>Subject: Application for approval of chemist for grading and marking of <?php echo $sub_commodities_list;?> under Agmark.</td><br><br>
+		<td><br>Subject: Application for training of chemist for analysis, grading and marking of <?php echo $commodities_cate_list; ?> (<?php echo $sub_commodities_list;?>) under Agmark.</td><br><br>
 	</tr>
 
     <tr>
@@ -59,22 +65,17 @@
 	</tr>
 
     <tr>
-		<td><br>I am to inform that,<br>
-            I am chemist, <?php echo $fname. "&nbsp;". $lname ;?> who has undergone necessary training in the analysis and grading of <?php echo $sub_commodities_list;?> under Agmark at the Regional Agmark Laboaratory.<br>
-            Please approved the pplication and permitted to take up the work
-            relating to the analysis, grading and marking of <?php echo $sub_commodities_list;?> under Agmark in
-            accordance with the provisions in Agriculture Produce (Grading and Marking) Act, 1937,
-            <?php echo $sub_commodities_list;?> Grading & Marking (Amendment) Rules and the instructions
-            issued in this connection from time to time by Agriculture Marketing Adviser to the Govt. of
-            India</td>
+		<td><br>I am to inform that,
+            I am applying for training of my chemist, <?php echo $fname. "&nbsp;". $lname ;?> <?php echo $middle_name_type; ?> <?php echo $middle_name; ?> for analysis, grading and marking of <?php echo $commodities_cate_list; ?> (<?php echo $sub_commodities_list;?>) under Agmark.<br>
+            It is requested to provide him/her training and permit to take up the work relating to analysis, grading and marking of <?php echo $commodities_cate_list; ?> (<?php echo $sub_commodities_list;?>) under Agmark in accoradance with the provisions of General Grading & Marking Rules, 1988
+			(as amended 2008) under Agriculture Produce (Grading & Marking) Act, 1937, and the instructions issued in this connection from time to time by Agriculture Marketing Adviser to the Govt. of
+            India<br>
+			I have deposited training charges RS. <?php echo $payment;?> on Bharatkosh.
+
+           </td>
 
 	  
-      <td>
-	         I will be responsible, for safe custody of labels, replica bearing
-            containers, maintenance of label account and label charges accounts, submission of regular
-            It may be noted that as per the relevant instructions, the services of the approved I
-            the Government of India or any person duly authorized by me.
-	  </td>  
+     
     </tr>
        
       </table>
@@ -95,7 +96,7 @@
 	   		Copy to:<br>
             1.The Agriculture Marketing Adviser to the Govt. of India, DMI, Head Office, Faridabad for
               favour of information.<br>
-            2.<?php echo $fname. "&nbsp;". $lname ;?>, <?php echo $chemist_address; ?>, for necessary action.
+            2.<?php echo $fname. "&nbsp;". $lname ;?> <?php echo $middle_name_type; ?> <?php echo $middle_name; ?>, <?php echo $chemist_address; ?>, for necessary action.
 	   	</td>
 	   </tr>
       </table>
