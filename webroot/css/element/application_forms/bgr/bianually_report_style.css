@@ -3,3 +3,11 @@
 .wdth {
   width: 150px; 
 }
+.highlight-empty {
+  border: 2px solid red;
+}
+/* Add styles for the error messages */
+.error {
+  color: red;
+  font-size: 12px;
+}

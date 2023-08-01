@@ -2627,8 +2627,9 @@ class AjaxFunctionsController extends AppController{
 	public function getCommodityWiseCharge(){
 		
 		$this->autoRender = false;
-
+	
 		$commodity_id = $_POST['commodity_id'];
+		
 		//get charge from table
 		$this->loadModel('DmiReplicaChargesDetails');
 		$this->loadModel('DmiReplicaUnitDetails');
@@ -2659,6 +2660,7 @@ class AjaxFunctionsController extends AppController{
 	//to get gross quantity and total charges when enter no. of packets
 	public function getGrossQuantityAndTotalCharge() {
 			
+		
 		$this->autoRender = false;
 		$packet_size = $_POST['packet_size'];
 		$sub_unit_id = $_POST['sub_unit_id'];

@@ -15,10 +15,11 @@ $(document).ready(function () {
 
   $("#table_1").on("change", ".commodity", function () {
     let id_No = this.id.split("-"); // Corrected method name from splite() to split()
+
     id_No = id_No[2];
 
     let commodity_id = $("#ta-commodity-" + id_No).val();
-
+    console.log(commodity_id);
     $.ajax({
       type: "POST",
       url: "../AjaxFunctions/get_commodity_wise_charge",
@@ -64,49 +65,31 @@ $(document).ready(function () {
 
     var commodity_id = $("#ta-commodity-" + id_No).val();
 
-    $.ajax({
-      type: "POST",
-      url: "../AjaxFunctions/get_gross_quantity_and_total_charge",
-      data: {
-        packet_size: packet_size,
-        sub_unit_id: sub_unit_id,
-        no_of_packets: no_of_packets,
-        commodity_id: commodity_id,
-      },
-      beforeSend: function (xhr) {
-        // Add this line
-        xhr.setRequestHeader("X-CSRF-Token", $('[name="_csrfToken"]').val());
-      },
-      success: function (response) {
-        var response = response.match(/~([^']+)~/)[1]; //getting data bitween ~..~ from response
-        response = JSON.parse(response); //response is JSOn encoded to parse JSON
+    if (commodity_id !== "") {
+      $.ajax({
+        type: "POST",
+        url: "../AjaxFunctions/get_gross_quantity_and_total_charge",
+        data: {
+          packet_size: packet_size,
+          sub_unit_id: sub_unit_id,
+          no_of_packets: no_of_packets,
+          commodity_id: commodity_id,
+        },
+        beforeSend: function (xhr) {
+          // Add this line
+          xhr.setRequestHeader("X-CSRF-Token", $('[name="_csrfToken"]').val());
+        },
+        success: function (response) {
+          var response = response.match(/~([^']+)~/)[1]; //getting data bitween ~..~ from response
+          response = JSON.parse(response); //response is JSOn encoded to parse JSON
 
-        $("#ta-total_quantity-" + id_No).val(response["gross_quantity"]);
-        $("#ta-total_label_charges-" + id_No).val(response["total_charges"]);
-      },
-    });
+          $("#ta-total_quantity-" + id_No).val(response["gross_quantity"]);
+          $("#ta-total_label_charges-" + id_No).val(response["total_charges"]);
+        },
+      });
+    } else {
+      alert("please select commodity first");
+      $("#ta-no_of_packets-" + id_No).val("");
+    }
   });
-
-  // $("#from_input, #to_input").on("change", function () {
-  //   let from_input = $("#from_input").val();
-  //   let to_input = $("#to_input").val();
-
-  //   if (from_input != "" && to_input != "") {
-  //     let custemer_id = $("#custemer_id").val();
-
-  //     $.ajax({
-  //       type: "POST",
-  //       url: "../AjaxFunctions/get_replica_allotment_details",
-  //       data: {
-  //         from_input: from_input,
-  //         to_input: to_input,
-  //         custemer_id: custemer_id,
-  //       },
-  //       beforeSend: function (xhr) {
-  //         xhr.setRequestHeader("X-CSRF-Token", $('[name="_csrfToken"]').val());
-  //       },
-  //       success: function (response) {},
-  //     });
-  //   }
-  // });
 });

@@ -348,7 +348,7 @@ $class1 = INPUT_FIELD_CLASSES;
                           'label'=>false,
                           'class'=>'form-control wd120 commodity'
                         )); ?>
-                        <span id="error_commodity" class="error invalid-feedback"></span>
+                        <div class="error-message" id="error-commodity"></div>
                   </td>
                   <td>
                         <?php echo $this->Form->control('lot_no_tf_no_m_no', array(
@@ -359,7 +359,7 @@ $class1 = INPUT_FIELD_CLASSES;
                           'class'=>$class1,
                           'placeholder'=>'Enter Lot No.TF No./M. No.'
                         )); ?>
-                        <span id="error_lot_no_tf_no_m_no" class="error invalid-feedback"></span>
+                        <div class="error-message" id="error-lot_no_tf_no_m_no"></div>
                   </td>
                   <td>
                         <?php echo $this->Form->control('date_of_sampling', array(
@@ -370,7 +370,7 @@ $class1 = INPUT_FIELD_CLASSES;
                           'class'=>$class1,
                           'placeholder'=>$placeholder
                         )); ?>
-                        <span id="error_date_of_sampling" class="error invalid-feedback"></span>
+                        <div class="error-message" id="error-date_of_sampling"></div>
                   </td>
                   <td>
                         <?php echo $this->Form->control('date_of_packing', array(
@@ -381,7 +381,7 @@ $class1 = INPUT_FIELD_CLASSES;
                           'class'=>$class1,
                           'placeholder'=>$placeholder
                         )); ?>
-                        <span id="error_date_of_packing" class="error invalid-feedback"></span>
+                        <div class="error-message" id="error-date_of_packing"></div>
                   </td>
                   <td>
                        <?php
@@ -393,7 +393,7 @@ $class1 = INPUT_FIELD_CLASSES;
                           'label'=>false,
                           'class'=>'form-control wd120'
                         )); ?>
-                        <span id="error_grade" class="error invalid-feedback"></span>
+                        <div class="error-message" id="error-grade"></div>
                   </td>
                   <td>
                       <?php echo $this->Form->control('pack_size', array(
@@ -404,10 +404,10 @@ $class1 = INPUT_FIELD_CLASSES;
                         'class'=>$class1,
                         'placeholder'=>'Enter Pack Size'
                       )); ?>
-                      <span id="error_pack_size" class="error invalid-feedback"></span>
+                      <div class="error-message" id="error-ta-packet_size-"></div>
                   </td>
                   <td>
-                      <?php echo $this->Form->control('pack_unit', array(
+                      <?php echo $this->Form->control('packet_size_unit', array(
                         'type'=>'select',
                         'escape'=>false,
                         'empty'=>'Select Unit',
@@ -415,7 +415,7 @@ $class1 = INPUT_FIELD_CLASSES;
                         'label'=>false,
                         'class'=>$class1,
                       )); ?>
-                      <span id="error_pack_size" class="error invalid-feedback"></span>
+                      <div class="error-message" id="error-packet_size_unit-"></div>
                   </td>
                   <td>
                       <?php echo $this->Form->control('total_no_packages', array(
@@ -426,7 +426,7 @@ $class1 = INPUT_FIELD_CLASSES;
                         'class'=>'total_no_packages form-control input-field wd120',
                         'placeholder'=>'Enter Total No. of packages'
                       )); ?>
-                      <span id="error_total_no_packages" class="error invalid-feedback"></span>
+                      <div class="error-message" id="error-ta-no_of_packets-"></div>
                   </td>
                   <td>
                       <?php echo $this->Form->control('total_qty_graded_quintal', array(
@@ -438,7 +438,7 @@ $class1 = INPUT_FIELD_CLASSES;
                         // 'readonly'=>'readonly',
                         'placeholder'=>'0.00'
                       )); ?>
-                      <span id="error_total_qty_graded_quintal" class="error invalid-feedback"></span>
+                     <div class="error-message" id="error-total_qty_graded_quintal"></div>
                   </td>
                   <td>
                         <?php echo $this->Form->control('estimated_value', array(
@@ -449,51 +449,53 @@ $class1 = INPUT_FIELD_CLASSES;
                           'class'=>$class1,
                           'placeholder'=>'0.00'
                         )); ?>
-                      <span id="error_estimated_value" class="error invalid-feedback"></span>
+                        <div class="error-message" id="error-estimated_value"></div>
                   </td>
                   <td>
-                      <?php echo $this->Form->control('from_input', array(
+                      <?php echo $this->Form->control('agmark_replica_from', array(
                           'type'=>'text',
                           'escape'=>false,
-                          'id'=>'from_input',
+                          'id'=>'agmark_replica_from',
                           'label'=>false,
                           'placeholder'=>'',
                           'class'=>$class1,
                         )); ?>
+                        <div class="error-message" id="error-estimated_value"></div>
                   </td>
                   <td>
-                      <?php echo $this->Form->control('to_input', array(
+                      <?php echo $this->Form->control('agmark_replica_to', array(
                           'type'=>'text',
                           'escape'=>false,
-                          'id'=>'to_input',
+                          'id'=>'agmark_replica_to',
                           'placeholder'=>'',
                           'label'=>false,
                           'class'=>$class1,
                         )); ?>
+                        <div class="error-message" id="error-agmark_replica_to"></div>
                   </td>
                   <td>
-                      <?php echo $this->Form->control('total_input', array(
+                      <?php echo $this->Form->control('agmark_replica_total', array(
                           'type'=>'text',
                           'escape'=>false,
-                          'id'=>'total_input',
+                          'id'=>'agmark_replica_total',
                           'label'=>false,
                           // 'readonly'=>'readonly',
-                          'placeholder'=>'0.00',
+                          // 'placeholder'=>'0.00',
                           'class'=>$class1,
                         )); ?>
+                        <div class="error-message" id="error-agmark_replica_total"></div>
                   </td>
                   <td>
                       <?php echo $this->Form->control('replica_charges', array(
                           'type'=>'text',
                           'escape'=>false,
-                          'id'=>'ta-total_label_charges-',
+                          'id'=>'replica_charges',
                           'label'=>false,
                           'class'=>$class1,
                           // 'readonly'=>'readonly',
                           'placeholder'=>'0.00'
                         )); ?>
-                       
-                      <span id="error_replica_charges" class="error invalid-feedback"></span>
+                      <div class="error-message" id="error-replica_charges"></div>
                   </td>
                   <td>
                      <?php echo $this->Form->control('laboratory_name', array(
@@ -505,18 +507,18 @@ $class1 = INPUT_FIELD_CLASSES;
                           'label'=>false,
                           'class'=>$class1,
                         )); ?>
-                      <span id="error_laboratory_name" class="error invalid-feedback"></span>
+                      <div class="error-message" id="error-laboratory_name"></div>
                   </td>
                   <td>
                       <?php echo $this->Form->control('report_no', array(
                         'type'=>'text',
                         'escape'=>false,
-                        'id'=>'to_b',
+                        'id'=>'report_no',
                         'label'=>false,
                         'class'=>$class1,
                         'placeholder'=>'Enter Report No.'
                       )); ?>
-                      <span id="error_report_no" class="error invalid-feedback"></span>
+                      <div class="error-message" id="error-report_no"></div>
                   </td>
                   <td>
                       <?php echo $this->Form->control('report_date', array(
@@ -527,7 +529,7 @@ $class1 = INPUT_FIELD_CLASSES;
                           'class'=>$class1,
                           'placeholder'=>$placeholder
                         )); ?>
-                      <span id="error_report_date" class="error invalid-feedback"></span>
+                       <div class="error-message" id="error-report_date"></div>
                   </td>
                   <td>
                       <?php echo $this->Form->control('remarks', array(
@@ -538,16 +540,15 @@ $class1 = INPUT_FIELD_CLASSES;
                         'class'=>$class1,
                         'placeholder'=>'Enter Remarks'
                       )); ?>
-                      <span id="error_remarks" class="error invalid-feedback"></span>
+                      <div class="error-message" id="error-remarks"></div>
                   </td>
                       <td>
                         <div class="form-buttons">
-                          <a href="#" id="add_replica_details" class='table_record_add_btn btn btn-info btn-sm'>
+                          <a href="#" id="add_bgr_details" class='table_record_add_btn btn btn-info btn-sm'>
                           <i class="fa fa-plus"></i> Add</a>
                         </div>
                       </td>
                     </tr>
-                 
                   </div>
             <?php } ?>
           </div>
@@ -555,5 +556,5 @@ $class1 = INPUT_FIELD_CLASSES;
       </div>
     </div>
   </div>
-        
+<input type="hidden" id="custemer_id" value='<?php echo $_SESSION['packer_id']; ?>'>
 <!-- end table -->
