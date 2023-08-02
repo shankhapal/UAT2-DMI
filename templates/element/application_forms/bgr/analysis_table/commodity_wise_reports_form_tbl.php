@@ -31,7 +31,7 @@ $class1 = INPUT_FIELD_CLASSES;
 <div class="row">
   <div class="col-md-12 ">
     <div class="table-format">
-       <table id="table_1" class="table table-bordered table-striped table-responsive">
+       <table id="live_data" class="table table-bordered table-striped table-responsive">
          <caption></caption>
               <tr>
                   <th
@@ -145,8 +145,12 @@ $class1 = INPUT_FIELD_CLASSES;
                 <th class="tablehead wdth" scope="col"></th>
               </tr>
 
+              <!-- to display record -->
+              <tr id="data_row"></tr>
+
           <div id="statement_each_row">
             <?php
+             
               $i=1;$section_form_details[1] = [];
               foreach ($section_form_details[1] as $each_statement) { ?>
                 <tr>
@@ -340,7 +344,7 @@ $class1 = INPUT_FIELD_CLASSES;
                       <td></td>
                       <td >
                       <?php
-                        echo $this->Form->control('commodity', array(
+                        echo $this->Form->control('ta-commodity-', array(
                           'type'=>'select',
                           'empty'=>'Select Commodity',
                           'id'=>'ta-commodity-',
@@ -348,7 +352,7 @@ $class1 = INPUT_FIELD_CLASSES;
                           'label'=>false,
                           'class'=>'form-control wd120 commodity'
                         )); ?>
-                        <div class="error-message" id="error-commodity"></div>
+                        <div class="error-message" id="error-ta-commodity-"></div>
                   </td>
                   <td>
                         <?php echo $this->Form->control('lot_no_tf_no_m_no', array(
@@ -396,7 +400,7 @@ $class1 = INPUT_FIELD_CLASSES;
                         <div class="error-message" id="error-grade"></div>
                   </td>
                   <td>
-                      <?php echo $this->Form->control('pack_size', array(
+                      <?php echo $this->Form->control('ta-packet_size-', array(
                         'type'=>'text',
                         'escape'=>false,
                         'id'=>'ta-packet_size-',
@@ -407,7 +411,7 @@ $class1 = INPUT_FIELD_CLASSES;
                       <div class="error-message" id="error-ta-packet_size-"></div>
                   </td>
                   <td>
-                      <?php echo $this->Form->control('packet_size_unit', array(
+                      <?php echo $this->Form->control('ta-packet_size_unit-', array(
                         'type'=>'select',
                         'escape'=>false,
                         'empty'=>'Select Unit',
@@ -415,10 +419,10 @@ $class1 = INPUT_FIELD_CLASSES;
                         'label'=>false,
                         'class'=>$class1,
                       )); ?>
-                      <div class="error-message" id="error-packet_size_unit-"></div>
+                      <div class="error-message" id="error-ta-packet_size_unit-"></div>
                   </td>
                   <td>
-                      <?php echo $this->Form->control('total_no_packages', array(
+                      <?php echo $this->Form->control('ta-no_of_packets-', array(
                         'type'=>'text',
                         'escape'=>false,
                         'id'=>'ta-no_of_packets-',
@@ -460,7 +464,7 @@ $class1 = INPUT_FIELD_CLASSES;
                           'placeholder'=>'',
                           'class'=>$class1,
                         )); ?>
-                        <div class="error-message" id="error-estimated_value"></div>
+                        <div class="error-message" id="error-agmark_replica_from"></div>
                   </td>
                   <td>
                       <?php echo $this->Form->control('agmark_replica_to', array(

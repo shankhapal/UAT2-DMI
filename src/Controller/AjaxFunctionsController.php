@@ -2706,26 +2706,65 @@ class AjaxFunctionsController extends AppController{
 		exit;
 	}
 
-	// public function getReplicaAllotmentDetails(){
+	 // This method will handle the request to add BGR details
+	 // added by shankhpal shende on 02/08/2023
+	function addBgrDetails() {
 
-	// 		// pr($_POST);die;
-	// 		$this->loadModel('DmiReplicaAllotmentDetails');
-	// 		$this->autoRender = false;
-	// 		$custemer_id = $_POST['custemer_id'];
-	// 		$to_input = $_POST['to_input'];
-	// 		$from_input = $_POST['from_input'];
+		$this->autoRender = false;
+		$this->loadModel('DmiBgrCommodityReportsAddmore');
+		 // Validate the required fields, you can add additional validation as per your requirements
+    $requiredFields = ['ta-commodity-', 'lot_no_tf_no_m_no', 'date_of_sampling', 'date_of_packing', 'grade', 'ta-packet_size-', 'ta-packet_size_unit-', 'ta-no_of_packets-', 'total_qty_graded_quintal', 'estimated_value', 'agmark_replica_from', 'agmark_replica_to', 'agmark_replica_total', 'replica_charges', 'laboratory_name', 'report_no', 'report_date', 'remarks'];
+    
+    foreach ($requiredFields as $field) {
+        if (!isset($_POST[$field]) || empty($_POST[$field])) {
+            // Handle missing required field error
+            die('Error: Missing required field ' . $field);
+        }
+    }
+		
+		$data = array(
+			'commodity' => $_POST['ta-commodity-'],
+			'lot_no_tf_no_m_no' => $_POST['lot_no_tf_no_m_no'],
+			'date_of_sampling' => $_POST['date_of_sampling'],
+			'date_of_packing' => $_POST['date_of_packing'],
+			'grade' => $_POST['grade'],
+			'packet_size' => $_POST['ta-packet_size-'],
+			'packet_size_unit' => $_POST['ta-packet_size_unit-'],
+			'total_no_of_packets' => $_POST['ta-no_of_packets-'],
+			'total_qty_graded_quintal' => $_POST['total_qty_graded_quintal'],
+			'estimated_value' => $_POST['estimated_value'],
+			'agmark_replica_from' => $_POST['agmark_replica_from'],
+			'agmark_replica_to' => $_POST['agmark_replica_to'],
+			'agmark_replica_total' => $_POST['agmark_replica_total'],
+			'replica_charges' => $_POST['replica_charges'],
+			'laboratory_name' => $_POST['laboratory_name'],
+			'report_no' => $_POST['report_no'],
+			'report_date' => $_POST['report_date'],
+			'remarks' => $_POST['remarks'],
+		);
 
-	// 		//$get_factor = $this->DmiReplicaUnitDetails->find('all',array('fields'=>'conversion_factor', 'conditions'=>array('id IS'=>$sub_unit_id)))->first();
+		$save_bgr_details = $this->DmiBgrCommodityReportsAddmore->saveCommodityWiseReport($data);// call custome method from model
+	}
 
-	// 		$replica_appl_list = $this->DmiReplicaAllotmentDetails->find('all', array(
-	// 				'fields' => array('customer_id', 'alloted_rep_from', 'alloted_rep_to', 'created'),
-	// 				'conditions' => array(
-	// 					'customer_id IN'=>$custemer_id,
-	// 					'alloted_rep_from'=>$from_input,
-	// 					'alloted_rep_to'=>$to_input,
-	// 					'delete_status IS NULL')))->toList();
-			
-	// }
+
+	public function addedBgrDetails()
+	{
+		$this->autoRender = false;
+		$this->loadModel('DmiBgrCommodityReportsAddmore');
+
+		$customer_id = $_SESSION['packer_id'];
+
+		$query = $this->DmiBgrCommodityReportsAddmore->find()
+    ->where(['customer_id' => $customer_id])
+    ->order(['id' => 'desc']);
+
+		$bgrReportData = $query->toArray();
+
+		 // Convert the data to JSON format and echo it to return the response
+    echo json_encode($bgrReportData);
+		
+	}
+
 
 }
 ?>

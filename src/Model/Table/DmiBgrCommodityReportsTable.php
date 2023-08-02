@@ -16,7 +16,13 @@
 		$latest_id = $this->find('list', array(
 			'valueField'=>'id',
 			'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
-			
+
+		$DmiBgrCommodityReportsAddmore = TableRegistry::getTableLocator()->get('DmiBgrCommodityReportsAddmore');
+
+		$bgraAddedRecord = $DmiBgrCommodityReportsAddmore->find('all',array(
+			'conditions'=>array(
+			'customer_id IS'=>$customer_id)))->toArray();
+		
 		if($latest_id != null){
 			$form_fields = $this->find('all', array(
 				'conditions'=>array('id'=>MAX($latest_id))))->first();
@@ -156,10 +162,20 @@
 			$to_date,
 			$sub_commodity_value,
 			$grade_list,
-			$laboratory_name
+			$laboratory_name,
+			$bgraAddedRecord
 		);
 
 	}
 	
+	public function saveCommodityWiseReport($forms_data){
+
+	}
+	public function saveFormDetails($forms_data){
+
+		
+		
+
+	}
 		
 }
