@@ -382,15 +382,17 @@ $(function(){
    // added below  function by laxmi to view profile and sign after upload without save on [06-07-2023]
     $('.file_profile').change(function(){
      var upload_view_src = $('.chemist_doc').attr('src');
+     $('.uploadpreview').remove();
     //  if(upload_view_src == '' || upload_view_src == undefined){
     //        $('.chemist_doc').hide();
     //  }
       var path = URL.createObjectURL(event.target.files[0]);
-      $("<img src width=auto height=80px >").insertAfter( $("#profile_img") ).fadeIn("fast").attr('src',path);
+      $("<img src width=auto height=80px class= uploadpreview>").insertAfter( $("#profile_img") ).fadeIn("fast").attr('src',path);
     });
     $('.file_sign').change(function(){
+      $('.signpreview').remove();
       var path = URL.createObjectURL(event.target.files[0]);
-      $("<img src width=auto height=80px >").insertAfter( $("#sign_img") ).fadeIn("fast").attr('src',path);
+      $("<img src width=auto height=80px class=signpreview>").insertAfter( $("#sign_img") ).fadeIn("fast").attr('src',path);
     });
 
     //End by Laxmi
