@@ -66,7 +66,7 @@
     <table  width="100%">
         <tr>
             <td> <?php echo $customer_firm_data['firm_name']; ?>,<br>
-                <?php echo $customer_firm_data['street_address']; ?>,<br>
+                <?php echo htmlspecialchars_decode($customer_firm_data['street_address']); ?>,<br>
                  <?php echo $firm_district_name;?>,
                   <?php echo $firm_state_name; ?> – <?php echo $customer_firm_data['postal_code']; ?>
 
@@ -114,8 +114,8 @@
 			<td>Your’s faithfully<br> 
 				<?php echo $ro_fname;?>  <?php echo $ro_lname;?>,
                 <br>Incharge,  DMI, RO/SO<br> 
-                <?php echo str_replace(",","<br>",$ro_address); ?><br>
-				<?php echo $ro_office; ?>.<br>
+                <?php echo htmlspecialchars_decode(str_replace(",","<br>",$ro_address)); ?>,<br>
+				<?php echo $ro_office; ?><br>
 			</td>
 		</tr>
 	</table>
@@ -124,7 +124,7 @@
   	<td>
   		Copy to:<br>
   		1.The Agricultural Marketing Adviser to the Govt. of India, DMI, Head Office, Faridabad for favour of information.<br>
-  		2.<?php echo $chemist_fname;?> <?php echo $chemist_lname;?>, <?php echo $chemist_address;?>, for necessary action.<br>
+  		2.<?php echo $chemist_fname;?> <?php echo $chemist_lname;?>, <?php echo htmlspecialchars_decode($chemist_address);?>, for necessary action.<br>
         <br>  <img width="100" height="100" src="<?php echo $result_for_qr['qr_code_path']; ?>">
   	</td>
       
