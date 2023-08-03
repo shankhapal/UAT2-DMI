@@ -64,5 +64,44 @@
 			}
 	}
 	
+
+	public function getBgrData($id){
+		
+		$query = $this->find()
+		->where(['id'=>$id,'delete_status IS NULL']);
+		return $editData = $query->first();
+
+		// $newEntity = $this->newEntity(array(
+						
+		// 		'id'=> $editData['id'],
+		// 		'customer_id'=>$editData['customer_id'],
+		// 		'commodity' =>$editData['commodity'],
+		// 		'lotno' => $editData['lotno'],
+		// 		'datesampling' => $editData['datesampling'],
+		// 		'dateofpacking' => $editData['dateofpacking'],
+		// 		'gradeasign' => $editData['gradeasign'],
+		// 		'packetsize' => $editData['packetsize'],
+		// 		'packetsizeunit' => $editData['packetsizeunit'],
+		// 		'totalnoofpackets' => $editData['totalnoofpackets'],
+		// 		'totalqtyquintal' => $editData['totalqtyquintal'],
+		// 		'estimatedvalue' => $editData['estimatedvalue'],
+		// 		'agmarkreplicafrom' => $editData['agmarkreplicafrom'],
+		// 		'agmarkreplicato' => $editData['agmarkreplicato'],
+		// 		'agmarkreplicatotal' => $editData['agmarkreplicatotal'],
+		// 		'replicacharges' => $editData['replicacharges'],
+		// 		'laboratoryname' => $editData['laboratoryname'],
+		// 		'reportno' => $editData['reportno'],
+		// 		'reportdate' => $editData['reportdate'],
+		// 		'remarks' => $editData['remarks'],
+		// 		'created'=>date('Y-m-d H:i:s'),
+		// 		'modified'=>date('Y-m-d H:i:s')
+		// 	));
+								
+			// if($this->save($newEntity)){
+			// 	return true;
+			// }
+
+
+	}
 		
 }

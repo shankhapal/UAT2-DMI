@@ -13,7 +13,7 @@ $(document).ready(function () {
     autoclose: true,
   });
 
-  $("#table_1").on("change", ".commodity", function () {
+  $("#dataTable").on("change", ".commodity", function () {
     let id_No = this.id.split("-"); // Corrected method name from splite() to split()
 
     id_No = id_No[2];
@@ -55,7 +55,7 @@ $(document).ready(function () {
   });
 
   //to get gross quantity and total charges
-  $("#table_1").on("focusout", ".total_no_packages", function () {
+  $("#dataTable").on("focusout", ".total_no_packages", function () {
     var id_No = this.id.split("-"); //to get dynamic id of element for each row, and split to get no.
     id_No = id_No[2];
 

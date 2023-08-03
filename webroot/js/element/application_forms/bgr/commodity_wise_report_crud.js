@@ -5,29 +5,141 @@ $(document).ready(function () {
       method: "POST",
       dataType: "json",
       success: function (data) {
-        var tableBody = $("#data_row");
-        tableBody.empty(); // Clear the existing table rows
+        const tableBody = document.querySelector("#dataTable tbody");
 
-        var rowHtml = ""; // Initialize an empty string to hold the HTML for all rows
+        function createCell(content) {
+          const cell = document.createElement("td");
+          cell.textContent = content;
+          return cell;
+        }
 
-        data.map((rowData) => {
-          rowHtml = `
-       
-            <td>${rowData.id}</td>
-            <td>${rowData.customer_id}</td>
-            <td>${rowData.commodity}</td>
-            <td>${rowData.totalrevenue}</td>
-            <td>${rowData.progressiverevenue}</td>
-            <!-- Add more table cells for other columns in your data -->
-            <td>
-              <a href="#" class="edit_bgr_id glyphicon glyphicon-edit machine_edit" id="${rowData.id}"></a> |
-              <a href="#" class="delete_bgr_id glyphicon glyphicon-remove-sign machine_delete" id="${rowData.id}"></a>
-            </td>
-      
-        `;
+        function createButtonCell(text, onClick, classes) {
+          const button = document.createElement("button");
+          button.textContent = text;
+
+          // Add Bootstrap classes to the button
+          if (classes && classes.length > 0) {
+            button.classList.add(...classes.split(" "));
+          }
+
+          button.addEventListener("click", function (event) {
+            event.preventDefault(); // Stop the default button behavior
+            onClick();
+          });
+          return button;
+        }
+
+        function handleEditClick(id) {
+          $.ajax({
+            url: "../AjaxFunctions/edit_bgr_details",
+            method: "POST",
+            dataType: "json",
+            data: { id: id }, // send ID in the request data
+            success: function (response) {
+              console.log(response);
+
+              // Define an array of input field details
+              const inputFields = [
+                {
+                  label: "Commodity",
+                  id: "editCommodityInput",
+                  value: response.commodity,
+                },
+                {
+                  label: "Lot Number",
+                  id: "editLotnoInput",
+                  value: response.lotno,
+                },
+                // Add other input fields for other properties as needed
+              ];
+
+              // Generate the modal body content dynamically
+              let modalBodyContent = "";
+              inputFields.forEach((field) => {
+                modalBodyContent += `
+                    <div class="form-row">
+                      <div class="form-group ml-4">
+                        <label for="${field.id}">${field.label}:</label>
+                        <input type="text" id="${field.id}" class="form-control ml-2" value="${field.value}">
+                      </div>
+                    </div>
+                  `;
+              });
+
+              // Get the modal body element and set the content
+              const modalBody = $("#editModal").find(".modal-body");
+              modalBody.html(modalBodyContent);
+
+              // Add other input fields for other properties as needed
+
+              // Show the modal
+              $("#editModal").modal("show");
+            },
+            error: function (error) {
+              // Handle any errors that occur during the AJAX request
+              console.error("Error:", error);
+            },
+          });
+        }
+
+        function handleDeleteClick(id) {
+          // Handle the delete action for the row with the given ID
+          console.log(`Delete button clicked for ID: ${id}`);
+        }
+
+        data.forEach((datas, counter) => {
+          const row = document.createElement("tr");
+          const properties = [
+            "commodity",
+            "lotno",
+            "datesampling",
+            "dateofpacking",
+            "gradeasign",
+            "packetsize",
+            "packetsizeunit",
+            "totalnoofpackets",
+            "totalqtyquintal",
+            "estimatedvalue",
+            "agmarkreplicafrom",
+            "agmarkreplicato",
+            "agmarkreplicatotal",
+            "replicacharges",
+            "laboratoryname",
+            "reportno",
+            "reportdate",
+            "remarks",
+          ];
+          row.appendChild(createCell(counter + 1)); // Add counter value
+          properties.forEach((property) => {
+            row.appendChild(createCell(datas[property]));
+          });
+
+          // Create a single cell to contain both the edit and delete buttons
+          const actionsCell = document.createElement("td");
+
+          actionsCell.appendChild(
+            createButtonCell(
+              "Edit",
+              function () {
+                handleEditClick(datas.id);
+              },
+              "btn btn-primary"
+            )
+          );
+          actionsCell.appendChild(
+            createButtonCell(
+              "Delete",
+              function () {
+                handleDeleteClick(datas.id);
+              },
+              "btn btn-danger"
+            )
+          );
+
+          row.appendChild(actionsCell);
+
+          tableBody.appendChild(row);
         });
-
-        tableBody.html(rowHtml); // Append all rows to the table body
       },
     });
   }

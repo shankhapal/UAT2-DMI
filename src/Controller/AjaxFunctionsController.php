@@ -4,10 +4,12 @@
 namespace App\Controller;
 use Cake\Network\Session\DatabaseSession;
 use App\Network\Request\Request;
-use App\Network\Response\Response;
+// use App\Network\Response\Response;
 use Cake\ORM\TableRegistry;
 use Controller\Dashboard;
 use Cake\Chronos\Chronos;  // Chronos library is use for DateTime by shankhpal on 08/06/2023 
+use Cake\Http\Response; //added by shankhpal on 04/07/2023
+
 
 class AjaxFunctionsController extends AppController{
 	
@@ -21,7 +23,7 @@ class AjaxFunctionsController extends AppController{
 		$this->loadComponent('Communication');
 	}
 
-
+	
 
 	// SHOW COMMODITY DROPDOWN
 	// DESCRIPTION : --
@@ -2751,6 +2753,7 @@ class AjaxFunctionsController extends AppController{
 	{
 		$this->autoRender = false;
 		$this->loadModel('DmiBgrCommodityReportsAddmore');
+		$this->loadModel('MCommodity');
 
 		$customer_id = $_SESSION['packer_id'];
 
@@ -2760,9 +2763,40 @@ class AjaxFunctionsController extends AppController{
 
 		$bgrReportData = $query->toArray();
 
-		 // Convert the data to JSON format and echo it to return the response
-    echo json_encode($bgrReportData);
+		foreach ($bgrReportData as $eachvalue) {
+			
+			$commodity_code = $eachvalue['commodity'];
+
+			$result = $this->MCommodity->find()
+			->select('commodity_name')
+			->where(['commodity_code' => $commodity_code]);
+
+			$commodityArray = $result->first();
+			$eachvalue['commodity'] = $commodityArray ? $commodityArray->commodity_name : '';
+
+		}
 		
+		 // Convert the data to JSON format and echo it to return the response
+		 return $this->response->withType('application/json')->withStringBody(json_encode($bgrReportData));
+  	// return json_encode($bgrReportData);
+		
+	}
+
+	public function editBgrDetails(){
+		$this->autoRender = false;
+		$this->loadModel('DmiBgrCommodityReportsAddmore');
+
+		$updatedData = $this->request->getData();
+		// Assuming the primary key field is 'id'
+    $id = $updatedData['id'];
+
+		$bgrReportData = $this->DmiBgrCommodityReportsAddmore->getBgrData($id);
+ 		
+		echo json_encode($bgrReportData);
+		
+
+    
+		 
 	}
 
 

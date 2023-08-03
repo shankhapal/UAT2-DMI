@@ -31,7 +31,8 @@ $class1 = INPUT_FIELD_CLASSES;
 <div class="row">
   <div class="col-md-12 ">
     <div class="table-format">
-       <table id="live_data" class="table table-bordered table-striped table-responsive">
+       <table id="dataTable" class="table table-bordered table-striped table-responsive">
+          <thead>
          <caption></caption>
               <tr>
                   <th
@@ -144,201 +145,10 @@ $class1 = INPUT_FIELD_CLASSES;
                 <th class="tablehead wdth" scope="col"></th>
                 <th class="tablehead wdth" scope="col"></th>
               </tr>
-
-              <!-- to display record -->
-              <tr id="data_row"></tr>
-
-          <div id="statement_each_row">
-            <?php
-             
-              $i=1;$section_form_details[1] = [];
-              foreach ($section_form_details[1] as $each_statement) { ?>
-                <tr>
-                  <td><?php //echo $i; ?></td>
-                  <td><?php //echo $each_statement['date']; ?></td>
-                  <td><?php //echo isset($section_form_details[2][$each_statement['commodity']])?$section_form_details[2][$each_statement['commodity']]:"-"; ?></td>
-                  <td><?php //echo $each_statement['approved_tbl_brand']; ?></td>
-                  <td><?php //echo $each_statement['agmark_grade']; ?></td>
-                  <td><?php //echo $each_statement['pack_size']; ?></td>
-                  <td><?php //echo $each_statement['from_a']; ?></td>
-                  <td><?php //echo $each_statement['to_a']; ?></td>
-                  <td><?php //echo $each_statement['total_a']; ?></td>
-                  <td><?php //echo $each_statement['from_b']; ?></td>
-                  <td><?php //echo $each_statement['to_b']; ?></td>
-                  <td><?php //echo $each_statement['to_b']; ?></td>
-                  <td><?php //echo $each_statement['to_b']; ?></td>
-                  <td><?php //echo $each_statement['to_b']; ?></td>
-                  <td><?php //echo $each_statement['to_b']; ?></td>
-                  <td>
-                    <a href="#" class="edit_bgr_id glyphicon glyphicon-edit machine_edit" id="<?php //echo $each_statement['id']; ?>" ></a> |
-                    <a href="#" class="delete_bgr_id glyphicon glyphicon-remove-sign machine_delete" id="<?php //echo $each_statement['id']; ?>" ></a>
-                  </td>
-                </tr>
-              <?php $i=$i+1; } ?>
-            
-              <div id="error_replica" class="text-red float-right text-sm"></div>
-
-              <!-- for edit bgr details -->
-              <?php if ($this->request->getSession()->read('edit_bgr_id') != null) { ?>
-                <tr>
-                  <td></td>
-                  <td>
-                    <?php echo $this->Form->control('date', array(
-                      'type'=>'text',
-                      'id'=>'date',
-                      'value'=>'',
-                      'escape'=>false,
-                      'class'=>$class1,
-                      'label'=>false
-                    )); ?>
-                  </td>
-
-                  <td>
-                    <?php echo $this->Form->control('date', array(
-                      'type'=>'text',
-                      'id'=>'date',
-                      'value'=>'',
-                      'escape'=>false,
-                      'class'=>$class1,
-                      'label'=>false
-                    )); ?>
-                  </td>
-
-                  <td>
-                    <?php echo $this->Form->control('date', array(
-                      'type'=>'text',
-                      'id'=>'date',
-                      'value'=>'',
-                      'escape'=>false,
-                      'class'=>$class1,
-                      'label'=>false
-                    )); ?>
-                  </td>
-
-                  <td>
-                    <?php echo $this->Form->control('date', array(
-                      'type'=>'text',
-                      'id'=>'date',
-                      'value'=>'',
-                      'escape'=>false,
-                      'class'=>$class1,
-                      'label'=>false
-                    )); ?>
-                  </td>
-
-                  <td>
-                    <?php echo $this->Form->control('date', array(
-                      'type'=>'text',
-                      'id'=>'date',
-                      'value'=>'',
-                      'escape'=>false,
-                      'class'=>$class1,
-                      'label'=>false
-                    )); ?>
-                  </td>
-
-                  <td>
-                    <?php echo $this->Form->control('date', array(
-                      'type'=>'text',
-                      'id'=>'date',
-                      'value'=>'',
-                      'escape'=>false,
-                      'class'=>$class1,
-                      'label'=>false
-                    )); ?>
-                  </td>
-
-                  <td>
-                    <?php echo $this->Form->control('date', array(
-                      'type'=>'text',
-                      'id'=>'date',
-                      'value'=>'',
-                      'escape'=>false,
-                      'class'=>$class1,
-                      'label'=>false
-                    )); ?>
-                  </td>
-
-                  <td>
-                    <?php echo $this->Form->control('date', array(
-                      'type'=>'text',
-                      'id'=>'date',
-                      'value'=>'',
-                      'escape'=>false,
-                      'class'=>$class1,
-                      'label'=>false
-                    )); ?>
-                  </td>
-
-                  <td>
-                    <?php echo $this->Form->control('date', array(
-                      'type'=>'text',
-                      'id'=>'date',
-                      'value'=>'',
-                      'escape'=>false,
-                      'class'=>$class1,
-                      'label'=>false
-                    )); ?>
-                  </td>
-
-                  <td>
-                    <?php echo $this->Form->control('date', array(
-                      'type'=>'text',
-                      'id'=>'date',
-                      'value'=>'',
-                      'escape'=>false,
-                      'class'=>$class1,
-                      'label'=>false
-                    )); ?>
-                  </td>
-
-                  <td>
-                    <?php echo $this->Form->control('date', array(
-                      'type'=>'text',
-                      'id'=>'date',
-                      'value'=>'',
-                      'escape'=>false,
-                      'class'=>$class1,
-                      'label'=>false
-                    )); ?>
-                  </td>
-
-                  <td>
-                    <?php echo $this->Form->control('date', array(
-                      'type'=>'text',
-                      'id'=>'date',
-                      'value'=>'',
-                      'escape'=>false,
-                      'class'=>$class1,
-                      'label'=>false
-                    )); ?>
-                  </td>
-
-                  <td>
-                    <?php echo $this->Form->control('date', array(
-                      'type'=>'text',
-                      'id'=>'date',
-                      'value'=>'',
-                      'escape'=>false,
-                      'class'=>$class1,
-                      'label'=>false
-                    )); ?>
-                  </td>
-
-                  <td>
-                    <div class="form-buttons">
-                      <a href="#" id="save_statement_details" class="btn btn-info btn-sm">Save</a>
-                    </div>
-                    <?php echo $this->form->submit('save', array(
-                      'name'=>'edit_machine_details',
-                      'id'=>'edit_machine_details',
-                      'label'=>false));
-                    ?>
-                  </td>
-                </tr>
-
-              <!-- To show added and save new bgr details -->
-              <?php } else { ?>
+             </thead>
+              <tbody>
+            <!-- Data rows will be inserted here -->
+            </tbody>
                   <div id="add_new_row">
                     <tr>
                       <td></td>
@@ -554,11 +364,32 @@ $class1 = INPUT_FIELD_CLASSES;
                       </td>
                     </tr>
                   </div>
-            <?php } ?>
+           
           </div>
         </table>
       </div>
     </div>
   </div>
+  
+ <div id="editModal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit BGR Details</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- The modal body content will be added dynamically here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="saveEditedData()">Save</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <input type="hidden" id="custemer_id" value='<?php echo $_SESSION['packer_id']; ?>'>
 <!-- end table -->
