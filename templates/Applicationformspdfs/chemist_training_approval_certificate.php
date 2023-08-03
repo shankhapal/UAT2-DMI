@@ -92,7 +92,7 @@
                for the period from <b><?php echo $schedule_from;?></b> to <b> <?php echo $shedule_to;?></b>  and procedural training for sampling, grading, packing and maintainance of records at the <?php echo $office_type; ?>, DMI, <b><?php echo $ro_office;?> </b>for the period from <b><?php echo $ro_schedule_from;?></b>  to <b><?php echo $ro_shedule_to;?></b> 
                is hereby approved as chemist and permitted to take up the work relating to the analysis, grading and marking of <b> <?php echo $commodities_cate_list;?> (<?php echo $sub_commodities_list;?>) </b> under Agmark in accordance with the provisions of General Grading and Marking Rules, 1988 (as amended 2008), under Agriculture Produce (Grading & Marking) Act, 1973,
 
-               <b><?php echo $commodities_cate_list;?> (<?php echo $sub_commodities_list;?>)</b> Grading & Marking (Amendment) Rules, [year] and the instructions issued in this connection from time to time by Agriculture Marketing Adviser to the Govt. of India.<br>
+               and the instructions issued in this connection from time to time by Agriculture Marketing Adviser to the Govt. of India.<br>
 
                <b><?php echo $chemist_fname;?> <?php echo $chemist_lname;?></b> chemist shall be responsible for safe custody of labels, replica bearing containers, maintenance of label account and label charges accounts, submission of regular biannual returns etc in the absence of chemist In-charge.<br>
 
