@@ -2712,45 +2712,102 @@ class AjaxFunctionsController extends AppController{
 	 // added by shankhpal shende on 02/08/2023
 	function addBgrDetails() {
 
-		$this->autoRender = false;
-		$this->loadModel('DmiBgrCommodityReportsAddmore');
-		 // Validate the required fields, you can add additional validation as per your requirements
-    $requiredFields = ['ta-commodity-', 'lot_no_tf_no_m_no', 'date_of_sampling', 'date_of_packing', 'grade', 'ta-packet_size-', 'ta-packet_size_unit-', 'ta-no_of_packets-', 'total_qty_graded_quintal', 'estimated_value', 'agmark_replica_from', 'agmark_replica_to', 'agmark_replica_total', 'replica_charges', 'laboratory_name', 'report_no', 'report_date', 'remarks'];
-    
-    foreach ($requiredFields as $field) {
-        if (!isset($_POST[$field]) || empty($_POST[$field])) {
-            // Handle missing required field error
-            die('Error: Missing required field ' . $field);
-        }
-    }
-		
-		$data = array(
-			'commodity' => $_POST['ta-commodity-'],
-			'lot_no_tf_no_m_no' => $_POST['lot_no_tf_no_m_no'],
-			'date_of_sampling' => $_POST['date_of_sampling'],
-			'date_of_packing' => $_POST['date_of_packing'],
-			'grade' => $_POST['grade'],
-			'packet_size' => $_POST['ta-packet_size-'],
-			'packet_size_unit' => $_POST['ta-packet_size_unit-'],
-			'total_no_of_packets' => $_POST['ta-no_of_packets-'],
-			'total_qty_graded_quintal' => $_POST['total_qty_graded_quintal'],
-			'estimated_value' => $_POST['estimated_value'],
-			'agmark_replica_from' => $_POST['agmark_replica_from'],
-			'agmark_replica_to' => $_POST['agmark_replica_to'],
-			'agmark_replica_total' => $_POST['agmark_replica_total'],
-			'replica_charges' => $_POST['replica_charges'],
-			'laboratory_name' => $_POST['laboratory_name'],
-			'report_no' => $_POST['report_no'],
-			'report_date' => $_POST['report_date'],
-			'remarks' => $_POST['remarks'],
-		);
+			$this->autoRender = false;
+			$this->loadModel('DmiBgrCommodityReportsAddmore');
 
-		$save_bgr_details = $this->DmiBgrCommodityReportsAddmore->saveCommodityWiseReport($data);// call custome method from model
+			// Validate the required fields, you can add additional validation as per your requirements
+			$requiredFields = ['ta-commodity-', 'lot_no_tf_no_m_no', 'date_of_sampling', 'date_of_packing', 'grade', 'ta-packet_size-', 'ta-packet_size_unit-', 'ta-no_of_packets-', 'total_qty_graded_quintal', 'estimated_value', 'agmark_replica_from', 'agmark_replica_to', 'agmark_replica_total', 'replica_charges', 'laboratory_name', 'report_no', 'report_date', 'remarks'];
+
+			// Check if record_id is empty for insert or not for update
+			if (empty($_POST['record_id'])) {
+					// Insert operation
+					// Make sure all required fields are present
+					foreach ($requiredFields as $field) {
+							if (!isset($_POST[$field]) || empty($_POST[$field])) {
+									// Handle missing required field error
+									die('Error: Missing required field ' . $field);
+							}
+					}
+
+					// Create the data array for insert
+					$data = array(
+							'commodity' => $_POST['ta-commodity-'],
+							'lotno' => $_POST['lot_no_tf_no_m_no'],
+							'datesampling' => $_POST['date_of_sampling'],
+							'dateofpacking' => $_POST['date_of_packing'],
+							'grade' => $_POST['grade'],
+							'packetsize' => $_POST['ta-packet_size-'],
+							'packetsizeunit' => $_POST['ta-packet_size_unit-'],
+							'totalnoofpackets' => $_POST['ta-no_of_packets-'],
+							'totalqtyquintal' => $_POST['total_qty_graded_quintal'],
+							'estimatedvalue' => $_POST['estimated_value'],
+							'agmarkreplicafrom' => $_POST['agmark_replica_from'],
+							'agmarkreplicato' => $_POST['agmark_replica_to'],
+							'agmarkreplicatotal' => $_POST['agmark_replica_total'],
+							'replicacharges' => $_POST['replica_charges'],
+							'laboratoryname' => $_POST['laboratory_name'],
+							'reportno' => $_POST['report_no'],
+							'reportdate' => $_POST['report_date'],
+							'remarks' => $_POST['remarks'],
+					);
+
+					// Insert the data into the database using the model
+					$save_bgr_details = $this->DmiBgrCommodityReportsAddmore->saveCommodityWiseReport($data);// call custome method from model
+
+			} else {
+				
+					// Update operation
+					// Ensure that at least one field (other than record_id) is present for update
+					$updateFields = array_diff($requiredFields, ['record_id']);
+					$atLeastOneFieldPresent = false;
+					foreach ($updateFields as $field) {
+							if (isset($_POST[$field]) && !empty($_POST[$field])) {
+									$atLeastOneFieldPresent = true;
+									break;
+							}
+					}
+
+					if (!$atLeastOneFieldPresent) {
+							die('Error: At least one field (other than record_id) must be present for update');
+					}
+					
+					 
+					// Create the data array for update
+					$data = array(
+							'record_id' => $_POST['record_id'],
+							'commodity' => $_POST['ta-commodity-'],
+							'lotno' => $_POST['lot_no_tf_no_m_no'],
+							'datesampling' => $_POST['date_of_sampling'],
+							'dateofpacking' => $_POST['date_of_packing'],
+							'grade' => $_POST['grade'],
+							'packetsize' => $_POST['ta-packet_size-'],
+							'packetsizeunit' => $_POST['ta-packet_size_unit-'],
+							'totalnoofpackets' => $_POST['ta-no_of_packets-'],
+							'totalqtyquintal' => $_POST['total_qty_graded_quintal'],
+							'estimatedvalue' => $_POST['estimated_value'],
+							'agmarkreplicafrom' => $_POST['agmark_replica_from'],
+							'agmarkreplicato' => $_POST['agmark_replica_to'],
+							'agmarkreplicatotal' => $_POST['agmark_replica_total'],
+							'replicacharges' => $_POST['replica_charges'],
+							'laboratoryname' => $_POST['laboratory_name'],
+							'reportno' => $_POST['report_no'],
+							'reportdate' => $_POST['report_date'],
+							'remarks' => $_POST['remarks'],
+					);
+
+					// Update the data in the database using the model
+					$save_bgr_details = $this->DmiBgrCommodityReportsAddmore->saveCommodityWiseReport($data);// call custome method from model
+			}
+
+		if($save_bgr_details){
+			$this->Session->delete('edit_analysis_id');
+		}
 	}
 
 
 	public function addedBgrDetails()
 	{
+		
 		$this->autoRender = false;
 		$this->loadModel('DmiBgrCommodityReportsAddmore');
 		$this->loadModel('MCommodity');
@@ -2783,16 +2840,20 @@ class AjaxFunctionsController extends AppController{
 	}
 
 	public function editBgrDetails(){
+
+
+		
 		$this->autoRender = false;
 		$this->loadModel('DmiBgrCommodityReportsAddmore');
 
 		$updatedData = $this->request->getData();
 		// Assuming the primary key field is 'id'
-    $id = $updatedData['id'];
+    $editbgrid = $updatedData['id'];
+		$this->Session->write('editbgrid',$editbgrid);
+		$bgrReportData = $this->DmiBgrCommodityReportsAddmore->getBgrData($editbgrid);
 
-		$bgrReportData = $this->DmiBgrCommodityReportsAddmore->getBgrData($id);
- 		
-		echo json_encode($bgrReportData);
+ 		return $this->response->withType('application/json')->withStringBody(json_encode($bgrReportData));
+		$this->render('/element/application_forms/bgr/analysis_table/commodity_wise_reports_form_tbl');
 		
 
     

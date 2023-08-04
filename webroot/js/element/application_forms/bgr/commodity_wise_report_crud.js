@@ -6,7 +6,7 @@ $(document).ready(function () {
       dataType: "json",
       success: function (data) {
         const tableBody = document.querySelector("#dataTable tbody");
-
+        console.log(data);
         function createCell(content) {
           const cell = document.createElement("td");
           cell.textContent = content;
@@ -35,45 +35,58 @@ $(document).ready(function () {
             method: "POST",
             dataType: "json",
             data: { id: id }, // send ID in the request data
+            beforeSend: function (xhr) {
+              // Add this line
+              xhr.setRequestHeader(
+                "X-CSRF-Token",
+                $('[name="_csrfToken"]').val()
+              );
+            },
             success: function (response) {
-              console.log(response);
+              const {
+                id,
+                commodity,
+                lotno,
+                datesampling,
+                dateofpacking,
+                gradeasign,
+                packetsize,
+                packetsizeunit,
+                totalnoofpackets,
+                totalqtyquintal,
+                estimatedvalue,
+                agmarkreplicafrom,
+                agmarkreplicato,
+                agmarkreplicatotal,
+                replicacharges,
+                laboratoryname,
+                reportno,
+                reportdate,
+                remarks,
+              } = response;
 
-              // Define an array of input field details
-              const inputFields = [
-                {
-                  label: "Commodity",
-                  id: "editCommodityInput",
-                  value: response.commodity,
-                },
-                {
-                  label: "Lot Number",
-                  id: "editLotnoInput",
-                  value: response.lotno,
-                },
-                // Add other input fields for other properties as needed
-              ];
-
-              // Generate the modal body content dynamically
-              let modalBodyContent = "";
-              inputFields.forEach((field) => {
-                modalBodyContent += `
-                    <div class="form-row">
-                      <div class="form-group ml-4">
-                        <label for="${field.id}">${field.label}:</label>
-                        <input type="text" id="${field.id}" class="form-control ml-2" value="${field.value}">
-                      </div>
-                    </div>
-                  `;
-              });
-
-              // Get the modal body element and set the content
-              const modalBody = $("#editModal").find(".modal-body");
-              modalBody.html(modalBodyContent);
-
-              // Add other input fields for other properties as needed
-
-              // Show the modal
-              $("#editModal").modal("show");
+              // $("#dataTable").html(response);
+              // Set the values of the input elements using jQuery
+              $("#record_id").val(id);
+              $("#update_bgr_details").val(id);
+              $("#ta-commodity-").val(commodity);
+              $("#lot_no_tf_no_m_no").val(lotno);
+              $("#date_of_sampling").val(datesampling);
+              $("#date_of_packing").val(dateofpacking);
+              $("#grade").val(gradeasign);
+              $("#ta-packet_size-").val(packetsize);
+              $("#ta-packet_size_unit-").val(packetsizeunit);
+              $("#ta-no_of_packets-").val(totalnoofpackets);
+              $("#total_qty_graded_quintal").val(totalqtyquintal);
+              $("#estimated_value").val(estimatedvalue);
+              $("#agmark_replica_from").val(agmarkreplicafrom);
+              $("#agmark_replica_to").val(agmarkreplicato);
+              $("#agmark_replica_total").val(agmarkreplicatotal);
+              $("#replica_charges").val(replicacharges);
+              $("#laboratory_name").val(laboratoryname);
+              $("#report_no").val(reportno);
+              $("#report_date").val(reportdate);
+              $("#remarks").val(remarks);
             },
             error: function (error) {
               // Handle any errors that occur during the AJAX request
@@ -89,6 +102,7 @@ $(document).ready(function () {
 
         data.forEach((datas, counter) => {
           const row = document.createElement("tr");
+
           const properties = [
             "commodity",
             "lotno",
@@ -172,11 +186,16 @@ $(document).ready(function () {
     e.preventDefault();
     handleFormAction("add");
   });
+  $("#update_bgr_details").on("click", function (e) {
+    e.preventDefault();
+    handleFormAction("update");
+  });
 
   // You can similarly add event handlers for other actions (edit, delete, save) if needed.
 
   async function handleFormAction(action) {
     const form_data = $("#" + form_section_id).serializeArray();
+
     const validationStatus = await bgr_report_validation(form_data);
 
     if (validationStatus.isValid) {
@@ -218,7 +237,7 @@ $(document).ready(function () {
 
     for (const field of Object.keys(requiredFields)) {
       const formField = form_data.find((item) => item.name === field);
-
+      console.log(formField);
       if (!formField || formField.value.trim() === "") {
         emptyFields.push(field);
       }

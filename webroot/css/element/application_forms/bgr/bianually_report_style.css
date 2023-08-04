@@ -46,3 +46,9 @@ td button {
     margin-bottom: 1rem;
     padding-right: 10px;
 }
+
+
+
+.pagination li:hover{
+    cursor: pointer;
+}

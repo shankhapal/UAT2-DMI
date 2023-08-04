@@ -25,8 +25,6 @@ define('DATE_FORMAT_MESSAGE', 'Enter DD/MM/YYYY');
 define('INPUT_FIELD_CLASSES', 'form-control input-field wd120');
 $placeholder = DATE_FORMAT_MESSAGE;
 $class1 = INPUT_FIELD_CLASSES;
-
-
  ?>
 <div class="row">
   <div class="col-md-12 ">
@@ -71,17 +69,17 @@ $class1 = INPUT_FIELD_CLASSES;
                     colspan="3"
                     class="border-bottom"
                     scope="col">Period: From
-                    <?php echo $section_form_details[7]; ?>
+                    <?php //echo $section_form_details[7]; ?>
                  </th>
                   <th
                     colspan="3"
                     class="border-bottom" scope="col">Period: To
-                    <?php echo $section_form_details[7]; ?> </th>
+                    <?php //echo $section_form_details[7]; ?> </th>
                   <th
                     colspan="6"
                     class="border-bottom"
                     scope="col">Type:
-                    <?php echo ($section_form_details[6] == "yes") ? "Export" : "Domestic"; ?>
+                    <?php //echo ($section_form_details[6] == "yes") ? "Export" : "Domestic"; ?>
                   </th>
                   </th>
                   <th scope="col"></th>
@@ -149,16 +147,239 @@ $class1 = INPUT_FIELD_CLASSES;
               <tbody>
             <!-- Data rows will be inserted here -->
             </tbody>
+                <!-- for edit machine details -->
+                <?php if ($this->request->getSession()->read('editbgrid') != null) { 
+                  $section_form_details[2] = ['abc', 'def', 'ghi'];
+                  // pr($bgrReportData);die;
+                  ?>
+                  <tr>
+                      <td>
+                         <?php echo $this->Form->control('record_id', array(
+                              'type' => 'hidden',
+                              'id' => 'record_id',
+                              'value' => '',
+                              'label' => false,
+                              'class' => 'form-control wd120'
+                          )); ?>
+                      </td>
+                      <td>
+                          <?php echo $this->Form->control('ta-commodity-', array(
+                              'type' => 'select',
+                              'empty' => 'Select Commodity',
+                              'id' => 'ta-commodity-',
+                              'options'=>$section_form_details[9],
+                              'value' => '',
+                              'label' => false,
+                              'class' => 'form-control wd120'
+                          )); ?>
+                          <div class="error-message" id="error-ta-commodity-"></div>
+                      </td>
+                      <td>
+                          <?php echo $this->Form->control('lot_no_tf_no_m_no', array(
+                              'type' => 'text',
+                              'escape' => false,
+                              'value' => '',
+                              'id' => 'lot_no_tf_no_m_no',
+                              'label' => false,
+                              'class' => 'form-control input-field wd120'
+                          )); ?>
+                          <div class="error-message" id="error-lot_no_tf_no_m_no"></div>
+                      </td>
+                      <td>
+                          <?php echo $this->Form->control('date_of_sampling', array(
+                              'type' => 'text',
+                              'escape' => false,
+                              'value' => '',
+                              'id' => 'date_of_sampling',
+                              'label' => false,
+                              'class' => 'form-control input-field wd120'
+                          )); ?>
+                          <div class="error-message" id="error-date_of_sampling"></div>
+                      </td>
+                      <td>
+                          <?php echo $this->Form->control('date_of_packing', array(
+                              'type' => 'text',
+                              'escape' => false,
+                              'value' => '',
+                              'id' => 'date_of_packing',
+                              'label' => false,
+                              'class' => 'form-control input-field wd120'
+                          )); ?>
+                          <div class="error-message" id="error-date_of_packing"></div>
+                      </td>
+                      <td>
+                          <?php echo $this->Form->control('grade', array(
+                              'type'=>'select',
+                              'empty'=>'Select grade',
+                              'id'=>'grade',
+                              'options'=>$section_form_details[10],
+                              'label'=>false,
+                              'class'=>'form-control wd120'
+                          )); ?>
+                          <div class="error-message" id="error-grade"></div>
+                      </td>
+                      <td>
+                          <?php echo $this->Form->control('ta-packet_size-', array(
+                              'type' => 'text',
+                              'escape' => false,
+                              'value' => '',
+                              'id' => 'ta-packet_size-',
+                              'label' => false,
+                              'class' => 'form-control input-field wd120'
+                          )); ?>
+                          <div class="error-message" id="error-ta-packet_size-"></div>
+                      </td>
+                      <td>
+                          <?php echo $this->Form->control('ta-packet_size_unit-', array(
+                              'type' => 'text',
+                              'escape' => false,
+                              'value' => '',
+                              'id' => 'ta-packet_size_unit-',
+                              'label' => false,
+                              'class' => 'form-control input-field wd120'
+                          )); ?>
+                          <div class="error-message" id="error-ta-packet_size_unit-"></div>
+                      </td>
+                      <td>
+                          <?php echo $this->Form->control('ta-no_of_packets-', array(
+                              'type' => 'text',
+                              'escape' => false,
+                              'value' => '',
+                              'id' => 'ta-no_of_packets-',
+                              'label' => false,
+                              'class' => 'form-control input-field wd120'
+                          )); ?>
+                          <div class="error-message" id="error-ta-no_of_packets-"></div>
+                      </td>
+                      <td>
+                          <?php echo $this->Form->control('total_qty_graded_quintal', array(
+                              'type' => 'text',
+                              'escape' => false,
+                              'value' => '',
+                              'id' => 'total_qty_graded_quintal',
+                              'label' => false,
+                              'class' => 'form-control input-field wd120'
+                          )); ?>
+                          <div class="error-message" id="error-total_qty_graded_quintal"></div>
+                      </td>
+                      <td>
+                          <?php echo $this->Form->control('estimated_value', array(
+                              'type' => 'text',
+                              'escape' => false,
+                              'value' => '',
+                              'id' => 'estimated_value',
+                              'label' => false,
+                              'class' => 'form-control input-field wd120'
+                          )); ?>
+                          <div class="error-message" id="error-estimated_value"></div>
+                      </td>
+                      <td>
+                          <?php echo $this->Form->control('agmark_replica_from', array(
+                              'type' => 'text',
+                              'escape' => false,
+                              'value' => '',
+                              'id' => 'agmark_replica_from',
+                              'label' => false,
+                              'class' => 'form-control input-field wd120'
+                          )); ?>
+                          <div class="error-message" id="error-agmark_replica_from"></div>
+                      </td>
+                      <td>
+                          <?php echo $this->Form->control('agmark_replica_to', array(
+                              'type' => 'text',
+                              'escape' => false,
+                              'value' => '',
+                              'id' => 'agmark_replica_to',
+                              'label' => false,
+                              'class' => 'form-control input-field wd120'
+                          )); ?>
+                          <div class="error-message" id="error-agmark_replica_to"></div>
+                      </td>
+                      <td>
+                          <?php echo $this->Form->control('agmark_replica_total', array(
+                              'type' => 'text',
+                              'escape' => false,
+                              'value' => '',
+                              'id' => 'agmark_replica_total',
+                              'label' => false,
+                              'class' => 'form-control input-field wd120'
+                          )); ?>
+                          <div class="error-message" id="error-agmark_replica_total"></div>
+                      </td>
+                      <td>
+                          <?php echo $this->Form->control('replica_charges', array(
+                              'type' => 'text',
+                              'escape' => false,
+                              'value' => '',
+                              'id' => 'replica_charges',
+                              'label' => false,
+                              'class' => 'form-control input-field wd120'
+                          )); ?>
+                          <div class="error-message" id="error-replica_charges"></div>
+                      </td>
+                      <td>
+                          <?php echo $this->Form->control('laboratory_name', array(
+                              'type' => 'text',
+                              'escape' => false,
+                              'value' => '',
+                              'id' => 'laboratory_name',
+                              'label' => false,
+                              'class' => 'form-control input-field wd120'
+                          )); ?>
+                          <div class="error-message" id="error-laboratory_name"></div>
+                      </td>
+                      <td>
+                          <?php echo $this->Form->control('report_no', array(
+                              'type' => 'text',
+                              'escape' => false,
+                              'value' => '',
+                              'id' => 'report_no',
+                              'label' => false,
+                              'class' => 'form-control input-field wd120'
+                          )); ?>
+                          <div class="error-message" id="error-report_no"></div>
+                      </td>
+                      <td>
+                          <?php echo $this->Form->control('report_date', array(
+                              'type' => 'text',
+                              'escape' => false,
+                              'value' => '',
+                              'id' => 'report_date',
+                              'label' => false,
+                              'class' => 'form-control input-field wd120'
+                          )); ?>
+                          <div class="error-message" id="error-report_date"></div>
+                      </td>
+                      <td>
+                          <?php echo $this->Form->control('remarks', array(
+                              'type' => 'text',
+                              'escape' => false,
+                              'value' => '',
+                              'id' => 'remarks',
+                              'label' => false,
+                              'class' => 'form-control input-field wd120'
+                          )); ?>
+                          <div class="error-message" id="error-remarks"></div>
+                      </td>
+                      <td>
+                        <div class="form-buttons">
+                          <a href="#" id="update_bgr_details" class="btn btn-info btn-sm">Save</a>
+                        </div>
+                      </td>
+                  </tr>
+
+                <!-- To show added and save new machine details -->
+                <?php } else { ?>
                   <div id="add_new_row">
                     <tr>
                       <td></td>
                       <td >
-                      <?php
+                      <?php 
                         echo $this->Form->control('ta-commodity-', array(
                           'type'=>'select',
                           'empty'=>'Select Commodity',
                           'id'=>'ta-commodity-',
-                          'options'=>$section_form_details[9],
+                           'options'=>$section_form_details[9],
                           'label'=>false,
                           'class'=>'form-control wd120 commodity'
                         )); ?>
@@ -255,15 +476,15 @@ $class1 = INPUT_FIELD_CLASSES;
                      <div class="error-message" id="error-total_qty_graded_quintal"></div>
                   </td>
                   <td>
-                        <?php echo $this->Form->control('estimated_value', array(
-                          'type'=>'text',
-                          'escape'=>false,
-                          'id'=>'estimated_value',
-                          'label'=>false,
-                          'class'=>$class1,
-                          'placeholder'=>'0.00'
-                        )); ?>
-                        <div class="error-message" id="error-estimated_value"></div>
+                  <?php echo $this->Form->control('estimated_value', array(
+                    'type'=>'text',
+                    'escape'=>false,
+                    'id'=>'estimated_value',
+                    'label'=>false,
+                    'class'=>$class1,
+                    'placeholder'=>'0.00'
+                  )); ?>
+                  <div class="error-message" id="error-estimated_value"></div>
                   </td>
                   <td>
                       <?php echo $this->Form->control('agmark_replica_from', array(
@@ -317,7 +538,7 @@ $class1 = INPUT_FIELD_CLASSES;
                           'escape'=>false,
                           'id'=>'laboratory_name',
                           'readonly'=>'readonly',
-                          'value'=>$section_form_details[11],
+                           'value'=>$section_form_details[11],
                           'label'=>false,
                           'class'=>$class1,
                         )); ?>
@@ -364,32 +585,14 @@ $class1 = INPUT_FIELD_CLASSES;
                       </td>
                     </tr>
                   </div>
-           
+            <?php } ?>
           </div>
         </table>
       </div>
     </div>
   </div>
   
- <div id="editModal" class="modal fade" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Edit BGR Details</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <!-- The modal body content will be added dynamically here -->
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" onclick="saveEditedData()">Save</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
+
 
 <input type="hidden" id="custemer_id" value='<?php echo $_SESSION['packer_id']; ?>'>
 <!-- end table -->
