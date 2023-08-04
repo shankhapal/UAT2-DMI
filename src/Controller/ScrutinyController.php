@@ -930,7 +930,14 @@ class ScrutinyController extends AppController{
 				$final_submit_status = 'no_final_submit';
 			}
 			$this->set('final_submit_status',$final_submit_status);
+            if($application_type == 4){
+				//for auto filled payment  fetch payment from table by laxmi on 13-07-2023 , 
+				$this->loadModel('DmiChemistRegistrations');
+				$payment_amt = $this->DmiChemistRegistrations->find('all', array('fields'=>['payment'], 'conditions'=>['chemist_id IS'=>$customer_id]))->first();
+			   $this->set('payment_amt',$payment_amt['payment']);
 
+			   $this->set('application_charge',$payment_amt['payment']);
+			}
 			// set variables to show popup messages from view file
 			$this->set('previous_button_url',$previous_button_url);
 			$this->set('allSectionDetails',$allSectionDetails);
