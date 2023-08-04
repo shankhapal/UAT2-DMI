@@ -13,9 +13,8 @@ $(function(){
     //calculated experience difference with basis  of month and year by laxmi 10-07-2023
      const split = date1.split('/');
      const split1 = date2.split('/');
-     var monthsDiff;
-   
-     
+
+    var monthsDiff; 
     const start = new Date(split[2]+','+split[1]);
     const end = new Date(split1[2]+','+split1[1]);
     let month= end.getMonth() - start.getMonth() + 
@@ -39,11 +38,7 @@ $(function(){
       }else{
          yearsDiff = 0;
          monthsDiff = month;
-      }    
-    
-   
-    
-    
+      } 
     
      if( (isNaN(yearsDiff)) || yearsDiff === 0 || yearsDiff === undefined){
             yearsDiff =  0;

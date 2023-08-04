@@ -2621,7 +2621,7 @@ class CustomfunctionsComponent extends Component {
 			$year = $removeTime[0];
 
 			if (count($input_date) == 3) {
-
+				
 				$zero_int_value = array('01','02','03','04','05','06','07','08','09');
 
 				if (in_array($input_date[0],$zero_int_value, true))
@@ -2663,8 +2663,19 @@ class CustomfunctionsComponent extends Component {
 					exit;
 				}
 
-			} else {
-				$this->Controller->customAlertPage("Sorry.. Something wrong happened. ");
+			} 
+			// elseif(count(explode('-',$date)) == 2) {
+			// 	// $removeTime	= explode(' ',$input_date[0]);
+			// 	// $year = $removeTime[0];
+			// 	// $month_value = $input_date[1];
+			// 	// $month_value = $this->integerInputCheck($month_value);
+			// 	// $year_value = $year;
+			// 	// $year_value = $this->integerInputCheck($year_value);
+			// 	return $this->changeDateFormat($date);
+			// }
+
+			else{
+				$this->Controller->customAlertPage("sorry.. Something wrong happened. ");
 				exit;
 			}
 
