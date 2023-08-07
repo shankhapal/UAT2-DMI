@@ -75,7 +75,7 @@
             }
             
             if(empty($grant_approval_pdf[$i])){
-              echo '|  <button id=rejectApp_'.$chemistTblid[$i].' class = rejectModel value='.$list['chemist_id'].' appl_type ="' .$appl_type[$i].'"> <span class="glyphicon glyphicon-remove"></span></button>';
+              echo '|  <button id=rejectApp_'.$chemistTblid[$i].' class = "rejectModel btn btn-primary" value='.$list['chemist_id'].' appl_type ="' .$appl_type[$i].'"> Reject </button>';
                }
           $i++;
 
