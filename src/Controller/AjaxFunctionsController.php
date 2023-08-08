@@ -2804,7 +2804,8 @@ class AjaxFunctionsController extends AppController{
 		}
 	}
 
-
+		// This method will handle the request to display added data for BGR details
+	 // added by shankhpal shende on 02/08/2023
 	public function addedBgrDetails()
 	{
 		
@@ -2815,8 +2816,13 @@ class AjaxFunctionsController extends AppController{
 		$customer_id = $_SESSION['packer_id'];
 
 		$query = $this->DmiBgrCommodityReportsAddmore->find()
-    ->where(['customer_id' => $customer_id])
+    ->where([
+        'customer_id' => $customer_id,
+        'delete_status IS NULL' // Records where delete_status is NULL
+    ])
     ->order(['id' => 'desc']);
+
+		
 
 		$bgrReportData = $query->toArray();
 
@@ -2839,9 +2845,9 @@ class AjaxFunctionsController extends AppController{
 		
 	}
 
+	// This method will handle the request to update BGR details
+	 // added by shankhpal shende on 02/08/2023
 	public function editBgrDetails(){
-
-
 		
 		$this->autoRender = false;
 		$this->loadModel('DmiBgrCommodityReportsAddmore');
@@ -2855,11 +2861,25 @@ class AjaxFunctionsController extends AppController{
  		return $this->response->withType('application/json')->withStringBody(json_encode($bgrReportData));
 		$this->render('/element/application_forms/bgr/analysis_table/commodity_wise_reports_form_tbl');
 		
-
-    
-		 
 	}
 
 
+	public function deleteBgrDetails() {
+
+		$this->autoRender = false;
+		$this->Session->delete('editbgrid');
+		$this->loadModel('DmiBgrCommodityReportsAddmore');
+
+		//$record_id = $id;
+		$deletedData = $this->request->getData();
+		$delete_id = $deletedData['id'];
+		$bgrReportData = $this->DmiBgrCommodityReportsAddmore->deleteBgrData($delete_id);// call to custome function from model
+		
+
+		$this->render('/element/application_forms/bgr/analysis_table/commodity_wise_reports_form_tbl');
+		
+	}
+
+	
 }
 ?>

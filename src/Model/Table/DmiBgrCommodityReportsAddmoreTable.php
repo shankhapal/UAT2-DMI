@@ -101,5 +101,18 @@
 		return $editData = $query->first();
 
 	}
+
+	public function deleteBgrData($id){
+		
+		$newEntity = $this->newEntity(array(
+				'id'=>$id,
+				'delete_status'=>'yes',
+				'modified'=>date('Y-m-d H:i:s')
+			));
+
+			if($this->save($newEntity)){
+				return true;
+			}
+	}
 		
 }

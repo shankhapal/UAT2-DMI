@@ -79,7 +79,7 @@ $(document).ready(function () {
           // Add this line
           xhr.setRequestHeader("X-CSRF-Token", $('[name="_csrfToken"]').val());
         },
-        success: function (response) {
+        success: function(response) {
           var response = response.match(/~([^']+)~/)[1]; //getting data bitween ~..~ from response
           response = JSON.parse(response); //response is JSOn encoded to parse JSON
 

@@ -146,8 +146,13 @@ $class1 = INPUT_FIELD_CLASSES;
              </thead>
               <tbody>
             <!-- Data rows will be inserted here -->
-                <div >
-                  <tr id="newRow">
+            </tbody>
+                <!-- for edit machine details -->
+                <?php if ($this->request->getSession()->read('editbgrid') != null) { 
+                  $section_form_details[2] = ['abc', 'def', 'ghi'];
+                  // pr($bgrReportData);die;
+                  ?>
+                  <tr>
                       <td>
                          <?php echo $this->Form->control('record_id', array(
                               'type' => 'hidden',
@@ -362,9 +367,9 @@ $class1 = INPUT_FIELD_CLASSES;
                         </div>
                       </td>
                   </tr>
-                </div>
+
                 <!-- To show added and save new machine details -->
-                <?php //} else { ?>
+                <?php } else { ?>
                   <div id="add_new_row">
                     <tr>
                       <td></td>
@@ -580,8 +585,8 @@ $class1 = INPUT_FIELD_CLASSES;
                       </td>
                     </tr>
                   </div>
-     
-          </tbody>
+            <?php } ?>
+          </div>
         </table>
       </div>
     </div>

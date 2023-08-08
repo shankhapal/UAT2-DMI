@@ -5,9 +5,8 @@ $(document).ready(function () {
       method: "POST",
       dataType: "json",
       success: function (data) {
-        console.log(data);
         const tableBody = document.querySelector("#dataTable tbody");
-
+        console.log(data);
         function createCell(content) {
           const cell = document.createElement("td");
           cell.textContent = content;
@@ -28,6 +27,88 @@ $(document).ready(function () {
             onClick();
           });
           return button;
+        }
+
+        function handleEditClick(id) {
+          $.ajax({
+            url: "../AjaxFunctions/edit_bgr_details",
+            method: "POST",
+            dataType: "json",
+            data: { id: id }, // send ID in the request data
+            beforeSend: function (xhr) {
+              // Add this line
+              xhr.setRequestHeader(
+                "X-CSRF-Token",
+                $('[name="_csrfToken"]').val()
+              );
+            },
+            success: function (response) {
+              const {
+                id,
+                commodity,
+                lotno,
+                datesampling,
+                dateofpacking,
+                gradeasign,
+                packetsize,
+                packetsizeunit,
+                totalnoofpackets,
+                totalqtyquintal,
+                estimatedvalue,
+                agmarkreplicafrom,
+                agmarkreplicato,
+                agmarkreplicatotal,
+                replicacharges,
+                laboratoryname,
+                reportno,
+                reportdate,
+                remarks,
+              } = response;
+
+              // $("#dataTable").html(response);
+              // Set the values of the input elements using jQuery
+              $("#record_id").val(id);
+              $("#update_bgr_details").val(id);
+              $("#ta-commodity-").val(commodity);
+              $("#lot_no_tf_no_m_no").val(lotno);
+              $("#date_of_sampling").val(datesampling);
+              $("#date_of_packing").val(dateofpacking);
+              $("#grade").val(gradeasign);
+              $("#ta-packet_size-").val(packetsize);
+              $("#ta-packet_size_unit-").val(packetsizeunit);
+              $("#ta-no_of_packets-").val(totalnoofpackets);
+              $("#total_qty_graded_quintal").val(totalqtyquintal);
+              $("#estimated_value").val(estimatedvalue);
+              $("#agmark_replica_from").val(agmarkreplicafrom);
+              $("#agmark_replica_to").val(agmarkreplicato);
+              $("#agmark_replica_total").val(agmarkreplicatotal);
+              $("#replica_charges").val(replicacharges);
+              $("#laboratory_name").val(laboratoryname);
+              $("#report_no").val(reportno);
+              $("#report_date").val(reportdate);
+              $("#remarks").val(remarks);
+            },
+            error: function (error) {
+              // Handle any errors that occur during the AJAX request
+              console.error("Error:", error);
+            },
+          });
+        }
+
+        function handleDeleteClick(id) {
+          if (confirm("Are you sure you want to delete this record?")) {
+            $.ajax({
+              url: "../AjaxFunctions/delete_bgr_details",
+              method: "POST",
+              data: { id: id },
+              success: function (data) {
+                alert("Data Deleted");
+                location.reload(); // Refresh the entire page
+              },
+            });
+          } else {
+            return false;
+          }
         }
 
         data.forEach((datas, counter) => {
@@ -88,86 +169,6 @@ $(document).ready(function () {
     });
   }
 
-  function handleEditClick(id) {
-    $.ajax({
-      url: "../AjaxFunctions/edit_bgr_details",
-      method: "POST",
-      dataType: "json",
-      data: { id: id }, // send ID in the request data
-      beforeSend: function (xhr) {
-        // Add this line
-        xhr.setRequestHeader("X-CSRF-Token", $('[name="_csrfToken"]').val());
-      },
-      success: function (response) {
-        const {
-          id,
-          commodity,
-          lotno,
-          datesampling,
-          dateofpacking,
-          gradeasign,
-          packetsize,
-          packetsizeunit,
-          totalnoofpackets,
-          totalqtyquintal,
-          estimatedvalue,
-          agmarkreplicafrom,
-          agmarkreplicato,
-          agmarkreplicatotal,
-          replicacharges,
-          laboratoryname,
-          reportno,
-          reportdate,
-          remarks,
-        } = response;
-
-        // $("#dataTable").html(response);
-        // Set the values of the input elements using jQuery
-        $("#record_id").val(id);
-        $("#update_bgr_details").val(id);
-        $("#ta-commodity-").val(commodity);
-        $("#lot_no_tf_no_m_no").val(lotno);
-        $("#date_of_sampling").val(datesampling);
-        $("#date_of_packing").val(dateofpacking);
-        $("#grade").val(gradeasign);
-        $("#ta-packet_size-").val(packetsize);
-        $("#ta-packet_size_unit-").val(packetsizeunit);
-        $("#ta-no_of_packets-").val(totalnoofpackets);
-        $("#total_qty_graded_quintal").val(totalqtyquintal);
-        $("#estimated_value").val(estimatedvalue);
-        $("#agmark_replica_from").val(agmarkreplicafrom);
-        $("#agmark_replica_to").val(agmarkreplicato);
-        $("#agmark_replica_total").val(agmarkreplicatotal);
-        $("#replica_charges").val(replicacharges);
-        $("#laboratory_name").val(laboratoryname);
-        $("#report_no").val(reportno);
-        $("#report_date").val(reportdate);
-        $("#remarks").val(remarks);
-        // Show the new row
-        $("#newRow").show();
-      },
-      error: function (error) {
-        // Handle any errors that occur during the AJAX request
-        console.error("Error:", error);
-      },
-    });
-  }
-  function handleDeleteClick(id) {
-    if (confirm("Are you sure you want to delete this record?")) {
-      $.ajax({
-        url: "../AjaxFunctions/delete_bgr_details",
-        method: "POST",
-        data: { id: id },
-        success: function (data) {
-          alert("Data Deleted");
-          $(`#row-${id}`).remove();
-          location.reload(); // Refresh the entire page
-        },
-      });
-    } else {
-      return false;
-    }
-  }
   fetch_data();
 
   const form_section_id = $("#form_section_id").val();
@@ -233,7 +234,6 @@ $(document).ready(function () {
         },
         success: function (response) {
           resolve(response);
-          location.reload(); // Refresh the entire page
           fetch_data();
         },
         error: function (error) {
