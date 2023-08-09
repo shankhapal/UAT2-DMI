@@ -124,7 +124,7 @@
 					'fields'=>'grade_code',
 					'conditions'=>array('commodity_code IN'=>$sub_comm_ids),'group'=>'grade_code'
 				))->toArray();
-
+				
 				$grade_list = [];
 				foreach($get_grade as $each_grade){
 
@@ -168,13 +168,27 @@
 
 	}
 	
-	public function saveCommodityWiseReport($forms_data){
 
-	}
-	public function saveFormDetails($forms_data){
+	public function saveFormDetails($customer_id,$forms_data){
 
-		
-		
+			
+
+				$newEntity = $this->newEntity(array(
+					
+					'customer_id'=>$customer_id,
+					'form_status'=>'saved',
+					'created'=>date('Y-m-d H:i:s'),
+					'modified'=>date('Y-m-d H:i:s')
+
+				));
+
+				if($this->save($newEntity)){
+					
+					return true;
+					
+				}
+				
+			
 
 	}
 		

@@ -2712,9 +2712,10 @@ class AjaxFunctionsController extends AppController{
 	 // added by shankhpal shende on 02/08/2023
 	function addBgrDetails() {
 
+				// pr($_POST);die;
 			$this->autoRender = false;
 			$this->loadModel('DmiBgrCommodityReportsAddmore');
-
+		
 			// Validate the required fields, you can add additional validation as per your requirements
 			$requiredFields = ['ta-commodity-', 'lot_no_tf_no_m_no', 'date_of_sampling', 'date_of_packing', 'grade', 'ta-packet_size-', 'ta-packet_size_unit-', 'ta-no_of_packets-', 'total_qty_graded_quintal', 'estimated_value', 'agmark_replica_from', 'agmark_replica_to', 'agmark_replica_total', 'replica_charges', 'laboratory_name', 'report_no', 'report_date', 'remarks'];
 
@@ -2797,53 +2798,48 @@ class AjaxFunctionsController extends AppController{
 
 					// Update the data in the database using the model
 					$save_bgr_details = $this->DmiBgrCommodityReportsAddmore->saveCommodityWiseReport($data);// call custome method from model
+					 $this->render('/element/application_forms/bgr/analysis_table/commodity_wise_reports_form_tbl');
 			}
 
-		if($save_bgr_details){
-			$this->Session->delete('edit_analysis_id');
-		}
+		
 	}
 
+	
+	
 		// This method will handle the request to display added data for BGR details
 	 // added by shankhpal shende on 02/08/2023
 	public function addedBgrDetails()
-	{
-		
-		$this->autoRender = false;
-		$this->loadModel('DmiBgrCommodityReportsAddmore');
-		$this->loadModel('MCommodity');
+{
+    $this->autoRender = false;
+    $this->loadModel('DmiBgrCommodityReportsAddmore');
+    $this->loadModel('MCommodity');
 
-		$customer_id = $_SESSION['packer_id'];
+    $customer_id = $_SESSION['packer_id'];
 
-		$query = $this->DmiBgrCommodityReportsAddmore->find()
-    ->where([
-        'customer_id' => $customer_id,
-        'delete_status IS NULL' // Records where delete_status is NULL
-    ])
-    ->order(['id' => 'desc']);
+    $query = $this->DmiBgrCommodityReportsAddmore->find()
+        ->where([
+            'customer_id' => $customer_id,
+            'delete_status IS NULL' // Records where delete_status is NULL
+        ])
+        ->order(['id' => 'desc']);
 
-		
+    $bgrReportData = $query->toArray();
 
-		$bgrReportData = $query->toArray();
+    foreach ($bgrReportData as &$eachvalue) { // Note the "&" before $eachvalue
+        $commodity_code = $eachvalue['commodity'];
 
-		foreach ($bgrReportData as $eachvalue) {
-			
-			$commodity_code = $eachvalue['commodity'];
+        $result = $this->MCommodity->find()
+            ->select('commodity_name')
+            ->where(['commodity_code' => $commodity_code]);
 
-			$result = $this->MCommodity->find()
-			->select('commodity_name')
-			->where(['commodity_code' => $commodity_code]);
+        $commodityArray = $result->first();
+        $eachvalue['commodity'] = $commodityArray ? $commodityArray->commodity_name : '';
+    }
 
-			$commodityArray = $result->first();
-			$eachvalue['commodity'] = $commodityArray ? $commodityArray->commodity_name : '';
+    // Convert the data to JSON format and echo it to return the response
+    return $this->response->withType('application/json')->withStringBody(json_encode($bgrReportData));
+}
 
-		}
-		
-		 // Convert the data to JSON format and echo it to return the response
-		 return $this->response->withType('application/json')->withStringBody(json_encode($bgrReportData));
-  	// return json_encode($bgrReportData);
-		
-	}
 
 	// This method will handle the request to update BGR details
 	 // added by shankhpal shende on 02/08/2023
@@ -2863,7 +2859,8 @@ class AjaxFunctionsController extends AppController{
 		
 	}
 
-
+	// This method will handle the request to delete BGR details
+	 // added by shankhpal shende on 02/08/2023
 	public function deleteBgrDetails() {
 
 		$this->autoRender = false;
@@ -2876,7 +2873,7 @@ class AjaxFunctionsController extends AppController{
 		$bgrReportData = $this->DmiBgrCommodityReportsAddmore->deleteBgrData($delete_id);// call to custome function from model
 		
 
-		$this->render('/element/application_forms/bgr/analysis_table/commodity_wise_reports_form_tbl');
+		// $this->render('/element/application_forms/bgr/analysis_table/commodity_wise_reports_form_tbl');
 		
 	}
 

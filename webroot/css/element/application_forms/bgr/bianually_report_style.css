@@ -52,6 +52,6 @@ td button {
 .pagination li:hover{
     cursor: pointer;
 }
-#newRow {
-  display: none !important;
+#update_bgr_details {
+  display: none;
 }

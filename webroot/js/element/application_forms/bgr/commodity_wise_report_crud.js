@@ -8,6 +8,11 @@ $(document).ready(function () {
         console.log(data);
         const tableBody = document.querySelector("#dataTable tbody");
 
+        // // Clear existing rows within the tbody element
+        // while (tableBody.firstChild) {
+        //   tableBody.removeChild(tableBody.firstChild);
+        // }
+
         function createCell(content) {
           const cell = document.createElement("td");
           cell.textContent = content;
@@ -40,7 +45,6 @@ $(document).ready(function () {
             "dateofpacking",
             "gradeasign",
             "packetsize",
-            "packetsizeunit",
             "totalnoofpackets",
             "totalqtyquintal",
             "estimatedvalue",
@@ -89,6 +93,8 @@ $(document).ready(function () {
   }
 
   function handleEditClick(id) {
+    $("#update_bgr_details").show(); // Show Edit button
+    $("#add_bgr_details").hide();
     $.ajax({
       url: "../AjaxFunctions/edit_bgr_details",
       method: "POST",
@@ -99,6 +105,7 @@ $(document).ready(function () {
         xhr.setRequestHeader("X-CSRF-Token", $('[name="_csrfToken"]').val());
       },
       success: function (response) {
+        console.log(response);
         const {
           id,
           commodity,
@@ -107,7 +114,6 @@ $(document).ready(function () {
           dateofpacking,
           gradeasign,
           packetsize,
-          packetsizeunit,
           totalnoofpackets,
           totalqtyquintal,
           estimatedvalue,
@@ -131,7 +137,6 @@ $(document).ready(function () {
         $("#date_of_packing").val(dateofpacking);
         $("#grade").val(gradeasign);
         $("#ta-packet_size-").val(packetsize);
-        $("#ta-packet_size_unit-").val(packetsizeunit);
         $("#ta-no_of_packets-").val(totalnoofpackets);
         $("#total_qty_graded_quintal").val(totalqtyquintal);
         $("#estimated_value").val(estimatedvalue);
@@ -143,8 +148,6 @@ $(document).ready(function () {
         $("#report_no").val(reportno);
         $("#report_date").val(reportdate);
         $("#remarks").val(remarks);
-        // Show the new row
-        $("#newRow").show();
       },
       error: function (error) {
         // Handle any errors that occur during the AJAX request
@@ -160,8 +163,8 @@ $(document).ready(function () {
         data: { id: id },
         success: function (data) {
           alert("Data Deleted");
-          $(`#row-${id}`).remove();
-          location.reload(); // Refresh the entire page
+          // fetch_data();
+          location.reload();
         },
       });
     } else {
@@ -179,7 +182,6 @@ $(document).ready(function () {
     grade: "Grade",
     "ta-packet_size-": "Pack Size",
     replica_charges: "Replica Charges",
-    "ta-packet_size_unit-": "Packet Size Unit",
     "ta-no_of_packets-": "Total No. of Packages",
     total_qty_graded_quintal: "Total Qty Graded (Quintal)",
     estimated_value: "Estimated Value",
@@ -205,7 +207,7 @@ $(document).ready(function () {
 
   async function handleFormAction(action) {
     const form_data = $("#" + form_section_id).serializeArray();
-
+    console.log(form_data);
     const validationStatus = await bgr_report_validation(form_data);
 
     if (validationStatus.isValid) {
@@ -223,6 +225,7 @@ $(document).ready(function () {
   }
 
   async function sendFormToServer(form_data) {
+    // console.log("abc" + form_data);
     return new Promise((resolve, reject) => {
       $.ajax({
         type: "POST",
@@ -233,8 +236,12 @@ $(document).ready(function () {
         },
         success: function (response) {
           resolve(response);
-          location.reload(); // Refresh the entire page
+          // location.reload(); // Refresh the entire page
           fetch_data();
+          $(
+            "#record_id, #ta-commodity-, #lot_no_tf_no_m_no, #date_of_sampling, #date_of_packing, #grade, #ta-packet_size-, #ta-packet_size_unit-, #ta-no_of_packets-, #total_qty_graded_quintal, #estimated_value, #agmark_replica_from, #agmark_replica_to, #agmark_replica_total, #replica_charges, #report_no, #report_date, #remarks"
+          ).val("");
+          location.reload();
         },
         error: function (error) {
           reject(error);
