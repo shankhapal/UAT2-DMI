@@ -620,6 +620,18 @@
 							</li>
 						</li>
 			   <?php }?>
+
+			   <!-- added movement menu by laxmi on 09/08/2023 -->
+			  <?php if ($current_user_roles['ro_inspection'] == 'yes' || $current_user_roles['so_inspection']=='yes' ||
+						$current_user_roles['dy_ama'] == 'yes' || $current_user_roles['jt_ama'] == 'yes' ||
+						$current_user_roles['ama'] == 'yes' || $current_user_roles['super_admin'] == 'yes') { ?>
+                     <li class="nav-item">
+								<a href="<?php echo $this->request->getAttribute('webroot');?>movements/movement_history" class="nav-link">
+									<i class="far fas fa-server nav-icon"></i>
+									<p class="nav-icon-p">Movement History	</p>
+								</a>
+							</li>
+					<?php } ?>
 					<!-- added for testing user redirect for DMI and LMIS -->
 					<?php if ($current_user_division['division'] == 'BOTH') { ?>
 

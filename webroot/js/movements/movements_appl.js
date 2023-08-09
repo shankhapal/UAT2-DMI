@@ -79,7 +79,7 @@ $('#appl_type').change(function(){
                         .attr("value", this.chemist_id).text(this.chemist_id +  "  "  + this.chemist_fname + "  " + this.chemist_lname));
                     }
                 });
-               
+               //below added for dropdown search box 
                 $(function () {
                     $("#appl_id").select2();
                   });
