@@ -1,10 +1,14 @@
 //added new file by Laxmi Bhadade for movement of application on 20-07-2023
+$(window).on('load', function () {
+	$("#appl_type").find('option:selected').removeAttr("selected");
+});
 $("#get_movement").click(function(e){
     if(movement_appl_validation() == false){
        
         e.preventDefault(); 
-    }else{
+    }else{ 
         $('#movement_application').submit();
+       
     }
 });
 
@@ -14,6 +18,7 @@ function movement_appl_validation(){
   
     var appl_type = $('#appl_type').val();
     var appl_id = $('#appl_id').val();
+    var value_return = true;
     if(appl_type==''){
 
         $("#error_appl_type").show().text("Please Select Application type");
@@ -28,12 +33,14 @@ function movement_appl_validation(){
         $("#appl_id").click(function(){$("#error_appl_id").hide().text;$("#appl_id").removeClass("is-invalid");});
         value_return = 'false';
     }
-    if(value_return == 'false'){
+    if(value_return == 'false'){ 
         var msg = "Please check some fields are missing or not proper.";
         renderToast('error', msg);
         return false;
     }else{
-        exit();
+        
+        
+       
     }
 }
 
@@ -72,7 +79,10 @@ $('#appl_type').change(function(){
                         .attr("value", this.chemist_id).text(this.chemist_id +  "  "  + this.chemist_fname + "  " + this.chemist_lname));
                     }
                 });
-                
+               
+                $(function () {
+                    $("#appl_id").select2();
+                  });
             }
         });
     }
@@ -83,21 +93,9 @@ $('#appl_type').change(function(){
 
 
 $(document).ready(function (){
-    
+     
  $('#movement_history').dataTable({
     
-});
-// to pass application type and application id added by laxmi 21-07-2023
-$("#get_movement").click( function(e){
-    e.preventDefault();
-   
-    var appl_type = $("#appl_type").val('');
-     
-    var appl_id   =  $("#appl_id").val('');
-
-   
-    
-
 });
 });
 

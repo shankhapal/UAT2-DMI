@@ -28,14 +28,14 @@
                                  <div class="col-sm-4">
                                  <div class="form-group">
                                     <label>Application type <span class="cRed">*</span></label>
-                                    <?php echo $this->Form->control('appl_type', array('type'=>'select', 'id'=>'appl_type', 'label'=>false, 'options'=>$applTypesList, 'empty'=>'--Select--','class'=>'form-control')); ?>
+                                    <?php echo $this->Form->control('appl_type', array('type'=>'select', 'id'=>'appl_type', 'label'=>false, 'options'=>$applTypesList, 'empty'=>'--Select--','class'=>'form-control', 'aria-hidden'=>true)); ?>
                                     <span id="error_appl_type" class="error invalid-feedback"></span>
 								 </div>
                                  </div>
                                  <div class="col-sm-4">
                                  <div class="form-group">
                                     <label>Application Id <span class="cRed">*</span></label>
-                                    <?php echo $this->Form->control('appl_id', array('type'=>'select', 'id'=>'appl_id', 'label'=>false, 'empty'=>'--Select--','class'=>'form-control selectpicker select2-hidden-accessible', 'aria-hidden'=>true)); ?>
+                                    <?php echo $this->Form->control('appl_id', array('type'=>'select', 'id'=>'appl_id', 'label'=>false, 'empty'=>'--Select--','class'=>'form-control selectpicker ', 'aria-hidden'=>true)); ?>
                                     <span id="error_appl_id" class="error invalid-feedback"></span>
                                 </div>
                                  </div>
@@ -108,5 +108,6 @@
 
 </div>
 <?php //echo $this->Html->css('select2.min'); ?>
-<?php //echo $this->Html->script('movements/select2.min'); ?>
+
 <?php echo $this->Html->script('movements/movements_appl'); ?>
+<?php //echo $this->Html->script('movements/select2.min'); ?>
