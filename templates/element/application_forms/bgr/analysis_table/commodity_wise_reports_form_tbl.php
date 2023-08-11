@@ -24,8 +24,8 @@
 define('DATE_FORMAT_MESSAGE', 'Enter DD/MM/YYYY');
 define('INPUT_FIELD_CLASSES', 'form-control input-field wd120');
 $placeholder = DATE_FORMAT_MESSAGE;
-$class1 = INPUT_FIELD_CLASSES;
- ?>
+$class1 = INPUT_FIELD_CLASSES;?>
+ 
 <div class="row">
   <div class="col-md-12 ">
     <div class="table-format">
@@ -144,6 +144,38 @@ $class1 = INPUT_FIELD_CLASSES;
               </tr>
              </thead>
               <tbody>
+               
+                  <?php
+                  $i=1;
+                  foreach ($section_form_details[12] as  $eachrow) { ?>
+                    <tr  id="custom_row<?php echo $eachrow['id'];?>">
+                      <td><?php echo $i; ?></td>
+                      <td><?php echo $eachrow['commodity'];?></td>
+                      <td><?php echo $eachrow['lotno'];?></td>
+                      <td><?php echo $eachrow['datesampling'];?></td>
+                      <td><?php echo $eachrow['dateofpacking'];?></td>
+                      <td><?php echo $eachrow['gradeasign'];?></td>
+                      <td><?php echo $eachrow['packetsize'];?></td>
+                      <td><?php echo $eachrow['totalnoofpackets'];?></td>
+                      <td><?php echo $eachrow['totalqtyquintal'];?></td>
+                      <td><?php echo $eachrow['estimatedvalue'];?></td>
+                      <td><?php echo $eachrow['agmarkreplicafrom'];?></td>
+                      <td><?php echo $eachrow['agmarkreplicato'];?></td>
+                      <td><?php echo $eachrow['agmarkreplicatotal'];?></td>
+                      <td><?php echo $eachrow['replicacharges'];?></td>
+                      <td><?php echo $eachrow['laboratoryname'];?></td>
+                      <td><?php echo $eachrow['reportno'];?></td>
+                      <td><?php echo $eachrow['reportdate'];?></td>
+                      <td><?php echo $eachrow['remarks'];?></td>
+                      <td>
+                       <a href="#" class="edit_bgr_id glyphicon glyphicon-edit" id="<?php echo $eachrow['id']; ?>" ></a> |
+                        <a href="#" class="delete_bgr_id glyphicon glyphicon-remove-sign machine_delete" id="<?php echo $eachrow['id']; ?>" ></a>
+                      </td>
+                    </tr>
+                 <?php $i++; }?>
+                  
+                  
+               
                 <tr id="add_new_row">
                        <td>
                          <?php echo $this->Form->control('record_id', array(
@@ -155,7 +187,7 @@ $class1 = INPUT_FIELD_CLASSES;
                           )); ?>
                       </td>
                       <td >
-                          <?php 
+                          <?php
                             echo $this->Form->control('ta-commodity-', array(
                               'type'=>'select',
                               'empty'=>'Select Commodity',

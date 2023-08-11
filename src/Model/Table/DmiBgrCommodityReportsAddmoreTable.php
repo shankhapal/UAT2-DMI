@@ -21,7 +21,6 @@
     $dateofPacking = $forms_data['dateofpacking'];
     $gradeAsign = $forms_data['grade'];
     $packetSize = $forms_data['packetsize'];
-    $packetSizeUnit = $forms_data['packetsizeunit'];
     $totalNoOfPackets = $forms_data['totalnoofpackets'];
     $totalQtyQuintal = $forms_data['totalqtyquintal'];
     $estimatedValue = $forms_data['estimatedvalue'];
@@ -45,7 +44,6 @@
 				'dateofpacking' => $dateofPacking,
 				'gradeasign' => $gradeAsign,
 				'packetsize' => $packetSize,
-				'packetsizeunit' => $packetSizeUnit,
 				'totalnoofpackets' => $totalNoOfPackets,
 				'totalqtyquintal' => $totalQtyQuintal,
 				'estimatedvalue' => $estimatedValue,
@@ -70,7 +68,6 @@
 				'dateofpacking' => $dateofPacking,
 				'gradeasign' => $gradeAsign,
 				'packetsize' => $packetSize,
-				'packetsizeunit' => $packetSizeUnit,
 				'totalnoofpackets' => $totalNoOfPackets,
 				'totalqtyquintal' => $totalQtyQuintal,
 				'estimatedvalue' => $estimatedValue,
@@ -93,6 +90,8 @@
 			}
 	}
 	
+	
+
 
 	public function getBgrData($id){
 		

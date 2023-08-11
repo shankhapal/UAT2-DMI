@@ -4663,13 +4663,22 @@ class ApplicationformspdfsController extends AppController{
 			
 			// This method is added by shankhpal shende for handling pdf file for BGR module
 			public function applPdfBgr(){
+			
+				$customer_id = $this->Session->read('packer_id');
+				$this->set('customer_id',$customer_id);
 
-				
-				$customer_id = $this->Session->read('username');
-				// echo $customer_id;die;
-				$chemist_created_by = $this->Session->read('packer_id');
 				//get nodal office of the applied CA
 				$this->loadModel('DmiApplWithRoMappings');
+				$this->loadModel('DmiStates');
+				$this->loadModel('DmiFirms');
+				$this->loadModel('DmiDistricts');
+				$this->loadModel('DmiGrantCertificatesPdfs');
+				$this->loadModel('MCommodity');
+				$this->loadModel('MCommodityCategory');
+				$this->loadModel('MGradeDesc');
+				$this->loadModel('CommGrade');
+				$this->loadModel('DmiBgrCommodityReportsAddmore');
+
 				$get_office = $this->DmiApplWithRoMappings->getOfficeDetails($customer_id);
 				$this->set('get_office',$get_office);
 
@@ -4678,7 +4687,92 @@ class ApplicationformspdfsController extends AppController{
 				$customer_firm_data = $fetch_customer_firm_data;
 				$this->set('customer_firm_data',$customer_firm_data);
 
+				$fetch_state_name = $this->DmiStates->find('all',array('fields'=>'state_name','conditions'=>array('id IS'=>$customer_firm_data['state'], 'OR'=>array('delete_status IS NULL','delete_status ='=>'no'))))->first();
+				$firm_state_name = $fetch_state_name['state_name'];
+				$this->set('firm_state_name',$firm_state_name);
+
+				// to show firm address name form id	
+				$fetch_district_name = $this->DmiDistricts->find('all',array('fields'=>'district_name','conditions'=>array('id IS'=>$customer_firm_data['district'], 'OR'=>array('delete_status IS NULL','delete_status ='=>'no'))))->first();
+				$firm_district_name = $fetch_district_name['district_name'];
+				$this->set('firm_district_name',$firm_district_name);
+
+				$chemist_fname = $this->Session->read('f_name');
+				$chemist_lname = $this->Session->read('l_name');
+				$this->set('chemist_fname', $chemist_fname);
+				$this->set('chemist_lname', $chemist_lname);
+
+				$firmData = $this->DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+				$this->set('firmData',$firmData);
+
+				$get_last_grant_date = $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>array('id desc')))->first();
+				$last_grant_date = $get_last_grant_date['date'];
+
+				$certificate_valid_upto = $this->Customfunctions->getCertificateValidUptoDate($customer_id,$last_grant_date);
+				$this->set('certificate_valid_upto',$certificate_valid_upto);
+
 				
+				$added_firm = $this->DmiFirms->find('all', ['conditions' => ['customer_id' => $customer_id]])->first();
+					
+				if ($added_firm) {
+						$sub_comm_ids = explode(',', $added_firm['sub_commodity']);
+						
+						$sub_commodity_value = $this->MCommodity
+								->find('list', ['keyField' => 'commodity_code', 'valueField' => 'commodity_name'])
+								->where(['commodity_code IN' => $sub_comm_ids])
+								->toArray();
+
+						$get_grade = $this->CommGrade->find('all',array(
+							'fields'=>'grade_code',
+							'conditions'=>array('commodity_code IN'=>$sub_comm_ids),'group'=>'grade_code'
+						))->toArray();
+						
+						$grade_list = [];
+						foreach($get_grade as $each_grade){
+
+							$get_grade_desc = $this->MGradeDesc->find('all',array(
+								'fields'=>array('grade_code','grade_desc'),'conditions'=>array(
+									'grade_code IN'=>$each_grade['grade_code']),'group'=>array('grade_code','grade_desc'
+							)))->first();
+							
+							$grade_list[$get_grade_desc['grade_code']] = $get_grade_desc['grade_desc'];
+						}
+				} else {
+						$sub_commodity_value = [];
+						$grade_list = [];
+				}
+				
+				$commaSeparatedCommodity = implode(', ', $sub_commodity_value);
+				$this->set('commaSeparatedCommodity',$commaSeparatedCommodity);
+
+				$pdf_date = date('d-m-Y');
+				$this->set('pdf_date',$pdf_date);
+
+				$query = $this->DmiBgrCommodityReportsAddmore->find()
+        ->where([
+            'customer_id' => $customer_id,
+            'delete_status IS NULL' // Records where delete_status is NULL
+        ])
+        ->order(['id' => 'desc']);
+
+    		$bgrReportData = $query->toArray();
+
+				foreach ($bgrReportData as &$eachvalue) { // Note the "&" before $eachvalue
+					$commodity_code = $eachvalue['commodity'];
+
+					$result = $this->MCommodity->find()
+							->select('commodity_name')
+							->where(['commodity_code' => $commodity_code]);
+
+					$commodityArray = $result->first();
+					$eachvalue['commodity'] = $commodityArray ? $commodityArray->commodity_name : '';
+    		}
+
+				$this->loadComponent('Randomfunctions');
+				//added custom method to check if the lab application is NABL accreditated
+				$NablDate = $this->Randomfunctions->checkIfLabNablAccreditated($customer_id);
+
+				$this->set('NablDate',$NablDate);
+				$this->set('bgrReportData',$bgrReportData);
 
 				$this->generateApplicationPdf('/Applicationformspdfs/applPdfBgr');	
 			}

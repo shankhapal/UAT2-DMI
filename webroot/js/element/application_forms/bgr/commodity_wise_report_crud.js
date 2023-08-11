@@ -1,100 +1,33 @@
 $(document).ready(function () {
-  function fetch_data() {
-    $.ajax({
-      url: "../AjaxFunctions/added_bgr_details",
-      method: "POST",
-      dataType: "json",
-      success: function (data) {
-        console.log(data);
-        const tableBody = document.querySelector("#dataTable tbody");
-
-        // // Clear existing rows within the tbody element
-        // while (tableBody.firstChild) {
-        //   tableBody.removeChild(tableBody.firstChild);
-        // }
-
-        function createCell(content) {
-          const cell = document.createElement("td");
-          cell.textContent = content;
-          return cell;
-        }
-
-        function createButtonCell(text, onClick, classes) {
-          const button = document.createElement("button");
-          button.textContent = text;
-
-          // Add Bootstrap classes to the button
-          if (classes && classes.length > 0) {
-            button.classList.add(...classes.split(" "));
+  $(".delete_bgr_id").click(function (e) {
+    e.preventDefault();
+    var id = $(this).attr("id");
+    if (confirm("Are you sure you want to delete this record?")) {
+      $.ajax({
+        url: "../AjaxFunctions/delete_bgr_details",
+        method: "POST",
+        data: { id: id },
+        success: function (response) {
+          // alert(response);
+          if (response == "success") {
+            var custom_row = document.getElementById("custom_row" + id);
+            custom_row.parentNode.removeChild(custom_row);
+            alert("Record deleted successfully."); // Display the success message
+          } else {
+            alert("An error occurred while deleting the record."); // Display an error message
           }
+        },
+      });
+    }
+  });
 
-          button.addEventListener("click", function (event) {
-            event.preventDefault(); // Stop the default button behavior
-            onClick();
-          });
-          return button;
-        }
-
-        data.forEach((datas, counter) => {
-          const row = document.createElement("tr");
-
-          const properties = [
-            "commodity",
-            "lotno",
-            "datesampling",
-            "dateofpacking",
-            "gradeasign",
-            "packetsize",
-            "totalnoofpackets",
-            "totalqtyquintal",
-            "estimatedvalue",
-            "agmarkreplicafrom",
-            "agmarkreplicato",
-            "agmarkreplicatotal",
-            "replicacharges",
-            "laboratoryname",
-            "reportno",
-            "reportdate",
-            "remarks",
-          ];
-          row.appendChild(createCell(counter + 1)); // Add counter value
-          properties.forEach((property) => {
-            row.appendChild(createCell(datas[property]));
-          });
-
-          // Create a single cell to contain both the edit and delete buttons
-          const actionsCell = document.createElement("td");
-
-          actionsCell.appendChild(
-            createButtonCell(
-              "Edit",
-              function () {
-                handleEditClick(datas.id);
-              },
-              "btn btn-primary"
-            )
-          );
-          actionsCell.appendChild(
-            createButtonCell(
-              "Delete",
-              function () {
-                handleDeleteClick(datas.id);
-              },
-              "btn btn-danger"
-            )
-          );
-
-          row.appendChild(actionsCell);
-
-          tableBody.appendChild(row);
-        });
-      },
-    });
-  }
-
-  function handleEditClick(id) {
+  $(".edit_bgr_id").click(function (e) {
     $("#update_bgr_details").show(); // Show Edit button
     $("#add_bgr_details").hide();
+    e.preventDefault();
+
+    var id = $(this).attr("id");
+
     $.ajax({
       url: "../AjaxFunctions/edit_bgr_details",
       method: "POST",
@@ -127,8 +60,6 @@ $(document).ready(function () {
           remarks,
         } = response;
 
-        // $("#dataTable").html(response);
-        // Set the values of the input elements using jQuery
         $("#record_id").val(id);
         $("#update_bgr_details").val(id);
         $("#ta-commodity-").val(commodity);
@@ -154,24 +85,7 @@ $(document).ready(function () {
         console.error("Error:", error);
       },
     });
-  }
-  function handleDeleteClick(id) {
-    if (confirm("Are you sure you want to delete this record?")) {
-      $.ajax({
-        url: "../AjaxFunctions/delete_bgr_details",
-        method: "POST",
-        data: { id: id },
-        success: function (data) {
-          alert("Data Deleted");
-          // fetch_data();
-          location.reload();
-        },
-      });
-    } else {
-      return false;
-    }
-  }
-  fetch_data();
+  });
 
   const form_section_id = $("#form_section_id").val();
   const requiredFields = {
@@ -207,7 +121,7 @@ $(document).ready(function () {
 
   async function handleFormAction(action) {
     const form_data = $("#" + form_section_id).serializeArray();
-    console.log(form_data);
+
     const validationStatus = await bgr_report_validation(form_data);
 
     if (validationStatus.isValid) {
@@ -225,7 +139,15 @@ $(document).ready(function () {
   }
 
   async function sendFormToServer(form_data) {
-    // console.log("abc" + form_data);
+    let recordId = null;
+
+    for (const item of form_data) {
+      if (item.name === "record_id") {
+        recordId = item.value;
+        break; // No need to continue searching
+      }
+    }
+
     return new Promise((resolve, reject) => {
       $.ajax({
         type: "POST",
@@ -235,16 +157,15 @@ $(document).ready(function () {
           xhr.setRequestHeader("X-CSRF-Token", $('[name="_csrfToken"]').val());
         },
         success: function (response) {
-          resolve(response);
-          // location.reload(); // Refresh the entire page
-          fetch_data();
-          $(
-            "#record_id, #ta-commodity-, #lot_no_tf_no_m_no, #date_of_sampling, #date_of_packing, #grade, #ta-packet_size-, #ta-packet_size_unit-, #ta-no_of_packets-, #total_qty_graded_quintal, #estimated_value, #agmark_replica_from, #agmark_replica_to, #agmark_replica_total, #replica_charges, #report_no, #report_date, #remarks"
-          ).val("");
-          location.reload();
-        },
-        error: function (error) {
-          reject(error);
+          if (response == "updated") {
+            $(
+              "#record_id, #ta-commodity-, #lot_no_tf_no_m_no, #date_of_sampling, #date_of_packing, #grade, #ta-packet_size-, #ta-packet_size_unit-, #ta-no_of_packets-, #total_qty_graded_quintal, #estimated_value, #agmark_replica_from, #agmark_replica_to, #agmark_replica_total, #replica_charges, #report_no, #report_date, #remarks"
+            ).val("");
+            location.reload();
+            alert("Record updated successfully."); // Display the success message
+          } else {
+            alert("An error occurred while deleting the record."); // Display an error message
+          }
         },
       });
     });

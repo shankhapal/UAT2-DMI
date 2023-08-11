@@ -2782,7 +2782,6 @@ class AjaxFunctionsController extends AppController{
 							'dateofpacking' => $_POST['date_of_packing'],
 							'grade' => $_POST['grade'],
 							'packetsize' => $_POST['ta-packet_size-'],
-							'packetsizeunit' => $_POST['ta-packet_size_unit-'],
 							'totalnoofpackets' => $_POST['ta-no_of_packets-'],
 							'totalqtyquintal' => $_POST['total_qty_graded_quintal'],
 							'estimatedvalue' => $_POST['estimated_value'],
@@ -2797,8 +2796,15 @@ class AjaxFunctionsController extends AppController{
 					);
 
 					// Update the data in the database using the model
-					$save_bgr_details = $this->DmiBgrCommodityReportsAddmore->saveCommodityWiseReport($data);// call custome method from model
-					 $this->render('/element/application_forms/bgr/analysis_table/commodity_wise_reports_form_tbl');
+				$save_bgr_details = $this->DmiBgrCommodityReportsAddmore->saveCommodityWiseReport($data);// call custome method from model
+				
+				if($save_bgr_details == "updated"){
+					echo "updated";
+				}else{
+					echo "added";
+				}
+				exit(); 		
+
 			}
 
 		
@@ -2866,14 +2872,19 @@ class AjaxFunctionsController extends AppController{
 		$this->autoRender = false;
 		$this->Session->delete('editbgrid');
 		$this->loadModel('DmiBgrCommodityReportsAddmore');
+		$this->loadModel('DmiBgrCommodityReports');
 
 		//$record_id = $id;
 		$deletedData = $this->request->getData();
 		$delete_id = $deletedData['id'];
-		$bgrReportData = $this->DmiBgrCommodityReportsAddmore->deleteBgrData($delete_id);// call to custome function from model
-		
 
-		// $this->render('/element/application_forms/bgr/analysis_table/commodity_wise_reports_form_tbl');
+		// Retrieve updated table data
+		$bgrReportData = $this->DmiBgrCommodityReportsAddmore->deleteBgrData($delete_id);// call to custome function 
+		
+		echo "success";
+		
+ 		exit();
+		
 		
 	}
 

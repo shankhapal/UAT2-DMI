@@ -19,9 +19,7 @@
 
 		$DmiBgrCommodityReportsAddmore = TableRegistry::getTableLocator()->get('DmiBgrCommodityReportsAddmore');
 
-		$bgraAddedRecord = $DmiBgrCommodityReportsAddmore->find('all',array(
-			'conditions'=>array(
-			'customer_id IS'=>$customer_id)))->toArray();
+		
 		
 		if($latest_id != null){
 			$form_fields = $this->find('all', array(
@@ -150,7 +148,31 @@
 		$form_laboratory_data = $DmiCustomerLaboratoryDetails->find('all', [
 				'conditions' => ['id' => $lab_id]])->first();
 		$laboratory_name = $form_laboratory_data['laboratory_name'];
+			
+		$bgraAddedRecord = $DmiBgrCommodityReportsAddmore->find('all',array(
+			'conditions'=>array(
+			'customer_id IS'=>$customer_id)))->toArray();
 
+			 $query = $DmiBgrCommodityReportsAddmore->find()
+        ->where([
+            'customer_id' => $customer_id,
+            'delete_status IS NULL' // Records where delete_status is NULL
+        ])
+        ->order(['id' => 'desc']);
+
+    $bgrReportData = $query->toArray();
+
+    foreach ($bgrReportData as $eachvalue) { // Note the "&" before $eachvalue
+        $commodity_code = $eachvalue['commodity'];
+
+        $result = $MCommodity->find()
+            ->select('commodity_name')
+            ->where(['commodity_code' => $commodity_code]);
+
+        $commodityArray = $result->first();
+        $eachvalue['commodity'] = $commodityArray ? $commodityArray->commodity_name : '';
+    }
+	
 		return array(
 			$form_fields_details,
 			$firmname,$email,
@@ -163,10 +185,11 @@
 			$sub_commodity_value,
 			$grade_list,
 			$laboratory_name,
-			$bgraAddedRecord
+			$bgrReportData
 		);
 
 	}
+	
 	
 
 	public function saveFormDetails($customer_id,$forms_data){
