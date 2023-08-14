@@ -60,7 +60,12 @@
     <div class="row">
         <div class="col-md-12">
         <div class="card card-Lightblue">
-		 <div class="card-header"><h3 class="card-title-new"> Application Movement History</h3></div>
+		 <div class="card-header"><h3 class="card-title-new"> Application Movement History</h3>
+       <?php if(!empty($application_type) && !empty($firm_name)){ ?>
+       <br>
+       <h6 class="text-center"><span>Application Type:  <?php echo $application_type;?></span> &nbsp;  <span> Firm Name :  <?php echo $firm_name;?></span></h6>
+      <?php } ?>
+      </div>
          <div class="form-horizontal">
              <div class="card-body">
               <div class="row1">
