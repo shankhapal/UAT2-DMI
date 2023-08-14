@@ -4774,6 +4774,40 @@ class ApplicationformspdfsController extends AppController{
 				$this->set('NablDate',$NablDate);
 				$this->set('bgrReportData',$bgrReportData);
 
+				// Get the current year
+				$currentYear = date('Y');
+				$currentDate = date('Y-m-d');
+
+				// Calculate the start and end dates of the first biannual period (April 1st to September 30th)
+				$firstPeriodStartDate = $currentYear . '-04-01';
+				$firstPeriodEndDate = $currentYear . '-09-30';
+
+				// Fetch data for the first period (April 1st to September 30th)
+				$firstPeriodData = $this->DmiBgrCommodityReportsAddmore->find()
+						->where([
+								'created >=' => $firstPeriodStartDate,
+								'created <=' => $firstPeriodEndDate
+						])->toArray();
+			
+				// Calculate the start and end dates of the second biannual period (October 1st to March 31st)
+				$secondPeriodStartDate = $currentYear . '-10-01';
+				$secondPeriodEndDate = ($currentYear + 1) . '-03-31';
+
+					// Determine which biannual period the current date falls into
+				if ($currentDate >= $firstPeriodStartDate && $currentDate <= $firstPeriodEndDate) {
+						$periodStartDisplay = date('m/d/y', strtotime($secondPeriodStartDate));
+						$periodEndDisplay = date('m/d/y', strtotime($secondPeriodEndDate));
+				} elseif ($currentDate >= $secondPeriodStartDate && $currentDate <= $secondPeriodEndDate) {
+						$periodStartDisplay = date('m/d/y', strtotime($firstPeriodStartDate));
+						$periodEndDisplay = date('m/d/y', strtotime($firstPeriodEndDate));
+				} else {
+						$periodStartDisplay = '';
+						$periodEndDisplay = '';
+				}
+
+				$this->set('periodStartDisplay',$periodStartDisplay);
+				$this->set('periodEndDisplay',$periodEndDisplay);
+
 				$this->generateApplicationPdf('/Applicationformspdfs/applPdfBgr');	
 			}
 

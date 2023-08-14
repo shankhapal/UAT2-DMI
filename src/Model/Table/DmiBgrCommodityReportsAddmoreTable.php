@@ -21,6 +21,7 @@
     $dateofPacking = $forms_data['dateofpacking'];
     $gradeAsign = $forms_data['grade'];
     $packetSize = $forms_data['packetsize'];
+		$packetsizeunit = $forms_data['packetsizeunit'];
     $totalNoOfPackets = $forms_data['totalnoofpackets'];
     $totalQtyQuintal = $forms_data['totalqtyquintal'];
     $estimatedValue = $forms_data['estimatedvalue'];
@@ -44,6 +45,7 @@
 				'dateofpacking' => $dateofPacking,
 				'gradeasign' => $gradeAsign,
 				'packetsize' => $packetSize,
+				'packetsizeunit'=>$packetsizeunit,
 				'totalnoofpackets' => $totalNoOfPackets,
 				'totalqtyquintal' => $totalQtyQuintal,
 				'estimatedvalue' => $estimatedValue,
@@ -58,6 +60,11 @@
 				'created'=>date('Y-m-d H:i:s'),
 				'modified'=>date('Y-m-d H:i:s')
 			));
+
+			if($this->save($newEntity)){
+				echo "updated";
+			}
+
 		}else{
 			$newEntity = $this->newEntity(array(
 								
@@ -68,6 +75,7 @@
 				'dateofpacking' => $dateofPacking,
 				'gradeasign' => $gradeAsign,
 				'packetsize' => $packetSize,
+				'packetsizeunit'=>$packetsizeunit,
 				'totalnoofpackets' => $totalNoOfPackets,
 				'totalqtyquintal' => $totalQtyQuintal,
 				'estimatedvalue' => $estimatedValue,
@@ -82,12 +90,14 @@
 				'created'=>date('Y-m-d H:i:s'),
 				'modified'=>date('Y-m-d H:i:s')
 			));
+
+			if($this->save($newEntity)){
+				echo "added";
+			}
 		}
 		
 								
-			if($this->save($newEntity)){
-				return true;
-			}
+			
 	}
 	
 	

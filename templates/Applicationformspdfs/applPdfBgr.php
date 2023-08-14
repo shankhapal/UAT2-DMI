@@ -19,7 +19,7 @@
 	<table width="100%" border="1">
 		<tr>
 		<td align="center" style="padding:5px;">
-			<h4>Application Bianually Grading returns of [month & year]</h4>
+			<h4>Application Bianually Grading returns of <?php echo $periodStartDisplay; ?> to <?php echo $periodEndDisplay; ?></h4>
 		</td>
 		</tr>
 	</table>
@@ -41,7 +41,7 @@
 		</tr>
 			
 		<tr>
-			<td><br>Subject: Submission of Biannual grading returns of [month & year] -regarding.</td><br>
+			<td><br>Subject: Submission of Biannual grading returns of <?php echo $periodStartDisplay; ?> to <?php echo $periodEndDisplay; ?> -regarding.</td><br>
 		</tr>
 
 		<tr>
@@ -64,7 +64,7 @@
 		<table>
 			<tr>
 				<td align="left">
-						I, hereby submitting Agmark Biannual grading returns for the month of [ Add Month] along with following verified and self attested documents for perusal and necessary action please.
+						I, hereby submitting Agmark Biannual grading returns for the month of <?php echo $periodStartDisplay; ?> to <?php echo $periodEndDisplay; ?> along with following verified and self attested documents for perusal and necessary action please.
 				</td>
 			</tr>
 	</table>
@@ -120,7 +120,11 @@
 		</tr>
 		<tr>
 				<th colspan="6" class="border-bottom" scope="col">Period:
-					<?php //echo $section_form_details[7]; ?>
+					 <?php if ($periodStartDisplay && $periodEndDisplay) : ?>
+       		 Period: From <?php echo $periodStartDisplay; ?> to <?php echo $periodEndDisplay; ?>
+  		  <?php else : ?>
+        Period: Not within a defined biannual period
+   		 <?php endif; ?>
 				</th>
 				<th colspan="8" class="border-bottom" scope="col">Type:</th>
 		</tr>
@@ -192,7 +196,7 @@
 
 <table width="100%" border="1">
 	<tr>
-			<td align="center" style="padding:5px;"><h4>Details of Analysis of Food Safety Parameters Done from NABL Accredited Laboratory During [Month]</h4></td>
+			<td align="center" style="padding:5px;"><h4>Details of Analysis of Food Safety Parameters Done from NABL Accredited Laboratory During <?php echo $periodStartDisplay; ?> to <?php echo $periodEndDisplay; ?></h4></td>
 	</tr>
 </table>
 

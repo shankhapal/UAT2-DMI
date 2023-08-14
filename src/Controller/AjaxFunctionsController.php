@@ -2712,7 +2712,7 @@ class AjaxFunctionsController extends AppController{
 	 // added by shankhpal shende on 02/08/2023
 	function addBgrDetails() {
 
-				// pr($_POST);die;
+				//  pr($_POST);die;
 			$this->autoRender = false;
 			$this->loadModel('DmiBgrCommodityReportsAddmore');
 		
@@ -2782,6 +2782,7 @@ class AjaxFunctionsController extends AppController{
 							'dateofpacking' => $_POST['date_of_packing'],
 							'grade' => $_POST['grade'],
 							'packetsize' => $_POST['ta-packet_size-'],
+							'packetsizeunit' => $_POST['ta-packet_size_unit-'],
 							'totalnoofpackets' => $_POST['ta-no_of_packets-'],
 							'totalqtyquintal' => $_POST['total_qty_graded_quintal'],
 							'estimatedvalue' => $_POST['estimated_value'],
@@ -2795,15 +2796,21 @@ class AjaxFunctionsController extends AppController{
 							'remarks' => $_POST['remarks'],
 					);
 
-					// Update the data in the database using the model
-				$save_bgr_details = $this->DmiBgrCommodityReportsAddmore->saveCommodityWiseReport($data);// call custome method from model
-				
-				if($save_bgr_details == "updated"){
-					echo "updated";
-				}else{
-					echo "added";
+				// Update the data in the database using the model
+				$save_bgr_details = $this->DmiBgrCommodityReportsAddmore->saveCommodityWiseReport($data); // Call custom method from model
+
+				// Define a variable to hold the response message
+				$response = "";
+				// Check the result of the update operation
+				if ($save_bgr_details == "updated") {
+						$response = "updated";
+				} elseif($save_bgr_details == "added") {
+						$response = "added";
 				}
-				exit(); 		
+
+				// Echo the response
+				echo $response;
+				exit();
 
 			}
 
@@ -2814,8 +2821,8 @@ class AjaxFunctionsController extends AppController{
 	
 		// This method will handle the request to display added data for BGR details
 	 // added by shankhpal shende on 02/08/2023
-	public function addedBgrDetails()
-{
+	public function addedBgrDetails(){
+
     $this->autoRender = false;
     $this->loadModel('DmiBgrCommodityReportsAddmore');
     $this->loadModel('MCommodity');
@@ -2886,6 +2893,24 @@ class AjaxFunctionsController extends AppController{
  		exit();
 		
 		
+	}
+
+	public function getTotalReplicaCharge(){
+
+		$this->autoRender = false;
+		$this->loadModel('DmiBgrCommodityReportsAddmore');
+
+		$query = $this->DmiBgrCommodityReportsAddmore->find();
+		$query->select(['replicacharges' => $query->func()->sum('replicacharges')]);
+		$query->where(['delete_status IS' => null]);
+
+		$result = $query->first();
+		
+		echo $totalReplicaCharges = $result['replicacharges'];
+
+		
+		// echo json_encode($totalReplicaCharges);
+		exit;
 	}
 
 	

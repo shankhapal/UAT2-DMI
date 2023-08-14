@@ -1,4 +1,16 @@
 $(document).ready(function () {
+  function updateOverallTotalCharges() {
+    $.ajax({
+      type: "GET",
+      url: "../AjaxFunctions/get_total_replica_charge",
+      success: function (response) {
+        // Update the overall_total_chrg element with the response value
+        $("#overall_total_chrg").val(response);
+        $("#totalRevenueHeader").html(response);
+      },
+    });
+  }
+  updateOverallTotalCharges();
   $(".delete_bgr_id").click(function (e) {
     e.preventDefault();
     var id = $(this).attr("id");
@@ -18,6 +30,7 @@ $(document).ready(function () {
           }
         },
       });
+      updateOverallTotalCharges();
     }
   });
 
@@ -47,6 +60,7 @@ $(document).ready(function () {
           dateofpacking,
           gradeasign,
           packetsize,
+          packetsizeunit,
           totalnoofpackets,
           totalqtyquintal,
           estimatedvalue,
@@ -68,6 +82,7 @@ $(document).ready(function () {
         $("#date_of_packing").val(dateofpacking);
         $("#grade").val(gradeasign);
         $("#ta-packet_size-").val(packetsize);
+        $("#ta-packet_size_unit-").val(packetsizeunit);
         $("#ta-no_of_packets-").val(totalnoofpackets);
         $("#total_qty_graded_quintal").val(totalqtyquintal);
         $("#estimated_value").val(estimatedvalue);
@@ -85,6 +100,7 @@ $(document).ready(function () {
         console.error("Error:", error);
       },
     });
+    updateOverallTotalCharges();
   });
 
   const form_section_id = $("#form_section_id").val();
@@ -157,14 +173,21 @@ $(document).ready(function () {
           xhr.setRequestHeader("X-CSRF-Token", $('[name="_csrfToken"]').val());
         },
         success: function (response) {
-          if (response == "updated") {
+          console.log(response);
+          if (response === "updated" || response === "added") {
+            // Clear input fields
             $(
               "#record_id, #ta-commodity-, #lot_no_tf_no_m_no, #date_of_sampling, #date_of_packing, #grade, #ta-packet_size-, #ta-packet_size_unit-, #ta-no_of_packets-, #total_qty_graded_quintal, #estimated_value, #agmark_replica_from, #agmark_replica_to, #agmark_replica_total, #replica_charges, #report_no, #report_date, #remarks"
             ).val("");
-            location.reload();
-            alert("Record updated successfully."); // Display the success message
+
+            location.reload(); // Reload the page
+            alert(
+              "Record " +
+                (response === "updated" ? "updated" : "added") +
+                " successfully."
+            );
           } else {
-            alert("An error occurred while deleting the record."); // Display an error message
+            alert("An error occurred."); // Display an error message
           }
         },
       });

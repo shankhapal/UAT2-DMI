@@ -93,20 +93,46 @@
 		
 		$CustomersController = new CustomersController;
 		$export_unit_status = $CustomersController->Customfunctions->checkApplicantExportUnit($customer_id);
+	
 		
-		// Get the current month and year
-		$current_month = date('m');
-		$current_year = date('y');
+		// Get the current year
+		$currentYear = date('Y');
+		$currentDate = date('Y-m-d');
 
-		// Calculate the "from" and "to" dates based on the current month
-		if ($current_month >= 4 && $current_month <= 9) {
-				$from_date = '04/01/' . ($current_year - 1);
-				$to_date = '09/30/' . $current_year;
-		} else {
-				$from_date = '10/01/' . ($current_year - 1);
-				$to_date = '03/31/' . $current_year;
-		}
-			
+		// Calculate the start and end dates of the first biannual period (April 1st to September 30th)
+		$firstPeriodStartDate = $currentYear . '-04-01';
+		$firstPeriodEndDate = $currentYear . '-09-30';
+
+		// Assuming you have a model named DmiBgrCommodityReportsAddmore
+		$DmiBgrCommodityReportsAddmore = TableRegistry::getTableLocator()->get('DmiBgrCommodityReportsAddmore');
+
+		// Fetch data for the first period (April 1st to September 30th)
+		$firstPeriodData = $DmiBgrCommodityReportsAddmore->find()
+				->where([
+						'created >=' => $firstPeriodStartDate,
+						'created <=' => $firstPeriodEndDate
+				])->toArray();
+
+		// pr($firstPeriodData);die;
+
+		// Calculate the start and end dates of the second biannual period (October 1st to March 31st)
+		$secondPeriodStartDate = $currentYear . '-10-01';
+		$secondPeriodEndDate = ($currentYear + 1) . '-03-31';
+
+
+		if ($currentDate >= $firstPeriodStartDate && $currentDate <= $firstPeriodEndDate) {
+					$periodStartDisplay = date('m/d/y', strtotime($secondPeriodStartDate));
+					$periodEndDisplay = date('m/d/y', strtotime($secondPeriodEndDate));
+			} elseif ($currentDate >= $secondPeriodStartDate && $currentDate <= $secondPeriodEndDate) {
+					$periodStartDisplay = date('m/d/y', strtotime($firstPeriodStartDate));
+					$periodEndDisplay = date('m/d/y', strtotime($firstPeriodEndDate));
+			} else {
+					$periodStartDisplay = '';
+					$periodEndDisplay = '';
+			}
+
+		
+
 		
 		$added_firm = $DmiFirms->find('all', ['conditions' => ['customer_id' => $customer_id]])->first();
 			
@@ -172,7 +198,7 @@
         $commodityArray = $result->first();
         $eachvalue['commodity'] = $commodityArray ? $commodityArray->commodity_name : '';
     }
-	
+		
 		return array(
 			$form_fields_details,
 			$firmname,$email,
@@ -180,8 +206,8 @@
 			$state_name,
 			$region,
 			$export_unit_status,
-			$from_date,
-			$to_date,
+			$periodStartDisplay,
+			$periodEndDisplay,
 			$sub_commodity_value,
 			$grade_list,
 			$laboratory_name,

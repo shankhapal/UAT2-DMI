@@ -19,8 +19,10 @@
 // -->
 
 
-//  pr($section_form_details);die;
+// pr($section_form_details);die;
  // Define the constant with the message
+ use Cake\Datasource\ConnectionManager;
+
 define('DATE_FORMAT_MESSAGE', 'Enter DD/MM/YYYY');
 define('INPUT_FIELD_CLASSES', 'form-control input-field wd120');
 $placeholder = DATE_FORMAT_MESSAGE;
@@ -59,27 +61,22 @@ $class1 = INPUT_FIELD_CLASSES;?>
                     scope="col">Email :
                     <?php echo base64_decode(isset($section_form_details[2])?$section_form_details[2]:"NA"); ?></th>
                   <th
-                    colspan="3"
+                    colspan="6"
                     class="border-bottom"
                     scope="col">Address :
                     <?php echo isset($section_form_details[3])?$section_form_details[3]:"NA" ?></th>
               </tr>
               <tr>
                   <th
-                    colspan="3"
-                    class="border-bottom"
-                    scope="col">Period: From
-                    <?php //echo $section_form_details[7]; ?>
-                 </th>
-                  <th
-                    colspan="3"
-                    class="border-bottom" scope="col">Period: To
-                    <?php //echo $section_form_details[7]; ?> </th>
-                  <th
                     colspan="6"
                     class="border-bottom"
+                    scope="col">Period: From <?php echo $section_form_details[7]; ?> to <?php echo $section_form_details[8]; ?>
+                 </th>
+                  <th
+                    colspan="7"
+                    class="border-bottom"
                     scope="col">Type:
-                    <?php //echo ($section_form_details[6] == "yes") ? "Export" : "Domestic"; ?>
+                    <?php echo ($section_form_details[6] == "yes") ? "Export" : "Domestic"; ?>
                   </th>
                   </th>
                   <th scope="col"></th>
@@ -92,7 +89,9 @@ $class1 = INPUT_FIELD_CLASSES;?>
                  
               </tr>
                <tr>
-                  <th colspan="6" class="border-bottom" scope="col">Total Revenue (In. Rs.):</th>
+                  <th colspan="6" class="border-bottom" scope="col">
+                    Total Revenue (In. Rs.): <span id="totalRevenueHeader"></span>
+                  </th>
                   <th colspan="6" class="border-bottom" scope="col">Progressive Revenue (In Rs.):</th>
                   <th scope="col"></th>
                   <th scope="col"></th>
@@ -110,7 +109,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                 <th class="tablehead wdth" scope="col">Date of sampling</th>
                 <th class="tablehead wdth" scope="col">Date of packing</th>
                 <th class="tablehead wdth" scope="col">Grade assigned</th>
-                <th class="tablehead wdth" scope="col">Pack Size</th>
+                <th class="tablehead wdth" scope="col" colspan="2">Pack Size</th>
                 <th class="tablehead wdth" scope="col">Total No. of packages</th>
                 <th class="tablehead wdth" scope="col">Total Qty. graded in Quintal</th>
                 <th class="tablehead wdth" scope="col">Estimated value (in Rs.)</th>
@@ -128,7 +127,8 @@ $class1 = INPUT_FIELD_CLASSES;?>
                 <th class="tablehead wdth" scope="col"></th>
                 <th class="tablehead wdth" scope="col"></th>
                 <th class="tablehead wdth" scope="col"></th>
-                <th class="tablehead wdth" scope="col"></th>
+                 <th class="tablehead wdth" scope="col">Size</th>
+                <th class="tablehead wdth" scope="col">Unit</th>
                 <th class="tablehead wdth" scope="col"></th>
                 <th class="tablehead wdth" scope="col"></th>
                 <th class="tablehead wdth" scope="col"></th>
@@ -147,15 +147,41 @@ $class1 = INPUT_FIELD_CLASSES;?>
                
                   <?php
                   $i=1;
-                  foreach ($section_form_details[12] as  $eachrow) { ?>
+                  foreach ($section_form_details[12] as  $eachrow) {
+                    $conn = ConnectionManager::get('default');
+                    $numericValue = $eachrow['packetsizeunit'];
+                    $unitName = "";
+                    if(!empty($numericValue)){
+                       $query = "SELECT unit FROM dmi_replica_unit_details WHERE id = $numericValue";
+                       $q = $conn->execute($query);
+
+                       if ($q->rowCount() > 0) {
+                        $row = $q->fetch();
+                        if (isset($row[0])) { // Check if index 0 exists
+                            $unitName = $row[0]; // Use index 0 to access the value
+                        }
+                       }
+                    }
+
+                    $gradeasign = $eachrow['gradeasign'];
+                    $query2 = "SELECT grade_desc from m_grade_desc WHERE grade_code = $gradeasign";
+                    $q2 = $conn->execute($query2);
+                    $row2 = $q2->fetch();
+                    $gradename = '';
+                    if (isset($row2[0])) { // Check if index 0 exists
+                      $gradename = $row2[0]; // Use index 0 to access the value
+                    }
+                   
+                    ?>
                     <tr  id="custom_row<?php echo $eachrow['id'];?>">
                       <td><?php echo $i; ?></td>
                       <td><?php echo $eachrow['commodity'];?></td>
                       <td><?php echo $eachrow['lotno'];?></td>
                       <td><?php echo $eachrow['datesampling'];?></td>
                       <td><?php echo $eachrow['dateofpacking'];?></td>
-                      <td><?php echo $eachrow['gradeasign'];?></td>
+                      <td><?php echo $gradename; ?></td>
                       <td><?php echo $eachrow['packetsize'];?></td>
+                      <td><?php echo $unitName; ?></td>
                       <td><?php echo $eachrow['totalnoofpackets'];?></td>
                       <td><?php echo $eachrow['totalqtyquintal'];?></td>
                       <td><?php echo $eachrow['estimatedvalue'];?></td>
@@ -254,7 +280,19 @@ $class1 = INPUT_FIELD_CLASSES;?>
                           )); ?>
                           <div class="error-message" id="error-ta-packet_size-"></div>
                       </td>
+                          
+                      <td>
 
+
+                      <?php echo $this->Form->control('ta-packet_size_unit-', array(
+                        'type'=>'select',
+                        'empty'=>'Select Unit',
+                        'id'=>'ta-packet_size_unit-',
+                        'label'=>false,
+                        'class'=>$class1,
+                      )); ?>
+                      <div class="error-message" id="error-ta-packet_size_unit-"></div>
+                     </td>
                       
                      
                       <td>
@@ -373,7 +411,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                       </td>
                       <td>
                           <?php echo $this->Form->control('remarks', array(
-                            'type'=>'text',
+                            'type'=>'textarea',
                             'escape'=>false,
                             'id'=>'remarks',
                             'label'=>false,
@@ -393,6 +431,10 @@ $class1 = INPUT_FIELD_CLASSES;?>
      
           </tbody>
         </table>
+        <div class="col-md-3 float-right">
+            <?php echo $this->Form->control('overall_total_chrg', array('type'=>'number', 'id'=>'overall_total_chrg','value'=>'0', 'class'=>'form-control', 'readonly'=>true, 'label'=>'Total Replica Charges (Rs.):', 'required'=>true)); ?>
+            <span id="bal_amt_exceeds_msg"></span>
+        </div>
       </div>
     </div>
   </div>
