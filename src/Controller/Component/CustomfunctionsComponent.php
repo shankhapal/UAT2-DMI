@@ -504,6 +504,8 @@ class CustomfunctionsComponent extends Component {
 		} elseif ($appl_type==10) {		#For Routine Inspection (RTI) - Shankhpal [12/12/2022] 
 			
 			$form_type = 'RTI';
+		} elseif ($appl_type == 11){ #For Biannually Grading Report (BGR) - Shankhpal [21/08/2023] 
+			$form_type = 'BGR';
 		}
 
 		return $form_type;

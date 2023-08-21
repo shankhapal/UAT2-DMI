@@ -112,7 +112,7 @@ class ScrutinyController extends AppController{
 
 		$customer_id = $this->Customfunctions->checkCustomerIdAvailable($this->Session->read('customer_id'));
 		$this->set('customer_id',$customer_id);
-
+		
 		$oldapplication = $this->Customfunctions->isOldApplication($customer_id);
 		$this->set('oldapplication',$oldapplication);
 
@@ -125,7 +125,7 @@ class ScrutinyController extends AppController{
 
 		$application_type = $this->Session->read('application_type');
 		$this->set('application_type',$application_type);
-
+		
 		$document_lists = $this->Mastertablecontent->allDocumentsList();
 		$this->set('document_lists',$document_lists);
 		
@@ -263,7 +263,7 @@ class ScrutinyController extends AppController{
 
 		$firm_type_text = $this->Customfunctions->firmTypeText($customer_id);
 		$form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
-
+		
 		$final_submit_details = $this->Customfunctions->finalSubmitDetails($customer_id,'application_form');
 		$this->set('final_submit_details',$final_submit_details);
 
@@ -276,7 +276,7 @@ class ScrutinyController extends AppController{
 		if($form_type=='F' && $ca_bevo_applicant=='yes'){
 			$form_type='E';
 		}
-
+		
 		$this->set('form_type',$form_type);
 
 		// check current form section value
@@ -326,7 +326,7 @@ class ScrutinyController extends AppController{
 
 		$final_submit_table_name = $Dmi_flow_wise_tables_list->getFlowWiseTableDetails($application_type,'application_form');
 		$Dmi_final_submit_table = TableRegistry::getTableLocator()->get($final_submit_table_name);
-
+			
 		// get current section all details
 		$section_details = $this->DmiCommonScrutinyFlowDetails->currentSectionDetails($application_type,$office_type,$firm_type,$form_type,$section_id);
 		
@@ -430,10 +430,10 @@ class ScrutinyController extends AppController{
 			$redirect_location = '/scrutiny/form-scrutiny';
 			$this->Communication->saveEditedMoComment($section_model,$htmlencoded_comment_by_mo,$mo_comment_ul,$redirect_location);
 		}
-
+		
 		//For RO reply
 		if (null!==($this->request->getData('save_edited_ro_reply'))){
-
+			
 			$htmlencoded_reply_by_ro = $this->request->getData('edited_ro_reply');
 
 			if(!empty($this->request->getData('rr_comment_ul')->getClientFilename())){
@@ -450,7 +450,7 @@ class ScrutinyController extends AppController{
 			$redirect_location = '/scrutiny/form-scrutiny';
 			$this->Communication->saveEditedRoReply($section_model,$htmlencoded_reply_by_ro,$rr_comment_ul,$redirect_location);
 		}
-
+		
 
 		//Start code for Edit/Delete options For RO on Communication with Applicant.
 		if($current_level == 'level_3'){

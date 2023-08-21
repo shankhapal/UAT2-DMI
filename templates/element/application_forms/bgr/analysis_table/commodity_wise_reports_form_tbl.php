@@ -19,9 +19,9 @@
 // -->
 
 
-// pr($section_form_details);die;
+// == pr($section_form_details);die;
  // Define the constant with the message
- use Cake\Datasource\ConnectionManager;
+use Cake\Datasource\ConnectionManager;
 
 define('DATE_FORMAT_MESSAGE', 'Enter DD/MM/YYYY');
 define('INPUT_FIELD_CLASSES', 'form-control input-field wd120');
@@ -70,7 +70,9 @@ $class1 = INPUT_FIELD_CLASSES;?>
                   <th
                     colspan="6"
                     class="border-bottom"
-                    scope="col">Period: From <?php echo $section_form_details[7]; ?> to <?php echo $section_form_details[8]; ?>
+                    scope="col">Period: From
+                    <?php echo $section_form_details[7]; ?>
+                    to <?php echo $section_form_details[8]; ?>
                  </th>
                   <th
                     colspan="7"
@@ -194,8 +196,12 @@ $class1 = INPUT_FIELD_CLASSES;?>
                       <td><?php echo $eachrow['reportdate'];?></td>
                       <td><?php echo $eachrow['remarks'];?></td>
                       <td>
-                       <a href="#" class="edit_bgr_id glyphicon glyphicon-edit" id="<?php echo $eachrow['id']; ?>" ></a> |
-                        <a href="#" class="delete_bgr_id glyphicon glyphicon-remove-sign machine_delete" id="<?php echo $eachrow['id']; ?>" ></a>
+                       <a href="#"
+                       class="edit_bgr_id glyphicon glyphicon-edit"
+                       id="<?php echo $eachrow['id']; ?>" ></a> |
+                        <a href="#"
+                        class="delete_bgr_id glyphicon glyphicon-remove-sign machine_delete"
+                        id="<?php echo $eachrow['id']; ?>" ></a>
                       </td>
                     </tr>
                  <?php $i++; }?>
@@ -274,6 +280,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                             'type'=>'text',
                             'escape'=>false,
                             'id'=>'ta-packet_size-',
+                            'options'=>$section_form_details[10],
                             'label'=>false,
                             'class'=>$class1,
                             'placeholder'=>'Enter Pack Size'
@@ -288,6 +295,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                         'type'=>'select',
                         'empty'=>'Select Unit',
                         'id'=>'ta-packet_size_unit-',
+                        'options'=>$section_form_details[13],
                         'label'=>false,
                         'class'=>$class1,
                       )); ?>
@@ -357,8 +365,6 @@ $class1 = INPUT_FIELD_CLASSES;?>
                               'escape'=>false,
                               'id'=>'agmark_replica_total',
                               'label'=>false,
-                              // 'readonly'=>'readonly',
-                              // 'placeholder'=>'0.00',
                               'class'=>$class1,
                             )); ?>
                             <div class="error-message" id="error-agmark_replica_total"></div>
@@ -370,7 +376,6 @@ $class1 = INPUT_FIELD_CLASSES;?>
                               'id'=>'replica_charges',
                               'label'=>false,
                               'class'=>$class1,
-                              // 'readonly'=>'readonly',
                               'placeholder'=>'0.00'
                             )); ?>
                           <div class="error-message" id="error-replica_charges"></div>
@@ -432,14 +437,29 @@ $class1 = INPUT_FIELD_CLASSES;?>
           </tbody>
         </table>
         <div class="col-md-3 float-right">
-            <?php echo $this->Form->control('overall_total_chrg', array('type'=>'number', 'id'=>'overall_total_chrg','value'=>'0', 'class'=>'form-control', 'readonly'=>true, 'label'=>'Total Replica Charges (Rs.):', 'required'=>true)); ?>
+            <?php echo $this->Form->control('overall_total_chrg',
+            array(
+                'type'=>'number',
+                'id'=>'overall_total_chrg',
+                'value'=>'0',
+                'class'=>'form-control',
+                'readonly'=>true,
+                'label'=>'Total Replica Charges (Rs.):',
+                'required'=>true
+            )); ?>
             <span id="bal_amt_exceeds_msg"></span>
         </div>
+
+
       </div>
     </div>
   </div>
   
 
-
-<input type="hidden" id="custemer_id" value='<?php echo $_SESSION['packer_id']; ?>'>
+<?php if(!empty($_SESSION['packer_id']) || isset($_SESSION['packer_id'])){
+			$customer_id = $_SESSION['packer_id'];
+		}else{
+			$customer_id = $_SESSION['customer_id'];
+		} ?>
+<input type="hidden" id="custemer_id" value='<?php echo $customer_id; ?>'>
 <!-- end table -->

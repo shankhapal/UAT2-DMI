@@ -56,8 +56,13 @@
 		}
 
 		// to fetch CA details: Name of Packer with address and e-mail id
-		$customer_id = $_SESSION['packer_id'];
-
+		if(!empty($_SESSION['packer_id']) || isset($_SESSION['packer_id'])){
+			$customer_id = $_SESSION['packer_id'];
+		}else{
+			$customer_id = $_SESSION['customer_id'];
+		}
+		
+		
 		$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
 		$DmiStates = TableRegistry::getTableLocator()->get('DmiStates');
 		$Dmi_ro_office = TableRegistry::getTableLocator()->get('DmiRoOffices');
@@ -113,7 +118,6 @@
 						'created <=' => $firstPeriodEndDate
 				])->toArray();
 
-		// pr($firstPeriodData);die;
 
 		// Calculate the start and end dates of the second biannual period (October 1st to March 31st)
 		$secondPeriodStartDate = $currentYear . '-10-01';
@@ -168,12 +172,28 @@
 				'conditions' => ['customer_id' => $customer_id,'map_type'=>'lab', 'delete_status IS NULL'],
 				'order' => ['id' => 'DESC']
 		])->first();
-
-		$lab_id = $attached_laboratory['lab_id'];
-
-		$form_laboratory_data = $DmiCustomerLaboratoryDetails->find('all', [
+			
+		if(!empty($attached_laboratory)){
+			$lab_id = $attached_laboratory['lab_id'];
+		
+			if(strpos($lab_id,"/Own") !== false){
+				$recordidArray = explode("/", $lab_id);
+				$ownlabId = $recordidArray[0];
+				$form_laboratory_data = $DmiCustomerLaboratoryDetails->find('all', [
+				'conditions' => ['id' => $ownlabId]])->first();
+				$laboratory_name = $form_laboratory_data['laboratory_name'];
+			}else{
+				$form_laboratory_data = $DmiCustomerLaboratoryDetails->find('all', [
 				'conditions' => ['id' => $lab_id]])->first();
-		$laboratory_name = $form_laboratory_data['laboratory_name'];
+				$laboratory_name = $form_laboratory_data['laboratory_name'];
+			}
+			
+		}else{
+			$laboratory_name = "";
+		}
+		
+
+		
 			
 		$bgraAddedRecord = $DmiBgrCommodityReportsAddmore->find('all',array(
 			'conditions'=>array(
@@ -198,6 +218,17 @@
         $commodityArray = $result->first();
         $eachvalue['commodity'] = $commodityArray ? $commodityArray->commodity_name : '';
     }
+
+		$DmiReplicaUnitDetails = TableRegistry::getTableLocator()->get('DmiReplicaUnitDetails');
+		
+		$unit_list = $DmiReplicaUnitDetails
+    ->find('list', [
+        'keyField' => 'id',
+        'valueField' => 'sub_unit',
+        'conditions' => [],
+        'order' => 'id asc'
+    ])
+    ->toArray();
 		
 		return array(
 			$form_fields_details,
@@ -211,7 +242,8 @@
 			$sub_commodity_value,
 			$grade_list,
 			$laboratory_name,
-			$bgrReportData
+			$bgrReportData,
+			$unit_list
 		);
 
 	}
@@ -220,25 +252,70 @@
 
 	public function saveFormDetails($customer_id,$forms_data){
 
-			
 
-				$newEntity = $this->newEntity(array(
-					
-					'customer_id'=>$customer_id,
-					'form_status'=>'saved',
-					'created'=>date('Y-m-d H:i:s'),
-					'modified'=>date('Y-m-d H:i:s')
+		 	$CustomersController = new CustomersController;
 
-				));
+			if(!empty($forms_data['other_upload_docs']->getClientFilename())){
 
-				if($this->save($newEntity)){
-					
-					return true;
-					
-				}
+				$file_name = $forms_data['other_upload_docs']->getClientFilename();
+				$file_size = $forms_data['other_upload_docs']->getSize();
+				$file_type = $forms_data['other_upload_docs']->getClientMediaType();
+				$file_local_path = $forms_data['other_upload_docs']->getStream()->getMetadata('uri');
+
+				$other_upload_docs = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function
+
+			}else{
+				$other_upload_docs = null;
+			}
+
+			//check if new file is selected	while reply if not save file path from db
+    if(!empty($section_form_details[0]['id'])){
+      if(empty($other_upload_docs)){
+        $other_upload_docs = $section_form_details[0]['other_upload_docs'];
+      }
+    }
+
+			$newEntity = $this->newEntity(array(
+				'customer_id'=>$customer_id,
+				'other_upload_docs'=>$other_upload_docs,
+				'form_status'=>'saved',
+				'created'=>date('Y-m-d H:i:s'),
+				'modified'=>date('Y-m-d H:i:s')
+
+			));
+
+			if($this->save($newEntity)){
 				
-			
+				return true;
+				
+			}
 
+	}
+
+	public function saveReferredBackComment($customer_id,$report_details,$reffered_back_comment,$rb_comment_ul){
+
+		$CustomersController = new CustomersController;
+
+		$formSavedEntity = $this->newEntity(array(
+			'customer_id'=>$customer_id,
+			'other_upload_docs'=>$report_details['other_upload_docs'],
+			'referred_back_comment'=>$reffered_back_comment,
+			'rb_comment_ul'=>$rb_comment_ul,
+			'referred_back_date'=>date('Y-m-d H:i:s'),
+			'referred_back_by_email'=>$_SESSION['username'],
+			'referred_back_by_once'=>$_SESSION['once_card_no'],
+			'form_status'=>'referred_back',
+			'current_level'=>$_SESSION['current_level'],
+			'created'=>date('Y-m-d H:i:s'),
+			'modified'=>date('Y-m-d H:i:s')
+		));
+		if($this->save($formSavedEntity)){
+			
+			return 1;
+		}else{
+			
+			return 0;
+		}
 	}
 		
 }

@@ -2866,7 +2866,7 @@ class AjaxFunctionsController extends AppController{
     $editbgrid = $updatedData['id'];
 		$this->Session->write('editbgrid',$editbgrid);
 		$bgrReportData = $this->DmiBgrCommodityReportsAddmore->getBgrData($editbgrid);
-
+	
  		return $this->response->withType('application/json')->withStringBody(json_encode($bgrReportData));
 		$this->render('/element/application_forms/bgr/analysis_table/commodity_wise_reports_form_tbl');
 		

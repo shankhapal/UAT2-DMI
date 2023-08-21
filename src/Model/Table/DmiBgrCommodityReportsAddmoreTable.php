@@ -95,13 +95,7 @@
 				echo "added";
 			}
 		}
-		
-								
-			
 	}
-	
-	
-
 
 	public function getBgrData($id){
 		

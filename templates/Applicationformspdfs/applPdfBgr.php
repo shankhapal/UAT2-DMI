@@ -104,19 +104,18 @@
 					scope="col"
 					class="border-bottom">
 					Regional Office/Sub-Office:
-					<?php //echo isset($section_form_details[5])?$section_form_details[5]:"NA"; ?></th>
+					<?php echo isset($region)?$region:"NA"; ?></th>
 				<th
 					colspan="8"
 					scope="col"
 					class="border-bottom">
 					State :
-					<?php //echo isset($section_form_details[4])?$section_form_details[4]:"NA"; ?></th>
+					<?php echo isset($state_name)?$state_name:"NA"; ?></th>
 		</tr>
 
 		<tr>
-				<th colspan="6" class="border-bottom" scope="col">Name of Packer with address and e-mail id:
-					<?php echo "shankhpal"."shankhpal@gov.in"."Nagpur"; ?>
-				</th>
+				<th colspan="6" class="border-bottom" scope="col">Name of Packer with address and e-mail id:</th>
+				<th colspan="8">Name:<?php echo isset($firmname)?$firmname:"NA"; ?>, Email:<?php echo isset($email)?$email:"NA"; ?>, Address:<?php echo isset($address)?$address:"NA"; ?></th>
 		</tr>
 		<tr>
 				<th colspan="6" class="border-bottom" scope="col">Period:
@@ -126,11 +125,11 @@
         Period: Not within a defined biannual period
    		 <?php endif; ?>
 				</th>
-				<th colspan="8" class="border-bottom" scope="col">Type:</th>
+				<th colspan="8" class="border-bottom" scope="col">Type:<?php echo ($export_unit_status == "yes") ? "Export" : "Domestic"; ?></th>
 		</tr>
 	
 			<tr>
-					<th colspan="6" class="border-bottom" scope="col">Total Revenue (In. Rs.):</th>
+					<th colspan="6" class="border-bottom" scope="col">Total Revenue (In. Rs.):<?php echo $totalReplicaCharges; ?></th>
 					<th colspan="8" class="border-bottom" scope="col">Progressive Revenue (In Rs.):</th>
       </tr>
               

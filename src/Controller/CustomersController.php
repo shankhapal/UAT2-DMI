@@ -1186,6 +1186,7 @@ class CustomersController extends AppController {
 	public function secondaryHome() {
 
 		$customer_id = $this->Session->read('username');
+		
 
 		if ($customer_id == null) {
 			$this->customAlertPage("Sorry You are not authorized to view this page..");

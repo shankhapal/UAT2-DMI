@@ -83,6 +83,7 @@ $(document).ready(function () {
         $("#grade").val(gradeasign);
         $("#ta-packet_size-").val(packetsize);
         $("#ta-packet_size_unit-").val(packetsizeunit);
+
         $("#ta-no_of_packets-").val(totalnoofpackets);
         $("#total_qty_graded_quintal").val(totalqtyquintal);
         $("#estimated_value").val(estimatedvalue);

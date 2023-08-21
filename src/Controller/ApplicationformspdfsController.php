@@ -4683,16 +4683,26 @@ class ApplicationformspdfsController extends AppController{
 				$this->set('get_office',$get_office);
 
 				$this->loadModel('DmiFirms');
-				$fetch_customer_firm_data = $this->DmiFirms->find('all',array('conditions'=>array('customer_id 	IS'=>$customer_id)))->first();
+				$fetch_customer_firm_data = $this->DmiFirms->find('all',array(
+					'conditions'=>array(
+					'customer_id 	IS'=>$customer_id)))->first();
 				$customer_firm_data = $fetch_customer_firm_data;
 				$this->set('customer_firm_data',$customer_firm_data);
 
-				$fetch_state_name = $this->DmiStates->find('all',array('fields'=>'state_name','conditions'=>array('id IS'=>$customer_firm_data['state'], 'OR'=>array('delete_status IS NULL','delete_status ='=>'no'))))->first();
+				$fetch_state_name = $this->DmiStates->find('all',array(
+					'fields'=>'state_name',
+					'conditions'=>array(
+					'id IS'=>$customer_firm_data['state'], 
+					'OR'=>array('delete_status IS NULL','delete_status ='=>'no'))))->first();
 				$firm_state_name = $fetch_state_name['state_name'];
 				$this->set('firm_state_name',$firm_state_name);
 
-				// to show firm address name form id	
-				$fetch_district_name = $this->DmiDistricts->find('all',array('fields'=>'district_name','conditions'=>array('id IS'=>$customer_firm_data['district'], 'OR'=>array('delete_status IS NULL','delete_status ='=>'no'))))->first();
+				
+				$fetch_district_name = $this->DmiDistricts->find('all',array(
+					'fields'=>'district_name',
+					'conditions'=>array(
+					'id IS'=>$customer_firm_data['district'], 
+					'OR'=>array('delete_status IS NULL','delete_status ='=>'no'))))->first();
 				$firm_district_name = $fetch_district_name['district_name'];
 				$this->set('firm_district_name',$firm_district_name);
 
@@ -4704,7 +4714,10 @@ class ApplicationformspdfsController extends AppController{
 				$firmData = $this->DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
 				$this->set('firmData',$firmData);
 
-				$get_last_grant_date = $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>array('id desc')))->first();
+				$get_last_grant_date = $this->DmiGrantCertificatesPdfs->find('all',array(
+					'conditions'=>array(
+					'customer_id IS'=>$customer_id),
+					'order'=>array('id desc')))->first();
 				$last_grant_date = $get_last_grant_date['date'];
 
 				$certificate_valid_upto = $this->Customfunctions->getCertificateValidUptoDate($customer_id,$last_grant_date);
@@ -4740,12 +4753,53 @@ class ApplicationformspdfsController extends AppController{
 						$sub_commodity_value = [];
 						$grade_list = [];
 				}
+						
+
+				// to get RO/SO office
+				$this->loadModel('DmiApplWithRoMappings');
+				$get_office = $this->DmiApplWithRoMappings->getOfficeDetails($customer_id);
+				$region = $get_office['ro_office'];
+				$this->set('region',$region);
+
+				$this->loadModel('DmiStates');
+
+				$firm_details = $this->DmiFirms->firmDetails($customer_id);
+	
+				$state_id = $firm_details['state'];
+
+				$fetch_state_name = $this->DmiStates->find('all',array(
+					'fields'=>'state_name',
+					'conditions'=>array(
+						'id IS'=>$state_id,
+						'OR'=>array(
+							'delete_status IS NULL',
+							'delete_status ='=>'no'
+				))))->first();
+
+				$state_name = $fetch_state_name['state_name'];
+				$this->set('state_name',$state_name);
+
+				$firmname = $firm_details['firm_name'];
+				$email = $firm_details['email'];
+				$address = $firm_details['street_address'];
+
+				$this->set('firmname',$firmname);
+				$this->set('email',$email);
+				$this->set('address',$address);
+
+				$CustomersController = new CustomersController;
+				$export_unit_status = $CustomersController->Customfunctions->checkApplicantExportUnit($customer_id);
+				$this->set('export_unit_status',$export_unit_status);	
+				
 				
 				$commaSeparatedCommodity = implode(', ', $sub_commodity_value);
 				$this->set('commaSeparatedCommodity',$commaSeparatedCommodity);
 
+
 				$pdf_date = date('d-m-Y');
 				$this->set('pdf_date',$pdf_date);
+
+
 
 				$query = $this->DmiBgrCommodityReportsAddmore->find()
         ->where([
@@ -4773,6 +4827,18 @@ class ApplicationformspdfsController extends AppController{
 
 				$this->set('NablDate',$NablDate);
 				$this->set('bgrReportData',$bgrReportData);
+
+
+				$this->loadModel('DmiBgrCommodityReportsAddmore');
+
+				$query = $this->DmiBgrCommodityReportsAddmore->find();
+				$query->select(['replicacharges' => $query->func()->sum('replicacharges')]);
+				$query->where(['delete_status IS' => null]);
+
+				$result = $query->first();
+				
+				$totalReplicaCharges = $result['replicacharges']; // Total Revenue
+				$this->set('totalReplicaCharges',$totalReplicaCharges);
 
 				// Get the current year
 				$currentYear = date('Y');
