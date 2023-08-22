@@ -305,7 +305,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                      
                       <td>
                           <?php echo $this->Form->control('ta-no_of_packets-', array(
-                            'type'=>'text',
+                            'type'=>'number',
                             'escape'=>false,
                             'id'=>'ta-no_of_packets-',
                             'label'=>false,

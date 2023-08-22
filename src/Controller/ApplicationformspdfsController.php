@@ -4833,7 +4833,7 @@ class ApplicationformspdfsController extends AppController{
 
 				$query = $this->DmiBgrCommodityReportsAddmore->find();
 				$query->select(['replicacharges' => $query->func()->sum('replicacharges')]);
-				$query->where(['delete_status IS' => null]);
+				$query->where(['customer_id'=>$customer_id,'delete_status IS' => null]);
 
 				$result = $query->first();
 				

@@ -253,61 +253,166 @@
 	public function saveFormDetails($customer_id,$forms_data){
 
 
-		 	$CustomersController = new CustomersController;
+			$dataValidatation = $this->postDataValidation($customer_id,$forms_data);
 
-			if(!empty($forms_data['other_upload_docs']->getClientFilename())){
+			if($dataValidatation == 1 ){
 
-				$file_name = $forms_data['other_upload_docs']->getClientFilename();
-				$file_size = $forms_data['other_upload_docs']->getSize();
-				$file_type = $forms_data['other_upload_docs']->getClientMediaType();
-				$file_local_path = $forms_data['other_upload_docs']->getStream()->getMetadata('uri');
+				$CustomersController = new CustomersController;
+				$section_form_details = $this->sectionFormDetails($customer_id);
 
-				$other_upload_docs = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function
+								// file upload
+				if(!empty($forms_data['other_upload_docs']->getClientFilename())){
 
-			}else{
-				$other_upload_docs = null;
-			}
+					$file_name = $forms_data['other_upload_docs']->getClientFilename();
+					$file_size = $forms_data['other_upload_docs']->getSize();
+					$file_type = $forms_data['other_upload_docs']->getClientMediaType();
+					$file_local_path = $forms_data['other_upload_docs']->getStream()->getMetadata('uri');
 
-			//check if new file is selected	while reply if not save file path from db
-    if(!empty($section_form_details[0]['id'])){
-      if(empty($other_upload_docs)){
-        $other_upload_docs = $section_form_details[0]['other_upload_docs'];
-      }
-    }
+					$other_upload_docs = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function
 
-			$newEntity = $this->newEntity(array(
-				'customer_id'=>$customer_id,
-				'other_upload_docs'=>$other_upload_docs,
-				'form_status'=>'saved',
-				'created'=>date('Y-m-d H:i:s'),
-				'modified'=>date('Y-m-d H:i:s')
+				}else{
+					$other_upload_docs = null;
+				}
 
-			));
-
-			if($this->save($newEntity)){
+				 if(!empty($section_form_details[0]['id'])){
+					if(empty($other_upload_docs)){
+						$other_upload_docs = $section_form_details[0]['other_upload_docs'];
+					}
+    		 }
 				
-				return true;
-				
-			}
+				 // If applicant have referred back on give section
+				if($section_form_details[0]['form_status'] == 'referred_back'){
+					$max_id = $section_form_details[0]['id'];
+					$htmlencoded_reply = htmlentities($forms_data['customer_reply'], ENT_QUOTES);
+					$customer_reply_date = date('Y-m-d H:i:s');
 
+					if(!empty($forms_data['cr_comment_ul']->getClientFilename())){
+						
+						$file_name = $forms_data['cr_comment_ul']->getClientFilename();
+						$file_size = $forms_data['cr_comment_ul']->getSize();
+						$file_type = $forms_data['cr_comment_ul']->getClientMediaType();
+						$file_local_path = $forms_data['cr_comment_ul']->getStream()->getMetadata('uri');
+						
+						$cr_comment_ul = $CustomersController->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function
+				
+					}else{ $cr_comment_ul = null; }
+				}else{
+						$htmlencoded_reply = '';
+						$max_id = '';
+						$customer_reply_date = '';
+						$cr_comment_ul = null;
+				}
+
+				if(empty($section_form_details[0]['created'])){  $created = date('Y-m-d H:i:s'); }
+				//added date function on 31-05-2021 by Amol to convert date format, as saving null
+				else{ $created = $CustomersController->Customfunctions->changeDateFormat($section_form_details[0]['created']); }
+
+				$newEntity = $this->newEntity(array(
+					'id'=>$max_id,
+					'customer_id'=>$customer_id,
+					'other_upload_docs'=>$other_upload_docs,
+					'form_status'=>'saved',
+					'customer_reply'=>$htmlencoded_reply,
+					'customer_reply_date'=>$customer_reply_date,
+					'cr_comment_ul'=>$cr_comment_ul,
+					'created'=>$created,
+					'modified'=>date('Y-m-d H:i:s'
+				)));
+				
+
+				if ($this->save($newEntity)){
+					
+					return 1;
+					
+				};
+
+			}else{	return false; }
+
+
+		 
+
+
+			
+   
+
+			
+
+			
 	}
 
-	public function saveReferredBackComment($customer_id,$report_details,$reffered_back_comment,$rb_comment_ul){
+	// To save 	RO/SO referred back  and MO reply comment
+	public function saveReferredBackComment ($customer_id,$forms_data,$comment,$comment_upload,$reffered_back_to){
+		
+		$logged_in_user = $_SESSION['username'];
+		$current_level = $_SESSION['current_level'];
 
 		$CustomersController = new CustomersController;
 
+		//added date function on 31-05-2021 by Amol to convert date format, as saving null
+		$created_date = $CustomersController->Customfunctions->changeDateFormat($forms_data['created']);
+		
+		if($reffered_back_to == 'Level3ToApplicant'){
+			
+			$form_status = 'referred_back';
+			$reffered_back_comment = $comment;
+			$reffered_back_date = date('Y-m-d H:i:s');
+			$rb_comment_ul = $comment_upload;
+			$ro_current_comment_to = 'applicant';
+			$mo_comment = null;
+			$mo_comment_date = null;
+			$mo_comment_ul = null;
+			$ro_reply_comment = null;
+			$ro_reply_comment_date = null;
+			$rr_comment_ul = null;
+			
+		}elseif($reffered_back_to == 'Level1ToLevel3'){
+			
+			$form_status = $forms_data['form_status'];
+			$reffered_back_comment = null;
+			$reffered_back_date = null;
+			$rb_comment_ul = null;
+			$ro_current_comment_to = null;
+			$mo_comment = $comment;
+			$mo_comment_date = date('Y-m-d H:i:s');
+			$mo_comment_ul = $comment_upload;
+			$ro_reply_comment = null;
+			$ro_reply_comment_date = null;
+			$rr_comment_ul = null;
+			
+		}elseif($reffered_back_to == 'Level3ToLevel'){
+			
+			$form_status = $forms_data['form_status'];
+			$reffered_back_comment = $forms_data['reffered_back_comment'];
+			$reffered_back_date = $forms_data['reffered_back_date'];
+			$rb_comment_ul = $forms_data['rb_comment_ul'];
+			$ro_current_comment_to = 'mo';
+			$mo_comment = null;
+			$mo_comment_date = null;
+			$mo_comment_ul = null;
+			$ro_reply_comment = $comment;
+			$ro_reply_comment_date = date('Y-m-d H:i:s');
+			$rr_comment_ul = $comment_upload;
+			
+		}
+
 		$formSavedEntity = $this->newEntity(array(
 			'customer_id'=>$customer_id,
-			'other_upload_docs'=>$report_details['other_upload_docs'],
-			'referred_back_comment'=>$reffered_back_comment,
+			'other_upload_docs'=>$forms_data['other_upload_docs'],
+			'form_status'=>$form_status,
+			'reffered_back_comment'=>$reffered_back_comment,
+			'reffered_back_date'=>$reffered_back_date,
 			'rb_comment_ul'=>$rb_comment_ul,
-			'referred_back_date'=>date('Y-m-d H:i:s'),
-			'referred_back_by_email'=>$_SESSION['username'],
-			'referred_back_by_once'=>$_SESSION['once_card_no'],
-			'form_status'=>'referred_back',
-			'current_level'=>$_SESSION['current_level'],
-			'created'=>date('Y-m-d H:i:s'),
-			'modified'=>date('Y-m-d H:i:s')
+			'user_email_id'=>$_SESSION['username'],
+			'current_level'=>$current_level,
+			'ro_current_comment_to'=>$ro_current_comment_to,
+			'mo_comment'=>$mo_comment,
+			'mo_comment_date'=>$mo_comment_date,
+			'mo_comment_ul'=>$mo_comment_ul,
+			'ro_reply_comment'=>$ro_reply_comment,
+			'ro_reply_comment_date'=>$ro_reply_comment_date,
+			'rr_comment_ul'=>$rr_comment_ul,
+			'created'=>$created_date,
+			'modified'=>date('Y-m-d H:i:s'),
 		));
 		if($this->save($formSavedEntity)){
 			
@@ -317,5 +422,25 @@
 			return 0;
 		}
 	}
+
+		public function postDataValidation($customer_id,$forms_data){
+		//	print_r($forms_data); exit;
+			$returnValue = true;
+			$section_form_details = $this->sectionFormDetails($customer_id);
+			$CustomersController = new CustomersController;
+
+
+			if(empty($section_form_details[0]['id'])){
+
+				if(empty($forms_data['other_upload_docs']->getClientFilename())){ $returnValue = null ; }
+			
+			}
+
+			if(empty($forms_data['other_upload_docs'])){ $returnValue = null ; }
+			
+			
+			return $returnValue;
+			
+		}
 		
 }

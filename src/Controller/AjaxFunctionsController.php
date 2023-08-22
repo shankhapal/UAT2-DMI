@@ -2895,14 +2895,24 @@ class AjaxFunctionsController extends AppController{
 		
 	}
 
+	// This method will handle the request to get Total Replica Charges for  BGR Module
+	 // added by shankhpal shende on 02/08/2023
 	public function getTotalReplicaCharge(){
 
 		$this->autoRender = false;
 		$this->loadModel('DmiBgrCommodityReportsAddmore');
+		
+		if(isset($_SESSION['packer_id'])){
+			$customer_id = $_SESSION['packer_id'];
+		}elseif(isset($_SESSION['customer_id'])){
+			$customer_id = $_SESSION['customer_id'];
+		}else{
+			$customer_id = null;
+		}
 
 		$query = $this->DmiBgrCommodityReportsAddmore->find();
 		$query->select(['replicacharges' => $query->func()->sum('replicacharges')]);
-		$query->where(['delete_status IS' => null]);
+		$query->where(['customer_id'=>$customer_id,'delete_status IS' => null]);
 
 		$result = $query->first();
 		

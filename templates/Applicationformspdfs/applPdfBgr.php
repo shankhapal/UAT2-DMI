@@ -1,4 +1,6 @@
-<?php  ?>
+<?php 
+use Cake\Datasource\ConnectionManager;
+?>
 
 <style>
 	h4 {
@@ -115,7 +117,7 @@
 
 		<tr>
 				<th colspan="6" class="border-bottom" scope="col">Name of Packer with address and e-mail id:</th>
-				<th colspan="8">Name:<?php echo isset($firmname)?$firmname:"NA"; ?>, Email:<?php echo isset($email)?$email:"NA"; ?>, Address:<?php echo isset($address)?$address:"NA"; ?></th>
+				<th colspan="8">Name:<?php echo isset($firmname)?$firmname:"NA"; ?>, Email:<?php echo base64_decode($email); ?>, Address:<?php echo isset($address)?$address:"NA"; ?></th>
 		</tr>
 		<tr>
 				<th colspan="6" class="border-bottom" scope="col">Period:
@@ -164,16 +166,28 @@
 					<th class="tablehead wdth" scope="col"></th>
 			</tr>
 	   <?php
+
 				if (!empty($bgrReportData)) {
 						$i=1;
 					  foreach ($bgrReportData as $row) {
+							
+							$conn = ConnectionManager::get('default');
+							$gradeasign = $row['gradeasign'];
+							$query2 = "SELECT grade_desc from m_grade_desc WHERE grade_code = $gradeasign";
+							$q2 = $conn->execute($query2);
+							$row2 = $q2->fetch();
+							$gradename = '';
+							if (isset($row2[0])) { // Check if index 0 exists
+								$gradename = $row2[0]; // Use index 0 to access the value
+							}
+							
 							echo "<tr>";
 							echo "<td>" . $i . "</td>";
             	echo "<td>" . $row['commodity'] . "</td>";
            		echo "<td>" . $row['lotno'] . "</td>";
 							echo "<td>" . $row['datesampling'] . "</td>";
           		echo "<td>" . $row['dateofpacking'] . "</td>";
-							echo "<td>" . $row['gradeasign'] . "</td>";
+							echo "<td>" . $gradename . "</td>";
 							echo "<td>" . $row['packetsize'] . "</td>";
 							echo "<td>" . $row['totalnoofpackets'] . "</td>";
 							echo "<td>" . $row['totalqtyquintal'] . "</td>";
@@ -186,8 +200,16 @@
 							$i++;
 						}
 				}
+
+		
+	
     ?>
 </table>
+<table width="100%" border="1">
+			<tr>
+			<td align="right" style="padding:5px;"><h5>Total Replica Charges (Rs.): <?php echo $totalReplicaCharges;?></h5></td>
+			</tr>
+	</table>
 
 <br pagebreak="true" />
 

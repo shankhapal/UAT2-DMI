@@ -779,7 +779,17 @@ class ChemistController extends AppController {
 		  $this->loadModel('DmiRejectedApplLogs');
 		  $rejectEntry = $this->DmiRejectedApplLogs->find('all')->where(['customer_id IS'=>$chemist_id])->first();
 		  
-              $this->set('rejectEntry', $rejectEntry);								
+      $this->set('rejectEntry', $rejectEntry);
+			
+		// Query added by Shankhpal Shende to check whether the logged-in chemist is an in-charge.
+		// If the chemist is an in-charge, the Bianually Grading Report menu will be displayed;
+		// otherwise, it won't be displayed.
+		// This comment is written on August 22, 2023.
+		$chemist_incharge = $this->DmiChemistAllotments->find('all',array('fields'=>'chemist_id','conditions'=>array('chemist_id IS'=>$_SESSION['username'],'status'=>1,'incharge'=>'yes')))->first();
+		
+		$this->set('rejectEntry', $rejectEntry);
+		$this->set('chemist_incharge', $chemist_incharge);
+			
 	}
 
 
@@ -1614,7 +1624,20 @@ class ChemistController extends AppController {
 				<option value="<?php echo $commodity['commodity_code'];?>"><?php echo $commodity['commodity_name'];?></option>
 		<?php }
 		exit;
-	}	
+	}
+
+	
+	// This function is used to display the mapped CA dropdown.
+	// Added by Shankhpal Shende on August 22, 2023.
+	public function displayMappedCADropdown(){
+		$this->viewBuilder()->setLayout('chemist_home_layout');
+
+		$alloted_chemist = $this->DmiChemistAllotments->find('list',array('keyField'=>'id','valueField'=>'customer_id','conditions'=>array('chemist_id IS'=>$_SESSION['username'],'status'=>1,'incharge'=>'yes')))->toArray();
+		
+		$this->set('alloted_chemist', $alloted_chemist);
+	}
+
+
 
 
 }

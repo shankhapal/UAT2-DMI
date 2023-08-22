@@ -58,15 +58,16 @@
 						<?php echo $this->Html->link('<i class=" nav-icon far fa-dot-circle"></i></i><p class="nav-icon-p">Log History</p>', array('controller'=>'common', 'action'=>'currentUserLogs'), array('escape'=>false, 'class'=>'nav-link '.$menu_profile)); ?>
 					</li>
 
-					<!-- The menu are added for BGR Module 
+					
+					<!-- The menu are added for BGR Module
 						Added by shankhpal shende on 21/06/2023 -->
-					<?php if($split_packer_name[1] == 1){ ?>
+					<?php if(!empty($chemist_incharge)){ ?>
+
 						<li class="nav-item">
-							<a href="<?php echo $this->request->getAttribute("webroot");?>application/application-type/11" class="nav-link">
-						<i class="nav-icon far fa-file-alt"></i>
-							<p class="nav-icon-p">Biannually Grading Report</p>
-							</a>
-					</li>	
+							<?php echo $this->Html->link('<i class="nav-icon far fa-file-alt"></i><p class="nav-icon-p">Biannually Grading Report</p>', array('controller'=>'chemist', 'action'=>'display-mapped-c-a-dropdown'), array('escape'=>false, 'class'=>'nav-link ')); ?>
+						</li>
+
+						
 					<?php } ?>
 
 					<li class="nav-item">
