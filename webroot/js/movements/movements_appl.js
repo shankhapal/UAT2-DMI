@@ -93,9 +93,46 @@ $('#appl_type').change(function(){
 
 
 $(document).ready(function (){
-     
- $('#movement_history').dataTable({
+    // var tableThLength = $(".movmentTable thead tr th").length;
+    // if(tableThLength == 4){
+	// 	$(".movmentTable").DataTable({"aoColumns": [null,null,{ "sType": "date-uk" },null],"pageLength": 25});
+    // }
     
+//  $('#movement_history').dataTable({
+//     columnDefs: [ { type: 'date', targets: 2}]
+// //$("#movement_history").DataTable({"aoColumns": [null,null,{ "type": "date-euro" },null],'targets': 2,"pageLength": 50});
+// });
+
+
+// $('#yourDataTable').DataTable({ 
+//     //columnDefs: [ { type: 'date', targets: 2 } ],
+//     aaSorting: [[2, 'desc']], 
+//     // language: { url: 'https://cdn.datatables.net/plug-ins/1.10.25/sorting/datetime-moment.js' // Optional: Provides localized date sorting
+//      });
+$('#movement_history').DataTable({
+    
+    "order": [[2, "desc"]],
+    'pageLength':5,
+    'columnDefs': [
+        {
+            'targets': 2,
+            
+            'createdCell':  function (td, cellData, rowData, row, col) {   
+
+                var celltime =  cellData.split(' ')[1];
+                var celldate = cellData.split(' ')[0];
+                var celldate1 = celldate.split('/'); 
+               
+                var newDate = celldate1[2]+"/"+celldate1[1]+"/"+celldate1[0];                  
+                var datestamp = new Date(newDate);
+                $(td).html((datestamp.getDate()) + '-' + (datestamp.getMonth()+1) + '-' + datestamp.getFullYear() + ' '+celltime);
+            }
+        }
+    ],
+    "initComplete": function(settings, json) {
+        $($.fn.dataTable.tables(true)).DataTable()
+            .columns.adjust();               
+    }
 });
 });
 

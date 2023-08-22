@@ -69,13 +69,13 @@
          <div class="form-horizontal">
              <div class="card-body">
               <div class="row1">
-                <table id="movement_history" class="table m-0 table-bordered table-striped table-hover">
+                <table id="movement_history" class="table m-0 table-bordered table-striped table-hover movmentTable">
                 <thead class="tablehead">
                     <tr>
-                    <th scope="col">From</th>
-                    <th scope="col">To</th>
-                    <th scope="col">Date</th>
-                    <th scope="col">Action</th>
+                    <th scope="col" >From</th>
+                    <th scope="col" >To</th>
+                    <th scope="col" >Date</th>
+                    <th scope="col" >Action</th>
                     </tr>
                     </thead>
                     <tbody>
