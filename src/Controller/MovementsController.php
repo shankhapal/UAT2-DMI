@@ -944,6 +944,7 @@ class MovementsController extends AppController {
             }elseif($findRole['so_inspection'] == 'yes'){
 
                 $findShortCode = $this->DmiRoOffices->find('all', array('fields'=>['short_code'], 'conditions'=>['ro_email_id IS'=>$username], 'delete_status IS'=>NULL))->toArray();
+              
                 $condition = '';
                 $chemistcondition = '';
                 $n = 1;
