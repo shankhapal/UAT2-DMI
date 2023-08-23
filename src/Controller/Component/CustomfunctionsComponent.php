@@ -2707,7 +2707,7 @@ class CustomfunctionsComponent extends Component {
 	//this is called in oldinspection controller in all edit firm profile function (CA,P.P,Lab)
 	//To fetch old cert details from added firm, and show in a popup box on firm profile section while DMI user scrutiny
 	public function showOldCertDetailsPopup($customer_id) {
-
+		
 		$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');//initialize model in component
 		$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
 		$DmiPackingTypes = TableRegistry::getTableLocator()->get('DmiPackingTypes');

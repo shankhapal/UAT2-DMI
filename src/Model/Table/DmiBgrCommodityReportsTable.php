@@ -5,6 +5,7 @@
 	use Cake\ORM\TableRegistry;
 	use App\Controller\AppController;
 	use App\Controller\CustomersController;
+	use App\Controller\ApplicationformspdfsController;
 	
 	class DmiBgrCommodityReportsTable extends Table{
 	
@@ -123,13 +124,39 @@
 		$secondPeriodStartDate = $currentYear . '-10-01';
 		$secondPeriodEndDate = ($currentYear + 1) . '-03-31';
 
+		$ApplicationformspdfsController = new ApplicationformspdfsController;
+		
+		$progRevenue1 = $ApplicationformspdfsController->getBiannualData($firstPeriodStartDate,$firstPeriodEndDate);
+		
+		if(!empty($progRevenue1)){
+			$progRevenue1 = $progRevenue1['progressive_revenue'];
+		}else {
+    	$progRevenue1 = 0; // Default value if $progRevenue1 is empty
+		}
+
+		$progRevenue2 = $ApplicationformspdfsController->getBiannualData($secondPeriodStartDate, $secondPeriodEndDate);
+
+		if(!empty($progRevenue2)){
+			$progRevenue2 = $progRevenue2['progressive_revenue'];
+		}else{
+			$progRevenue2 = 0;
+		}
+	
+		$totalprogrevenue = $progRevenue1 + $progRevenue2;
+		$formattedTotalRevenue = number_format($totalprogrevenue, 2);
+
+
+		
+
+	
+
 
 		if ($currentDate >= $firstPeriodStartDate && $currentDate <= $firstPeriodEndDate) {
-					$periodStartDisplay = date('m/d/y', strtotime($secondPeriodStartDate));
-					$periodEndDisplay = date('m/d/y', strtotime($secondPeriodEndDate));
+					$periodStartDisplay = date('Y/m/d', strtotime($secondPeriodStartDate));
+					$periodEndDisplay = date('Y/m/d', strtotime($secondPeriodEndDate));
 			} elseif ($currentDate >= $secondPeriodStartDate && $currentDate <= $secondPeriodEndDate) {
-					$periodStartDisplay = date('m/d/y', strtotime($firstPeriodStartDate));
-					$periodEndDisplay = date('m/d/y', strtotime($firstPeriodEndDate));
+					$periodStartDisplay = date('Y/m/d', strtotime($firstPeriodStartDate));
+					$periodEndDisplay = date('Y/m/d', strtotime($firstPeriodEndDate));
 			} else {
 					$periodStartDisplay = '';
 					$periodEndDisplay = '';
@@ -243,7 +270,8 @@
 			$grade_list,
 			$laboratory_name,
 			$bgrReportData,
-			$unit_list
+			$unit_list,
+			$formattedTotalRevenue
 		);
 
 	}
@@ -251,8 +279,12 @@
 	
 
 	public function saveFormDetails($customer_id,$forms_data){
-
-
+		
+			
+			$from_period = $forms_data['from_period'];
+			$to_period = $forms_data['to_period'];
+			$total_revenue = $forms_data['total_revenue'];
+			$progresive_revenue = $forms_data['progresive_revenue'];
 			$dataValidatation = $this->postDataValidation($customer_id,$forms_data);
 
 			if($dataValidatation == 1 ){
@@ -315,11 +347,15 @@
 					'customer_reply'=>$htmlencoded_reply,
 					'customer_reply_date'=>$customer_reply_date,
 					'cr_comment_ul'=>$cr_comment_ul,
+					'period_from'=>$from_period,
+					'period_to'=>$to_period,
+					'total_revenue'=>$total_revenue,
+					'progresive_revenue'=>$progresive_revenue,
 					'created'=>$created,
 					'modified'=>date('Y-m-d H:i:s'
 				)));
 				
-
+				
 				if ($this->save($newEntity)){
 					
 					return 1;
@@ -343,6 +379,11 @@
 	// To save 	RO/SO referred back  and MO reply comment
 	public function saveReferredBackComment ($customer_id,$forms_data,$comment,$comment_upload,$reffered_back_to){
 		
+		$from_period = $forms_data['from_period'];
+		$to_period = $forms_data['to_period'];
+		$progresive_revenue = $forms_data['progresive_revenue'];
+		$total_revenue = $forms_data['total_revenue'];
+
 		$logged_in_user = $_SESSION['username'];
 		$current_level = $_SESSION['current_level'];
 
@@ -398,6 +439,10 @@
 		$formSavedEntity = $this->newEntity(array(
 			'customer_id'=>$customer_id,
 			'other_upload_docs'=>$forms_data['other_upload_docs'],
+			'period_from'=>$from_period,
+			'period_to'=>$to_period,
+			'progresive_revenue'=>$progresive_revenue,
+			'total_revenue'=>$total_revenue,
 			'form_status'=>$form_status,
 			'reffered_back_comment'=>$reffered_back_comment,
 			'reffered_back_date'=>$reffered_back_date,

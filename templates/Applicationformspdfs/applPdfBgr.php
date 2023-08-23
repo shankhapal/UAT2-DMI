@@ -132,7 +132,7 @@ use Cake\Datasource\ConnectionManager;
 	
 			<tr>
 					<th colspan="6" class="border-bottom" scope="col">Total Revenue (In. Rs.):<?php echo $totalReplicaCharges; ?></th>
-					<th colspan="8" class="border-bottom" scope="col">Progressive Revenue (In Rs.):</th>
+					<th colspan="8" class="border-bottom" scope="col">Progressive Revenue (In Rs.):<?php echo $formattedTotalRevenue; ?></th>
       </tr>
               
 			<tr>

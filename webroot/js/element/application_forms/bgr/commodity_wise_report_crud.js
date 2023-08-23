@@ -7,6 +7,19 @@ $(document).ready(function () {
         // Update the overall_total_chrg element with the response value
         $("#overall_total_chrg").val(response);
         $("#totalRevenueHeader").html(response);
+        var totalRevenueValue = response;
+        $("#totalRevenueHidden").val(totalRevenueValue);
+      },
+    });
+    $.ajax({
+      type: "GET",
+      url: "../AjaxFunctions/get_total_progressive_revenue",
+      success: function (response) {
+        // Update the overall_total_chrg element with the response value
+        $("#progresiveRevenue").html(response);
+
+        var progresiveRevenue = response;
+        $("#progresiveRevenueHidden").val(progresiveRevenue);
       },
     });
   }

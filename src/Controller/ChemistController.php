@@ -1630,11 +1630,27 @@ class ChemistController extends AppController {
 	// This function is used to display the mapped CA dropdown.
 	// Added by Shankhpal Shende on August 22, 2023.
 	public function displayMappedCADropdown(){
+	
 		$this->viewBuilder()->setLayout('chemist_home_layout');
 
-		$alloted_chemist = $this->DmiChemistAllotments->find('list',array('keyField'=>'id','valueField'=>'customer_id','conditions'=>array('chemist_id IS'=>$_SESSION['username'],'status'=>1,'incharge'=>'yes')))->toArray();
+		$alloted_chemist = $this->DmiChemistAllotments->find('list',array('keyField'=>'customer_id','valueField'=>'customer_id','conditions'=>array('chemist_id IS'=>$_SESSION['username'],'status'=>1,'incharge'=>'yes')))->toArray();
 		
 		$this->set('alloted_chemist', $alloted_chemist);
+
+		$reqData = $this->request->getData('packerlist'); // Get the selected values
+		if (!empty($reqData)) {
+				foreach ($reqData as $value) {
+						$packer_id = $value; // Each value is a selected packer ID
+						
+				}
+			$this->request->getSession()->write('packer_id',$packer_id);
+			// $this->request->getSession()->write('application_type',11);
+			$this->redirect(['controller' => 'application','action' => 'applicationType',11]);
+			
+			$this->redirect(['controller' => 'application','action' => 'applicationForCertificate']);
+		}
+		
+	
 	}
 
 

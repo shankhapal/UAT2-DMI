@@ -13,6 +13,11 @@ $(document).ready(function () {
     autoclose: true,
   });
 
+  $current_level = $("#current_level").val();
+  if ($current_level === "level_3") {
+    $("#form_inner_main .glyphicon-edit").css("display", "none");
+    $("#form_inner_main .glyphicon-remove-sign").css("display", "none");
+  }
   $("#dataTable").on("change", ".commodity", function () {
     let id_No = this.id.split("-"); // Corrected method name from splite() to split()
 

@@ -2923,6 +2923,28 @@ class AjaxFunctionsController extends AppController{
 		exit;
 	}
 
+	public function getTotalProgressiveRevenue(){
+		$this->autoRender = false;
+		$this->loadModel('DmiBgrCommodityReports');
+
+		if(isset($_SESSION['packer_id'])){
+			$customer_id = $_SESSION['packer_id'];
+		}elseif(isset($_SESSION['customer_id'])){
+			$customer_id = $_SESSION['customer_id'];
+		}else{
+			$customer_id = null;
+		}
+
+		$result = $this->DmiBgrCommodityReports->find('all')->select(['period_from','period_to','total_revenue'])->where(['customer_id'=>$customer_id])->order(['id' => 'DESC'])->first();
+		
+		if($result !== null){
+			echo $progressive_revenue = $result['total_revenue'];
+		}else{
+			$progressive_revenue = null;
+		}
+		
+	}
+
 	
 }
 ?>

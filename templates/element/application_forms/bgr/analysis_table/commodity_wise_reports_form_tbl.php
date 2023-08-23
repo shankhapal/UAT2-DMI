@@ -67,13 +67,12 @@ $class1 = INPUT_FIELD_CLASSES;?>
                     <?php echo isset($section_form_details[3])?$section_form_details[3]:"NA" ?></th>
               </tr>
               <tr>
-                  <th
-                    colspan="6"
-                    class="border-bottom"
-                    scope="col">Period: From
-                    <?php echo $section_form_details[7]; ?>
-                    to <?php echo $section_form_details[8]; ?>
-                 </th>
+                    <td colspan="6" class="border-bottom" scope="col">
+                        Period: From
+                        <input type="text" name="from_period" value="<?php echo $section_form_details[7]; ?>" readonly>
+                        to
+                        <input type="text" name="to_period" value="<?php echo $section_form_details[8]; ?>" readonly>
+                    </td>
                   <th
                     colspan="7"
                     class="border-bottom"
@@ -94,7 +93,8 @@ $class1 = INPUT_FIELD_CLASSES;?>
                   <th colspan="6" class="border-bottom" scope="col">
                     Total Revenue (In. Rs.): <span id="totalRevenueHeader"></span>
                   </th>
-                  <th colspan="6" class="border-bottom" scope="col">Progressive Revenue (In Rs.):</th>
+                  <th colspan="6" class="border-bottom" scope="col">Progressive Revenue (In Rs.):<span id="progresiveRevenue"></span>
+                  </th>
                   <th scope="col"></th>
                   <th scope="col"></th>
                   <th scope="col"></th>
@@ -462,4 +462,9 @@ $class1 = INPUT_FIELD_CLASSES;?>
 			$customer_id = $_SESSION['customer_id'];
 		} ?>
 <input type="hidden" id="custemer_id" value='<?php echo $customer_id; ?>'>
+<input type="hidden" name="total_revenue" id="totalRevenueHidden">
+<input type="hidden" name="progresive_revenue" id="progresiveRevenueHidden">
+<input type="hidden" name="current_level" id="current_level" value='<?php echo $_SESSION['current_level'];?>'>
+
+
 <!-- end table -->

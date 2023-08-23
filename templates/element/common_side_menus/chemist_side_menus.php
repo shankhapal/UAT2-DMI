@@ -64,6 +64,8 @@
 					<?php if(!empty($chemist_incharge)){ ?>
 
 						<li class="nav-item">
+								<!-- <a href="<?php //echo $this->request->getAttribute("webroot");?>application/application-type/11" class="nav-link">
+								<i class="nav-icon far fa-file-alt"></i><p class="nav-icon-p">Biannually Grading Report</p></a> -->
 							<?php echo $this->Html->link('<i class="nav-icon far fa-file-alt"></i><p class="nav-icon-p">Biannually Grading Report</p>', array('controller'=>'chemist', 'action'=>'display-mapped-c-a-dropdown'), array('escape'=>false, 'class'=>'nav-link ')); ?>
 						</li>
 

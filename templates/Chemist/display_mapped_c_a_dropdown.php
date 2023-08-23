@@ -7,11 +7,8 @@
 		<div class="container-fluid">
 			<div class="row">
 				<div class="col-md-8">
-					<?php echo $this->Form->create(null,(array(
-        'id' => 'mappedca',
-        'url' => array('controller' => 'application', 'action' => 'application-type', 11),
-        'method' => 'POST'
-    ))); ?>
+					<?php echo $this->Form->create(null,array('type'=>'file', 'enctype'=>'multipart/form-data')); ?>
+				
 						<div class="card card-secondary mt-5">
 							<div class="card-header"><h3 class="card-title-new">Select Packer</h3></div>
 							<div class="form-horizontal">
@@ -32,8 +29,6 @@
 									</div>
 								<div class="card-footer cardFooterBackground">
                   <?php echo $this->Form->control('Submit', array('type'=>'submit', 'name'=>'submit', 'label'=>false,'class'=>'btn btn-success ')); ?>
-
-                  <!-- <a id="next_btn" class="btn btn-success" href="<?php //echo $this->request->getAttribute('webroot');?>application/application-type/11">Processed</a> -->
 								</div>
 							</div>
 						</div>
@@ -44,4 +39,3 @@
 	</section>
 </div>
 
-<?php echo $this->Html->script('Common/change_password'); ?>

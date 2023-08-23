@@ -204,7 +204,7 @@ class ApplicationController extends AppController{
 	
 	// APPLICATION TYPE
 	public function applicationType($id) {
-
+		
 		$this->Session->delete('section_id');
 		$this->Session->delete('paymentforchange');
 		$this->Session->write('application_type',$id);
@@ -232,7 +232,7 @@ class ApplicationController extends AppController{
 		
 		$oldapplication = $this->Customfunctions->isOldApplication($customer_id);
 		$this->set('oldapplication',$oldapplication);
-
+		
 		$authRegFirm = $this->Mastertablecontent->authFirmRegistration($customer_id);
 		$this->set('authRegFirm',$authRegFirm);
 
@@ -257,7 +257,7 @@ class ApplicationController extends AppController{
 		
 		$application_type = $this->Session->read('application_type');
 		$this->set('application_type',$application_type);
-		
+	
 		// check current form section value
 		if (isset($_SESSION['section_id'])) {
 			$section_id = $this->Session->read('section_id');
@@ -284,11 +284,19 @@ class ApplicationController extends AppController{
 			$this->Communication->singleWindowCommentHistory($chemist_id);
 			
 		}			
-
+		
 		// This condition added by shankhpal shende for BGR Module on 06/07/2023
 		if($application_type == 11){
-			$chemistDetails = $this->DmiChemistRegistrations->find('all',array('conditions'=>array('chemist_id IS'=>$customer_id,'delete_status IS NULL')))->first();
-			$customer_id = $chemistDetails['created_by'];
+		
+			if(isset($_SESSION['packer_id'])){
+				$customer_id = $_SESSION['packer_id'];
+			}elseif(isset($_SESSION['customer_id'])){
+				$customer_id = $_SESSION['customer_id'];
+			}else{
+				$customer_id = null;
+			}
+
+			$chemistDetails = $this->DmiChemistRegistrations->find('all',array('conditions'=>array('chemist_id IS'=>$_SESSION['username'],'delete_status IS NULL')))->first();
 			
 			$form_type='BGR';
 			$this->loadModel('DmiBgrGrantCertificatePdfs');  
@@ -387,7 +395,7 @@ class ApplicationController extends AppController{
 		$firm_type_text = $this->Customfunctions->firmTypeText($customer_id);
 		$final_submit_details = $this->Customfunctions->finalSubmitDetails($customer_id,'application_form');
 		$this->set('final_submit_details',$final_submit_details);
-		
+
 		$section_details = $this->DmiCommonScrutinyFlowDetails->currentSectionDetails($application_type,$office_type,$firm_type,$form_type,$section_id);
 
 		// get all section all details

@@ -161,7 +161,7 @@ class ScrutinyController extends AppController{
 			$selectedValues = $selectedfields[0];
 			$this->set('selectedValues',$selectedValues);
 		}
-
+		
 		if($oldapplication == 'yes' && $application_type == 1){
 
 			$this->viewBuilder()->setLayout('old_app_scrutiny_layout');
@@ -229,6 +229,16 @@ class ScrutinyController extends AppController{
 		 }
 		}
 
+		if($application_type == 11){
+			if(isset($_SESSION['packer_id'])){
+			$customer_id = $_SESSION['packer_id'];
+			}elseif(isset($_SESSION['customer_id'])){
+				$customer_id = $_SESSION['customer_id'];
+			}else{
+				$customer_id = null;
+			}
+
+		}
 
 		if($current_level){
 
