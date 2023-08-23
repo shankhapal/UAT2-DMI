@@ -62,10 +62,7 @@ $('#appl_type').change(function(){
        
             success: function (data) {
               
-                $("#appl_id").html('');
-                // var resArray = data.match(/~([^']+)~/)[1];//getting data bitween ~..~ from response
-                
-                var  resArray = JSON.parse(data);//response is JSOn encoded to parse JSON
+                $("#appl_id").html(''); var  resArray = JSON.parse(data);//response is JSOn encoded to parse JSON
                 $("#appl_id").append("<input type= 'text' placeholder='search.' />");
                 $("#appl_id").append("<option value=''>--Select--</option>");//for first option with value blank
                 //taking each customer id and firm_name from array and creating options tag with value and text.
@@ -93,22 +90,7 @@ $('#appl_type').change(function(){
 
 
 $(document).ready(function (){
-    // var tableThLength = $(".movmentTable thead tr th").length;
-    // if(tableThLength == 4){
-	// 	$(".movmentTable").DataTable({"aoColumns": [null,null,{ "sType": "date-uk" },null],"pageLength": 25});
-    // }
-    
-//  $('#movement_history').dataTable({
-//     columnDefs: [ { type: 'date', targets: 2}]
-// //$("#movement_history").DataTable({"aoColumns": [null,null,{ "type": "date-euro" },null],'targets': 2,"pageLength": 50});
-// });
-
-
-// $('#yourDataTable').DataTable({ 
-//     //columnDefs: [ { type: 'date', targets: 2 } ],
-//     aaSorting: [[2, 'desc']], 
-//     // language: { url: 'https://cdn.datatables.net/plug-ins/1.10.25/sorting/datetime-moment.js' // Optional: Provides localized date sorting
-//      });
+ 
 $('#movement_history').DataTable({
     
     "order": [[2, "desc"]],
