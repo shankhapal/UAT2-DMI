@@ -251,5 +251,21 @@ $(document).ready(function () {
         $(`#error-${field}`).empty();
       }, 5000);
     }
+
+    if (value_return == "false") {
+      var msg = "Please check some fields are missing or not proper.";
+      renderToast("error", msg);
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  function renderToast(theme, msgTxt) {
+    $("#toast-msg-" + theme).html(msgTxt);
+    $("#toast-msg-box-" + theme).fadeIn("slow");
+    $("#toast-msg-box-" + theme)
+      .delay(3000)
+      .fadeOut("slow");
   }
 });
