@@ -18,8 +18,7 @@
 // Developed by Shankhpal Shende on 28/07/2023 for the Bianually Grading Report module of the application.
 // -->
 
-
-// == pr($section_form_details);die;
+//  pr($section_form_details);die;
  // Define the constant with the message
 use Cake\Datasource\ConnectionManager;
 
@@ -68,10 +67,17 @@ $class1 = INPUT_FIELD_CLASSES;?>
               </tr>
               <tr>
                     <td colspan="6" class="border-bottom" scope="col">
-                        Period: From
-                        <input type="text" name="from_period" value="<?php echo $section_form_details[7]; ?>" readonly>
-                        to
-                        <input type="text" name="to_period" value="<?php echo $section_form_details[8]; ?>" readonly>
+                         
+                        <?php
+                            echo $this->Form->control('period', array(
+                              'type'=>'text',
+                              'id'=>'period',
+                              'value'=>$section_form_details[7],
+                              'label'=>'Period:',
+                              'readonly'=>'readonly',
+                              'class'=>'form-control'
+                            )); ?>
+
                     </td>
                   <th
                     colspan="7"
@@ -320,10 +326,11 @@ $class1 = INPUT_FIELD_CLASSES;?>
                             'escape'=>false,
                             'id'=>'total_qty_graded_quintal',
                             'label'=>false,
-                            'class'=>'form-control input-field txtCal wd120',
-                            // 'readonly'=>'readonly',
-                            'placeholder'=>'0.00'
+                            'class'=>'form-control input-field',
+                            'readonly'=>'readonly',
+                           
                           )); ?>
+                           <span id="totalQty"></span>
                         <div class="error-message" id="error-total_qty_graded_quintal"></div>
                       </td>
                       <td>
@@ -462,6 +469,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
 			$customer_id = $_SESSION['customer_id'];
 		} ?>
 <input type="hidden" id="custemer_id" value='<?php echo $customer_id; ?>'>
+
 <input type="hidden" name="total_revenue" id="totalRevenueHidden">
 <input type="hidden" name="progresive_revenue" id="progresiveRevenueHidden">
 <input type="hidden" name="current_level" id="current_level" value='<?php echo $_SESSION['current_level'];?>'>

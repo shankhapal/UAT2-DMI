@@ -4252,5 +4252,41 @@ class CustomfunctionsComponent extends Component {
 			}
 		}
 	}
+
+	// added for biannually grading report module
+	// for getting period of biannual
+	// written by shankhpal shende on 25/08/2023
+	public function computeBiannualPeriod(){
+
+			$currentYear = date('Y'); 
+	  	$currentMonth = date('m');
+      $associative_first_half= array();
+		if ($currentMonth >= 4 && $currentMonth <= 9) {
+				// Current date is between 1st April and 30th September
+				$lastYear = $currentYear - 1; 
+				$startDate = $lastYear."-10-01";
+				$endDate =  $currentYear."-03-31"; 
+				$period = "Second-Half";
+        $associative_first_half= array(
+    			"startDateofAssociativeFH" => $lastYear."-04-01",
+    			"endDateofAssociativeFH" => $lastYear."-09-30"
+				);
+		} else {
+				// Current date is after 30th September, switch to the next period
+				$startDate = $currentYear."-04-01"; 
+				$endDate = $currentYear."-09-30"; 
+				$period = "First-Half";
+		}
+
+		$myMap = array(
+			"startDate" => $startDate,
+			"endDate" => $endDate,
+			"period" => $period,
+			"associative_first_half" => $associative_first_half
+		);
+    
+		
+    return $myMap;  
+	}
 }
 ?>

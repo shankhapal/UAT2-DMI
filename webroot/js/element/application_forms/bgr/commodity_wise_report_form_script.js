@@ -37,7 +37,6 @@ $(document).ready(function () {
 
         if (response == "No Charge") {
           $("#replica_charges" + id_No).val("");
-          $("#total_qty_graded_quintal" + id_No).val();
         } else {
           response = JSON.parse(response); //response is JSOn encoded to parse JSON
           // Assuming response is a valid JSON object containing the "unit" property
@@ -47,54 +46,53 @@ $(document).ready(function () {
           let unit_option = "<option value=''>--Select--</option>";
           $.each(unit_list, function (index, value) {
             unit_option +=
-              "<option value='" + index + "'>" + value + "</option>";
+              "<option value='" + value + "'>" + value + "</option>";
           });
 
           // Assuming id_No is set correctly and refers to the correct element ID
           $("#ta-packet_size_unit-" + id_No).html(unit_option);
           $("#replica_charges" + id_No).val(response["charge"]);
-          $("#total_qty_graded_quintal" + id_No).val(response["min_qty"]);
         }
       },
     });
   });
 
   //to get gross quantity and total charges
-  $("#dataTable").on("focusout", ".total_no_packages", function () {
-    var id_No = this.id.split("-"); //to get dynamic id of element for each row, and split to get no.
-    id_No = id_No[2];
+  // $("#dataTable").on("focusout", ".total_no_packages", function () {
+  //   var id_No = this.id.split("-"); //to get dynamic id of element for each row, and split to get no.
+  //   id_No = id_No[2];
 
-    var packet_size = $("#ta-packet_size-" + id_No).val();
-    var sub_unit_id = $("#ta-packet_size_unit-" + id_No).val();
-    var no_of_packets = $("#ta-no_of_packets-" + id_No).val();
+  //   var packet_size = $("#ta-packet_size-" + id_No).val();
+  //   var sub_unit_id = $("#ta-packet_size_unit-" + id_No).val();
+  //   var no_of_packets = $("#ta-no_of_packets-" + id_No).val();
 
-    var commodity_id = $("#ta-commodity-" + id_No).val();
+  //   var commodity_id = $("#ta-commodity-" + id_No).val();
 
-    if (commodity_id !== "") {
-      $.ajax({
-        type: "POST",
-        url: "../AjaxFunctions/get_gross_quantity_and_total_charge",
-        data: {
-          packet_size: packet_size,
-          sub_unit_id: sub_unit_id,
-          no_of_packets: no_of_packets,
-          commodity_id: commodity_id,
-        },
-        beforeSend: function (xhr) {
-          // Add this line
-          xhr.setRequestHeader("X-CSRF-Token", $('[name="_csrfToken"]').val());
-        },
-        success: function (response) {
-          var response = response.match(/~([^']+)~/)[1]; //getting data bitween ~..~ from response
-          response = JSON.parse(response); //response is JSOn encoded to parse JSON
+  //   if (commodity_id !== "") {
+  //     $.ajax({
+  //       type: "POST",
+  //       url: "../AjaxFunctions/get_gross_quantity_and_total_charge",
+  //       data: {
+  //         packet_size: packet_size,
+  //         sub_unit_id: sub_unit_id,
+  //         no_of_packets: no_of_packets,
+  //         commodity_id: commodity_id,
+  //       },
+  //       beforeSend: function (xhr) {
+  //         // Add this line
+  //         xhr.setRequestHeader("X-CSRF-Token", $('[name="_csrfToken"]').val());
+  //       },
+  //       success: function (response) {
+  //         var response = response.match(/~([^']+)~/)[1]; //getting data bitween ~..~ from response
+  //         response = JSON.parse(response); //response is JSOn encoded to parse JSON
 
-          $("#ta-total_quantity-" + id_No).val(response["gross_quantity"]);
-          $("#ta-total_label_charges-" + id_No).val(response["total_charges"]);
-        },
-      });
-    } else {
-      alert("please select commodity first");
-      $("#ta-no_of_packets-" + id_No).val("");
-    }
-  });
+  //         $("#ta-total_quantity-" + id_No).val(response["gross_quantity"]);
+  //         $("#ta-total_label_charges-" + id_No).val(response["total_charges"]);
+  //       },
+  //     });
+  //   } else {
+  //     alert("please select commodity first");
+  //     $("#ta-no_of_packets-" + id_No).val("");
+  //   }
+  // });
 });

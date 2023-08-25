@@ -2923,6 +2923,8 @@ class AjaxFunctionsController extends AppController{
 		exit;
 	}
 
+	// This method will handle the request to get Total Progressive Revenue for  BGR Module
+	// added by shankhpal shende on 02/08/2023
 	public function getTotalProgressiveRevenue(){
 		$this->autoRender = false;
 		$this->loadModel('DmiBgrCommodityReports');

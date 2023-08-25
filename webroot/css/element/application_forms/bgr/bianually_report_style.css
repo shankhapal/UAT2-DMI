@@ -55,3 +55,8 @@ td button {
 #update_bgr_details {
   display: none;
 }
+#period{
+  display: inline;
+  margin-inline: 10px;
+  width: 30%;
+}

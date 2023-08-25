@@ -30,7 +30,7 @@
 																					 {echo 'Other Upload Docs'; }
 																					else { echo 'Other Upload Docs'; }
 																					?>
-																				</span>
+																				</span><span class="cRed">*</span>
 																		</label>
 
 																				<span class="float-left">
@@ -77,6 +77,7 @@
   <?php
 		echo $this->Html->script('element/application_forms/bgr/commodity_wise_report_crud');
     echo $this->Html->script('element/application_forms/bgr/commodity_wise_report_form_script');
+		echo $this->Html->script('element/application_forms/bgr/bgr_calculation');
     echo $this->Html->css('element/application_forms/bgr/bianually_report_style');
 		echo $this->Html->script('element/application_forms/bgr/bgr_file_uploads_validation');
   ?>

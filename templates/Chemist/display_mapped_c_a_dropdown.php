@@ -28,7 +28,7 @@
 										</div>
 									</div>
 								<div class="card-footer cardFooterBackground">
-                  <?php echo $this->Form->control('Submit', array('type'=>'submit', 'name'=>'submit', 'label'=>false,'class'=>'btn btn-success ')); ?>
+                  <?php echo $this->Form->control('Continue', array('type'=>'submit', 'name'=>'submit', 'label'=>false,'class'=>'btn btn-success ')); ?>
 								</div>
 							</div>
 						</div>

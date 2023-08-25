@@ -11,7 +11,9 @@
 	
 	var $name = "DmiBgrCommodityReports";
 	
+
 	
+
 	public function sectionFormDetails($customer_id){
 
 		$latest_id = $this->find('list', array(
@@ -81,10 +83,10 @@
 		$fetch_state_name = $DmiStates->find('all',array(
 			'fields'=>'state_name',
 			'conditions'=>array(
-				'id IS'=>$state_id,
-				'OR'=>array(
-					'delete_status IS NULL',
-					'delete_status ='=>'no'
+			'id IS'=>$state_id,
+			'OR'=>array(
+			'delete_status IS NULL',
+			'delete_status ='=>'no'
 		))))->first();
 
 		$state_name = $fetch_state_name['state_name'];
@@ -101,69 +103,16 @@
 		$export_unit_status = $CustomersController->Customfunctions->checkApplicantExportUnit($customer_id);
 	
 		
-		// Get the current year
-		$currentYear = date('Y');
-		$currentDate = date('Y-m-d');
-
-		// Calculate the start and end dates of the first biannual period (April 1st to September 30th)
-		$firstPeriodStartDate = $currentYear . '-04-01';
-		$firstPeriodEndDate = $currentYear . '-09-30';
-
-		// Assuming you have a model named DmiBgrCommodityReportsAddmore
-		$DmiBgrCommodityReportsAddmore = TableRegistry::getTableLocator()->get('DmiBgrCommodityReportsAddmore');
-
-		// Fetch data for the first period (April 1st to September 30th)
-		$firstPeriodData = $DmiBgrCommodityReportsAddmore->find()
-				->where([
-						'created >=' => $firstPeriodStartDate,
-						'created <=' => $firstPeriodEndDate
-				])->toArray();
-
-
-		// Calculate the start and end dates of the second biannual period (October 1st to March 31st)
-		$secondPeriodStartDate = $currentYear . '-10-01';
-		$secondPeriodEndDate = ($currentYear + 1) . '-03-31';
-
-		$ApplicationformspdfsController = new ApplicationformspdfsController;
+		//-----------------------------------------------------------------------------------------
+		$time_period_map=	$CustomersController->Customfunctions->computeBiannualPeriod();
 		
-		$progRevenue1 = $ApplicationformspdfsController->getBiannualData($firstPeriodStartDate,$firstPeriodEndDate);
-		
-		if(!empty($progRevenue1)){
-			$progRevenue1 = $progRevenue1['progressive_revenue'];
-		}else {
-    	$progRevenue1 = 0; // Default value if $progRevenue1 is empty
-		}
+		$startDate = $time_period_map['startDate'];
+		$endDate = $time_period_map['endDate'];
+		$period = $time_period_map['period'];
 
-		$progRevenue2 = $ApplicationformspdfsController->getBiannualData($secondPeriodStartDate, $secondPeriodEndDate);
-
-		if(!empty($progRevenue2)){
-			$progRevenue2 = $progRevenue2['progressive_revenue'];
-		}else{
-			$progRevenue2 = 0;
-		}
-	
-		$totalprogrevenue = $progRevenue1 + $progRevenue2;
-		$formattedTotalRevenue = number_format($totalprogrevenue, 2);
-
-
-		
-
-	
-
-
-		if ($currentDate >= $firstPeriodStartDate && $currentDate <= $firstPeriodEndDate) {
-					$periodStartDisplay = date('Y/m/d', strtotime($secondPeriodStartDate));
-					$periodEndDisplay = date('Y/m/d', strtotime($secondPeriodEndDate));
-			} elseif ($currentDate >= $secondPeriodStartDate && $currentDate <= $secondPeriodEndDate) {
-					$periodStartDisplay = date('Y/m/d', strtotime($firstPeriodStartDate));
-					$periodEndDisplay = date('Y/m/d', strtotime($firstPeriodEndDate));
-			} else {
-					$periodStartDisplay = '';
-					$periodEndDisplay = '';
-			}
-
-		
-
+		// Construct the final string
+		$displayStringPeriod = $startDate . ' - ' . $endDate . ' - ' . $period;
+		//------------------------------------------------------------------------------------------
 		
 		$added_firm = $DmiFirms->find('all', ['conditions' => ['customer_id' => $customer_id]])->first();
 			
@@ -206,22 +155,21 @@
 			if(strpos($lab_id,"/Own") !== false){
 				$recordidArray = explode("/", $lab_id);
 				$ownlabId = $recordidArray[0];
-				$form_laboratory_data = $DmiCustomerLaboratoryDetails->find('all', [
-				'conditions' => ['id' => $ownlabId]])->first();
-				$laboratory_name = $form_laboratory_data['laboratory_name'];
+
+				$form_laboratory_data = $DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('id'=>$ownlabId),'order'=>'firm_name asc'))->first();
+				$laboratory_name = $form_laboratory_data;
+
 			}else{
-				$form_laboratory_data = $DmiCustomerLaboratoryDetails->find('all', [
-				'conditions' => ['id' => $lab_id]])->first();
-				$laboratory_name = $form_laboratory_data['laboratory_name'];
+				
+				$form_laboratory_data = $DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('id'=>$lab_id),'order'=>'firm_name asc'))->first();
+				$laboratory_name = $form_laboratory_data;
+				
 			}
 			
 		}else{
 			$laboratory_name = "";
 		}
 		
-
-		
-			
 		$bgraAddedRecord = $DmiBgrCommodityReportsAddmore->find('all',array(
 			'conditions'=>array(
 			'customer_id IS'=>$customer_id)))->toArray();
@@ -264,14 +212,14 @@
 			$state_name,
 			$region,
 			$export_unit_status,
-			$periodStartDisplay,
-			$periodEndDisplay,
+			$displayStringPeriod,
+			$endDate=null,
 			$sub_commodity_value,
 			$grade_list,
 			$laboratory_name,
 			$bgrReportData,
 			$unit_list,
-			$formattedTotalRevenue
+			$period
 		);
 
 	}
@@ -280,9 +228,14 @@
 
 	public function saveFormDetails($customer_id,$forms_data){
 		
+		// pr($forms_data['period']);die;
+			$period = explode(' ',$forms_data['period']);
 			
-			$from_period = $forms_data['from_period'];
-			$to_period = $forms_data['to_period'];
+	
+			$from_period = $period[0];
+			$to_period = $period[2];
+			$bianualperiod = $period[4];
+
 			$total_revenue = $forms_data['total_revenue'];
 			$progresive_revenue = $forms_data['progresive_revenue'];
 			$dataValidatation = $this->postDataValidation($customer_id,$forms_data);
@@ -349,6 +302,7 @@
 					'cr_comment_ul'=>$cr_comment_ul,
 					'period_from'=>$from_period,
 					'period_to'=>$to_period,
+					'period'=>$bianualperiod,
 					'total_revenue'=>$total_revenue,
 					'progresive_revenue'=>$progresive_revenue,
 					'created'=>$created,
@@ -360,19 +314,12 @@
 					
 					return 1;
 					
-				};
+				}else{
+			
+					return 0;
+				}
 
 			}else{	return false; }
-
-
-		 
-
-
-			
-   
-
-			
-
 			
 	}
 
@@ -473,6 +420,9 @@
 			$returnValue = true;
 			$section_form_details = $this->sectionFormDetails($customer_id);
 			$CustomersController = new CustomersController;
+
+			$DmiBgrCommodityReportsAddmoreTable = TableRegistry::getTableLocator()->get('DmiBgrCommodityReportsAddmore');
+
 
 
 			if(empty($section_form_details[0]['id'])){

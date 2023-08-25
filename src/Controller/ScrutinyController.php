@@ -228,6 +228,10 @@ class ScrutinyController extends AppController{
             $this->set('trainingCompleteAtRo', $trainingCompleteAtRo['training_completed']);
 		 }
 		}
+		
+		//-----------------------------------------------------------------------------------------------------
+		// This section is added for the BGR module when the application type is set to 11 during a session. At that time, if $_SESSION['packer_id'] is set, then $customer_id will be assigned the value of $_SESSION['packer_id']. Otherwise, $customer_id will be assigned the value of $_SESSION['customer_id'].
+		// written by :- shankhpal shende on 24/08/2023
 
 		if($application_type == 11){
 			if(isset($_SESSION['packer_id'])){
@@ -239,6 +243,7 @@ class ScrutinyController extends AppController{
 			}
 
 		}
+		//----------------------------------------------------------------------------------------------------------
 
 		if($current_level){
 
