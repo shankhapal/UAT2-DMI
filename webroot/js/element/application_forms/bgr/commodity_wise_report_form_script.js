@@ -57,42 +57,25 @@ $(document).ready(function () {
     });
   });
 
-  //to get gross quantity and total charges
-  // $("#dataTable").on("focusout", ".total_no_packages", function () {
-  //   var id_No = this.id.split("-"); //to get dynamic id of element for each row, and split to get no.
-  //   id_No = id_No[2];
+  // if lab is not NABL Accredited then dissabled the field
+  const labNablAccreditedInput = document.getElementById(
+    "lab_nabl_accredited"
+  ).value;
 
-  //   var packet_size = $("#ta-packet_size-" + id_No).val();
-  //   var sub_unit_id = $("#ta-packet_size_unit-" + id_No).val();
-  //   var no_of_packets = $("#ta-no_of_packets-" + id_No).val();
+  const reportNoInput = document.getElementById("report_no");
+  const reportDateInput = document.getElementById("report_date");
+  const remarksInput = document.getElementById("remarks");
+  const laboratorynameInput = document.getElementById("laboratory_name");
 
-  //   var commodity_id = $("#ta-commodity-" + id_No).val();
-
-  //   if (commodity_id !== "") {
-  //     $.ajax({
-  //       type: "POST",
-  //       url: "../AjaxFunctions/get_gross_quantity_and_total_charge",
-  //       data: {
-  //         packet_size: packet_size,
-  //         sub_unit_id: sub_unit_id,
-  //         no_of_packets: no_of_packets,
-  //         commodity_id: commodity_id,
-  //       },
-  //       beforeSend: function (xhr) {
-  //         // Add this line
-  //         xhr.setRequestHeader("X-CSRF-Token", $('[name="_csrfToken"]').val());
-  //       },
-  //       success: function (response) {
-  //         var response = response.match(/~([^']+)~/)[1]; //getting data bitween ~..~ from response
-  //         response = JSON.parse(response); //response is JSOn encoded to parse JSON
-
-  //         $("#ta-total_quantity-" + id_No).val(response["gross_quantity"]);
-  //         $("#ta-total_label_charges-" + id_No).val(response["total_charges"]);
-  //       },
-  //     });
-  //   } else {
-  //     alert("please select commodity first");
-  //     $("#ta-no_of_packets-" + id_No).val("");
-  //   }
-  // });
+  if (labNablAccreditedInput === "" || labNablAccreditedInput === null) {
+    reportNoInput.style.display = "none";
+    reportDateInput.style.display = "none";
+    remarksInput.style.display = "none";
+    laboratorynameInput.style.display = "none";
+  } else {
+    reportNoInput.style.display = "block"; // Or "initial" depending on your CSS
+    reportDateInput.style.display = "block"; // Or "initial" depending on your CSS
+    remarksInput.style.display = "block"; // Or "initial" depending on your CSS
+    laboratorynameInput.style.display = "block";
+  }
 });

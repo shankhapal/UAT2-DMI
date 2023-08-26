@@ -198,13 +198,19 @@
 		
 		$unit_list = $DmiReplicaUnitDetails
     ->find('list', [
-        'keyField' => 'id',
+        'keyField' => 'sub_unit',
         'valueField' => 'sub_unit',
         'conditions' => [],
         'order' => 'id asc'
     ])
     ->toArray();
-		
+
+		// check lab is NABL Accredited or not
+		//------------------------------------------------------------------------------------------------------------
+		$LabNablAccredited = $CustomersController->Randomfunctions->checkIfLabNablAccreditated($customer_id);
+		//------------------------------------------------------------------------------------------------------------
+
+
 		return array(
 			$form_fields_details,
 			$firmname,$email,
@@ -219,7 +225,8 @@
 			$laboratory_name,
 			$bgrReportData,
 			$unit_list,
-			$period
+			$period,
+			$LabNablAccredited
 		);
 
 	}
@@ -416,22 +423,29 @@
 	}
 
 		public function postDataValidation($customer_id,$forms_data){
-		//	print_r($forms_data); exit;
+		
 			$returnValue = true;
 			$section_form_details = $this->sectionFormDetails($customer_id);
 			$CustomersController = new CustomersController;
 
 			$DmiBgrCommodityReportsAddmoreTable = TableRegistry::getTableLocator()->get('DmiBgrCommodityReportsAddmore');
 
-
-
-			if(empty($section_form_details[0]['id'])){
-
-				if(empty($forms_data['other_upload_docs']->getClientFilename())){ $returnValue = null ; }
+			$records = $DmiBgrCommodityReportsAddmoreTable->find('all', [
+					'conditions' => ['customer_id' => $customer_id]
+			])->toArray();
 			
+			// Add validation for record presence
+			if (empty($records)) {
+					$returnValue = null;
 			}
 
-			if(empty($forms_data['other_upload_docs'])){ $returnValue = null ; }
+			// if(empty($section_form_details[0]['id'])){
+
+			// 	if(empty($forms_data['other_upload_docs']->getClientFilename())){ $returnValue = null ; }
+			
+			// }
+
+			// if(empty($forms_data['other_upload_docs'])){ $returnValue = null ; }
 			
 			
 			return $returnValue;

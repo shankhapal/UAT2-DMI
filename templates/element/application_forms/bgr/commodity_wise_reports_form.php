@@ -30,7 +30,7 @@
 																					 {echo 'Other Upload Docs'; }
 																					else { echo 'Other Upload Docs'; }
 																					?>
-																				</span><span class="cRed">*</span>
+																				</span>
 																		</label>
 
 																				<span class="float-left">

@@ -100,8 +100,9 @@
 	public function getBgrData($id){
 		
 		$query = $this->find()
-		->where(['id'=>$id,'delete_status IS NULL']);
+    ->where(['id' => $id, 'delete_status IS NULL']);
 		return $editData = $query->first();
+		
 
 	}
 

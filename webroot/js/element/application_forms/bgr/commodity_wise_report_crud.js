@@ -118,6 +118,11 @@ $(document).ready(function () {
   });
 
   const form_section_id = $("#form_section_id").val();
+
+  const labNablAccreditedInput = document.getElementById(
+    "lab_nabl_accredited"
+  ).value;
+
   const requiredFields = {
     "ta-commodity-": "Commodity",
     lot_no_tf_no_m_no: "Lot No/TF No/M No",
@@ -150,8 +155,21 @@ $(document).ready(function () {
   // You can similarly add event handlers for other actions (edit, delete, save) if needed.
 
   async function handleFormAction(action) {
-    const form_data = $("#" + form_section_id).serializeArray();
-
+    const labNablAccreditedInput = document.getElementById(
+      "lab_nabl_accredited"
+    ).value;
+    let form_data = $("#" + form_section_id).serializeArray();
+    let itemsToRemove = [
+      "report_date",
+      "remarks",
+      "report_no",
+      "progresive_revenue",
+      "record_id",
+    ];
+    form_data = form_data.filter((item) => !itemsToRemove.includes(item.name));
+    if (labNablAccreditedInput !== "") {
+    }
+    console.log(form_data);
     const validationStatus = await bgr_report_validation(form_data);
 
     if (validationStatus.isValid) {
@@ -211,13 +229,15 @@ $(document).ready(function () {
   async function bgr_report_validation(form_data) {
     let emptyFields = [];
 
+    console.log(form_data);
     for (const field of Object.keys(requiredFields)) {
       const formField = form_data.find((item) => item.name === field);
-      console.log(formField);
-      if (!formField || formField.value.trim() === "") {
+      // console.log(formField);
+      if (formField && formField?.value.trim() === "") {
         emptyFields.push(field);
       }
     }
+    debugger;
     return {
       isValid: emptyFields.length === 0,
       emptyFields: emptyFields,
@@ -242,14 +262,39 @@ $(document).ready(function () {
     // Add highlight class to empty fields
     for (const field of emptyFields) {
       const fieldName = requiredFields[field];
-      console.log(field);
-      $(`#${field}`).addClass("highlight-empty");
-      const errorMessage = `<span class="error">${fieldName} is required.</span>`;
-      $(`#error-${field}`).html(errorMessage);
+      const labNablAccreditedInput = document.getElementById(
+        "lab_nabl_accredited"
+      ).value;
 
-      setTimeout(() => {
-        $(`#error-${field}`).empty();
-      }, 5000);
+      if (
+        labNablAccreditedInput === "" &&
+        (field === "report_no" ||
+          field === "report_date" ||
+          field === "remarks")
+      ) {
+        continue; // Skip validation for specific fields if labNablAccreditedInput is empty
+      }
+
+      // Additional check to skip validation for certain field names
+      if (
+        fieldName === "report_no" ||
+        fieldName === "report_date" ||
+        fieldName === "remarks"
+      ) {
+        continue; // Skip validation for these specific field names
+      }
+
+      const fieldValue = $(`#${field}`).val().trim();
+
+      if (!fieldValue) {
+        $(`#${field}`).addClass("highlight-empty");
+        const errorMessage = `<span class="error">${fieldName} is required.</span>`;
+        $(`#error-${field}`).html(errorMessage);
+
+        setTimeout(() => {
+          $(`#error-${field}`).empty();
+        }, 5000);
+      }
     }
   }
 });

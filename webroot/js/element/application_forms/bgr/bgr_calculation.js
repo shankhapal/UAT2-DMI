@@ -34,6 +34,9 @@ $(document).ready(function () {
     var conversionFactor = unitConversions[unit];
     totalQty = packSize * totalPackages * conversionFactor; // Assign to the outer totalQty
 
-    $("#total_qty_graded_quintal").text(totalQty + " quintal");
+    var decimalPlaces = 3; // Change this to 2 if you want 2 decimal places
+    var formattedQty = totalQty.toFixed(decimalPlaces);
+
+    $("#total_qty_graded_quintal").val(formattedQty + " quintal");
   }
 });

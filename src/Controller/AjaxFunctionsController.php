@@ -2725,8 +2725,10 @@ class AjaxFunctionsController extends AppController{
 					// Make sure all required fields are present
 					foreach ($requiredFields as $field) {
 							if (!isset($_POST[$field]) || empty($_POST[$field])) {
-									// Handle missing required field error
-									die('Error: Missing required field ' . $field);
+									$_POST['report_no'] = null;
+									$_POST['report_date'] = null;
+									$_POST['remarks'] = null;
+									$_POST['laboratory_name'] = null;
 							}
 					}
 
@@ -2866,7 +2868,7 @@ class AjaxFunctionsController extends AppController{
     $editbgrid = $updatedData['id'];
 		$this->Session->write('editbgrid',$editbgrid);
 		$bgrReportData = $this->DmiBgrCommodityReportsAddmore->getBgrData($editbgrid);
-	
+		// pr($bgrReportData);die;
  		return $this->response->withType('application/json')->withStringBody(json_encode($bgrReportData));
 		$this->render('/element/application_forms/bgr/analysis_table/commodity_wise_reports_form_tbl');
 		
@@ -2926,6 +2928,7 @@ class AjaxFunctionsController extends AppController{
 	// This method will handle the request to get Total Progressive Revenue for  BGR Module
 	// added by shankhpal shende on 02/08/2023
 	public function getTotalProgressiveRevenue(){
+		
 		$this->autoRender = false;
 		$this->loadModel('DmiBgrCommodityReports');
 
@@ -2937,14 +2940,25 @@ class AjaxFunctionsController extends AppController{
 			$customer_id = null;
 		}
 
-		$result = $this->DmiBgrCommodityReports->find('all')->select(['period_from','period_to','total_revenue'])->where(['customer_id'=>$customer_id])->order(['id' => 'DESC'])->first();
-		
-		if($result !== null){
-			echo $progressive_revenue = $result['total_revenue'];
-		}else{
-			$progressive_revenue = null;
-		}
-		
+		$reports = $this->DmiBgrCommodityReports
+    ->find()
+    ->select(['total_revenue', 'period'])
+    ->where([
+        'customer_id' => $customer_id,
+        'period IN' => ['Second-Half', 'First-Half']
+    ])
+    ->toArray();
+		$totalRevenueForSelectedPeriods = '';
+		if (!empty($reports)) {
+			$totalRevenueForSelectedPeriods = 0.0;
+
+			foreach ($reports as $report) {
+				$totalRevenueForSelectedPeriods += (float)$report->total_revenue;
+			}
+			
+		} 
+		echo $totalRevenueForSelectedPeriods;
+				
 	}
 
 	

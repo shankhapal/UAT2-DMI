@@ -18,7 +18,7 @@
 // Developed by Shankhpal Shende on 28/07/2023 for the Bianually Grading Report module of the application.
 // -->
 
-//  pr($section_form_details);die;
+//pr($section_form_details);die;
  // Define the constant with the message
 use Cake\Datasource\ConnectionManager;
 
@@ -156,21 +156,8 @@ $class1 = INPUT_FIELD_CLASSES;?>
                   <?php
                   $i=1;
                   foreach ($section_form_details[12] as  $eachrow) {
+                 
                     $conn = ConnectionManager::get('default');
-                    $numericValue = $eachrow['packetsizeunit'];
-                    $unitName = "";
-                    if(!empty($numericValue)){
-                       $query = "SELECT unit FROM dmi_replica_unit_details WHERE id = $numericValue";
-                       $q = $conn->execute($query);
-
-                       if ($q->rowCount() > 0) {
-                        $row = $q->fetch();
-                        if (isset($row[0])) { // Check if index 0 exists
-                            $unitName = $row[0]; // Use index 0 to access the value
-                        }
-                       }
-                    }
-
                     $gradeasign = $eachrow['gradeasign'];
                     $query2 = "SELECT grade_desc from m_grade_desc WHERE grade_code = $gradeasign";
                     $q2 = $conn->execute($query2);
@@ -189,7 +176,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                       <td><?php echo $eachrow['dateofpacking'];?></td>
                       <td><?php echo $gradename; ?></td>
                       <td><?php echo $eachrow['packetsize'];?></td>
-                      <td><?php echo $unitName; ?></td>
+                      <td><?php echo $eachrow['packetsizeunit']; ?></td>
                       <td><?php echo $eachrow['totalnoofpackets'];?></td>
                       <td><?php echo $eachrow['totalqtyquintal'];?></td>
                       <td><?php echo $eachrow['estimatedvalue'];?></td>
@@ -283,7 +270,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                       </td>
                       <td>
                           <?php echo $this->Form->control('ta-packet_size-', array(
-                            'type'=>'text',
+                            'type'=>'number',
                             'escape'=>false,
                             'id'=>'ta-packet_size-',
                             'options'=>$section_form_details[10],
@@ -381,6 +368,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                               'type'=>'text',
                               'escape'=>false,
                               'id'=>'replica_charges',
+                              'readonly'=>'readonly',
                               'label'=>false,
                               'class'=>$class1,
                               'placeholder'=>'0.00'
@@ -469,7 +457,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
 			$customer_id = $_SESSION['customer_id'];
 		} ?>
 <input type="hidden" id="custemer_id" value='<?php echo $customer_id; ?>'>
-
+<input type="hidden" id="lab_nabl_accredited" value='<?php echo $section_form_details[15]; ?>'>
 <input type="hidden" name="total_revenue" id="totalRevenueHidden">
 <input type="hidden" name="progresive_revenue" id="progresiveRevenueHidden">
 <input type="hidden" name="current_level" id="current_level" value='<?php echo $_SESSION['current_level'];?>'>
