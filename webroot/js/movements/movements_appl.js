@@ -44,12 +44,17 @@ function movement_appl_validation(){
     }
 }
 
+ 
 
 
 //to fetch application id list for specific appl type .
-$('#appl_type').change(function(){	
-    $('#appl_id').val('');//reset 'application ID' dropdown
-    var appl_type = $('#appl_type').val();
+$('#appl_id').select2();
+
+    $('#appl_id').on('select2:open', function() {
+      $('.select2-search__field').focus();
+//$('#appl_id').click(function(){	
+   // $('#appl_id').val('');//reset 'application ID' dropdown
+    var appl_type = 1;
     
     if(appl_type != ''){
         $.ajax({
@@ -76,46 +81,137 @@ $('#appl_type').change(function(){
                         .attr("value", this.chemist_id).text(this.chemist_id +  "  "  + this.chemist_fname + "  " + this.chemist_lname));
                     }
                 });
-               //below added for dropdown search box 
-                $(function () {
-                    $("#appl_id").select2();
-                  });
+                //below added for dropdown search box 
+                // $(function () {
+                //     $("#appl_id").select2();
+                // });
             }
         });
     }
 });
+$('.chemist').hide();
+$('.appli_type').hide();
+
+$('#appl_id').change(function(){	
+    var appl_id = $('#appl_id').val();
+    
+    if(appl_id != ''){
+        $.ajax({
+            type: "POST",
+            url:"../movements/get_appl_type",
+            data: {appl_id:appl_id},
+            beforeSend: function (xhr) { // Add this line
+                xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+            }, 
+       
+            success: function (data) {
+                $("#appl_type").html(''); 
+                var resultArray = JSON.parse(data); 
+                $('.appli_type').show();
+                $("#appl_type").append("<option value=''>--Select--</option>");
+                
+                $.each(resultArray, function(value, value) { 
+                   
+                        $("#appl_type").append($("<option></option>")
+                        .attr("value", this.id).text(this.application_type));
+                });
+                
+               
+            }
+        });
+    }       
+});
 
 
+// for chemist application id
 
+$('#appl_type').change(function(){	
+    var appl_type = $('#appl_type').val();
+    var appl_id = $('#appl_id').val();
+    if((appl_type != '' && appl_type == 4) && appl_id != ''){
+        $.ajax({
+            type: "POST",
+            url:"../movements/get_chemist_appl_id",
+            data: {appl_id:appl_id},
+            beforeSend: function (xhr) { // Add this line
+                xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+            }, 
+       
+            success: function (data) {
+                $("#chemist_id").html(''); 
+                var resultArray = JSON.parse(data); 
+                $('.chemist').show();
+                $("#chemist_id").append("<option value=''>--Select--</option>");
+                
+                $.each(resultArray, function(value, value) { 
+                   
+                    $("#chemist_id").append($("<option></option>")
+                    .attr("value", this.chemist_id).text(this.chemist_id +  "  "  + this.chemist_fname + "  " + this.chemist_lname));
+                
+                });
+                
+               
+            }
+        });
+    }       
+});
 
 
 $(document).ready(function (){
- 
-$('#movement_history').DataTable({
-    
-    "order": [[2, "desc"]],
-    'pageLength':5,
-    'columnDefs': [
-        {
-            'targets': 2,
-            
-            'createdCell':  function (td, cellData, rowData, row, col) {   
+//     var tableThLength = $(".movmentTable thead tr th").length
+//     if(tableThLength == 4){
+// 		$(".movmentTable").DataTable({"aoColumns": [null,null,{ "sType": "date-uk" },null],"pageLength": 50});
+//     }
+// });
 
-                var celltime =  cellData.split(' ')[1];
-                var celldate = cellData.split(' ')[0];
-                var celldate1 = celldate.split('/'); 
+//     jQuery.extend( jQuery.fn.dataTableExt.oSort, {
+//         "date-uk-pre": function ( a ) {
+//             var ukDatea = a.split('/');
+//             return (ukDatea[2] + ukDatea[1] + ukDatea[0]) * 1;
+//         },
+        
+//         "date-uk-asc": function ( a, b ) {
+//             return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+//         },
+        
+//         "date-uk-desc": function ( a, b ) {
+//             return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+//         }
+//     } );
+ 
+
+    $('#movement_history').DataTable({
+        "ordering": false,
+        searching: false,
+    });
+// $('#movement_history').DataTable({
+//     'pageLength':5,
+//     columnDefs: [ { type: 'date', 'targets': [2] } ],
+// order: [[ 2, 'desc' ]]
+    
+//     "order": [[2, "desc"]],
+//     'pageLength':5,
+//     'columnDefs': [
+//         {
+//             'targets': 2,
+            
+//             'createdCell':  function (td, cellData, rowData, row, col) {   
+
+//                 var celltime =  cellData.split(' ')[1];
+//                 var celldate = cellData.split(' ')[0];
+//                 var celldate1 = celldate.split('-'); 
                
-                var newDate = celldate1[2]+"/"+celldate1[1]+"/"+celldate1[0];                  
-                var datestamp = new Date(newDate);
-                $(td).html((datestamp.getDate()) + '-' + (datestamp.getMonth()+1) + '-' + datestamp.getFullYear() + ' '+celltime);
-            }
-        }
-    ],
-    "initComplete": function(settings, json) {
-        $($.fn.dataTable.tables(true)).DataTable()
-            .columns.adjust();               
-    }
-});
+//                 var newDate = celldate1[2]+"/"+celldate1[1]+"/"+celldate1[0];                  
+//                 var datestamp = new Date(newDate);
+//                 $(td).html((datestamp.getDate()) + '-' + (datestamp.getMonth()+1) + '-' + datestamp.getFullYear() + ' '+celltime);
+//             }
+//         }
+//     ],
+//     "initComplete": function(settings, json) {
+//         $($.fn.dataTable.tables(true)).DataTable()
+//             .columns.adjust();               
+//     }
+//  });
 });
 
 
