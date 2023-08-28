@@ -208,6 +208,7 @@
 		// check lab is NABL Accredited or not
 		//------------------------------------------------------------------------------------------------------------
 		$LabNablAccredited = $CustomersController->Randomfunctions->checkIfLabNablAccreditated($customer_id);
+			// $LabNablAccredited = 'yes';
 		//------------------------------------------------------------------------------------------------------------
 
 

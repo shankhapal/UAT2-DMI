@@ -1630,30 +1630,90 @@ class ChemistController extends AppController {
 	// This function is used to display the mapped CA dropdown.
 	// Added by Shankhpal Shende on August 22, 2023.
 	public function displayMappedCADropdown(){
-	
+		
+		$message = "";
+		$message_theme = "";
+		$redirect_to = "";
 		$this->viewBuilder()->setLayout('chemist_home_layout');
+		$this->loadModel('DmiBgrCommodityReports');
 
 		$alloted_chemist = $this->DmiChemistAllotments->find('list',array('keyField'=>'customer_id','valueField'=>'customer_id','conditions'=>array('chemist_id IS'=>$_SESSION['username'],'status'=>1,'incharge'=>'yes')))->toArray();
-		
 		$this->set('alloted_chemist', $alloted_chemist);
+		
+		// $CustomersController = new CustomersController;
+		// $time_period_map=	$CustomersController->Customfunctions->computeBiannualPeriod();
+		
+		$finacialYearsData = $this->DmiBgrCommodityReports
+    ->find()
+    ->select(['period_from', 'period_to','period'])
+    ->where([
+        'period IN' => ['Second-Half', 'First-Half']
+    ])
+    ->toArray();
 
-		$reqData = $this->request->getData('packerlist'); // Get the selected values
-		if (!empty($reqData)) {
-				foreach ($reqData as $value) {
-						$packer_id = $value; // Each value is a selected packer ID
-						
-				}
-			$this->request->getSession()->write('packer_id',$packer_id);
-			// $this->request->getSession()->write('application_type',11);
-			$this->redirect(['controller' => 'application','action' => 'applicationType',11]);
+		$finacialYearsArray = [];
+		if(!empty($finacialYearsData)){
+			foreach ($finacialYearsData as $eachdata) {
+					$startDate = $eachdata['period_from'];
+					$endDate = $eachdata['period_to'];
+					$period = $eachdata['period'];
+					
+					$formattedString = $startDate . '-To-' . $endDate . '-' . $period;
+        	$finacialYearsArray[] = $formattedString;
+			}
+		}
+
+		$this->set('finacialYearsArray',$finacialYearsArray);
+
+		
+		// $reqData = $this->request->getData(); // Get the selected values
+		// pr($reqData);die;
+		if (null!== ($this->request->getData('continue-btn'))) {
+			// pr($reqData);die;
+			$packerid = $_POST['packerid'];
 			
-			$this->redirect(['controller' => 'application','action' => 'applicationForCertificate']);
+			$financialYear = $_POST['financialYear'];
+		// echo $financialYear;die;
+			if(!empty($packerid) || !empty($financialYear)){
+				//  echo "ok";die;
+				$this->request->getSession()->write('packer_id',$packerid);
+				if(isset($_SESSION)){
+					$this->redirect(['controller' => 'application','action' => 'applicationType',11]);
+					$this->redirect(['controller' => 'application','action' => 'applicationForCertificate',11]);
+				}
+			 
+			}else{
+				$message = "Please select both a financial year and a packer ID.";
+				$message_theme = 'warning';
+				$redirect_to = '../chemist/display-mapped-c-a-dropdown';
+				$this->render('/element/message_boxes');
+			}
+			
+			
+			
+			
+			
+
+
 		}
 		
-	
+
+		$this->set('message_theme',$message_theme);
+		$this->set('message',$message);
+		$this->set('redirect_to',$redirect_to);
+
+		if ($message != null) {
+			$this->render('/element/message_boxes');
+		}
+		
+			
+		
+					
+					// $this->request->getSession()->write('application_type',11);
+					// $this->redirect(['controller' => 'application','action' => 'applicationType',11]);
+					
+					
 	}
-
-
 
 
 }

@@ -155,9 +155,6 @@ $(document).ready(function () {
   // You can similarly add event handlers for other actions (edit, delete, save) if needed.
 
   async function handleFormAction(action) {
-    const labNablAccreditedInput = document.getElementById(
-      "lab_nabl_accredited"
-    ).value;
     let form_data = $("#" + form_section_id).serializeArray();
     let itemsToRemove = [
       "report_date",
@@ -167,8 +164,7 @@ $(document).ready(function () {
       "record_id",
     ];
     form_data = form_data.filter((item) => !itemsToRemove.includes(item.name));
-    if (labNablAccreditedInput !== "") {
-    }
+
     console.log(form_data);
     const validationStatus = await bgr_report_validation(form_data);
 
@@ -229,7 +225,6 @@ $(document).ready(function () {
   async function bgr_report_validation(form_data) {
     let emptyFields = [];
 
-    console.log(form_data);
     for (const field of Object.keys(requiredFields)) {
       const formField = form_data.find((item) => item.name === field);
       // console.log(formField);
@@ -237,7 +232,7 @@ $(document).ready(function () {
         emptyFields.push(field);
       }
     }
-    debugger;
+
     return {
       isValid: emptyFields.length === 0,
       emptyFields: emptyFields,
@@ -276,19 +271,13 @@ $(document).ready(function () {
       }
 
       // Additional check to skip validation for certain field names
-      if (
-        fieldName === "report_no" ||
-        fieldName === "report_date" ||
-        fieldName === "remarks"
-      ) {
-        continue; // Skip validation for these specific field names
-      }
 
       const fieldValue = $(`#${field}`).val().trim();
 
       if (!fieldValue) {
         $(`#${field}`).addClass("highlight-empty");
         const errorMessage = `<span class="error">${fieldName} is required.</span>`;
+
         $(`#error-${field}`).html(errorMessage);
 
         setTimeout(() => {

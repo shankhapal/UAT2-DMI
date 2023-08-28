@@ -37,6 +37,6 @@ $(document).ready(function () {
     var decimalPlaces = 3; // Change this to 2 if you want 2 decimal places
     var formattedQty = totalQty.toFixed(decimalPlaces);
 
-    $("#total_qty_graded_quintal").val(formattedQty + " quintal");
+    $("#total_qty_graded_quintal").val(formattedQty);
   }
 });

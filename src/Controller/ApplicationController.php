@@ -288,6 +288,7 @@ class ApplicationController extends AppController{
 		// This condition added by shankhpal shende for BGR Module on 06/07/2023
 		if($application_type == 11){
 		
+			
 			if(isset($_SESSION['packer_id'])){
 				$customer_id = $_SESSION['packer_id'];
 			}elseif(isset($_SESSION['customer_id'])){
@@ -304,7 +305,7 @@ class ApplicationController extends AppController{
 			$checkIfgrant = $this->DmiBgrGrantCertificatePdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
 			$this->set('checkIfgrant',$checkIfgrant);
 		}
-
+		
 		$this->Customfunctions->showOldCertDetailsPopup($customer_id);
 
 	//commented on 13-04-2023 for change request appl

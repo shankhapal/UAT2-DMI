@@ -16,7 +16,7 @@
 									<div class="form-group row">
 										<label for="inputEmail3" class="col-sm-3 col-form-label">Select Packer <span class="cRed">*</span></label>
 										<div class="col-sm-6">
-											<?php echo $this->Form->control('packerlist[]', array(
+											<?php echo $this->Form->control('packerid', array(
                         'type'=>'select',
                         'empty'=>'Select Packer',
                         'id'=>'packerlist',
@@ -27,15 +27,35 @@
 											<span id="error_oldpass" class="error invalid-feedback"></span>
 										</div>
 									</div>
+
+									<div class="form-group row">
+										<label for="financialYear" class="col-sm-3 col-form-label">Select Financial Year: <span class="cRed">*</span></label>
+									<div class="col-sm-6">
+											<?php 
+												echo $this->Form->control('financialYear', array(
+                        'type'=>'select',
+                        'empty'=>'Select Financial Year',
+                        'id'=>'financialYear',
+                        'options'=>$finacialYearsArray,
+                        'label'=>false,
+                        'class'=>$class1,
+                        )); ?>
+											<div class="invalid-feedback">Please select a financial year.</div>
+										</div>
+									</div>
+
 								<div class="card-footer cardFooterBackground">
-                  <?php echo $this->Form->control('Continue', array('type'=>'submit', 'name'=>'submit', 'label'=>false,'class'=>'btn btn-success ')); ?>
+                  <?php echo $this->Form->control('Continue', array('type' => 'submit', 'name' => 'continue-btn', 'label' => false, 'class' => 'btn btn-success', 'id' => 'financialYear')); ?>
 								</div>
 							</div>
 						</div>
 					<?php echo $this->Form->end(); ?>
+					
 				</div>
 			</div>
 		</div>
 	</section>
 </div>
 
+
+		

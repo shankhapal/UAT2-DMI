@@ -4791,7 +4791,6 @@ class ApplicationformspdfsController extends AppController{
 				$export_unit_status = $CustomersController->Customfunctions->checkApplicantExportUnit($customer_id);
 				$this->set('export_unit_status',$export_unit_status);	
 				
-				
 				$commaSeparatedCommodity = implode(', ', $sub_commodity_value);
 				$this->set('commaSeparatedCommodity',$commaSeparatedCommodity);
 
@@ -4823,13 +4822,24 @@ class ApplicationformspdfsController extends AppController{
 
 				$this->loadComponent('Randomfunctions');
 				//added custom method to check if the lab application is NABL accreditated
-				$NablDate = $this->Randomfunctions->checkIfLabNablAccreditated($customer_id);
-
+				// $NablDate = $this->Randomfunctions->checkIfLabNablAccreditated($customer_id);
+				$NablDate = 'yes';
+			
 				$this->set('NablDate',$NablDate);
 				$this->set('bgrReportData',$bgrReportData);
 
 
 				$this->loadModel('DmiBgrCommodityReportsAddmore');
+			
+				$time_period_map=	$CustomersController->Customfunctions->computeBiannualPeriod();
+				// pr($time_period_map);die;
+				$startDate = $time_period_map['startDate'];
+				$endDate = $time_period_map['endDate'];
+				$period = $time_period_map['period'];
+				
+				// Construct the final string
+				$displayStringPeriod = $startDate . ' - ' . $endDate . ' - ' . $period;
+				$this->set('displayStringPeriod',$displayStringPeriod);
 
 				$query = $this->DmiBgrCommodityReportsAddmore->find();
 				$query->select(['replicacharges' => $query->func()->sum('replicacharges')]);
@@ -4837,84 +4847,49 @@ class ApplicationformspdfsController extends AppController{
 
 				$result = $query->first();
 				
-				$totalReplicaCharges = $result['replicacharges']; // Total Revenue
+				$totalReplicaCharges = $result['replicacharges'];
 				$this->set('totalReplicaCharges',$totalReplicaCharges);
 
-				// Get the current year
-				$currentYear = date('Y');
-				$currentDate = date('d-m-Y');
-
-				// Calculate the start and end dates of the first biannual period (April 1st to September 30th)
-				$startDate1 = $currentYear . '-04-01';
-				$endDate1 = $currentYear . '-09-30';
-
-				$startDate2 = $currentYear . '-10-01';
-				$endDate2 = ($currentYear + 1) . '-03-31';
-
-				// Call the private function to retrieve data for the first biannual period
-				$progRevenue1 = $this->getBiannualData($startDate1, $endDate1);
-				if(!empty($progRevenue1)){
-					$progRevenue1 = $progRevenue1['progressive_revenue'];
-				}else {
-					$progRevenue1 = 0; // Default value if $progRevenue1 is empty
-				}
-
-        $progRevenue2 = $this->getBiannualData($startDate2, $endDate2);
-				if(!empty($progRevenue2)){
-					$progRevenue2 = $progRevenue2['progressive_revenue'];
-				}else{
-					$progRevenue2 = 0;
-				}
-
-				$totalprogrevenue = $progRevenue1 + $progRevenue2;
-				$formattedTotalRevenue = number_format($totalprogrevenue, 2);
-				$this->set('formattedTotalRevenue',$formattedTotalRevenue);
-
 				$this->loadModel('DmiBgrCommodityReports');
-				$progRevenue = $this->DmiBgrCommodityReports->find('all')->select(['progressive_revenue','period_from','period_to'])->where(['customer_id'=>$customer_id])->order(['id' => 'DESC'])->first();
-		
+
+				$reports = $this->DmiBgrCommodityReports
+				->find()
+				->select(['total_revenue', 'period'])
+				->where([
+						'customer_id' => $customer_id,
+						'period IN' => ['Second-Half', 'First-Half']
+				])
+				->order(['id' => 'desc'])
+				->first();
 				
-				
-				if($result !== null){
-					echo $progressive_revenue = $result['total_revenue'];
-				}else{
-					$progressive_revenue = null;
-				}
+				$totalRevenueForSelectedPeriods = '';
+				if (!empty($reports)) {
+					$totalRevenueForSelectedPeriods = 0.0;
+					$associative_first_half = $time_period_map['associative_first_half'];
+					//  pr($associative_first_half);die;
+					if(!empty($associative_first_half)){
+						$startDateofAssociativeFH = $associative_first_half['startDateofAssociativeFH'];
+						$endDateofAssociativeFH = $associative_first_half['endDateofAssociativeFH'];
 
-				// Get the current year
-				$currentYear = date('Y');
-				$currentDate = date('Y-m-d');
-
-				// Calculate the start and end dates of the first biannual period (April 1st to September 30th)
-				$firstPeriodStartDate = $currentYear . '-04-01';
-				$firstPeriodEndDate = $currentYear . '-09-30';
-
-				// Fetch data for the first period (April 1st to September 30th)
-				$firstPeriodData = $this->DmiBgrCommodityReportsAddmore->find()
+						$associative_first = $this->DmiBgrCommodityReports
+						->find()
+						->select(['total_revenue', 'period'])
 						->where([
-								'created >=' => $firstPeriodStartDate,
-								'created <=' => $firstPeriodEndDate
-						])->toArray();
+								'customer_id' => $customer_id,
+								'period_from' => $startDateofAssociativeFH,
+								'period_to' => $endDateofAssociativeFH,
+						])
+						->order(['id' => 'desc'])
+						->first();
+					}	
+					
+					$totalRevenueForSelectedPeriods = (float)$reports->total_revenue + (float)$associative_first->total_revenue;
 			
-				// Calculate the start and end dates of the second biannual period (October 1st to March 31st)
-				$secondPeriodStartDate = $currentYear . '-10-01';
-				$secondPeriodEndDate = ($currentYear + 1) . '-03-31';
-
-					// Determine which biannual period the current date falls into
-				if ($currentDate >= $firstPeriodStartDate && $currentDate <= $firstPeriodEndDate) {
-						$periodStartDisplay = date('m/d/y', strtotime($secondPeriodStartDate));
-						$periodEndDisplay = date('m/d/y', strtotime($secondPeriodEndDate));
-				} elseif ($currentDate >= $secondPeriodStartDate && $currentDate <= $secondPeriodEndDate) {
-						$periodStartDisplay = date('m/d/y', strtotime($firstPeriodStartDate));
-						$periodEndDisplay = date('m/d/y', strtotime($firstPeriodEndDate));
-				} else {
-						$periodStartDisplay = '';
-						$periodEndDisplay = '';
-				}
-
-				$this->set('periodStartDisplay',$periodStartDisplay);
-				$this->set('periodEndDisplay',$periodEndDisplay);
-
+					
+					
+				} 
+			$this->set('totalRevenueForSelectedPeriods',$totalRevenueForSelectedPeriods);
+	
 				$this->generateApplicationPdf('/Applicationformspdfs/applPdfBgr');	
 			}
 

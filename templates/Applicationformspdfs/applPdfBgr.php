@@ -21,7 +21,7 @@ use Cake\Datasource\ConnectionManager;
 	<table width="100%" border="1">
 		<tr>
 		<td align="center" style="padding:5px;">
-			<h4>Application Bianually Grading returns of <?php echo $periodStartDisplay; ?> to <?php echo $periodEndDisplay; ?></h4>
+			<h4>Application Bianually Grading returns ofPeriod:<?php echo $displayStringPeriod; ?></h4>
 		</td>
 		</tr>
 	</table>
@@ -43,7 +43,7 @@ use Cake\Datasource\ConnectionManager;
 		</tr>
 			
 		<tr>
-			<td><br>Subject: Submission of Biannual grading returns of <?php echo $periodStartDisplay; ?> to <?php echo $periodEndDisplay; ?> -regarding.</td><br>
+			<td><br>Subject: Submission of Biannual grading returns of Period <?php echo $displayStringPeriod; ?> -regarding.</td><br>
 		</tr>
 
 		<tr>
@@ -66,7 +66,7 @@ use Cake\Datasource\ConnectionManager;
 		<table>
 			<tr>
 				<td align="left">
-						I, hereby submitting Agmark Biannual grading returns for the month of <?php echo $periodStartDisplay; ?> to <?php echo $periodEndDisplay; ?> along with following verified and self attested documents for perusal and necessary action please.
+						I, hereby submitting Agmark Biannual grading returns for the month of Period <?php echo $displayStringPeriod; ?> along with following verified and self attested documents for perusal and necessary action please.
 				</td>
 			</tr>
 	</table>
@@ -120,19 +120,14 @@ use Cake\Datasource\ConnectionManager;
 				<th colspan="8">Name:<?php echo isset($firmname)?$firmname:"NA"; ?>, Email:<?php echo base64_decode($email); ?>, Address:<?php echo isset($address)?$address:"NA"; ?></th>
 		</tr>
 		<tr>
-				<th colspan="6" class="border-bottom" scope="col">Period:
-					 <?php if ($periodStartDisplay && $periodEndDisplay) : ?>
-       		 Period: From <?php echo $periodStartDisplay; ?> to <?php echo $periodEndDisplay; ?>
-  		  <?php else : ?>
-        Period: Not within a defined biannual period
-   		 <?php endif; ?>
+				<th colspan="6" class="border-bottom" scope="col">Period:<?php echo $displayStringPeriod; ?> 
 				</th>
 				<th colspan="8" class="border-bottom" scope="col">Type:<?php echo ($export_unit_status == "yes") ? "Export" : "Domestic"; ?></th>
 		</tr>
 	
 			<tr>
 					<th colspan="6" class="border-bottom" scope="col">Total Revenue (In. Rs.):<?php echo $totalReplicaCharges; ?></th>
-					<th colspan="8" class="border-bottom" scope="col">Progressive Revenue (In Rs.):<?php echo $formattedTotalRevenue; ?></th>
+					<th colspan="8" class="border-bottom" scope="col">Progressive Revenue (In Rs.):<?php echo $totalRevenueForSelectedPeriods; ?></th>
       </tr>
               
 			<tr>
@@ -217,7 +212,7 @@ use Cake\Datasource\ConnectionManager;
 
 <table width="100%" border="1">
 	<tr>
-			<td align="center" style="padding:5px;"><h4>Details of Analysis of Food Safety Parameters Done from NABL Accredited Laboratory During <?php echo $periodStartDisplay; ?> to <?php echo $periodEndDisplay; ?></h4></td>
+			<td align="center" style="padding:5px;"><h4>Details of Analysis of Food Safety Parameters Done from NABL Accredited Laboratory During period <?php echo $displayStringPeriod; ?></h4></td>
 	</tr>
 </table>
 
