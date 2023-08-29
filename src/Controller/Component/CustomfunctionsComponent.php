@@ -4253,6 +4253,11 @@ class CustomfunctionsComponent extends Component {
 		}
 	}
 
+
+
+
+	
+	
 	// added for biannually grading report module
 	// for getting period of biannual
 	// written by shankhpal shende on 25/08/2023
@@ -4264,29 +4269,58 @@ class CustomfunctionsComponent extends Component {
 		if ($currentMonth >= 4 && $currentMonth <= 9) {
 				// Current date is between 1st April and 30th September
 				$lastYear = $currentYear - 1; 
-				$startDate = $lastYear."-10-01";
-				$endDate =  $currentYear."-03-31"; 
-				$period = "Second-Half";
+				$startDate = "Oct-".$lastYear;
+				$endDate =  "March-".$currentYear; 
+				// $period = "Second-Half";
         $associative_first_half= array(
-    			"startDateofAssociativeFH" => $lastYear."-04-01",
-    			"endDateofAssociativeFH" => $lastYear."-09-30"
+    			"startDateofAssociativeFH" => "April-".$lastYear,
+    			"endDateofAssociativeFH" => "Sep-".$lastYear
 				);
 		} else {
 				// Current date is after 30th September, switch to the next period
-				$startDate = $currentYear."-04-01"; 
-				$endDate = $currentYear."-09-30"; 
-				$period = "First-Half";
+				$startDate = "April-".$currentYear; 
+				$endDate = "Sep-".$currentYear; 
+				// $period = "First-Half";
 		}
 
 		$myMap = array(
 			"startDate" => $startDate,
 			"endDate" => $endDate,
-			"period" => $period,
-			"associative_first_half" => $associative_first_half
+			// "period" => $period,
+			// "associative_first_half" => $associative_first_half
 		);
     
 		
     return $myMap;  
+	}
+
+	// added for biannually grading report module
+	// for check record is available or not 
+	// written by shankhpal shende on 29/08/2023
+	public function bgrReportData($customer_id){
+
+		$DmiBgrCommodityReportsAddmoreTable = TableRegistry::getTableLocator()->get('DmiBgrCommodityReportsAddmore');
+
+		// Find the latest report IDs for the given customer
+    $latest_ids = $DmiBgrCommodityReportsAddmoreTable->find()
+        ->where(['customer_id' => $customer_id])
+        ->order(['id' => 'DESC'])
+        ->limit(1)
+        ->extract('id')
+        ->toArray();
+
+		if (!empty($latest_ids)) {
+        $latest_id = reset($latest_ids);
+        // Retrieve the report fields using the latest ID
+        $report_fields = $DmiBgrCommodityReportsAddmoreTable->get($latest_id);
+			
+    } else {
+        $report_fields = null;
+    }
+		
+		return !empty($report_fields) ? 1 : 0;
+
+
 	}
 }
 ?>

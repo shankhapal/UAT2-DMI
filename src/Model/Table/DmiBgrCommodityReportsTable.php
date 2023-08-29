@@ -19,12 +19,35 @@
 		$latest_id = $this->find('list', array(
 			'valueField'=>'id',
 			'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
-
+		
 		$DmiBgrCommodityReportsAddmore = TableRegistry::getTableLocator()->get('DmiBgrCommodityReportsAddmore');
 
-		
+		// $financialYear = null;
+		// $periodWiseReport = [];
+		// if(isset($_SESSION['financialYear'])){
+		// 	$financialYear = $_SESSION['financialYear'];
+		// 	// Split the input string into an array using the delimiter "-"
+		// 	$parts = explode("-", $financialYear);
+
+		// 	// Extract year, month, day for "From" and "To" components
+		// 	$fromYear = $parts[0];
+		// 	$fromMonth = $parts[1];
+		// 	$fromDay = $parts[2];
+
+		// 	$toYear = $parts[4];
+		// 	$toMonth = $parts[5];
+		// 	$toDay = $parts[6];
+
+		// 		// Combine year, month, day to create "From" and "To" dates
+		// 	$fromDate = $fromYear . '-' . $fromMonth . '-' . $fromDay;
+		// 	$toDate = $toYear . '-' . $toMonth . '-' . $toDay;
+		// 	$period1 = $parts[7] . '-' . $parts[8]; // Combine "Second" and "Half"
+
+		// 	$periodWiseReport = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'period_from'=>$fromDate,'period_to'=>$toDate,'period'=>$period1)))->first();
+		// }
 		
 		if($latest_id != null){
+		// if($latest_id != null || $periodWiseReport != null){
 			$form_fields = $this->find('all', array(
 				'conditions'=>array('id'=>MAX($latest_id))))->first();
 			
@@ -104,14 +127,22 @@
 	
 		
 		//-----------------------------------------------------------------------------------------
-		$time_period_map=	$CustomersController->Customfunctions->computeBiannualPeriod();
-		
-		$startDate = $time_period_map['startDate'];
-		$endDate = $time_period_map['endDate'];
-		$period = $time_period_map['period'];
+		$getYears = $CustomersController->Customfunctions->computeBiannualPeriod();
 
-		// Construct the final string
-		$displayStringPeriod = $startDate . ' - ' . $endDate . ' - ' . $period;
+		$startYear = $getYears['startDate'];
+		$endYear = $getYears['endDate'];
+		
+		// added version for inserting version in this table by shankhpal on 08/06/2023
+		$financialYears = $startYear." - ".$endYear;
+		
+		$displayStringPeriod = $financialYears;
+		
+	
+		// if(!empty($periodWiseReport)){
+		// 	$displayStringPeriod = $fromDate . ' - ' . $toDate . ' - ' . $period1;
+		// }else{
+		// 	$displayStringPeriod = $startDate . ' - ' . $endDate . ' - ' . $period;
+		// }
 		//------------------------------------------------------------------------------------------
 		
 		$added_firm = $DmiFirms->find('all', ['conditions' => ['customer_id' => $customer_id]])->first();
@@ -205,6 +236,9 @@
     ])
     ->toArray();
 
+		// $AllotedReplica = $this->toGetAllotedReplica();
+
+		
 		// check lab is NABL Accredited or not
 		//------------------------------------------------------------------------------------------------------------
 		$LabNablAccredited = $CustomersController->Randomfunctions->checkIfLabNablAccreditated($customer_id);
@@ -236,7 +270,7 @@
 
 	public function saveFormDetails($customer_id,$forms_data){
 		
-		// pr($forms_data['period']);die;
+		
 			$period = explode(' ',$forms_data['period']);
 			
 	
@@ -425,31 +459,38 @@
 
 		public function postDataValidation($customer_id,$forms_data){
 		
+
+			$CustomersController = new CustomersController;
+	
 			$returnValue = true;
 			$section_form_details = $this->sectionFormDetails($customer_id);
 			$CustomersController = new CustomersController;
 
-			$DmiBgrCommodityReportsAddmoreTable = TableRegistry::getTableLocator()->get('DmiBgrCommodityReportsAddmore');
+			$is_record_exist = $CustomersController->Customfunctions->bgrReportData($customer_id);
 
-			$records = $DmiBgrCommodityReportsAddmoreTable->find('all', [
-					'conditions' => ['customer_id' => $customer_id]
-			])->toArray();
-			
 			// Add validation for record presence
-			if (empty($records)) {
-					$returnValue = null;
+			if ($is_record_exist == 1) {
+					$returnValue = true;
+			}else{
+				$returnValue = null;
 			}
 
-			// if(empty($section_form_details[0]['id'])){
-
-			// 	if(empty($forms_data['other_upload_docs']->getClientFilename())){ $returnValue = null ; }
-			
-			// }
-
-			// if(empty($forms_data['other_upload_docs'])){ $returnValue = null ; }
-			
-			
 			return $returnValue;
+			
+		}
+
+
+		public function toGetAllotedReplica(){
+
+			$DmiReplicaAllotmentDetails = TableRegistry::getTableLocator()->get('DmiReplicaAllotmentDetails');
+		
+			$replicaAllotmentDetails = $DmiReplicaAllotmentDetails->find('all',array(
+				'conditions'=>array(
+					'customer_id'=>$customer_id,
+					'allot_status'=>1,
+					'delete_status IS NULL'
+				)))->toArray();
+
 			
 		}
 		

@@ -1639,37 +1639,35 @@ class ChemistController extends AppController {
 
 		$alloted_chemist = $this->DmiChemistAllotments->find('list',array('keyField'=>'customer_id','valueField'=>'customer_id','conditions'=>array('chemist_id IS'=>$_SESSION['username'],'status'=>1,'incharge'=>'yes')))->toArray();
 		$this->set('alloted_chemist', $alloted_chemist);
-		
-		// $CustomersController = new CustomersController;
-		// $time_period_map=	$CustomersController->Customfunctions->computeBiannualPeriod();
-		
+	
 		$finacialYearsData = $this->DmiBgrCommodityReports
     ->find()
-    ->select(['period_from', 'period_to','period'])
+    ->select(['period_from', 'period_to'])
     ->where([
-        'period IN' => ['Second-Half', 'First-Half']
+				'form_status'=>'approved'
     ])
     ->toArray();
-
+	
 		$finacialYearsArray = [];
+		$i=0;
 		if(!empty($finacialYearsData)){
 			foreach ($finacialYearsData as $eachdata) {
 					$startDate = $eachdata['period_from'];
 					$endDate = $eachdata['period_to'];
-					$period = $eachdata['period'];
 					
-					$formattedString = $startDate . '-To-' . $endDate . '-' . $period;
-        	$finacialYearsArray[] = $formattedString;
+					$formattedString = $startDate . ' - ' . $endDate;
+        	$finacialYearsArray[$i] = $formattedString;
+					$i++;
 			}
 		}
-
+	
 		$this->set('finacialYearsArray',$finacialYearsArray);
 
 		
 		// $reqData = $this->request->getData(); // Get the selected values
 		// pr($reqData);die;
 		if (null!== ($this->request->getData('continue-btn'))) {
-			// pr($reqData);die;
+	
 			$packerid = $_POST['packerid'];
 			
 			$financialYear = $_POST['financialYear'];
@@ -1677,6 +1675,7 @@ class ChemistController extends AppController {
 			if(!empty($packerid) || !empty($financialYear)){
 				//  echo "ok";die;
 				$this->request->getSession()->write('packer_id',$packerid);
+				$this->request->getSession()->write('financialYear',$financialYear);
 				if(isset($_SESSION)){
 					$this->redirect(['controller' => 'application','action' => 'applicationType',11]);
 					$this->redirect(['controller' => 'application','action' => 'applicationForCertificate',11]);
@@ -1689,12 +1688,6 @@ class ChemistController extends AppController {
 				$this->render('/element/message_boxes');
 			}
 			
-			
-			
-			
-			
-
-
 		}
 		
 
@@ -1706,13 +1699,6 @@ class ChemistController extends AppController {
 			$this->render('/element/message_boxes');
 		}
 		
-			
-		
-					
-					// $this->request->getSession()->write('application_type',11);
-					// $this->redirect(['controller' => 'application','action' => 'applicationType',11]);
-					
-					
 	}
 
 

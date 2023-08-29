@@ -10,11 +10,11 @@
 					<?php echo $this->Form->create(null,array('type'=>'file', 'enctype'=>'multipart/form-data')); ?>
 				
 						<div class="card card-secondary mt-5">
-							<div class="card-header"><h3 class="card-title-new">Select Packer</h3></div>
+							<div class="card-header"><h3 class="card-title-new">Select Packer and Financial Year</h3></div>
 							<div class="form-horizontal">
 								<div class="card-body">
 									<div class="form-group row">
-										<label for="inputEmail3" class="col-sm-3 col-form-label">Select Packer <span class="cRed">*</span></label>
+										<label for="inputEmail3" class="col-sm-3 col-form-label">Select Packer: <span class="cRed">*</span></label>
 										<div class="col-sm-6">
 											<?php echo $this->Form->control('packerid', array(
                         'type'=>'select',
