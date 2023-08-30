@@ -612,6 +612,7 @@ class RolesController extends AppController{
 		$this->autoRender = false;
 
 		$user_id = $_POST['user_id'];
+		$this->loadModel('DmiUsers');
 		$user_division_value = $this->DmiUsers->find('all',array('fields'=>'division','conditions'=>array('id IS'=>$user_id)))->first();
 		?><label style="float:right; font-weight:bold;margin-top: 8px;margin-right: 50px;" id="user_type_text">User Type : <?php if ($user_division_value['division']=='LMIS') {echo 'LIMS';} else {echo $user_division_value['division'];} ?></label><?php
 		exit;

@@ -25,11 +25,6 @@ class RandomfunctionsComponent extends Component {
 
 	public function dashboardApplicationSearch($customer_id,$check_user_role){
 
-		$DmiRenewalFinalSubmits = TableRegistry::getTableLocator()->get('DmiRenewalFinalSubmits');
-		$DmiRenewalAllocations = TableRegistry::getTableLocator()->get('DmiRenewalAllocations');
-		$DmiRenewalHoAllocation = TableRegistry::getTableLocator()->get('DmiRenewalHoAllocations');
-		$DmiAllocations = TableRegistry::getTableLocator()->get('DmiAllocations');
-		$DmiHoAllocations = TableRegistry::getTableLocator()->get('DmiHoAllocations');
 		$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
 		$DmiCertificateTypes = TableRegistry::getTableLocator()->get('DmiCertificateTypes');
 		$MCommodityCategory = TableRegistry::getTableLocator()->get('MCommodityCategory');
@@ -42,44 +37,52 @@ class RandomfunctionsComponent extends Component {
 		$get_firm_data = null;
 		$current_position = null;
 		$no_result = null;
-
-
-		//check if applied for renewal, if yes then application will be searched in renewal flow.
-		$check_if_renewal_applied = $DmiRenewalFinalSubmits->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
-
+		
 		//if admin, then search without condition
 		//added on 03-09-2019 by Amol
 		if ($check_user_role['super_admin']=='yes') {
-
 			$condition_1 = array('customer_id IS'=>$customer_id);
 			$condition_2 = array('customer_id IS'=>$customer_id);
-
 		} else {
-
 			$condition_1 = array('customer_id IS'=>$customer_id,'OR'=>array('level_1 IS'=>$username, 'level_2 IS'=>$username, 'level_3 IS'=>$username, 'level_4_ro IS'=>$username, 'level_4_mo IS'=>$username));
 			$condition_2 = array('customer_id IS'=>$customer_id,'OR'=>array('dy_ama IS'=>$username, 'ho_mo_smo IS'=>$username, 'jt_ama IS'=>$username, 'ama IS'=>$username));
 		}
 
+		//updated below complete logic to search appl in all flows/modules and also its status as per phase II
+		//on 19-07-2023 by Amol, previously it was static only for new and renewal module as per phase I
+		$DmiFlowWiseTablesLists =  TableRegistry::getTableLocator()->get('DmiFlowWiseTablesLists');
+		$flow_wise_tables = $DmiFlowWiseTablesLists->find('all',array('conditions'=>array('application_type IN'=>$this->Session->read('applTypeArray')),'order'=>'id ASC'))->toArray();
+
 		$find_first_allocation = array();
+		$find_ho_allocation = array();
 		$process = '';
-		if (!empty($check_if_renewal_applied)) {
+		$appl_status = '';
+		foreach($flow_wise_tables as $eachFlow){
+			
+			$FinalSubmitsTable = TableRegistry::getTableLocator()->get($eachFlow['application_form']);
+			$allocationTable = TableRegistry::getTableLocator()->get($eachFlow['allocation']);
+			$hoAllocationTable = TableRegistry::getTableLocator()->get($eachFlow['ho_level_allocation']);
 
-			$find_first_allocation = $DmiRenewalAllocations->find('all',array('conditions'=>$condition_1,'order'=>'id DESC'))->first();
-	
-			$find_ho_allocation = $DmiRenewalHoAllocation->find('all',array('conditions'=>$condition_2,'order'=>'id DESC'))->first();
+			$check_final_submit_status = $FinalSubmitsTable->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
 
-			$current_position_table = 'DmiRenewalAllCurrentPositions';
-			$process = 'Renewal';
+			$find_first_allocation = $allocationTable->find('all',array('conditions'=>$condition_1,'order'=>'id DESC'))->first();
+			$find_ho_allocation = $hoAllocationTable->find('all',array('conditions'=>$condition_2,'order'=>'id DESC'))->first();
+			$current_position_table = $eachFlow['appl_current_pos'];
+			//get application type name
+			$DmiApplicationTypes = TableRegistry::getTableLocator()->get('DmiApplicationTypes');
+			$getApplTypeName = $DmiApplicationTypes->find('all',array('conditions'=>array('id IS'=>$eachFlow['application_type'])))->first();
+			$process = $getApplTypeName['application_type'];
 
-		} 
-		if(empty($find_first_allocation)) {
+			if(!empty($check_final_submit_status)){
+				if($check_final_submit_status['status']=='approved' && $check_final_submit_status['current_level']=='level_3'){
+					$appl_status = 'Granted';
+					continue;
+				}else{
+					$appl_status = 'In Process';
+					break;
+				}
+			}
 
-			$find_first_allocation = $DmiAllocations->find('all',array('conditions'=>$condition_1,'order'=>'id DESC'))->first();
-
-			$find_ho_allocation = $DmiHoAllocations->find('all',array('conditions'=>$condition_2,'order'=>'id DESC'))->first();
-
-			$current_position_table = 'DmiAllApplicationsCurrentPositions';
-			$process = 'Certification';
 		}
 
 		$current_position_table = TableRegistry::getTableLocator()->get($current_position_table);
@@ -149,10 +152,11 @@ class RandomfunctionsComponent extends Component {
 		}
 
 		//Added on the 01-06-2022 for not empty result
+		//in below array added new field for appl_status on 19-07-2023 by Amol
 		if($no_result != null){
-			return array('firm_data'=>null,'current_position'=>null,'no_result'=>$no_result,'process'=>null,'currentPositionUser'=>null,'getEmailCurrent'=>null);
+			return array('firm_data'=>null,'current_position'=>null,'no_result'=>$no_result,'process'=>null,'currentPositionUser'=>null,'getEmailCurrent'=>null,'appl_status'=>null);
 		}else{
-			return array('firm_data'=>$get_firm_data,'current_position'=>$current_position,'no_result'=>$no_result,'process'=>$process,'currentPositionUser'=>$currentPositionUser,'getEmailCurrent'=>$getEmailCurrent);
+			return array('firm_data'=>$get_firm_data,'current_position'=>$current_position,'no_result'=>$no_result,'process'=>$process,'currentPositionUser'=>$currentPositionUser,'getEmailCurrent'=>$getEmailCurrent,'appl_status'=>$appl_status);
 		}
 
 	}
