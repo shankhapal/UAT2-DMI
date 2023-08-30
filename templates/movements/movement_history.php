@@ -67,30 +67,7 @@
 
             </div>	
 </section>	
-<!-- 
-<section class ="application_type_show content form-middle listdata" >
-<div class="container-fluid">
-<div class="col-md-12">
-<div class="card card-Lightblue">
-<div class="card-header"><h3 class="card-title-new"> Application Types</h3>
-<table id="movement_history" class="table m-0 table-bordered table-striped table-hover movmentTable">
-<thead class="tablehead">
-   <tr>
-   <th scope="col" >Sr. No.</th>
-   <th scope="col" >Application Type</th>
-   <th scope="col" >Application ID</th>
-   </tr>
-   </thead>
-   <tbody>
-      
-      <tr id = "application_type_record"></tr>
-   </tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</section> -->
+
 
 
 
@@ -157,7 +134,4 @@
 
 
 </div>
-<?php //echo $this->Html->css('select2.min'); ?>
-
 <?php echo $this->Html->script('movements/movements_appl'); ?>
-<?php //echo $this->Html->script('movements/select2.min'); ?>

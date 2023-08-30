@@ -315,33 +315,7 @@ class MovementsController extends AppController {
                      }//foreach close
                      
                     
-                    } elseif(!empty($current_pos) && !empty($applicant_final['status']) && empty($isPaymentDone['payment_confirmation']) ){
-                        //Ro/So
-                        if(!empty($applicant)){ 
-                            $applicant_final= $applicant->find('all')->where(['customer_id IS'=>$appli_id, 'current_level' => 'level_3'])->first();
-                         }
-                         
-                        if(($current_pos['current_level'] == 'level_3')  && ($applicant_final['status'] == 'pending' || $applicant_final['status'] == 'approved' ||  $applicant_final['status'] == 'referred_back') && empty($isPaymentDone) ){
-                            if(!empty($applicant_final)){
-                                $ro_details = $this->DmiUsers->find('all', ['fields'=>['f_name','l_name','role'], 'conditions'=>['email IS'=>$current_pos['current_user_email_id']]])->first();
-                                
-                               
-                                $firm_details = $this->DmiFirms->find('all', ['fields'=>['firm_name','email','created'], 'conditions'=>['customer_id IS'=>$appli_id]])->first(); 
-                                $to[] = $ro_details['f_name'].' '.$ro_details['l_name'].' '.$ro_details['role'];
-                               
-                                if($appli_type == 4){
-                                    $from[] = $chemist_details['chemist_fname']." " .$chemist_details['chemist_lname']. "(" .$firmDetails['firm_name'].")";
-                                }else{
-                                    $from[] = $firm_details['firm_name'];
-                                }
-                               
-                                if($applicant_final ['current_level'] == 'level_3'){
-                                    $sentdate[] = $applicant_final['created'];
-                                }
-                               
-                                $action[] = 'Applicant forwarded to RO/SO';
-                            }
-                        }
+                    
                     }elseif(!empty($current_pos) && !empty($isPaymentDone)){
                         foreach($isPaymentDone as $isPayment){
                             if($isPayment['payment_confirmation'] == 'pending'){
@@ -470,9 +444,22 @@ class MovementsController extends AppController {
                                  if(!empty($officer_details)){
                                     $from[] = $officer_details['f_name'].' '.$officer_details['l_name'].' '.$officer_details['role'];
                                   }
-
+                                 
                                   $this->loadModel('DmiMoAllocationLogs');
-                                  $ioAlloc = $this->DmiMoAllocationLogs->find('all',['conditions'=>['customer_id'=>$appli_id]])->first();
+                                  $ioAlloc = $this->DmiMoAllocationLogs->find('all', ['conditions'=>['customer_id IS'=>$appli_id, 'application_type' =>$appli_type ]])->first();
+                                  
+                                if(empty($ioAlloc)){
+                                   if(!empty($appliType['application_type'])){
+                                        $appl_type = $appliType['application_type'];
+                                        if(!empty($appl_type)){
+                                            
+                                            $appl_type = strtolower($appliType['application_type']);
+                                            $ioAlloc = $this->DmiMoAllocationLogs->find('all', ['conditions'=>['customer_id IS'=>$appli_id,'application_type' =>$appl_type ]])->first();
+                                             
+                                        }
+                                 
+                                    }
+                                }
                                   if(!empty($ioAlloc)){
                                      $officer_detailsCurrent   = $this->DmiUsers->find('all', ['fields'=>['f_name','l_name','role'], 'conditions'=>['email IS'=>$ioAlloc['mo_email_id']]])->first();
                                    }  
@@ -488,7 +475,7 @@ class MovementsController extends AppController {
                                 }
                                
 
-                                 if($appli_type == 4){
+                                if($appli_type == 4){
                                     $this->loadModel('DmiChemistRoToRalLogs');
                                     $ro_ral_log = $this->DmiChemistRoToRalLogs->find('all')->where(['chemist_id IS'=>$appli_id])->first();
                                  if(!empty($ro_ral_log)){
@@ -539,9 +526,9 @@ class MovementsController extends AppController {
                               
                               
                             }
-
+                            
                             // for chemist_ro_ral
-                             if($appli_type == 4){
+                            if($appli_type == 4){
                                 $this->loadModel('DmiChemistRoToRalLogs');
                                 $this->loadModel('DmiChemistRalToRoLogs');
 
@@ -581,8 +568,8 @@ class MovementsController extends AppController {
                                
                               
  
-                             }
-                            
+                            }
+                           
                             if(!empty($comment_by_mo)){ 
                                   
                               foreach ($comment_by_mo as $key => $crm) {
@@ -612,7 +599,7 @@ class MovementsController extends AppController {
                                     }
                                 }
                             }
-
+                            
                             if(!empty($applicant_level3)){
                                 if(!empty($current_pos) && $current_pos['current_level'] == 'level_3'){
                                     $officer_details =  $this->DmiUsers->find('all', ['fields'=>['f_name','l_name','role'], 'conditions'=>['email IS'=>$current_pos['current_user_email_id']]])->first();
@@ -638,7 +625,7 @@ class MovementsController extends AppController {
                                         }
                                         $sentdate[] = $l3['modified'];
                                         $action[] = 'Forwarded Back to Applicant ';
-                                   }elseif($l3['status'] == 'replied'){
+                                   }elseif($l3['status'] == 'replied'){ 
                                         if(!empty($officer_details)){
                                             $to[] = $officer_details['f_name'].' '.$officer_details['l_name'].' '.$officer_details['role'];
                                         }
@@ -650,21 +637,22 @@ class MovementsController extends AppController {
                                             
                                             $sentdate[] = $l3['modified'];
                                             $action[] = 'Forwarded to RO/SO ';
-                                    }elseif($l3['status'] == 'approved' && $l3['current_level'] == 'level_1' && $appli_type != 4){
+                                    }elseif($l3['status'] == 'approved' && $l3['current_level'] == 'level_1' && $appli_type != 4){ 
                                         $r_details = $allocation->find('all', [ 'conditions'=>['customer_id IS'=>$appli_id]])->first();
-                                          
-                                        if(!empty($r_details['level_3']) && empty($r_details['level_1'])){
+                                         
+                                        if(!empty($r_details['level_3']) && empty($r_details['level_1'])){ 
                                             $officer_details   = $this->DmiUsers->find('all', ['fields'=>['f_name','l_name','role'], 'conditions'=>['email IS'=>$r_details['level_3']]])->first();
-                                
-                                        }
-                                        if(!empty($officer_details)){
-                                            $to[] = $officer_details['f_name'].' '.$officer_details['l_name'].' '.$officer_details['role'];
-                                            $from[] = $officer_details['f_name'].' '.$officer_details['l_name'].' '.$officer_details['role'];
-                                        }
+                                        
+                                            if(!empty($officer_details)){
+                                                $to[] = $officer_details['f_name'].' '.$officer_details['l_name'].' '.$officer_details['role'];
+                                                $from[] = $officer_details['f_name'].' '.$officer_details['l_name'].' '.$officer_details['role'];
+                                            }
                                             $sentdate[] = $l3['modified'];
                                             $action[] = 'Application Scrutinized';
+                                        }
 
                                     }elseif($l3['status'] == 'pending' && empty($isPaymentDone) && empty ($current_pos)){
+                                       
                                         if(!empty($allcation_table)){
 
 
@@ -678,27 +666,26 @@ class MovementsController extends AppController {
                                             
                                             $sentdate[] = $l3['modified'];
                                             $action[] = 'Forwarded to RO/SO ';
-                                    } elseif($l3['status'] == 'pending' && empty($isPaymentDone) && !empty ($current_pos)){
+                                    } elseif($l3['status'] == 'pending' && empty($isPaymentDone) && !empty ($current_pos)){ 
                                         $firm_details = $this->DmiFirms->find('all', ['fields'=>['firm_name','email','created'], 'conditions'=>['customer_id IS'=>$appli_id]])->first(); 
-                                      
+                                        
                                         if(!empty($allocation)){
                                             $roofficer_details = $allocation->find('all', ['fields'=>['level_3'], 'conditions'=>['customer_id IS'=>$appli_id]])->first();
                                             if(!empty($roofficer_details)){
                                                 $officer_details   = $this->DmiUsers->find('all', ['fields'=>['f_name','l_name','role'], 'conditions'=>['email IS'=>$roofficer_details['level_3']]])->first();
-                                        
                                             }
                                         }
                                         if($appli_type == 4){
                                             $to[] =$officer_details['f_name'].' '.$officer_details['l_name'].' '.$officer_details['role'];
                                             $from[] = $chemist_details['chemist_fname']." " .$chemist_details['chemist_lname']. "(" .$firmDetails['firm_name'].")";
-                                            $sentdate[] =  $applicant_final['created'];
+                                            $sentdate[] =  $l3['created'];
                                         }else{
-                                            $to[] = $to[] =$officer_details['f_name'].' '.$officer_details['l_name'].' '.$officer_details['role'];
+                                            $to[] =$officer_details['f_name'].' '.$officer_details['l_name'].' '.$officer_details['role'];
                                             $from[] = $firm_details['firm_name'];
-                                            $sentdate[] =  $applicant_final['created'];
+                                            $sentdate[] =  $l3['created'];
                                         }
                                         
-                                      
+                                        
                                         $action[] = 'Applicant to RO/SO';
                                     }
            
@@ -706,6 +693,8 @@ class MovementsController extends AppController {
                                 }
                                    
                             }
+                            
+                          
                             if((!empty($allcation_table['level_2']) && !empty($allcation_table['level_3'])) ){
                                     
                                 $officer_details   = $this->DmiUsers->find('all', ['fields'=>['f_name','l_name','role'], 'conditions'=>['email IS'=>$allcation_table['level_3']]])->first();
@@ -713,19 +702,32 @@ class MovementsController extends AppController {
                                     $from[] = $officer_details['f_name'].' '.$officer_details['l_name'].' '.$officer_details['role'];
                                 }
                                 $this->loadModel('DmiIoAllocationLogs');
-                                $ioAllo = $this->DmiIoAllocationLogs->find('all', ['conditions'=>['customer_id IS'=>$appli_id]])->first();
+                                
+                                if(!empty($appliType['application_type'])){
+                                    $appl_type = $appliType['application_type'];
+                                    if(!empty($appl_type)){
+                                        
+                                        $appl_type = strtolower($appliType['application_type']); 
+                                        $ioAllo = $this->DmiIoAllocationLogs->find('all', ['conditions'=>['customer_id IS'=>$appli_id,'application_type' =>$appl_type ]])->last();
+                                    }
+                                 
+                                }
+                                if(empty($ioAllo)){
+                                    $ioAllo = $this->DmiIoAllocationLogs->find('all', ['conditions'=>['customer_id IS'=>$appli_id,'application_type' =>$appli_type ]])->last();
+                                }
+                                
                                 if(!empty($ioAllo)){
                                    $officer_detailsCurrent   = $this->DmiUsers->find('all', ['fields'=>['f_name','l_name','role'], 'conditions'=>['email IS'=>$ioAllo['io_email_id']]])->first();
-                                }
+                                
                                    if(!empty($officer_detailsCurrent)){
                                     $to[] = $officer_detailsCurrent['f_name'].' '.$officer_detailsCurrent['l_name'].' '.$officer_detailsCurrent['role'];
                                    
                                    }
-                                
                                     $sentdate[] = $ioAllo['created'];
+                                    $action[] = 'Allocated to IO';
+                                }
                                 
-                               
-                                $action[] = 'Allocated to IO';
+                                    
                             }
 
                             if(!empty($inspection)){ 
@@ -735,7 +737,7 @@ class MovementsController extends AppController {
                             $i=0;
                             if(!empty($applicant)){
                                 $level_2approved = $applicant->find('all', ['conditions'=>['customer_id IS'=>$appli_id, 'status'=>'approved', 'current_level'=>'level_2']])->first();
-                               //print_r($level_2approved);exit;
+                              
                             }
                             if(!empty($ispectionReportData)){
                                     foreach ($ispectionReportData as $key => $inspect) {
@@ -914,12 +916,15 @@ class MovementsController extends AppController {
                                 if(!empty($grant)){
                                  $grantedRecord = $grant->find('all', ['conditions'=>['customer_id IS'=>$appli_id]])->last();
                                 }
-                                if(!empty($esignedRecord) && $esignedRecord['certificate_esigned'] == 'yes'){
-                                    
-                                    if(!empty($current_pos)){
+                                if(!empty($applicant)){
+                                    $level_3_approved = $applicant->find('all', ['conditions'=>['customer_id IS'=>$appli_id, 'status'=>'approved', 'current_level'=>'level_3' ]])->last();
+                                   }
+                                if((!empty($esignedRecord) && $esignedRecord['certificate_esigned'] == 'yes') && !empty($level_3_approved)){
+                                   
+                                    if(!empty($current_pos['current_user_email_id']) && $current_pos['current_level'] == 'level_3'){
                                         $officer_details   = $this->DmiUsers->find('all', ['fields'=>['f_name','l_name','role'], 'conditions'=>['email IS'=>$current_pos['current_user_email_id']]])->first();
                                     }
-                                    
+                                  
                                     $to[] = $officer_details['f_name'].' '.$officer_details['l_name'].' '.$officer_details['role'];
                                     $from[] = $officer_details['f_name'].' '.$officer_details['l_name'].' '.$officer_details['role'];
                                     $sentdate[]= $esignedRecord['modified'];
@@ -1031,8 +1036,9 @@ class MovementsController extends AppController {
             }elseif($findRole['ro_inspection'] == 'yes'){
                 $findId = $this->DmiRoOffices->find('all', array('fields'=>['id','short_code'], 'conditions'=>['ro_email_id IS'=>$username, 'office_type'=>'RO'], 'delete_status IS'=>NULL))->first();
                 
-                $findShortCode = $this->DmiRoOffices->find('all', array('fields'=>['short_code'], 'conditions'=>['ro_id_for_so IS'=>$findId['id']], 'delete_status IS'=>NULL))->toArray();
-                
+                $findShortCode = $this->DmiRoOffices->find('all', array('fields'=>['short_code'], 'conditions'=>['ro_id_for_so IS'=>$findId['id']] , 'delete_status IS'=>NULL))->toArray();
+                $findShortCode_ro = $this->DmiRoOffices->find('all', array('fields'=>['short_code'], 'conditions'=>['short_code IS'=>$findId['short_code']] , 'delete_status IS'=>NULL))->toArray();
+                $findShortCode = array_merge($findShortCode_ro, $findShortCode);
                 $condition = '';
                 $chemistcondition = '';
                 $n = 1;

@@ -18,6 +18,7 @@ function movement_appl_validation(){
   
     var appl_type = $('#appl_type').val();
     var appl_id = $('#appl_id').val();
+    var chemist_id  = $('#chemist_id').val();
     var value_return = true;
     if(appl_type==''){
 
@@ -33,6 +34,15 @@ function movement_appl_validation(){
         $("#appl_id").click(function(){$("#error_appl_id").hide().text;$("#appl_id").removeClass("is-invalid");});
         value_return = 'false';
     }
+    if(appl_type !='' && appl_type == 4){	
+        if(chemist_id ==''){
+            $("#error_chemist_id").show().text("Please Select Chemist Id");
+            $("#chemist_id").addClass("is-invalid");
+            $("#chemist_id").click(function(){$("#error_appl_id").hide().text;$("#appl_id").removeClass("is-invalid");});
+            value_return = 'false';
+        }
+    }
+
     if(value_return == 'false'){ 
         var msg = "Please check some fields are missing or not proper.";
         renderToast('error', msg);
@@ -52,8 +62,8 @@ $('#appl_id').select2();
 
     $('#appl_id').on('select2:open', function() {
       $('.select2-search__field').focus();
-//$('#appl_id').click(function(){	
-   // $('#appl_id').val('');//reset 'application ID' dropdown
+      $('.appli_type').hide();
+      $('.chemist').hide();
     var appl_type = 1;
     
     if(appl_type != ''){
@@ -69,7 +79,7 @@ $('#appl_id').select2();
               
                 $("#appl_id").html(''); var  resArray = JSON.parse(data);//response is JSOn encoded to parse JSON
                 $("#appl_id").append("<input type= 'text' placeholder='search.' />");
-                $("#appl_id").append("<option value=''>--Select--</option>");//for first option with value blank
+                $("#appl_id").append("<option value=''>--Search Application ID--</option>");//for first option with value blank
                 //taking each customer id and firm_name from array and creating options tag with value and text.
                
                 $.each(resArray, function(value, value) {
@@ -93,6 +103,8 @@ $('.chemist').hide();
 $('.appli_type').hide();
 
 $('#appl_id').change(function(){	
+    $('.chemist').hide();
+    $('.appli_type').hide();
     var appl_id = $('#appl_id').val();
     
     if(appl_id != ''){
@@ -105,6 +117,7 @@ $('#appl_id').change(function(){
             }, 
        
             success: function (data) {
+                $('.appli_type').show();
                 $("#appl_type").html(''); 
                 var resultArray = JSON.parse(data); 
                 $('.appli_type').show();
@@ -126,6 +139,7 @@ $('#appl_id').change(function(){
 // for chemist application id
 
 $('#appl_type').change(function(){	
+    $(".chemist").hide();
     var appl_type = $('#appl_type').val();
     var appl_id = $('#appl_id').val();
     if((appl_type != '' && appl_type == 4) && appl_id != ''){
@@ -138,6 +152,7 @@ $('#appl_type').change(function(){
             }, 
        
             success: function (data) {
+                $(".chemist").show();
                 $("#chemist_id").html(''); 
                 var resultArray = JSON.parse(data); 
                 $('.chemist').show();

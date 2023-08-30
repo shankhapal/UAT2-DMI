@@ -628,7 +628,7 @@
                      <li class="nav-item">
 								<a href="<?php echo $this->request->getAttribute('webroot');?>movements/movement_history" class="nav-link">
 									<i class="far fas fa-server nav-icon"></i>
-									<p class="nav-icon-p">Movement History	</p>
+									<p class="nav-icon-p">Application Movement	</p>
 								</a>
 							</li>
 					<?php } ?>
