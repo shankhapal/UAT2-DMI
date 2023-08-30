@@ -622,9 +622,11 @@
 			   <?php }?>
 
 			   <!-- added movement menu by laxmi on 09/08/2023 -->
-			  <?php if ($current_user_roles['ro_inspection'] == 'yes' || $current_user_roles['so_inspection']=='yes' ||
+			   <!-- below code comment by laxmi due to only one user to show movement suggest by tarun sir on 30-08-2023 -->
+			  <?php /*if ($current_user_roles['ro_inspection'] == 'yes' || $current_user_roles['so_inspection']=='yes' ||
 						$current_user_roles['dy_ama'] == 'yes' || $current_user_roles['jt_ama'] == 'yes' ||
-						$current_user_roles['ama'] == 'yes' || $current_user_roles['super_admin'] == 'yes') { ?>
+						$current_user_roles['ama'] == 'yes' || $current_user_roles['super_admin'] == 'yes') { */
+						if(!empty($_SESSION['username']) && $_SESSION['username'] == 'YWdtYXJrb25saW5lLmRtaUBnbWFpbC5jb20='){ ?>
                      <li class="nav-item">
 								<a href="<?php echo $this->request->getAttribute('webroot');?>movements/movement_history" class="nav-link">
 									<i class="far fas fa-server nav-icon"></i>
