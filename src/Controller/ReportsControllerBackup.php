@@ -12819,12 +12819,13 @@ class ReportsController extends AppController {
 			
 			
 			$search_user_email_id =  $this->request->getData('user_id');
+			// $selected_month =  $this->request->getData('from_date');
 			$selected_month =  $this->request->getData('selected_month');
 			
 			$selected_month = $this->Customfunctions->dateFormatCheck($selected_month);
 			$search_to_date =  $this->request->getData('to_date');
-			//$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
-			//$this->date_comparison($selected_month,$search_to_date);
+			$search_to_date = $this->Customfunctions->dateFormatCheck($search_to_date);
+			$this->date_comparison($selected_month,$search_to_date);
 
 			// Change on 2/11/2018 - For download excel report, Take search filter field value from session variables instend of POST variable - By Pravin
 			if ($download_report == 'yes') {
@@ -12916,12 +12917,12 @@ class ReportsController extends AppController {
 					$this->loadModel($key);
 					
 					// show the listion customer id and check status approve with livel by shreeya [08-07-2023]
-					$checkLastStatus = $this->$key->find('all',array('conditions'=>array('customer_id IN'=>$application_customer_id_list),'order'=>'created'))->first();
+					$checkLastStatus = $this->$key->find('all',array('conditions'=>array('customer_id IN'=>$application_customer_id_list),'order'=>'id desc'))->first();
 					if(!empty($checkLastStatus) && (($checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_4')) ||
 					($checkLastStatus['status']=='approved' && ($checkLastStatus['current_level']=='level_3' || $checkLastStatus['current_level']=='level_1')))){
-						$current_users_details = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list,'current_level IS'=>$search_user_role])->order(['created' => 'ASC'])->toArray();
+						$current_users_details = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list,'current_level IS'=>$search_user_role])->toArray();
 					} else {//further condition
-						$current_users_details = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list,'current_level IS'=>$search_user_role])->order(['created' => 'ASC'])->toArray();
+						$current_users_details = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list,'current_level IS'=>$search_user_role])->toArray();
 						
 					}
 					
@@ -12953,16 +12954,16 @@ class ReportsController extends AppController {
 						if (!empty($customer_id_list)) {
 							$checkLastStatus = $this->$key->find('all', [
 								'conditions' => ['customer_id IN' => $customer_id_list],
-								'order' => 'created'
+								'order' => 'id desc'
 							])->first();
 						
 							if (!empty($checkLastStatus) && (
 								($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_4')) ||
 								($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_1'))
 							)) {
-								$download_pending_application = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list,'current_level IS'=>$search_user_role])->order(['created' => 'ASC'])->toArray();
+								$download_pending_application = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list,'current_level IS'=>$search_user_role])->toArray();
 							}else{
-								$download_pending_application = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list,'current_level IS'=>$search_user_role])->order(['created' => 'ASC'])->toArray();
+								$download_pending_application = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list,'current_level IS'=>$search_user_role])->toArray();
 							}
 						
 						}
@@ -13008,21 +13009,19 @@ class ReportsController extends AppController {
 					if (!empty($customer_id_list)) {
 						$checkLastStatus = $this->$key->find('all', [
 							'conditions' => ['customer_id IN' => $customer_id_list],
-							'order' => 'created'
+							'order' => 'id desc'
 						])->first();
 					
 						if (!empty($checkLastStatus) && (
 							($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_4')) ||
 							($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_1'))
 						)) {
-							$current_users_details = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->order(['created' => 'ASC'])->toArray();
+							$current_users_details = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->toArray();
 						}else{
-							$current_users_details = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->order(['created' => 'ASC'])->toArray();
+							$current_users_details = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->toArray();
 						}
 					
 					}
-					
-
 
 				
 				}
@@ -13056,16 +13055,16 @@ class ReportsController extends AppController {
 						if (!empty($customer_id_list)) {
 							$checkLastStatus = $this->$key->find('all', [
 								'conditions' => ['customer_id IN' => $customer_id_list],
-								'order' => 'created'
+								'order' => 'id desc'
 							])->first();
 						
 							if (!empty($checkLastStatus) && (
 								($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_4')) ||
 								($checkLastStatus['status'] == 'approved' && ($checkLastStatus['current_level'] == 'level_3' || $checkLastStatus['current_level'] == 'level_1'))
 							)) {
-								$download_pending_application = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->order(['created' => 'ASC'])->toArray();
+								$download_pending_application = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->toArray();
 							}else{
-								$download_pending_application = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->order(['created' => 'ASC'])->toArray();
+								$download_pending_application = $this->$each_table->find('all')->where(['customer_id IN'=>$application_customer_id_list])->toArray();
 							}
 						
 						}
@@ -13301,6 +13300,41 @@ class ReportsController extends AppController {
 					// 	->toArray(); 
 					/******************************** Perticular Month Wise List End************************************** */
 
+
+					// $firstDayOfMonth = date('01-m-Y');
+					// $currentDate = date('d-m-Y');
+							
+					// $customer_id_list = $this->$each_table->find('all')->select(['id', 'customer_id'])
+					// 	->where([
+					// 		'current_level' => $search_user_role,
+					// 		'current_user_email_id IN' => $posted_offices,
+					// 		'created BETWEEN :start AND :end'
+					// 	])
+					// 	->bind(':start', '2023-04-01') // Replace '2023-04-01' with the desired starting date of April
+					// 	->bind(':end', $currentDate)
+					// 	->combine('id', 'customer_id')
+					// 	->toArray();
+
+					// $selected_month = date('d-m-Y', strtotime($selected_month));
+					// $split_selected_month = explode('-', $selected_month);
+
+					// $day = $split_selected_month[0];
+					// $month = $split_selected_month[1];
+					// $year = $split_selected_month[2];
+
+					// $selected_month = date('d-m-Y', strtotime($selected_month));
+
+					// $customer_id_list = $this->$each_table->find('all')->select(['id', 'customer_id'])
+					// 	->where([
+					// 		'current_level' => $search_user_role,
+					// 		'current_user_email_id IN' => $posted_offices,
+					// 		'created BETWEEN :start AND :end'
+					// 	])
+					// 	->bind(':start', '01'. '-'. '04' .'-' . '2023')
+					// 	->bind(':end', '30'. '-'. $month . '-' . $year)
+					// 	->combine('id', 'customer_id')
+					// 	->toArray(); 
+
 					$selected_month = date('d-m-Y', strtotime($selected_month));
 					$split_selected_month = explode('-', $selected_month);
 
@@ -13315,7 +13349,7 @@ class ReportsController extends AppController {
 
 					$customer_id_list = $this->$each_table->find('all')->select(['id', 'customer_id'])
 						->where([
-							'current_level IS' => $search_user_role,
+							'current_level' => $search_user_role,
 							'current_user_email_id IN' => $posted_offices,
 							'created BETWEEN :start AND :end'
 						])
@@ -13331,7 +13365,7 @@ class ReportsController extends AppController {
 					if (!empty($customer_id_list)) {
 						$checkLastStatus = $this->$key->find('all', [
 							'conditions' => ['customer_id IN' => $customer_id_list],
-							'order' => 'created'
+							'order' => 'id desc'
 						])->first();
 					
 						if (!empty($checkLastStatus) && (
@@ -13350,7 +13384,7 @@ class ReportsController extends AppController {
 					//fetch the customer_id
 					if (!empty($customer_id_list)) {
 
-						$customer_id_details[$i] = $this->DmiFirms->find('all')->where(['customer_id IN' => $customer_id_list])->order(['created' => 'ASC'])->toArray();
+						$customer_id_details[$i] = $this->DmiFirms->find('all')->where(['customer_id IN' => $customer_id_list])->order(['id' => 'DESC'])->toArray();
 
 					} else {
 						$customer_id_details[$i] = array(); // Initialize as empty array if customer_id_list is empty
@@ -13405,6 +13439,7 @@ class ReportsController extends AppController {
 				$this->loadModel('DmiRoOffices');
 				// $posted_off = $this->DmiRoOffices->find('all')->where(['id IN'=>$level_1_2_3_office])->first();
 				// $posted_office = $posted_off['ro_email_id'];
+
 				//Change condtion for show result in array format (ro-office) by shreeya on date [11-07-2023]
 				$posted_off = $this->DmiRoOffices->find('all')->where(['id IN' => $level_1_2_3_office])->toArray();
 				if (!empty($posted_off)) {
@@ -13440,21 +13475,17 @@ class ReportsController extends AppController {
 					$month = $split_selected_month[1];
 					$year = $split_selected_month[2];
 
-					// Calculate the last day of the selected month
-					$last_day = date('t', strtotime($selected_month));
-
 					$selected_month = date('d-m-Y', strtotime($selected_month));
 
 					$customer_id_list = $this->$each_table->find('all')->select(['id', 'customer_id'])
 						->where([
-							'current_level IS' => $search_user_role,
+							'current_level' => $search_user_role,
 							'created BETWEEN :start AND :end'
 						])
-						->bind(':start', '01-04-2023')
-						->bind(':end', $last_day . '-' . $month . '-' . $year)
+						->bind(':start', '01'. '-'. '04' .'-' . '2023')
+						->bind(':end', '30'. '-'. $month . '-' . $year)
 						->combine('id', 'customer_id')
-						->toArray();
- 
+						->toArray(); 
 
 
 						
@@ -13464,7 +13495,7 @@ class ReportsController extends AppController {
 					if (!empty($customer_id_list)) {
 						$checkLastStatus = $this->$key->find('all', [
 							'conditions' => ['customer_id IN' => $customer_id_list],
-							'order' => 'created'
+							'order' => 'id desc'
 						])->first();
 					
 						if (!empty($checkLastStatus) && (
@@ -13483,7 +13514,7 @@ class ReportsController extends AppController {
 					//fetch the customer_id
 					if (!empty($customer_id_list)) {
 
-						$customer_id_details[$i] = $this->DmiFirms->find('all')->where(['customer_id IN' => $customer_id_list])->order(['created' => 'ASC'])->toArray();
+						$customer_id_details[$i] = $this->DmiFirms->find('all')->where(['customer_id IN' => $customer_id_list])->order(['id' => 'DESC'])->toArray();
 
 					} else {
 						$customer_id_details[$i] = array(); // Initialize as empty array if customer_id_list is empty
@@ -13538,6 +13569,7 @@ class ReportsController extends AppController {
 				$this->loadModel('DmiRoOffices');
 				// $posted_off = $this->DmiRoOffices->find('all')->where(['id IN'=>$level_1_2_3_office])->first();
 				// $posted_office = $posted_off['ro_email_id'];
+
 				//Change condtion for show result in array format (ro-office) by shreeya on date [11-07-2023]
 				$posted_off = $this->DmiRoOffices->find('all')->where(['id IN' => $level_1_2_3_office])->toArray();
 				if (!empty($posted_off)) {
@@ -13571,7 +13603,7 @@ class ReportsController extends AppController {
 
 					$customer_id_list = $this->$each_table->find('all')->select(['id', 'customer_id'])
 						->where([
-							'current_level IS' => $search_user_role
+							'current_level' => $search_user_role
 						])
 						->combine('id', 'customer_id')
 						->toArray();
@@ -13582,7 +13614,7 @@ class ReportsController extends AppController {
 					if (!empty($customer_id_list)) {
 						$checkLastStatus = $this->$key->find('all', [
 							'conditions' => ['customer_id IN' => $customer_id_list],
-							'order' => 'created'
+							'order' => 'id desc'
 						])->first();
 					
 						if (!empty($checkLastStatus) && (
@@ -13601,7 +13633,7 @@ class ReportsController extends AppController {
 					//fetch the customer_id
 					if (!empty($customer_id_list)) {
 
-						$customer_id_details[$i] = $this->DmiFirms->find('all')->where(['customer_id IN' => $customer_id_list])->order(['created' => 'ASC'])->toArray();
+						$customer_id_details[$i] = $this->DmiFirms->find('all')->where(['customer_id IN' => $customer_id_list])->order(['id' => 'DESC'])->toArray();
 
 					} else {
 						$customer_id_details[$i] = array(); // Initialize as empty array if customer_id_list is empty
@@ -13635,6 +13667,25 @@ class ReportsController extends AppController {
 			elseif($selected_month != '')
 			{
 				
+				
+				if($search_user_role == "AMA"){
+					$search_user_role ="level_4";
+				}elseif($search_user_role == 'RO/SO'){
+					$search_user_role ="level_3";
+				}elseif($search_user_role == 'MO/SO'){
+					$search_user_role ="level_1";
+				}elseif($search_user_role == 'IO'){
+					$search_user_role ="level_2";
+				}	elseif($search_user_role == 'DY.AMA'){
+						$search_user_role ="level_4";
+				}elseif($search_user_role == 'JT.AMA'){
+					$search_user_role ="level_4";
+				}elseif($search_user_role == 'HO MO/SMO'){
+					$search_user_role ="level_4";
+				}
+
+				
+
 				$this->loadModel('DmiFlowWiseTablesLists');
 				$applications_current_positions_tables = $this->DmiFlowWiseTablesLists->find('all')->select(['application_form','appl_current_pos'])->where(array('application_type IN'=>$application_key))->order(['id'])->combine('application_form','appl_current_pos')->toArray();
 
@@ -13660,20 +13711,17 @@ class ReportsController extends AppController {
 					$month = $split_selected_month[1];
 					$year = $split_selected_month[2];
 
-					// Calculate the last day of the selected month
-					$last_day = date('t', strtotime($selected_month));
-
 					$selected_month = date('d-m-Y', strtotime($selected_month));
 
 					$customer_id_list = $this->$each_table->find('all')->select(['id', 'customer_id'])
 						->where([
+							
 							'created BETWEEN :start AND :end'
 						])
-						->bind(':start', '01-04-2023')
-						->bind(':end', $last_day . '-' . $month . '-' . $year)
+						->bind(':start', '01'. '-'. '04' .'-' . '2023')
+						->bind(':end', '30'. '-'. $month . '-' . $year)
 						->combine('id', 'customer_id')
 						->toArray();
-
 
 
 
@@ -13681,7 +13729,7 @@ class ReportsController extends AppController {
 					if (!empty($customer_id_list)) {
 						$checkLastStatus = $this->$key->find('all', [
 							'conditions' => ['customer_id IN' => $customer_id_list],
-							'order' => 'created'
+							'order' => 'id desc'
 						])->first();
 					
 						if (!empty($checkLastStatus) && (
@@ -13700,7 +13748,7 @@ class ReportsController extends AppController {
 					//fetch the customer_id
 					if (!empty($customer_id_list)) {
 
-						$customer_id_details[$i] = $this->DmiFirms->find('all')->where(['customer_id IN' => $customer_id_list])->order(['created' => 'ASC'])->toArray();
+						$customer_id_details[$i] = $this->DmiFirms->find('all')->where(['customer_id IN' => $customer_id_list])->order(['id' => 'DESC'])->toArray();
 
 					} else {
 						$customer_id_details[$i] = array(); // Initialize as empty array if customer_id_list is empty
@@ -13734,7 +13782,7 @@ class ReportsController extends AppController {
 			elseif($search_user_role == ''  || $selected_month == '' || $level_1_2_3_office == '')
 			{
 				
-			
+
 				$this->loadModel('DmiFlowWiseTablesLists');
 				if(empty($report_for) || $report_for == ''){
 
@@ -13759,7 +13807,7 @@ class ReportsController extends AppController {
 					if (!empty($customer_id_list)) {
 						$checkLastStatus = $this->$key->find('all', [
 							'conditions' => ['customer_id IN' => $customer_id_list],
-							'order' => 'created'
+							'order' => 'id desc'
 						])->first();
 					
 						if (!empty($checkLastStatus) && (
@@ -13777,7 +13825,7 @@ class ReportsController extends AppController {
 					//fetch the customer_id
 					if (!empty($customer_id_list)) {
 
-						$customer_id_details[$i] = $this->DmiFirms->find('all')->where(['customer_id IN' => $customer_id_list])->order(['created' => 'ASC'])->toArray();
+						$customer_id_details[$i] = $this->DmiFirms->find('all')->where(['customer_id IN' => $customer_id_list])->order(['id' => 'DESC'])->toArray();
 						
 					} else {
 						$customer_id_details[$i] = array(); // Initialize as empty array if customer_id_list is empty
@@ -13823,10 +13871,10 @@ class ReportsController extends AppController {
 					$this->loadModel($key);
 
 					//show last month record
-					//$lastMonth = date('Y-m-d', strtotime('-1month'));
+					// $lastMonth = date('Y-m-d', strtotime('-1month'));
 					
-					//$selected_month = ['modified >=' => date('Y-m-01', strtotime($lastMonth))];
-					//$search_to_date = ['modified <=' => date('Y-m-t', strtotime($lastMonth))];
+					// $selected_month = ['modified >=' => date('Y-m-01', strtotime($lastMonth))];
+					// $search_to_date = ['modified <=' => date('Y-m-t', strtotime($lastMonth))];
 
 					$customer_id_list = $this->$each_table->find('all')->select(['id', 'customer_id'])
 						->combine('id', 'customer_id')->toArray();
@@ -13837,7 +13885,7 @@ class ReportsController extends AppController {
 					if (!empty($customer_id_list)) {
 						$checkLastStatus = $this->$key->find('all', [
 							'conditions' => ['customer_id IN' => $customer_id_list],
-							'order' => 'created'
+							'order' => 'id desc'
 						])->first();
 					
 						if (!empty($checkLastStatus) && (
@@ -13851,11 +13899,11 @@ class ReportsController extends AppController {
 					
 					}
 
-					
+
 					//fetch the customer_id
 					if (!empty($customer_id_list)) {
 
-						$customer_id_details[$i] = $this->DmiFirms->find('all')->where(['customer_id IN' => $customer_id_list])->order(['created' => 'ASC'])->toArray();
+						$customer_id_details[$i] = $this->DmiFirms->find('all')->where(['customer_id IN' => $customer_id_list])->order(['id' => 'DESC'])->toArray();
 
 					} else {
 						$customer_id_details[$i] = array(); // Initialize as empty array if customer_id_list is empty

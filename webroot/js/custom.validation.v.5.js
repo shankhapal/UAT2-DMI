@@ -10,20 +10,46 @@ $(function(){
 		var date1 = $("#ta-from_dt-"+id_No).val();
 		var date2 = $("#ta-to_dt-"+id_No).val(); 
 		var yearsDiff =  new Date(date2).getFullYear() - new Date(date1).getFullYear();
-    //calculated experience difference with basis  of mont and year by laxmi 10-07-2023
+    //calculated experience difference with basis  of month and year by laxmi 10-07-2023
      const split = date1.split('/');
      const split1 = date2.split('/');
-     var monthsDiff = split1[1]-split[1];
-     debugger;
+
+    var monthsDiff; 
+    const start = new Date(split[2]+','+split[1]);
+    const end = new Date(split1[2]+','+split1[1]);
+    let month= end.getMonth() - start.getMonth() + 
+    (12 * (end.getFullYear() - start.getFullYear()));
+
     
-     if(yearsDiff == 0 || yearsDiff == NaN){
-      yearsDiff =  0;
+    if(month == 12){
+        yearsDiff = 1;
+        monthsDiff = 0;
+      }else if(month > 12){
+        var i = 10;
+        var calMonth = 12;
+        var calculated_years;
+        var calculatedMonth;
+        for (var k = 1; k<=i; k++){
+          calculated_years = month / calMonth;
+          calculatedMonth =  month % calMonth;
+        }
+         yearsDiff = Math.trunc(calculated_years);
+         monthsDiff = calculatedMonth;
+      }else{
+         yearsDiff = 0;
+         monthsDiff = month;
+      } 
+    
+     if( (isNaN(yearsDiff)) || yearsDiff === 0 || yearsDiff === undefined){
+            yearsDiff =  0;
+       }
+     if((isNaN(monthsDiff)) || monthsDiff === 0 || monthsDiff === undefined ){
+              monthsDiff =  0;
      }
-     if(monthsDiff == 0 || monthsDiff == NaN){
-      monthsDiff =  0;
-     }
+     
 		
     $("#ta-total-"+id_No).val(yearsDiff +"."+ monthsDiff);
+    
     })
   
 	$('#value1, #value2').keyup(function(){
@@ -351,15 +377,17 @@ $(function(){
    // added below  function by laxmi to view profile and sign after upload without save on [06-07-2023]
     $('.file_profile').change(function(){
      var upload_view_src = $('.chemist_doc').attr('src');
+     $('.uploadpreview').remove();
     //  if(upload_view_src == '' || upload_view_src == undefined){
     //        $('.chemist_doc').hide();
     //  }
       var path = URL.createObjectURL(event.target.files[0]);
-      $("<img src width=auto height=80px >").insertAfter( $("#profile_img") ).fadeIn("fast").attr('src',path);
+      $("<img src width=auto height=80px class= uploadpreview>").insertAfter( $("#profile_img") ).fadeIn("fast").attr('src',path);
     });
     $('.file_sign').change(function(){
+      $('.signpreview').remove();
       var path = URL.createObjectURL(event.target.files[0]);
-      $("<img src width=auto height=80px >").insertAfter( $("#sign_img") ).fadeIn("fast").attr('src',path);
+      $("<img src width=auto height=80px class=signpreview>").insertAfter( $("#sign_img") ).fadeIn("fast").attr('src',path);
     });
 
     //End by Laxmi

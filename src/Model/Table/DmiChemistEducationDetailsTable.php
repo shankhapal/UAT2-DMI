@@ -143,7 +143,7 @@ class DmiChemistEducationDetailsTable extends Table{
 				),
 				'6' => array(
 					//'col' 		=> '% Marks',//comment this by laxmi and add below line 07-07-23
-					'col' 		=> 'CGPA',
+					'col' 		=> 'CGPA / Percentage',
 					'colspan' 	=> '1',
 					'rowspan' 	=> '1'
 				),

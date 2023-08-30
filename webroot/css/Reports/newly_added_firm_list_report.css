@@ -29,3 +29,12 @@
   }
 
   .fs80{font-size:80%;}
+
+  /* donload pdf btn change css  by shreeya on date [11-07-2023] */
+.custom-btn {
+  background-color: #343a40;;  /*Replace with your desired background color */
+  color: #ffffff; /* Replace with your desired text color */
+  padding: 10px 20px; /* Adjust padding as needed */
+  border: none; /* Remove border if not required */
+  border-radius: 4px; /* Add border radius if desired */
+}

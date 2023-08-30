@@ -391,7 +391,7 @@ class ChemistController extends AppController {
 					$i=$i+1;
 					
 				}
-			
+			   
 				$unique_commodity_id = array_unique($commodity_id);
 				$count_subcommodities = count($unique_commodity_id);
 			
@@ -401,6 +401,8 @@ class ChemistController extends AppController {
 				$sub_commodities = $this->request->getData('selected_commodity');
                 
 				$subcsubcommoditities = implode(', ', $sub_commodities);
+				// added selected group of commodities by laxmi on 28-07-2023
+				$commodity = implode(', ', $unique_commodity_id);
 				
 			
 				if ($this->request->getData('chemist_fname') !="" && $this->request->getData('chemist_lname') !="" && $this->request->getData('email') !="" && $this->request->getData('mobile') !="" && $this->request->getData('dob') !="") {
@@ -446,7 +448,7 @@ class ChemistController extends AppController {
 								'usertype'=>$certificationType[1],
 								'created'=>date('Y-m-d H:i:s'),
 								'modified'=>date('Y-m-d H:i:s'),
-								'commodity'=>$usersData['commodity'],
+								'commodity'=>$commodity,
 								'sub_commodities'=>$subcsubcommoditities,
 								'payment'=>$payment_amnt,
 							));
@@ -1319,6 +1321,7 @@ class ChemistController extends AppController {
 			$this->set('chemist_fname',$roToRalData['chemist_first_name']);
 			$this->set('chemist_lname',$roToRalData['chemist_last_name']);
 			$this->set('chemist_id',$roToRalData['chemist_id']);
+			$this->Session->write('customer_id', $roToRalData['chemist_id']);
 			$ro_id = $roToRalData['ro_office_id'];
 			$customer_id =$roToRalData['chemist_id'];
 			}

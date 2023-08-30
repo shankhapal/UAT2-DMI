@@ -16,7 +16,7 @@ use Cake\Utility\Xml;
 use FR3D;
 use Cake\View;
 use PDF_Rotate;
-use MyCustomPDFWithWatermark;
+use MyCustomPDFWithWatermark; //added this by laxmi for watermark img 18-07/2023
 
 class ApplicationformspdfsController extends AppController{
 	
@@ -2629,7 +2629,7 @@ class ApplicationformspdfsController extends AppController{
 		//added on 16-09-2021 by Amol
 		$appl_type = $this->Session->read('application_type');
 		$current_level = $this->Session->read('current_level');
-	
+		
 		//if application is for old or w/o esign then store pdf in files folder directly.
 		if($pdf_for == 'old' || $with_esign == 'no'){
 			
@@ -2642,15 +2642,16 @@ class ApplicationformspdfsController extends AppController{
 		#For SCN moved file directly to the Specific Folder - Akash[03-01-2022]
 		}elseif($pdf_for == 'showcause_notice'){
 			$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/showcause_notice/'.$file_name;
-		}elseif( $appl_type == 4 && $pdf_for == 'grant'){
+
+		}elseif( $appl_type == 4 && $pdf_for == 'chemist'){
 			//elseif section added by laxmi B. on 30-12-2022
 			//for this file path is sent from the pdf function
 			//it will take default file path from the argument, if pdf for is chemist
-			$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/certificates/CHM/'.$file_name;
-																		 
-										  
 																					   
-		}else{
+		} elseif($appl_type == 4 && $pdf_for == 'grant'){
+			$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/temp/'.$file_name;
+		}
+		else{
 			$file_path = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/temp/'.$file_name;
 		}
 		
@@ -2659,11 +2660,11 @@ class ApplicationformspdfsController extends AppController{
 		require_once(ROOT . DS .'vendor' . DS . 'tcpdf' . DS . 'tcpdf.php');
 		//below line is added on 23-05-2023 by Amol, to print water mark on pdf
 		require_once(ROOT . DS . 'vendor' . DS . 'tcpdf' . DS . 'tcpdf_text.php');
-
+        //below line is added on 19-07-2023 by laxmi  for watermark image on pdf
 		require_once(ROOT . DS . 'vendor' . DS . 'tcpdf' . DS . 'tcpdf_watermark.php');
 
 		
-
+                
 		//This below condition is updated for the Surrender (SOC) Application PDFs watermarks - Akash [12-05-2023]
 		if ($appl_type == 9 && $current_level != 'applicant') { 
 
@@ -2678,7 +2679,8 @@ class ApplicationformspdfsController extends AppController{
 			}
 
 		}elseif($appl_type == 4 && $pdf_for == 'grant'){ 
-			$pdf = new MyCustomPDFWithWatermark(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);	
+			// for chemist certificate page height and width specify manually by laxmi on 01-08-2023
+			$pdf = new MyCustomPDFWithWatermark(PDF_PAGE_ORIENTATION, PDF_UNIT, array(250, 335), true, 'UTF-8', false);	
 		}else{
 			$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 		}
@@ -2730,7 +2732,7 @@ class ApplicationformspdfsController extends AppController{
 			$pdf->writeHTML($html, true, false, true, false, '');
 			
            
-
+			
 
 			//get signer details
 			//if applicant
@@ -4069,6 +4071,7 @@ class ApplicationformspdfsController extends AppController{
                     
                     // to find commodity from registrtion table added code by laxmi on 14-07-2023
 					$commodities = $this->DmiChemistRegistrations->find('all', ['conditions'=>['chemist_id IS'=>$customer_id]])->first();
+					
 					$sub_commodity_array = explode(',',$commodities['sub_commodities']);
 					$i=0;
 					foreach ($sub_commodity_array as $key => $sub_commodity) {
@@ -4082,6 +4085,7 @@ class ApplicationformspdfsController extends AppController{
 					$commodity_name_list = $this->MCommodityCategory->find('all',array('conditions'=>array('category_code IN'=>$unique_commodity_id, 'display'=>'Y')))->toArray();	
 					$this->set('commodity_name_list',$commodity_name_list);		
 					$this->set('sub_commodity_data',$sub_commodity_data);
+					$this->set('payment',$commodities['payment']);
 
 
 					$chemist_fname = $this->Session->read('f_name');
@@ -4095,8 +4099,11 @@ class ApplicationformspdfsController extends AppController{
 					} 
 
 					$chemist_profile_details = $this->DmiChemistProfileDetails->find('all')->where(array('customer_id IS'=>$customer_id))->first();
+				
 					if(!empty($chemist_profile_details) && !empty($chemist_profile_details['address'])){
 					$this->set('chemist_address', $chemist_profile_details['address']);
+					$this->set('middle_name_type', $chemist_profile_details['middle_name_type']);
+					$this->set('middle_name', $chemist_profile_details['middle_name']);
 					}
 
 					$this->generateApplicationPdf('/Applicationformspdfs/chemistApplPdf'); 
@@ -4288,6 +4295,9 @@ class ApplicationformspdfsController extends AppController{
 				if(!empty($chemist_profile)){
 					
                     $this->set('profile_photo', $chemist_profile['profile_photo']);
+					$this->set('address', $chemist_profile['address']);
+					$this->set('middle_name_type', $chemist_profile['middle_name_type']);
+					$this->set('middle_name', $chemist_profile['middle_name']);
 				}
 
                    
@@ -4335,9 +4345,10 @@ class ApplicationformspdfsController extends AppController{
 
 				}
 
-				$ro_office = $this->DmiRoOffices->find('list', array('valueField'=>'ro_office'))->where(array('id IS'=>$chemistData['ro_office_id']))->first();
-				$this->set('ro_office',$ro_office);
-
+				$ro_office = $this->DmiRoOffices->find('all', array('valueField'=>'ro_office'))->where(array('id IS'=>$chemistData['ro_office_id']))->first();
+				$this->set('ro_office',$ro_office['ro_office']);
+				$this->set('office_type',$ro_office['office_type']);
+				
 				}
 
 
@@ -4413,7 +4424,7 @@ class ApplicationformspdfsController extends AppController{
 				$chemist_data = $this->DmiChemistRegistrations->find('all', array( 'conditions'=>array('chemist_id IS'=>$customer_id)))->first();
                   
 				$chemist_address= $this->DmiChemistProfileDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
-               
+                
 				$this->set('chemist_address',$chemist_address['address']);
 				$this->set('chemist_fname', $chemist_data['chemist_fname']);
 				$this->set('chemist_lname', $chemist_data['chemist_lname']);
@@ -4421,7 +4432,8 @@ class ApplicationformspdfsController extends AppController{
 				$this->set('sign', $chemist_address['signature_photo']);
 				$this->set('middle_name_type', $chemist_address['middle_name_type']);
 				$this->set('middle_name', $chemist_address['middle_name']);
-				$this->set('profile_photo', $chemist_address['profile_photo']);
+				
+				
 
 				//set packer id in session and level_3
 				$this->Session->write('packer_id',$chemist_data['created_by'] );
@@ -4457,9 +4469,9 @@ class ApplicationformspdfsController extends AppController{
 				$sub_commodity_data[$i] =  $fetch_commodity_id;		
 				$i=$i+1;
 				}
-				$unique_commodity_id = array_unique($commodity_id); 
+				$unique_commodity_id = array_unique($commodity_id);
 				$commodity_name_list = $this->MCommodityCategory->find('all',array('conditions'=>array('category_code IN'=>$unique_commodity_id, 'display'=>'Y')))->toArray();
-
+				
 				$this->set('commodity_name_list',$commodity_name_list);		
 				$this->set('sub_commodity_data',$sub_commodity_data);
 				//to fetch ral schedule training date
@@ -4553,11 +4565,14 @@ class ApplicationformspdfsController extends AppController{
 			$chemist_data = $this->DmiChemistRegistrations->find('all', array('conditions'=>array('chemist_id IS'=>$customer_id)))->first();
                
 			$chemist_address= $this->DmiChemistProfileDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
-           
+			
 			$this->set('chemist_address',$chemist_address['address']);
 			$this->set('chemist_fname', $chemist_data['chemist_fname']);
 			$this->set('chemist_lname', $chemist_data['chemist_lname']);
 			$this->set('profile_photo', $chemist_address['profile_photo']);
+			$this->set('middle_name_type', $chemist_address['middle_name_type']);
+			$this->set('parent_name', $chemist_address['middle_name']);
+			$this->set('address', $chemist_address['address']);
 
 			//set packer id in session and level_3
 			$this->Session->write('packer_id',$chemist_data['created_by'] );
@@ -4596,12 +4611,12 @@ class ApplicationformspdfsController extends AppController{
 			}
 			$unique_commodity_id = array_unique($commodity_id); 
 			$commodity_name_list = $this->MCommodityCategory->find('all',array('conditions'=>array('category_code IN'=>$unique_commodity_id, 'display'=>'Y')))->toArray();
-
+			
 			$this->set('commodity_name_list',$commodity_name_list);		
 			$this->set('sub_commodity_data',$sub_commodity_data);
 			//to fetch ral name
 			$roToRalData = $this->DmiChemistRoToRalLogs->find('all', array('conditions'=>array('chemist_id IS'=>$customer_id)))->last(); 
-			
+			$this->Session->write('application_type',$roToRalData['appliaction_type'] );
 			if(!empty($roToRalData)){
 			$scheduleFrom = date('d-m-Y', strtotime(str_replace('/','-',$roToRalData['ro_schedule_from'])));
 			$scheduleTo = date('d-m-Y', strtotime(str_replace('/','-',$roToRalData['ro_schedule_to'])));
@@ -4610,8 +4625,10 @@ class ApplicationformspdfsController extends AppController{
 			$this->set('shedule_to',$scheduleTo);
 
 			//to fetch ro office name 
-			$office = $this->DmiRoOffices->find('all',array('fields'=>'ro_office', 'conditions'=>array('id IS'=>$roToRalData['ro_office_id'])))->first();
+			$office = $this->DmiRoOffices->find('all',array( 'conditions'=>array('id IS'=>$roToRalData['ro_office_id'])))->first();
 			$this->set('ro_office',$office['ro_office']);
+			$this->set('office_type',$office['office_type']);
+			
 			}
 
 
@@ -4623,11 +4640,12 @@ class ApplicationformspdfsController extends AppController{
 			$rearranged_id = $pdfPrefix.'('.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].')';
 
 			//check applicant last record version to increment		
-			$list_id = $this->DmiChemistRoToRalLogs->find('list', array('valueField'=>'id', 'conditions'=>array('chemist_id IS'=>$customer_id)))->toArray();
-
+			$list_id = $this->DmiChemistRoToRalLogs->find('list', array('valueField'=>'id', 'conditions'=>array('chemist_id IS'=>$customer_id)))->last();
+		
 			if(!empty($list_id))
 			{
-			$max_id = $this->DmiChemistRoToRalLogs->find('all', array('fields'=>'pdf_version', 'conditions'=>array('id'=>max($list_id))))->first();																	
+			$max_id = $this->DmiChemistRoToRalLogs->find('all', array('fields'=>'pdf_version', 'conditions'=>array('id'=>$list_id)))->first();																	
+			
 			$last_pdf_version 	=	$max_id['pdf_version'];
 
 			}
@@ -4635,20 +4653,21 @@ class ApplicationformspdfsController extends AppController{
 
 			$current_pdf_version = $last_pdf_version; //increment last version by 1//taking complete file name in session, which will be use in esign controller to esign the file.
 			$this->Session->write('pdf_file_name',$rearranged_id.'('.$current_pdf_version.')'.'.pdf');
-
+			
 			//creating filename and file path to save				
 			$file_path = '/testdocs/DMI/chemist_training/training_schedule_letter_at_ro/'.$rearranged_id.'('.$current_pdf_version.')'.'.pdf';
-
+			
 			$filename = $_SERVER["DOCUMENT_ROOT"].$file_path;
 			//creating filename and file path to save				
-
+			
 			$file_name = $rearranged_id.'('.$current_pdf_version.')'.'.pdf';
-
+			$$current_pdf_version = $current_pdf_version + 1;
 			$this->DmiChemistRoToRalLogs->updateAll(
-			array('ro_schedule_letter' => $file_path),
+			array('ro_schedule_letter' => $file_path,'pdf_version'=>$current_pdf_version),
 			array('chemist_id'=>$customer_id));
-
+                         
 			$file_path = $_SERVER["DOCUMENT_ROOT"].$file_path;
+		
 			//to preview application
 			$this->callTcpdf($all_data_pdf,'F',$customer_id,'chemist',$file_path);//with save mode
 			//$this->callTcpdf($all_data_pdf,'I',$customer_id,'chemist',$file_path);//on with preview mode
