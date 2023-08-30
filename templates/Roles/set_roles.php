@@ -80,6 +80,7 @@
 										</div>
 										<div class="clearfix"></div>
 									</div>
+									</div>
 
 									<div class="alert alert-success" id="both_user_roles_list_box">
 										<label> Common Roles List : </label>
@@ -128,7 +129,6 @@
 									<?php echo $this->Form->control('Set Roles', array('type'=>'submit', 'name'=>'set_roles_btn', 'id'=>'set_roles_btn', 'label'=>false,'class'=>'btn btn-success')); ?>
 								</div>
 							</div>
-						</div>
 					<?php echo $this->Form->end(); ?>
 				</div>
 			</div>
