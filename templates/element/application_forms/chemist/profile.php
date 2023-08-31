@@ -256,7 +256,7 @@
 					</div>
 					<div class="col-md-4 chemist_doc_div">
 						<img src="<?php echo $section_form_details[0]['profile_photo'] ?>" width="auto" height="80px" class="chemist_doc">
-						<img src="" id="profile_photo_prev" alt="your image" width="100px" height="50px" />
+						<!-- <img src="" id="profile_photo_prev" alt="your image" width="100px" height="50px" /> -->
 					</div>
 
 					<div class="col-md-2">
