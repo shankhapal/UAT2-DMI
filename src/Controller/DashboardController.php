@@ -1734,7 +1734,7 @@ class DashboardController extends AppController{
 
 					'customer_id'=>$customer_id,
 					'application_type'=>$appl_type_id['id'],
-					'created'=>$current_date,
+					'created'=>date('Y-m-d H:i:s'), // added field by shankhpal on 29/08/2023
 					'user_id'=>$user_id,
 					'io_office'=>$io_office,
 					'io_email_id'=>$io_user_id,
@@ -3144,7 +3144,7 @@ class DashboardController extends AppController{
 
 					'customer_id'=>$customer_id,
 					'application_type'=>$appl_type_id['id'],
-					'created'=>$current_date,
+					'created'=>date('Y-m-d H:i:s'), // added field by shankhpal on 29/08/2023
 					'user_id'=>$user_id,
 					'io_office'=>$io_office,
 					'io_email_id'=>$io_user_id,

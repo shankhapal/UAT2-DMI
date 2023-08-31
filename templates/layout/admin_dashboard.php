@@ -76,6 +76,10 @@
 				//echo $this->Html->script('jssor.slider-21.1.6.min');
 				echo $this->Html->script('jquery-confirm.min');
 				echo $this->Html->script('Validations/surrender_form_validations');
+
+				//added below css and script links for dropdown id search for movement by laxmi[09-08-2023]
+				echo $this->Html->css('select2.min');
+				echo $this->Html->script('movements/select2.min');
 			?>
 
 			<title>Directorate of Marketing & Inspection</title>

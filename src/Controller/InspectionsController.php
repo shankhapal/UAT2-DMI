@@ -229,7 +229,7 @@ class InspectionsController extends AppController{
 		$this->set('section_model_name',$section_model_name);
 		
 		$section_model = TableRegistry::getTableLocator()->get($section_model_name);
-		
+		$Dmi_rti_esigned_statuses_table = TableRegistry::getTableLocator()->get('DmiRtiEsignedStatuses'); // line added by shankhpal shende on date 24/08/2023 for  TableRegistry of DmiRtiEsignedStatuses
 		$section = $section_details['section_name'];
 			
 		//addded by akash thakre to display section details
@@ -521,8 +521,22 @@ class InspectionsController extends AppController{
 						)); 
 			
 						$Dmi_rti_final_submit_table->save($Dmi_rti_final_submit_Entity);
-						
-						$redirect_url = '../othermodules/routineInspectionList'; // change added by shankhpal shende for rti
+						// Uppdated Record of Dmi_rti_esigned_statuses_table added on 24/08/2023 by shankhpal
+						$updateData = array(
+							'application_esigned' => 'yes',
+							'report_esigned' => 'yes',
+							'certificate_esigned' => 'yes',
+							'application_type' => $application_type,
+							'modified'=>date('Y-m-d H:i:s'),
+							'application_status' => 'Granted',
+						);
+
+							$conditions = array('customer_id' => $customer_id);
+
+							$Dmi_rti_esigned_statuses_table->updateAll($updateData, $conditions, array('order' => 'id DESC'));
+
+					
+						   $redirect_url = '../othermodules/routineInspectionList'; // change added by shankhpal shende for rti
 					}
 				
 					
