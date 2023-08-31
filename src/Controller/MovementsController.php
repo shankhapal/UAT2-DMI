@@ -958,11 +958,9 @@ class MovementsController extends AppController {
                                SORT_DESC, 
                                $output);  
                        
-                        //print_r($output);exit;
+                       
                             $this->set('output',$output);
-                            // $this->set('from',$from);
-                            // $this->set('sentdate',$sentdate);
-                            // $this->set('action',$action);
+                            
                 } 
             }
             

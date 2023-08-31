@@ -112,9 +112,16 @@
                              <td>
                                 <?php echo $fm['to']; ?>
                              </td> 
+                            <?php 
+                              if(date('Y-m-d H:i:s' , strtotime($fm['sentdate'])) == '1970-01-01 05:30:00'){ ?>
+                                 <td >
+                                 <?php echo "Old Application"; ?> 
+                              </td>
+                              <?php }else{ ?>
                              <td >
                                 <?php echo $fm['sentdate']; ?> 
                              </td> 
+                             <?php } ?>
                              <td>
                                 <?php echo $fm['action']; ?>
                              </td> 
