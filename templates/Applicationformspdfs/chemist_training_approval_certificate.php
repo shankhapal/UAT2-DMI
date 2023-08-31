@@ -124,7 +124,7 @@
   	<td>
   		Copy to:<br>
   		1.The Agricultural Marketing Adviser to the Govt. of India, DMI, Head Office, Faridabad for favour of information.<br>
-  		2.<?php echo $chemist_fname;?> <?php echo $chemist_lname;?>, <?php echo htmlspecialchars_decode($chemist_address);?>, for necessary action.<br>
+  		2.<?php echo $chemist_fname;?> <?php echo $chemist_lname;?> <?php echo $middle_name_type ; ?> <?php echo $middle_name ; ?>, <?php echo htmlspecialchars_decode($chemist_address);?>, for necessary action.<br>
         <br>  <img width="100" height="100" src="<?php echo $result_for_qr['qr_code_path']; ?>">
   	</td>
       
