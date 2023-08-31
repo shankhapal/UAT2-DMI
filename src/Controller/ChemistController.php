@@ -698,7 +698,14 @@ class ChemistController extends AppController {
 
 		$this->viewBuilder()->setLayout('chemist_home_layout');
 		$this->Session->write('application_dashboard','chemist');
-  //chemist application shedule letter display in dashboard added by laxmi b.on 30-12-22
+            
+		//chemist application pdf added on chemist dashboard by laxmi on 31-08-2023
+		$this->loadModel('DmiChemistPdfRecords');
+		$chemist_appl_pdf = $this->DmiChemistPdfRecords->find('list',array('valueField'=>'pdf_file', 'conditions'=>array('customer_id'=>$_SESSION['username'])))->last();  
+		if(!empty($chemist_appl_pdf)){
+			$this->set('chemist_appl_pdf_file', $chemist_appl_pdf);
+		}
+         //chemist application shedule letter display in dashboard added by laxmi b.on 30-12-22
 		
 		$this->loadModel('DmiChemistRalToRoLogs');
         $scheduleLetter = $this->DmiChemistRalToRoLogs->find('list',array('valueField'=>'reshedule_pdf', 'conditions'=>array('chemist_id'=>$_SESSION['username'], 'training_completed IS'=>NULL, 'reshedule_status IS'=>'confirm')))->first();  
