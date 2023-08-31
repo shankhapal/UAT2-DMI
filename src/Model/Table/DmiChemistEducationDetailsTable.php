@@ -212,7 +212,7 @@ class DmiChemistEducationDetailsTable extends Table{
 					'valid'		=> 'text',
 					'option'	=> $division,
 					'selected'	=> $row['division'],
-					'class'		=> 'cvOn cvReq',
+					'class'		=> 'cvOn1 cvReq1 cvNotReq',//chnaged class name for division get optional by Laxmi[31-08-23]
 					'id'		=> 'division'
 				),
 				'6' => array(
