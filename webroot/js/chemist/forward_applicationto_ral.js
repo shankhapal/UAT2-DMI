@@ -89,4 +89,16 @@ $(document).ready(function(){
    $('.submitReschedule')[0].click();
   }
 
+  // to hide error msg added below by laxmi on 01-09-2023
+  $('#roOffice').click(function(){
+   $('.err_cv_ro_office').hide();
+  });
+  $('#sheduleFrom').click(function(){
+    $('.err_cv_shedule_from').hide();
+    $('#sheduleTo').val('');
+   });
+   $('#sheduleTo').click(function(){
+    $('.err_cv_shedule_to ').hide();
+   });
+
 });
