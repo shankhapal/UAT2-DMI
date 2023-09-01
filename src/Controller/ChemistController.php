@@ -1063,7 +1063,7 @@ class ChemistController extends AppController {
 				$this->DmiChemistAllCurrentPositions->currentUserUpdate($customer_id,$user_email_id,$current_level);//call to custom function from model
 				}
 
-				$message ="Chemist Application Forwarded to RAL".$find_office_email_id['ro_office'].". And the email id is ".base64_decode($office_incharge_id)."  ";
+				$message ="Chemist Application Forwarded to RAL" .$find_office_email_id['ro_office'].". And the email id is ".base64_decode($office_incharge_id)."  ";
 				$message_theme = "success";
 
 				// for rescheduling chemist training at RAL and generate letter pdf so comment this redirect url and redirect on  chemist module  by laxmi B. on 10-05-2023  for chemist modeule
@@ -1118,15 +1118,16 @@ class ChemistController extends AppController {
 			$this->viewBuilder()->setLayout('admin_dashboard');
 
 			$ro_email = $_SESSION['username'];	
-			$ro_office_id = $this->DmiRoOffices->find('list',array('valueField'=>'id', 'conditions'=>array('ro_email_id IS'=>$ro_email)))->last(); 
-			
-
+			$ro_office_ids = $this->DmiRoOffices->find('all',array('fields'=>['id', 'office_type'], 'conditions'=>array('ro_email_id IS'=>$ro_email)))->last(); 
+			$ro_office_id = $ro_office_ids['id'];
+            
 
 			$export_unit = $this->Session->read('export_unit');
 			if(!empty($export_unit) && $export_unit == 'yes'){
-				$ro_office_id = $this->DmiRoOffices->find('list',array('valueField'=>'id', 'conditions'=>array('ro_email_id IS'=>$ro_email, 'ro_office IS'=>'Mumbai')))->first(); 
+				$ro_office_ids = $this->DmiRoOffices->find('all',array('valueField'=>['id','office_type'], 'conditions'=>array('ro_email_id IS'=>$ro_email, 'ro_office IS'=>'Mumbai')))->first(); 
+			    $ro_office_id = $ro_office_ids['id'];
 			}
-			
+			$this->set('office_type', $ro_office_ids['office_type']);
 			$listofApp = $this->DmiChemistRoToRalLogs->find('all')->where(array('is_forwordedtoral IS NOT '=>NULL, 'ro_office_id IS'=>$ro_office_id))->order('created desc')->toArray();
 			
 			$i=0;

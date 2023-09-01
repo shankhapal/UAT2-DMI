@@ -591,7 +591,6 @@
 
 					<?php } ?>
 			<!-- added chemist training menu  by laxmi B. on 28-12-2022 -->
-
 					<?php if($current_user_roles['ro'] == 'yes' || $current_user_roles['so'] == 'yes'){ ?>
 				            <li class="nav-item">
 							<li class="nav-item has-treeview">
@@ -605,14 +604,14 @@
 											<a href="<?php echo $this->request->getAttribute("webroot");?>chemist/listOfChemistApplRoToRal" class="bg-cyan nav-link">
 												<i class="fas fa-list nav-icon"></i>
 
-												<p class="nav-icon-p">RO to RAL List</p>
+												<p class="nav-icon-p"><?php if(!empty($current_user_roles['user_flag'])){ echo $current_user_roles['user_flag']; }?> to RAL List</p>
 											</a>
 										</li>
 
 										<li class="nav-item">
 											<a href="<?php echo $this->request->getAttribute("webroot");?>chemist/listOfChemistApplRalToRo" class="bg-cyan nav-link">
 												<i class="fas fa-list nav-icon"></i>
-												<p class="nav-icon-p">RAL to RO List</p>
+												<p class="nav-icon-p">RAL to <?php if(!empty($current_user_roles['user_flag'])){ echo $current_user_roles['user_flag']; }?> List</p>
 											</a>
 										</li>
 									</li>
