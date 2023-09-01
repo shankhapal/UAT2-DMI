@@ -118,5 +118,43 @@
 				return true;
 			}
 	}
+
+	public function saveReplicaAllotmentData($forms_data){
+			
+			$customer_id = $_SESSION['packer_id'];
+
+			$newEntity = $this->newEntity(array(
+
+				
+				'customer_id'=>$customer_id,
+				'commodity' =>$forms_data['rpl_commodity'],
+				'lotno' => $forms_data['rpl_lotno'],
+				'datesampling' => $forms_data['rpl_datesampling'],
+				'dateofpacking' => $forms_data['rpl_dateofpacking'],
+				'gradeasign' => $forms_data['rpl_grade'],
+				'packetsize' => $forms_data['rpl_packet_size'],
+				'packetsizeunit'=>$forms_data['rpl_packet_size_unit'],
+				'totalnoofpackets' => $forms_data['rpl_no_of_packets'],
+				'totalqtyquintal' => $forms_data['rpl_qty_quantal'],
+				'estimatedvalue' => $forms_data['rpl_estimatedvalue'],
+				'agmarkreplicafrom' => $forms_data['rpl_alloted_rep_from'],
+				'agmarkreplicato' => $forms_data['rpl_alloted_rep_to'],
+				'agmarkreplicatotal' => $forms_data['rpl_total_quantity'],
+				'replicacharges' => $forms_data['rpl_replicacharges'],
+				'laboratoryname' => $forms_data['rpl_grading_lab'],
+				'reportno' => $forms_data['rpl_reportno'],
+				'reportdate' => $forms_data['rpl_reportdate'],
+				'remarks' => $forms_data['rpl_remarks'],
+				
+				'replica_alloted_record'=>'yes',
+				'created'=>date('Y-m-d H:i:s'),
+				'modified'=>date('Y-m-d H:i:s')
+			));
+
+			if($this->save($newEntity)){
+				echo "added";
+			}
+
+	}
 		
 }

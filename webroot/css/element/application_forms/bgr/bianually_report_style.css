@@ -60,3 +60,18 @@ td button {
   margin-inline: 10px;
   width: 30%;
 }
+.note {
+  background-color: #f7f7f7;
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+#downloadDiv{
+  display: none;
+}
+.table-container {
+  height: 500px;
+  /* Adjust the height as needed */
+  overflow-y: auto;
+  /* Enable vertical scrollbar when needed */
+}

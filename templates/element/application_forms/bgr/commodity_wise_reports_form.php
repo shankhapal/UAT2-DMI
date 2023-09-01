@@ -1,15 +1,56 @@
 <?php
+
 	echo $this->Html->css('../multiselect/jquery.multiselect');
 	echo $this->Html->script('../multiselect/jquery.multiselect');
 ?>
 
 <?php echo $this->Form->create(null,array('type'=>'file', 'enctype'=>'multipart/form-data', 'id'=>$section)); ?>
 	<div id="form_outer_main" class="col-md-12 form-middle">
-		<h5 class="mt-1 mb-2 tacfw700">Commodity wise Grading Data Entery Form</h5>
+		<?php if($section_form_details[0]['form_status'] === "approved"){?>
+			<h5 class="mt-1 mb-2 tacfw700">Report Download Section</h5>
+		<?php }else{ ?>
+				<h5 class="mt-1 mb-2 tacfw700">Commodity wise Grading Data Entery Form</h5>
+		<?php } ?>
 			<div id="form_inner_main" class="card card-success">
-					<div class="card-header"><h3 class="card-title">Commodity wise Grading Data Entery Form</h3></div>
+					<div class="card-header">
+						<?php if($section_form_details[0]['form_status'] === "approved"){?>
+							<h3 class="card-title">Note: Your Report is Already Applied</h3>
+						<?php }else{ ?>
+								<h3 class="card-title">Commodity wise Grading Data Entery Form</h3>
+						<?php } ?>
+						
+					</div>
 						 <div class="tank_table form-horizontal " >
 							<div class="card-body">
+								<div id="downloadDiv">
+									<table class="table">
+											<thead>
+												<tr>
+													<th scope="col">#</th>
+													<th scope="col">Tenure</th>
+													<th scope="col">Download Report</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<th scope="row">1</th>
+													<td><?php echo $_SESSION['financialYear']; ?></td>
+													<td><?php
+															if (!empty($section_form_details[0]['other_upload_docs'])) { ?>
+																	<a id="other_upload_docs_value"
+																	target="blank"
+																	href="<?php
+																	echo str_replace("D:/xampp/htdocs","",
+																	$section_form_details[0]
+																	['other_upload_docs']);
+																	?>">
+																	<?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]
+																	['other_upload_docs'])), -1))[0],23);?></a>
+															<?php }else{ echo "No Document Provided" ;} ?></td>
+												</tr>
+											</tbody>
+										</table>
+								</div>
                    <!-- call table view form element with ajax call -->
 										<?php echo $this->element('application_forms/bgr/analysis_table/commodity_wise_reports_form_tbl'); ?>
 								
@@ -17,7 +58,7 @@
 						</div>
 
 					
-									<div class="form-horizontal border">
+									<div class="form-horizontal border file_upload">
 										<div class="card-body">
 												<div class="row">
 														<div class="col-md-3">
@@ -80,4 +121,6 @@
 		echo $this->Html->script('element/application_forms/bgr/bgr_calculation');
     echo $this->Html->css('element/application_forms/bgr/bianually_report_style');
 		echo $this->Html->script('element/application_forms/bgr/bgr_file_uploads_validation');
+		echo $this->Html->script('element/application_forms/bgr/bgr_replica_allotment_validation');
+		
   ?>

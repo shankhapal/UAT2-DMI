@@ -16,79 +16,8 @@
 
 	public function sectionFormDetails($customer_id){
 
-		$latest_id = $this->find('list', array(
-			'valueField'=>'id',
-			'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
-		
+		$CustomersController = new CustomersController;
 		$DmiBgrCommodityReportsAddmore = TableRegistry::getTableLocator()->get('DmiBgrCommodityReportsAddmore');
-
-		// $financialYear = null;
-		// $periodWiseReport = [];
-		// if(isset($_SESSION['financialYear'])){
-		// 	$financialYear = $_SESSION['financialYear'];
-		// 	// Split the input string into an array using the delimiter "-"
-		// 	$parts = explode("-", $financialYear);
-
-		// 	// Extract year, month, day for "From" and "To" components
-		// 	$fromYear = $parts[0];
-		// 	$fromMonth = $parts[1];
-		// 	$fromDay = $parts[2];
-
-		// 	$toYear = $parts[4];
-		// 	$toMonth = $parts[5];
-		// 	$toDay = $parts[6];
-
-		// 		// Combine year, month, day to create "From" and "To" dates
-		// 	$fromDate = $fromYear . '-' . $fromMonth . '-' . $fromDay;
-		// 	$toDate = $toYear . '-' . $toMonth . '-' . $toDay;
-		// 	$period1 = $parts[7] . '-' . $parts[8]; // Combine "Second" and "Half"
-
-		// 	$periodWiseReport = $this->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'period_from'=>$fromDate,'period_to'=>$toDate,'period'=>$period1)))->first();
-		// }
-		
-		if($latest_id != null){
-		// if($latest_id != null || $periodWiseReport != null){
-			$form_fields = $this->find('all', array(
-				'conditions'=>array('id'=>MAX($latest_id))))->first();
-			
-			$form_fields_details = $form_fields;
-			
-		}else{
-			
-			$form_fields_details = array (
-				'id'=>"", 'customer_id' => "",
-				'reffered_back_comment' => "",
-				'reffered_back_date' => "",
-				'form_status' =>"",
-				'customer_reply' =>"",
-				'customer_reply_date' =>"",
-				'approved_date' => "",
-				'current_level' => "",
-				'mo_comment' =>"",
-				'mo_comment_date' => "",
-				'ro_reply_comment' =>"",
-				'ro_reply_comment_date' =>"",
-				'delete_mo_comment' =>"",
-				'delete_ro_reply' => "",
-				'delete_ro_referred_back' => "",
-				'delete_customer_reply' => "",
-				'ro_current_comment_to' => "",
-				'rb_comment_ul'=>"",
-				'mo_comment_ul'=>"",
-				'rr_comment_ul'=>"",
-				'cr_comment_ul'=>""
-			);
-			
-		}
-
-		// to fetch CA details: Name of Packer with address and e-mail id
-		if(!empty($_SESSION['packer_id']) || isset($_SESSION['packer_id'])){
-			$customer_id = $_SESSION['packer_id'];
-		}else{
-			$customer_id = $_SESSION['customer_id'];
-		}
-		
-		
 		$DmiFirms = TableRegistry::getTableLocator()->get('DmiFirms');
 		$DmiStates = TableRegistry::getTableLocator()->get('DmiStates');
 		$Dmi_ro_office = TableRegistry::getTableLocator()->get('DmiRoOffices');
@@ -99,170 +28,194 @@
 		$DmiCaPpLabMapings = TableRegistry::getTableLocator()->get('DmiCaPpLabMapings');
 		$DmiCustomerLaboratoryDetails = TableRegistry::getTableLocator()->get('DmiCustomerLaboratoryDetails');
 
-		$firm_details = $DmiFirms->firmDetails($customer_id);
-	
-		$state_id = $firm_details['state'];
 
-		$fetch_state_name = $DmiStates->find('all',array(
-			'fields'=>'state_name',
-			'conditions'=>array(
-			'id IS'=>$state_id,
-			'OR'=>array(
-			'delete_status IS NULL',
-			'delete_status ='=>'no'
-		))))->first();
+		// $currentPeriodRecord = [];
+		// $financialYear = $_SESSION['financialYear'];
+		
+		// if(isset($financialYear)){
+		// 	$dates = explode(" - ", $financialYear);
+		// 	$startMonthYear = $dates[0];
+		// 	$endMonthYear = $dates[1];
 
-		$state_name = $fetch_state_name['state_name'];
-		
-		$firmname = $firm_details['firm_name'];
-		$email = $firm_details['email'];
-		$address = $firm_details['street_address'];
+		// 	$currentPeriodRecord = $this->find('all',array(
+		// 	'conditions'=>array(
+		// 		'period_from'=>$startMonthYear,
+		// 		'period_to'=>$endMonthYear,
+		// 		'form_status'=>'approved'
+		// 	)))->first();
 
-		// to get RO/SO office
-		$get_office = $DmiApplWithRoMappings->getOfficeDetails($customer_id);
-		$region = $get_office['ro_office'];
-		
-		$CustomersController = new CustomersController;
-		$export_unit_status = $CustomersController->Customfunctions->checkApplicantExportUnit($customer_id);
-	
-		
-		//-----------------------------------------------------------------------------------------
-		$getYears = $CustomersController->Customfunctions->computeBiannualPeriod();
-
-		$startYear = $getYears['startDate'];
-		$endYear = $getYears['endDate'];
-		
-		// added version for inserting version in this table by shankhpal on 08/06/2023
-		$financialYears = $startYear." - ".$endYear;
-		
-		$displayStringPeriod = $financialYears;
-		
-	
-		// if(!empty($periodWiseReport)){
-		// 	$displayStringPeriod = $fromDate . ' - ' . $toDate . ' - ' . $period1;
-		// }else{
-		// 	$displayStringPeriod = $startDate . ' - ' . $endDate . ' - ' . $period;
 		// }
-		//------------------------------------------------------------------------------------------
 		
-		$added_firm = $DmiFirms->find('all', ['conditions' => ['customer_id' => $customer_id]])->first();
-			
-		if ($added_firm) {
-				$sub_comm_ids = explode(',', $added_firm['sub_commodity']);
-				
-				$sub_commodity_value = $MCommodity
-						->find('list', ['keyField' => 'commodity_code', 'valueField' => 'commodity_name'])
-						->where(['commodity_code IN' => $sub_comm_ids])
-						->toArray();
-
-				$get_grade = $CommGrade->find('all',array(
-					'fields'=>'grade_code',
-					'conditions'=>array('commodity_code IN'=>$sub_comm_ids),'group'=>'grade_code'
-				))->toArray();
-				
-				$grade_list = [];
-				foreach($get_grade as $each_grade){
-
-					$get_grade_desc = $MGradeDesc->find('all',array(
-						'fields'=>array('grade_code','grade_desc'),'conditions'=>array(
-							'grade_code IN'=>$each_grade['grade_code']),'group'=>array('grade_code','grade_desc'
-					)))->first();
-					
-					$grade_list[$get_grade_desc['grade_code']] = $get_grade_desc['grade_desc'];
-				}
-		} else {
-				$sub_commodity_value = [];
-				$grade_list = [];
-		}
-		// attached laboratory
-		$attached_laboratory = $DmiCaPpLabMapings->find('all', [
-				'conditions' => ['customer_id' => $customer_id,'map_type'=>'lab', 'delete_status IS NULL'],
-				'order' => ['id' => 'DESC']
-		])->first();
-			
-		if(!empty($attached_laboratory)){
-			$lab_id = $attached_laboratory['lab_id'];
 		
-			if(strpos($lab_id,"/Own") !== false){
-				$recordidArray = explode("/", $lab_id);
-				$ownlabId = $recordidArray[0];
-
-				$form_laboratory_data = $DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('id'=>$ownlabId),'order'=>'firm_name asc'))->first();
-				$laboratory_name = $form_laboratory_data;
-
+			$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+			
+			if($latest_id != null){
+					// if($latest_id != null || $periodWiseReport != null){
+				$form_fields = $this->find('all', array(
+					'conditions'=>array('id'=>MAX($latest_id))))->first();
+				
+				$form_fields_details = $form_fields;
+				
 			}else{
 				
-				$form_laboratory_data = $DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('id'=>$lab_id),'order'=>'firm_name asc'))->first();
-				$laboratory_name = $form_laboratory_data;
+				$form_fields_details = array (
+					'id'=>"", 
+					'customer_id' => "",
+					'rpl_commodity'=>"",
+					'reffered_back_comment' => "",
+					'reffered_back_date' => "",
+					'form_status' =>"",
+					'customer_reply' =>"",
+					'customer_reply_date' =>"",
+					'approved_date' => "",
+					'current_level' => "",
+					'mo_comment' =>"",
+					'mo_comment_date' => "",
+					'ro_reply_comment' =>"",
+					'ro_reply_comment_date' =>"",
+					'delete_mo_comment' =>"",
+					'delete_ro_reply' => "",
+					'delete_ro_referred_back' => "",
+					'delete_customer_reply' => "",
+					'ro_current_comment_to' => "",
+					'rb_comment_ul'=>"",
+					'mo_comment_ul'=>"",
+					'rr_comment_ul'=>"",
+					'cr_comment_ul'=>""
+				);
 				
 			}
+
+			// to fetch CA details: Name of Packer with address and e-mail id
+			if(!empty($_SESSION['packer_id']) || isset($_SESSION['packer_id'])){
+				$customer_id = $_SESSION['packer_id'];
+			}else{
+				$customer_id = $_SESSION['customer_id'];
+			}
+
+			$firm_details = $DmiFirms->firmDetails($customer_id);
+	
+			$state_id = $firm_details['state'];
+
+			$fetch_state_name = $DmiStates->find('all',array(
+				'fields'=>'state_name',
+				'conditions'=>array(
+				'id IS'=>$state_id,
+				'OR'=>array(
+				'delete_status IS NULL',
+				'delete_status ='=>'no'
+			))))->first();
+
+			$state_name = $fetch_state_name['state_name'];
 			
-		}else{
-			$laboratory_name = "";
-		}
-		
-		$bgraAddedRecord = $DmiBgrCommodityReportsAddmore->find('all',array(
-			'conditions'=>array(
-			'customer_id IS'=>$customer_id)))->toArray();
+			$firmname = $firm_details['firm_name'];
+			$email = $firm_details['email'];
+			$address = $firm_details['street_address'];
 
-			 $query = $DmiBgrCommodityReportsAddmore->find()
-        ->where([
-            'customer_id' => $customer_id,
-            'delete_status IS NULL' // Records where delete_status is NULL
-        ])
-        ->order(['id' => 'desc']);
+			// to get RO/SO office
+			$get_office = $DmiApplWithRoMappings->getOfficeDetails($customer_id);
+			$region = $get_office['ro_office'];
 
-    $bgrReportData = $query->toArray();
+			$export_unit_status = $CustomersController->Customfunctions->checkApplicantExportUnit($customer_id);
 
-    foreach ($bgrReportData as $eachvalue) { // Note the "&" before $eachvalue
-        $commodity_code = $eachvalue['commodity'];
+			$added_firm = $DmiFirms->find('all', ['conditions' => ['customer_id' => $customer_id]])->first();
 
-        $result = $MCommodity->find()
-            ->select('commodity_name')
-            ->where(['commodity_code' => $commodity_code]);
+				if ($added_firm) {
+					$sub_comm_ids = explode(',', $added_firm['sub_commodity']);
+					
+					$sub_commodity_value = $MCommodity
+							->find('list', ['keyField' => 'commodity_code', 'valueField' => 'commodity_name'])
+							->where(['commodity_code IN' => $sub_comm_ids])
+							->toArray();
 
-        $commodityArray = $result->first();
-        $eachvalue['commodity'] = $commodityArray ? $commodityArray->commodity_name : '';
-    }
+					$get_grade = $CommGrade->find('all',array(
+						'fields'=>'grade_code',
+						'conditions'=>array('commodity_code IN'=>$sub_comm_ids),'group'=>'grade_code'
+					))->toArray();
+					
+					$grade_list = [];
+					foreach($get_grade as $each_grade){
 
-		$DmiReplicaUnitDetails = TableRegistry::getTableLocator()->get('DmiReplicaUnitDetails');
-		
-		$unit_list = $DmiReplicaUnitDetails
-    ->find('list', [
-        'keyField' => 'sub_unit',
-        'valueField' => 'sub_unit',
-        'conditions' => [],
-        'order' => 'id asc'
-    ])
-    ->toArray();
+						$get_grade_desc = $MGradeDesc->find('all',array(
+							'fields'=>array('grade_code','grade_desc'),'conditions'=>array(
+								'grade_code IN'=>$each_grade['grade_code']),'group'=>array('grade_code','grade_desc'
+						)))->first();
+						
+						$grade_list[$get_grade_desc['grade_code']] = $get_grade_desc['grade_desc'];
+					}
+				} else {
+						$sub_commodity_value = [];
+						$grade_list = [];
+				}
+				// --------------------------------------------------------------------------------------------------------
+				// isko dekna hai
+				// attached laboratory
+				$attached_laboratory = $DmiCaPpLabMapings->find('all', [
+						'conditions' => ['customer_id' => $customer_id,'map_type'=>'lab', 'delete_status IS NULL'],
+						'order' => ['id' => 'DESC']
+				])->first();
+						
+				if(!empty($attached_laboratory)){
+					$lab_id = $attached_laboratory['lab_id'];
+				
+					if(strpos($lab_id,"/Own") !== false){
+						$recordidArray = explode("/", $lab_id);
+						$ownlabId = $recordidArray[0];
 
-		// $AllotedReplica = $this->toGetAllotedReplica();
+						$form_laboratory_data = $DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('id'=>$ownlabId),'order'=>'firm_name asc'))->first();
+						$laboratory_name = $form_laboratory_data;
 
-		
-		// check lab is NABL Accredited or not
-		//------------------------------------------------------------------------------------------------------------
-		$LabNablAccredited = $CustomersController->Randomfunctions->checkIfLabNablAccreditated($customer_id);
-			// $LabNablAccredited = 'yes';
-		//------------------------------------------------------------------------------------------------------------
+					}else{
+						
+						$form_laboratory_data = $DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('id'=>$lab_id),'order'=>'firm_name asc'))->first();
+						$laboratory_name = $form_laboratory_data;
+						
+					}
+					
+				}else{
+					$laboratory_name = "";
+				}
+				//-------------------------------------------------------------------------------
+				// Get Details of Replica Allotment
+				$ReplicaAllotmentDetails = $CustomersController->Customfunctions->getDetailsReplicaAllotment($customer_id);
+					
+				$bgrAddedTableRecords = $CustomersController->Customfunctions->bgrAddedTableRecords($customer_id);
+					
 
+				$DmiReplicaUnitDetails = TableRegistry::getTableLocator()->get('DmiReplicaUnitDetails');
+					
+				$unit_list = $DmiReplicaUnitDetails
+				->find('list', [
+						'keyField' => 'sub_unit',
+						'valueField' => 'sub_unit',
+						'conditions' => [],
+						'order' => 'id asc'
+				])
+				->toArray();
 
-		return array(
-			$form_fields_details,
-			$firmname,$email,
-			$address,
-			$state_name,
-			$region,
-			$export_unit_status,
-			$displayStringPeriod,
-			$endDate=null,
-			$sub_commodity_value,
-			$grade_list,
-			$laboratory_name,
-			$bgrReportData,
-			$unit_list,
-			$period,
-			$LabNablAccredited
-		);
+				$LabNablAccredited = $CustomersController->Randomfunctions->checkIfLabNablAccreditated($customer_id);
+				
+				return array(
+					$form_fields_details,
+					$firmname,$email,
+					$address,
+					$state_name,
+					$region,
+					$export_unit_status,
+					$displayStringPeriod=null,
+					$endDate=null,
+					$sub_commodity_value,
+					$grade_list,
+					$laboratory_name,
+					$bgrAddedTableRecords,
+					$unit_list,
+					$period=null,
+					$LabNablAccredited,
+					$ReplicaAllotmentDetails
+				);
+
+		// }
+
 
 	}
 	
@@ -270,13 +223,11 @@
 
 	public function saveFormDetails($customer_id,$forms_data){
 		
-		
-			$period = explode(' ',$forms_data['period']);
 			
+			$period = explode(' ',$forms_data['period']);
 	
 			$from_period = $period[0];
 			$to_period = $period[2];
-			$bianualperiod = $period[4];
 
 			$total_revenue = $forms_data['total_revenue'];
 			$progresive_revenue = $forms_data['progresive_revenue'];
@@ -344,7 +295,6 @@
 					'cr_comment_ul'=>$cr_comment_ul,
 					'period_from'=>$from_period,
 					'period_to'=>$to_period,
-					'period'=>$bianualperiod,
 					'total_revenue'=>$total_revenue,
 					'progresive_revenue'=>$progresive_revenue,
 					'created'=>$created,
@@ -459,7 +409,7 @@
 
 		public function postDataValidation($customer_id,$forms_data){
 		
-
+			// pr($forms_data);die;
 			$CustomersController = new CustomersController;
 	
 			$returnValue = true;
@@ -467,7 +417,7 @@
 			$CustomersController = new CustomersController;
 
 			$is_record_exist = $CustomersController->Customfunctions->bgrReportData($customer_id);
-
+			
 			// Add validation for record presence
 			if ($is_record_exist == 1) {
 					$returnValue = true;

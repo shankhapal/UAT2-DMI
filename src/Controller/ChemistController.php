@@ -1634,34 +1634,49 @@ class ChemistController extends AppController {
 		$message = "";
 		$message_theme = "";
 		$redirect_to = "";
+
+		$customer_id = $_SESSION['packer_id'];
+
 		$this->viewBuilder()->setLayout('chemist_home_layout');
 		$this->loadModel('DmiBgrCommodityReports');
+		$CustomersController = new CustomersController;
 
 		$alloted_chemist = $this->DmiChemistAllotments->find('list',array('keyField'=>'customer_id','valueField'=>'customer_id','conditions'=>array('chemist_id IS'=>$_SESSION['username'],'status'=>1,'incharge'=>'yes')))->toArray();
 		$this->set('alloted_chemist', $alloted_chemist);
 	
+		$finacialYears = $CustomersController->Customfunctions->computeBiannualPeriod();
+		$startDate = $finacialYears['startDate'];
+		$endDate = $finacialYears['endDate'];
+
+		$finacialYearsArray[$startDate . ' - ' . $endDate] = $startDate . ' - ' . $endDate;
+
 		$finacialYearsData = $this->DmiBgrCommodityReports
-    ->find()
+		->find()
     ->select(['period_from', 'period_to'])
     ->where([
-				'form_status'=>'approved'
+				'customer_id' =>$customer_id,
+        'form_status' => 'approved',
+        'period_from <=' => $finacialYears['endDate'], // Compare with the end date
+        'period_to >=' => $finacialYears['startDate'],   // Compare with the start date
     ])
+    ->order(['id' => 'DESC'])  // Order by ID in descending order to get the last added record
     ->toArray();
-	
-		$finacialYearsArray = [];
-		$i=0;
-		if(!empty($finacialYearsData)){
-			foreach ($finacialYearsData as $eachdata) {
-					$startDate = $eachdata['period_from'];
-					$endDate = $eachdata['period_to'];
-					
-					$formattedString = $startDate . ' - ' . $endDate;
-        	$finacialYearsArray[$i] = $formattedString;
-					$i++;
-			}
+		
+		if (!empty($finacialYearsData)) {
+			// Get the last added record that meets the criteria
+			$lastAddedRecord = $finacialYearsData[0]; // Assuming the first record is the last added
+
+			// Add the last added record to the array
+			$finacialYearsArray[$lastAddedRecord['period_from'] . ' - ' . $lastAddedRecord['period_to']] = $lastAddedRecord['period_from'] . ' - ' . $lastAddedRecord['period_to'];
 		}
 	
+
 		$this->set('finacialYearsArray',$finacialYearsArray);
+	
+		
+
+		
+		
 
 		
 		// $reqData = $this->request->getData(); // Get the selected values

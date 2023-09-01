@@ -4263,9 +4263,10 @@ class CustomfunctionsComponent extends Component {
 	// written by shankhpal shende on 25/08/2023
 	public function computeBiannualPeriod(){
 
-			$currentYear = date('Y'); 
-	  	$currentMonth = date('m');
-      $associative_first_half= array();
+		$currentYear = date('Y'); 
+		$currentMonth = date('m');
+		$associative_first_half= array();
+		
 		if ($currentMonth >= 4 && $currentMonth <= 9) {
 				// Current date is between 1st April and 30th September
 				$lastYear = $currentYear - 1; 
@@ -4319,8 +4320,129 @@ class CustomfunctionsComponent extends Component {
     }
 		
 		return !empty($report_fields) ? 1 : 0;
+	}
 
+
+	public function getDetailsReplicaAllotment($customer_id){
+		
+		$DmiReplicaAllotmentDetails = TableRegistry::getTableLocator()->get('DmiReplicaAllotmentDetails');
+
+		$last_allotment_counts = $DmiReplicaAllotmentDetails->find('all', array(
+			'conditions' => array(
+					'customer_id IS' => $customer_id,
+					'allot_status' => '1',
+					'delete_status IS Null'
+			),
+			'order' => 'id asc'
+		))->toArray();
+
+		$processedData = array(); // Initialize an array to hold processed data
+		if (!empty($last_allotment_counts)) {
+			foreach ($last_allotment_counts as $eachdetails) {
+					$commodity = $eachdetails['commodity'];
+					$grade = $eachdetails['grade'];
+					$packaging_material = $eachdetails['packaging_material'];
+					$packet_size = $eachdetails['packet_size'];
+					$packet_size_unit = $eachdetails['packet_size_unit'];
+					$no_of_packets = $eachdetails['no_of_packets'];
+					$total_quantity = $eachdetails['total_quantity'];
+					$total_label_charges = $eachdetails['total_label_charges'];
+					$alloted_rep_from = $eachdetails['alloted_rep_from'];
+					$alloted_rep_to = $eachdetails['alloted_rep_to'];
+					$grading_lab = $eachdetails['grading_lab'];
+					$label_charge = $eachdetails['label_charge'];
+					
+					
+					// Processed data for each entry
+					$processedData[] = array(
+							'commodity' => $commodity,
+							'grade' => $grade,
+							'packaging_material' => $packaging_material,
+							'packet_size' => $packet_size,
+							'packet_size_unit' => $packet_size_unit,
+							'no_of_packets' => $no_of_packets,
+							'total_quantity' => $total_quantity,
+							'total_label_charges' => $total_label_charges,
+							'alloted_rep_from' => $alloted_rep_from,
+							'alloted_rep_to' => $alloted_rep_to,
+							'grading_lab' => $grading_lab,
+							'label_charge'=>$label_charge,
+							'lotno'=>'',
+							'datesampling'=>'',
+							'dateofpacking'=>'',
+							'rpl_qty_quantal'=>'',
+							'estimatedvalue'=>'',
+							'reportno'=>'',
+							'reportdate'=>'',
+							'remarks'=>''
+
+					);
+
+
+
+			}
+		}
+
+		return $processedData;
 
 	}
+
+	public function bgrAddedTableRecords($customer_id){
+
+		
+		$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
+		$DmiBgrCommodityReportsAddmore = TableRegistry::getTableLocator()->get('DmiBgrCommodityReportsAddmore');
+
+		$currentPeriodRecord = [];
+		$financialYear = $_SESSION['financialYear'];
+		
+		if(isset($financialYear)){
+			$dates = explode(" - ", $financialYear);
+			$startMonthYear = $dates[0];
+			$endMonthYear = $dates[1];
+
+			$currentPeriodRecord = $DmiBgrCommodityReportsAddmore->find('all',array(
+			'conditions'=>array(
+				'customer_id' => $customer_id,
+				'delete_status IS NULL', // Records where delete_status is NULL
+				'period_from'=>$startMonthYear,
+				'period_to'=>$endMonthYear,
+			)))->first();
+
+			// pr($currentPeriodRecord);die;
+
+		}
+
+		// if(!empty($currentPeriodRecord)){
+
+		// }
+		// $bgraAddedRecord = $DmiBgrCommodityReportsAddmore->find('all',array(
+		// 	'conditions'=>array(
+		// 	'customer_id IS'=>$customer_id)))->toArray();
+	
+		// $query = $DmiBgrCommodityReportsAddmore->find()
+		// ->where([
+		// 		'customer_id' => $customer_id,
+		// 		'delete_status IS NULL' // Records where delete_status is NULL
+		// ])
+		// ->order(['id' => 'desc']);
+
+    // $bgrReportData = $query->toArray();
+		// pr($bgrReportData);die;
+    // foreach ($bgrReportData as $eachvalue) { // Note the "&" before $eachvalue
+    //     $commodity_code = $eachvalue['commodity'];
+
+    //     $result = $MCommodity->find()
+    //         ->select('commodity_name')
+    //         ->where(['commodity_code' => $commodity_code]);
+
+    //     $commodityArray = $result->first();
+    //     $eachvalue['commodity'] = $commodityArray ? $commodityArray->commodity_name : '';
+    // }
+
+		return $currentPeriodRecord;
+	}
+
+
 }
 ?>

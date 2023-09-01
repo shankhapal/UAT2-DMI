@@ -2961,6 +2961,66 @@ class AjaxFunctionsController extends AppController{
 				
 	}
 
+	// This method will handle the request to insert record of Replica Allotment details of BGR report for  BGR Module
+	// added by shankhpal shende on 31/08/2023
+	public function addReplicaAllotmentData(){
+
+		$this->autoRender = false;
+		$this->loadModel('DmiBgrCommodityReportsAddmore');
+
+		
+		
+		$financialYear = $_SESSION['financialYear'];
+		$startMonthYear=null;
+		$endMonthYear=null;
+
+		if(isset($financialYear)){
+			$dates = explode(" - ", $financialYear);
+			$startMonthYear = $dates[0];
+			$endMonthYear = $dates[1];
+		}
+		// Create the data array for update
+			$data = array(
+					'rpl_commodity' => $_POST['rpl_commodity'],
+					'rpl_lotno' => $_POST['rpl_lotno'],
+					'rpl_datesampling' => $_POST['rpl_datesampling'],
+					'rpl_dateofpacking' => $_POST['rpl_dateofpacking'],
+					'rpl_grade' => $_POST['rpl_grade'],
+					'rpl_packet_size' => $_POST['rpl_packet_size'],
+					'rpl_packet_size_unit' => $_POST['rpl_packet_size_unit'],
+					'rpl_no_of_packets' => $_POST['rpl_no_of_packets'],
+					'rpl_qty_quantal' => $_POST['rpl_qty_quantal'],
+					'rpl_estimatedvalue' => $_POST['rpl_estimatedvalue'],
+					'rpl_alloted_rep_from' => $_POST['rpl_alloted_rep_from'],
+					'rpl_alloted_rep_to' => $_POST['rpl_alloted_rep_to'],
+					'rpl_total_quantity' => $_POST['rpl_total_quantity'],
+					'rpl_replicacharges' => $_POST['rpl_replicacharges'],
+					'rpl_grading_lab' => $_POST['rpl_grading_lab'],
+					'rpl_reportno' => $_POST['rpl_reportno'],
+					'rpl_reportdate' => $_POST['rpl_reportdate'],
+					'rpl_remarks' => $_POST['rpl_remarks'],
+					'period_from'=>$startMonthYear,
+					'period_to'=>$endMonthYear,
+			);
+
+			// Update the data in the database using the model
+			$save_bgr_details = $this->DmiBgrCommodityReportsAddmore->saveReplicaAllotmentData($data); // Call custom method from model
+		
+			// Define a variable to hold the response message
+			$response = "";
+			// Check the result of the update operation
+			if ($save_bgr_details == "updated") {
+					$response = "updated";
+			} elseif($save_bgr_details == "added") {
+					$response = "added";
+			}
+
+			// Echo the response
+			echo $response;
+			exit();
+
+	}
+
 	
 }
 ?>
