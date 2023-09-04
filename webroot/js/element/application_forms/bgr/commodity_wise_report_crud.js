@@ -47,6 +47,117 @@ $(document).ready(function () {
     }
   });
 
+  $("#add_bgr_details").on("click", function () {
+    var isValid = true;
+    function validateField(fieldId, errorMessage) {
+      var $field = $("#" + fieldId);
+      var $errorField = $("#error-" + fieldId);
+      var fieldValue = $field.val();
+
+      if (fieldValue === "") {
+        $errorField.show().text(errorMessage).css({
+          color: "red",
+          "font-size": "14px",
+          "font-weight": "500",
+          "text-align": "left",
+        });
+
+        setTimeout(function () {
+          $errorField.fadeOut();
+        }, 8000);
+
+        $field.addClass("is-invalid");
+
+        $field.click(function () {
+          $errorField.hide().text("");
+          $field.removeClass("is-invalid");
+        });
+
+        isValid = false;
+      }
+    }
+
+    validateField("ta-commodity-", "Please Select Commodity"); // Validate Commodity
+    validateField("lot_no_tf_no_m_no", "Please Enter Lot No.TF No./M. No."); // Validate Lot No.TF No./M. No.
+    validateField("date_of_sampling", "Please Select Date of Sampling."); // Validate Date of sampling field
+    validateField("date_of_packing", "Please Select Date of packing."); // Validate Date of date of packing field
+    validateField("grade", "Please Select grade."); // Validation for grade
+    validateField("ta-packet_size_unit-", "Please Select Unit"); // Validation for Estimated value (in Rs.)
+
+    validateField(
+      "ta-no_of_packets-",
+      "Please Enter Total Qty. graded in Quintal"
+    ); // Validation for Total Qty. graded in Quintal
+
+    validateField("estimated_value", "Please Enter Estimated value (in Rs.)."); // Validate report date
+    validateField("rpl_remarks_", "Please Enter Remark."); // Validate remarks
+
+    validateField(
+      "agmark_replica_from",
+      "Please Enter No. of Agmark Replica From."
+    ); // Validate remarks
+    validateField(
+      "agmark_replica_to",
+      "Please Enter No. of Agmark Replica To."
+    ); // Validate remarks
+    validateField(
+      "agmark_replica_total",
+      "Please Enter No. of Agmark Replica Total."
+    ); // Validate remarks
+    validateField("replica_charges", "Please Enter Replica Charges."); // Validate remarks
+
+    if (!isValid) {
+      renderToast(
+        "error",
+        "Please check some fields are missing or not proper."
+      );
+      return false;
+    } else {
+      var formData = {
+        // Construct your data object with field values here
+        commodity: $("#ta-commodity-").val(),
+        lot_no_tf_no_m_no: $("#lot_no_tf_no_m_no").val(),
+        date_of_sampling: $("#date_of_sampling").val(),
+        date_of_packing: $("#date_of_packing").val(),
+        grade: $("#grade").val(),
+        packet_size: $("#ta-packet_size-").val(),
+        packet_size_unit: $("#ta-packet_size_unit-").val(),
+        no_of_packets: $("#ta-no_of_packets-").val(),
+        total_qty_graded_quintal: $("#total_qty_graded_quintal").val(),
+        estimated_value: $("#estimated_value").val(),
+        agmark_replica_from: $("#agmark_replica_from").val(),
+        agmark_replica_to: $("#agmark_replica_to").val(),
+        agmark_replica_total: $("#agmark_replica_total").val(),
+        replica_charges: $("#replica_charges").val(),
+
+        laboratory_name: $("#laboratory_name").val(),
+        report_no: $("#report_no").val(),
+        report_date: $("#report_date").val(),
+        remarks: $("#remarks").val(),
+
+        // Add more fields as needed
+      };
+
+      $.ajax({
+        url: "../AjaxFunctions/add_bgr_details",
+        type: "POST",
+        data: formData,
+        success: function (response) {
+          if (response == "added")
+            // Handle success response here
+            renderToast("success", "Data inserted successfully!");
+
+          // location.reload(); // Reload the page
+          // Optionally, you might want to reset form fields here
+        },
+        error: function (error) {
+          // Handle error response here
+          renderToast("error", "Error inserting data.");
+        },
+      });
+    }
+  });
+
   $(".edit_bgr_id").click(function (e) {
     $("#update_bgr_details").show(); // Show Edit button
     $("#add_bgr_details").hide();
@@ -143,14 +254,14 @@ $(document).ready(function () {
     remarks: "Remarks",
   };
 
-  $("#add_bgr_details").on("click", function (e) {
-    e.preventDefault();
-    handleFormAction("add");
-  });
-  $("#update_bgr_details").on("click", function (e) {
-    e.preventDefault();
-    handleFormAction("update");
-  });
+  // $("#add_bgr_details").on("click", function (e) {
+  //   e.preventDefault();
+  //   handleFormAction("add");
+  // });
+  // $("#update_bgr_details").on("click", function (e) {
+  //   e.preventDefault();
+  //   handleFormAction("update");
+  // });
 
   // You can similarly add event handlers for other actions (edit, delete, save) if needed.
 

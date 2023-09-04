@@ -159,9 +159,13 @@ $class1 = INPUT_FIELD_CLASSES;?>
                     if(!empty($section_form_details[12]) || !empty($section_form_details[16])){
                           $i=1;
                           if(!empty($section_form_details[12])){
+
                             foreach ($section_form_details[12] as  $eachrow) {
                               
                               $conn = ConnectionManager::get('default');
+
+                              $commodity_code = $eachrow['commodity'];
+
                               $gradeasign = $eachrow['gradeasign'];
                               $query2 = "SELECT grade_desc from m_grade_desc WHERE grade_code = $gradeasign";
                               $q2 = $conn->execute($query2);
@@ -170,11 +174,18 @@ $class1 = INPUT_FIELD_CLASSES;?>
                               if (isset($row2[0])) { // Check if index 0 exists
                                 $gradename = $row2[0]; // Use index 0 to access the value
                               }
-                            
+
+                              $commo_query = "SELECT commodity_name from m_commodity WHERE commodity_code = $commodity_code";
+                              $q3 = $conn->execute($commo_query);
+                              $row3 = $q3->fetch();
+                              if (isset($row3[0])) { // Check if index 0 exists
+                                $Commodityname = $row3[0]; // Use index 0 to access the value
+                              }
+                              
                               ?>
                               <tr  id="custom_row<?php echo $eachrow['id'];?>">
                                 <td><?php echo $i; ?></td>
-                                <td><?php echo $eachrow['commodity'];?></td>
+                                <td><?php echo $Commodityname;?></td>
                                 <td><?php echo $eachrow['lotno'];?></td>
                                 <td><?php echo $eachrow['datesampling'];?></td>
                                 <td><?php echo $eachrow['dateofpacking'];?></td>
@@ -207,18 +218,20 @@ $class1 = INPUT_FIELD_CLASSES;?>
 
                     <?php
                         
-                        $tempArray = $section_form_details[16];
+                     
                      
                       if(!empty($section_form_details[16])){
-
-                      
-                          $j = 0; 
+                        
+                          $j = 0;
+                          $k=1; 
                           foreach ($section_form_details[16] as $eachrow1) {
+                           
+                           
                             $replica_allotment_btn_id = "replica_allotment_btn_" . $j;
                             $update_bgr_details_id = "update_bgr_details_" . $j;
                             ?>
                           <tr id="add_new_row">
-                              <td></td>
+                              <td><?php echo $k; ?></td>
                               <td>
                                 <?php
                                 
@@ -231,7 +244,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'label'=>false,
                                     'class'=>'form-control wd120 commodity'
                                   )); ?>
-                                  <span class="error-message" id="error-rpl_commodity_<?php echo $j; ?>"></span>
+                                  <span id="error-rpl_commodity_<?php echo $j; ?>"></span>
                                 </td>
 
                               <td>
@@ -242,7 +255,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'value'=>$eachrow1['lotno'],
                                     'class'=>'form-control wd120'
                                   )); ?>
-                                <span class="error-message" id="error-rpl_lotno_<?php echo $j; ?>"></span>
+                                <span id="error-rpl_lotno_<?php echo $j; ?>"></span>
                               </td>
 
                               <td>
@@ -253,7 +266,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'value'=>$eachrow1['datesampling'],
                                     'class'=>'form-control wd120'
                                   )); ?>
-                                <span class="error-message" id="error-rpl_datesampling_<?php echo $j; ?>"></span>
+                                <span id="error-rpl_datesampling_<?php echo $j; ?>"></span>
                               </td>
 
                               <td>
@@ -264,7 +277,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'value'=>$eachrow1['dateofpacking'],
                                     'class'=>'form-control wd120'
                                   )); ?>
-                                <span class="error-message" id="error-rpl_dateofpacking_<?php echo $j; ?>"></span>
+                                <span id="error-rpl_dateofpacking_<?php echo $j; ?>"></span>
                               </td>
 
                               <td>
@@ -279,7 +292,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'label'=>false,
                                     'class'=>'form-control wd120'
                                   )); ?>
-                                  <span class="error-message" id="error-rpl_grade_<?php echo $j; ?>"></span>
+                                  <span id="error-rpl_grade_<?php echo $j; ?>"></span>
                               </td>
 
                               <td>
@@ -290,16 +303,17 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'value'=>$eachrow1['packet_size'],
                                     'class'=>'form-control wd120'
                                   )); ?>
-                                  <span class="error-message" id="error-rpl_packet_size_<?php echo $j; ?>"></span>
+                                  <span id="error-rpl_packet_size_<?php echo $j; ?>"></span>
                               <td>
                                  <?php echo $this->Form->control('rpl_packet_size_unit', array(
-                                    'type'=>'text',
+                                    'type'=>'select',
                                     'id'=>'rpl_packet_size_unit_'. $j,
                                     'label'=>false,
-                                    'value'=>$eachrow1['packet_size_unit'],
+                                    'options'=>$section_form_details[13],
+                                    'default'=>$eachrow1['packet_size_unit'],
                                     'class'=>'form-control wd120'
                                   )); ?>
-                                  <span class="error-message" id="error-rpl_packet_size_unit_<?php echo $j; ?>"></span>
+                                  <span id="error-rpl_packet_size_unit_<?php echo $j; ?>"></span>
                               </td>
 
                               <td>
@@ -310,7 +324,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'value'=>$eachrow1['no_of_packets'],
                                     'class'=>'form-control wd120'
                                   )); ?>
-                                  <span class="error-message" id="error-rpl_no_of_packets_<?php echo $j; ?>"></span>
+                                  <span id="error-rpl_no_of_packets_<?php echo $j; ?>"></span>
                               </td>
 
                               <td>
@@ -321,7 +335,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'value'=>$eachrow1['rpl_qty_quantal'],
                                     'class'=>'form-control wd120'
                                   )); ?>
-                                 <span class="error-message" id="error-rpl_qty_quantal_<?php echo $j; ?>"></span>
+                                 <span id="error-rpl_qty_quantal_<?php echo $j; ?>"></span>
                               </td>
                               
                               <td>
@@ -332,7 +346,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'value'=>$eachrow1['estimatedvalue'],
                                     'class'=>'form-control wd120'
                                   )); ?>
-                                  <span class="error-message" id="error-rpl_estimatedvalue_<?php echo $j; ?>"></span>
+                                  <span id="error-rpl_estimatedvalue_<?php echo $j; ?>"></span>
                               </td>
                           
                               <td>
@@ -343,7 +357,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'value'=>$eachrow1['alloted_rep_from'],
                                     'class'=>'form-control wd120'
                                   )); ?>
-                                  <span class="error-message" id="error-rpl_alloted_rep_from_<?php echo $j; ?>"></span>
+                                  <span id="error-rpl_alloted_rep_from_<?php echo $j; ?>"></span>
                               </td>
 
                               <td>
@@ -354,7 +368,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'value'=>$eachrow1['alloted_rep_to'],
                                     'class'=>'form-control wd120'
                                   )); ?>
-                                  <span class="error-message" id="error-rpl_alloted_rep_to_<?php echo $j; ?>"></span>
+                                  <span id="error-rpl_alloted_rep_to_<?php echo $j; ?>"></span>
                               </td>
 
                               <td>
@@ -365,7 +379,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'value'=>$eachrow1['total_quantity'],
                                     'class'=>'form-control wd120'
                                   )); ?>
-                                 <span class="error-message" id="error-rpl_total_quantity_<?php echo $j; ?>"></span>
+                                 <span id="error-rpl_total_quantity_<?php echo $j; ?>"></span>
                               </td>
 
                               <td>
@@ -376,7 +390,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'value'=>$eachrow1['label_charge'],
                                     'class'=>'form-control wd120'
                                   )); ?>
-                                  <span class="error-message" id="error-rpl_replicacharges_<?php echo $j; ?>"></span>
+                                  <span id="error-rpl_replicacharges_<?php echo $j; ?>"></span>
                               </td>
 
                               
@@ -417,7 +431,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'value'=>$eachrow1['reportno'],
                                     'class'=>'form-control wd120'
                                   )); ?>
-                                  <span class="error-message" id="error-rpl_reportno_<?php echo $j; ?>"></span>
+                                 <span id="error-rpl_reportno_<?php echo $j; ?>"></span>
                             </td>
 
                               <td>
@@ -428,7 +442,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'value'=>$eachrow1['reportdate'],
                                     'class'=>'form-control wd120'
                                   )); ?>
-                                 <span class="error-message" id="error-rpl_reportdate_<?php echo $j; ?>"></span>
+                                <span id="error-rpl_reportdate_<?php echo $j; ?>"></span>
                               </td>
 
                               <td>
@@ -439,22 +453,21 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'value'=>$eachrow1['remarks'],
                                     'class'=>'form-control wd120'
                                   )); ?>
-                                 <span class="error-message" id="error-rpl_remarks_<?php echo $j; ?>"></span>
+                                   <span id="error-rpl_remarks_<?php echo $j; ?>"></span>
+                                 
                             </td>
                             
                             <td>
                               <div class="form-buttons">
                                 <a href="#" id="<?php echo $replica_allotment_btn_id; ?>"  class='btn btn-info btn-sm replica_allotment_btn'>
                                 <i class="fa fa-plus"></i> Add</a>
-                                <a href="#" id="<?php echo $update_bgr_details_id; ?>" class="btn btn-info btn-sm update_bgr_details">Save</a>
                               </div>
                             </td>
                           </tr>
-                          <?php $j++;
-                    }}
+                          <?php $j++;$k++;
+                    }
                   }else{?>
-                          
-                        <tr id="add_new_row">
+                    <tr id="add_new_row">
                               <td>
                                 <?php echo $this->Form->control('record_id', array(
                                       'type' => 'hidden',
@@ -474,7 +487,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                       'label'=>false,
                                       'class'=>'form-control wd120 commodity'
                                     )); ?>
-                                    <div class="error-message" id="error-ta-commodity-"></div>
+                                   <span id="error-ta-commodity-"></span>
                               </td>
                               <td>
                                     <?php echo $this->Form->control('lot_no_tf_no_m_no', array(
@@ -485,7 +498,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                       'class'=>$class1,
                                       'placeholder'=>'Enter Lot No.TF No./M. No.'
                                     )); ?>
-                                    <div class="error-message" id="error-lot_no_tf_no_m_no"></div>
+                                    <span id="error-lot_no_tf_no_m_no"></span>
                               </td>
                               <td>
                                     <?php echo $this->Form->control('date_of_sampling', array(
@@ -496,7 +509,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                       'class'=>$class1,
                                       'placeholder'=>$placeholder
                                     )); ?>
-                                    <div class="error-message" id="error-date_of_sampling"></div>
+                                    <span id="error-date_of_sampling"></span>
                               </td>
                               <td>
                                     <?php echo $this->Form->control('date_of_packing', array(
@@ -507,7 +520,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                       'class'=>$class1,
                                       'placeholder'=>$placeholder
                                     )); ?>
-                                    <div class="error-message" id="error-date_of_packing"></div>
+                                    <span id="error-date_of_packing"></span>
                               </td>
                               <td>
                                   <?php
@@ -519,7 +532,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                       'label'=>false,
                                       'class'=>'form-control wd120'
                                     )); ?>
-                                    <div class="error-message" id="error-grade"></div>
+                                    <span id="error-grade"></span>
                               </td>
                               <td>
                                   <?php echo $this->Form->control('ta-packet_size-', array(
@@ -531,7 +544,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'class'=>$class1,
                                     'placeholder'=>'Enter Pack Size'
                                   )); ?>
-                                  <div class="error-message" id="error-ta-packet_size-"></div>
+                                  <span id="error-ta-packet_size-"></span>
                               </td>
                                   
                               <td>
@@ -545,7 +558,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                 'label'=>false,
                                 'class'=>$class1,
                               )); ?>
-                              <div class="error-message" id="error-ta-packet_size_unit-"></div>
+                              <span id="error-ta-packet_size_unit-"></span>
                             </td>
                               
                             
@@ -558,7 +571,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'class'=>'total_no_packages form-control input-field wd120',
                                     'placeholder'=>'Enter Total No. of packages'
                                   )); ?>
-                                  <div class="error-message" id="error-ta-no_of_packets-"></div>
+                                  <span id="error-ta-no_of_packets-"></span>
                               </td>
                               <td>
                                   <?php echo $this->Form->control('total_qty_graded_quintal', array(
@@ -571,7 +584,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                   
                                   )); ?>
                                   <span id="totalQty"></span>
-                                <div class="error-message" id="error-total_qty_graded_quintal"></div>
+                                <span id="error-total_qty_graded_quintal"></span>
                               </td>
                               <td>
                                     <?php echo $this->Form->control('estimated_value', array(
@@ -582,7 +595,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                       'class'=>$class1,
                                       'placeholder'=>'0.00'
                                     )); ?>
-                                  <div class="error-message" id="error-estimated_value"></div>
+                                  <span id="error-estimated_value"></span>
                               </td>
                               <td>
                                   <?php echo $this->Form->control('agmark_replica_from', array(
@@ -593,7 +606,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                       'placeholder'=>'',
                                       'class'=>$class1,
                                     )); ?>
-                                    <div class="error-message" id="error-agmark_replica_from"></div>
+                                  <span id="error-agmark_replica_from"></span>
                               </td>
                               <td>
                                   <?php echo $this->Form->control('agmark_replica_to', array(
@@ -604,7 +617,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                       'label'=>false,
                                       'class'=>$class1,
                                     )); ?>
-                                    <div class="error-message" id="error-agmark_replica_to"></div>
+                                    <span id="error-agmark_replica_to"></span>
                               </td>
                               <td>
                                   <?php echo $this->Form->control('agmark_replica_total', array(
@@ -614,7 +627,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                       'label'=>false,
                                       'class'=>$class1,
                                     )); ?>
-                                    <div class="error-message" id="error-agmark_replica_total"></div>
+                                  <span id="error-agmark_replica_total"></span>
                               </td>
                               <td>
                                   <?php echo $this->Form->control('replica_charges', array(
@@ -626,7 +639,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                       'class'=>$class1,
                                       'placeholder'=>'0.00'
                                     )); ?>
-                                  <div class="error-message" id="error-replica_charges"></div>
+                                  <span id="error-replica_charges"></span>
                               </td>
                               <td>
                                 <?php echo $this->Form->control('laboratory_name', array(
@@ -638,7 +651,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                       'label'=>false,
                                       'class'=>$class1,
                                     )); ?>
-                                  <div class="error-message" id="error-laboratory_name"></div>
+                                 <span id="error-laboratory_name"></span>
                               </td>
                               <td>
                                   <?php echo $this->Form->control('report_no', array(
@@ -649,7 +662,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'class'=>$class1,
                                     'placeholder'=>'Enter Report No.'
                                   )); ?>
-                                  <div class="error-message" id="error-report_no"></div>
+                                  <span id="error-report_no"></span>
                               </td>
                               <td>
                                   <?php echo $this->Form->control('report_date', array(
@@ -660,7 +673,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                       'class'=>$class1,
                                       'placeholder'=>$placeholder
                                     )); ?>
-                                  <div class="error-message" id="error-report_date"></div>
+                                  <span id="error-report_date"></span>
                               </td>
                               <td>
                                   <?php echo $this->Form->control('remarks', array(
@@ -671,7 +684,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'class'=>$class1,
                                     'placeholder'=>'Enter Remarks'
                                   )); ?>
-                                  <div class="error-message" id="error-remarks"></div>
+                                  <span id="error-remarks"></span>
                               </td>
                               <td>
                                 <div class="form-buttons">
@@ -682,8 +695,12 @@ $class1 = INPUT_FIELD_CLASSES;?>
                               </td>
                             </tr>
 
-                            <?php }?>
+                            <?php }}?>
         
+                  
+                
+                          
+                        
                       </tbody>
                     </table>
                   </div>

@@ -4326,12 +4326,14 @@ class CustomfunctionsComponent extends Component {
 	public function getDetailsReplicaAllotment($customer_id){
 		
 		$DmiReplicaAllotmentDetails = TableRegistry::getTableLocator()->get('DmiReplicaAllotmentDetails');
+		$DmiBgrCommodityReportsAddmore = TableRegistry::getTableLocator()->get('DmiReplicaAllotmentDetails');
 
 		$last_allotment_counts = $DmiReplicaAllotmentDetails->find('all', array(
 			'conditions' => array(
 					'customer_id IS' => $customer_id,
 					'allot_status' => '1',
-					'delete_status IS Null'
+					'delete_status IS Null',
+					'NOT EXISTS (SELECT 1 FROM dmi_bgr_commodity_reports_addmore bgr WHERE bgr.agmarkreplicafrom = DmiReplicaAllotmentDetails.alloted_rep_from AND bgr.agmarkreplicato = DmiReplicaAllotmentDetails.alloted_rep_to)'
 			),
 			'order' => 'id asc'
 		))->toArray();
@@ -4407,10 +4409,9 @@ class CustomfunctionsComponent extends Component {
 				'delete_status IS NULL', // Records where delete_status is NULL
 				'period_from'=>$startMonthYear,
 				'period_to'=>$endMonthYear,
-			)))->first();
+			)))->toArray();
 
-			// pr($currentPeriodRecord);die;
-
+		
 		}
 
 		// if(!empty($currentPeriodRecord)){

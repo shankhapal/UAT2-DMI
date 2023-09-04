@@ -2715,109 +2715,95 @@ class AjaxFunctionsController extends AppController{
 				//  pr($_POST);die;
 			$this->autoRender = false;
 			$this->loadModel('DmiBgrCommodityReportsAddmore');
-		
-			// Validate the required fields, you can add additional validation as per your requirements
-			$requiredFields = ['ta-commodity-', 'lot_no_tf_no_m_no', 'date_of_sampling', 'date_of_packing', 'grade', 'ta-packet_size-', 'ta-packet_size_unit-', 'ta-no_of_packets-', 'total_qty_graded_quintal', 'estimated_value', 'agmark_replica_from', 'agmark_replica_to', 'agmark_replica_total', 'replica_charges', 'laboratory_name', 'report_no', 'report_date', 'remarks'];
 
-			// Check if record_id is empty for insert or not for update
-			if (empty($_POST['record_id'])) {
-					// Insert operation
-					// Make sure all required fields are present
-					foreach ($requiredFields as $field) {
-							if (!isset($_POST[$field]) || empty($_POST[$field])) {
-									$_POST['report_no'] = null;
-									$_POST['report_date'] = null;
-									$_POST['remarks'] = null;
-									$_POST['laboratory_name'] = null;
-							}
-					}
-
-					// Create the data array for insert
-					$data = array(
-							'commodity' => $_POST['ta-commodity-'],
-							'lotno' => $_POST['lot_no_tf_no_m_no'],
-							'datesampling' => $_POST['date_of_sampling'],
-							'dateofpacking' => $_POST['date_of_packing'],
-							'grade' => $_POST['grade'],
-							'packetsize' => $_POST['ta-packet_size-'],
-							'packetsizeunit' => $_POST['ta-packet_size_unit-'],
-							'totalnoofpackets' => $_POST['ta-no_of_packets-'],
-							'totalqtyquintal' => $_POST['total_qty_graded_quintal'],
-							'estimatedvalue' => $_POST['estimated_value'],
-							'agmarkreplicafrom' => $_POST['agmark_replica_from'],
-							'agmarkreplicato' => $_POST['agmark_replica_to'],
-							'agmarkreplicatotal' => $_POST['agmark_replica_total'],
-							'replicacharges' => $_POST['replica_charges'],
-							'laboratoryname' => $_POST['laboratory_name'],
-							'reportno' => $_POST['report_no'],
-							'reportdate' => $_POST['report_date'],
-							'remarks' => $_POST['remarks'],
-					);
-
-					// Insert the data into the database using the model
-					$save_bgr_details = $this->DmiBgrCommodityReportsAddmore->saveCommodityWiseReport($data);// call custome method from model
-
-			} else {
 				
-					// Update operation
-					// Ensure that at least one field (other than record_id) is present for update
-					$updateFields = array_diff($requiredFields, ['record_id']);
-					$atLeastOneFieldPresent = false;
-					foreach ($updateFields as $field) {
-							if (isset($_POST[$field]) && !empty($_POST[$field])) {
-									$atLeastOneFieldPresent = true;
-									break;
-							}
-					}
+			// Create the data array for insert
+			$data = array(
+					'commodity' => $_POST['commodity'],
+					'lotno' => $_POST['lot_no_tf_no_m_no'],
+					'datesampling' => $_POST['date_of_sampling'],
+					'dateofpacking' => $_POST['date_of_packing'],
+					'grade' => $_POST['grade'],
+					'packetsize' => $_POST['packet_size'],
+					'packetsizeunit' => $_POST['packet_size_unit'],
+					'totalnoofpackets' => $_POST['total_qty_graded_quintal'],
+					'totalqtyquintal' => $_POST['agmark_replica_from'],
+					'estimatedvalue' => $_POST['estimated_value'],
+					'agmarkreplicafrom' => $_POST['agmark_replica_from'],
+					'agmarkreplicato' => $_POST['agmark_replica_to'],
+					'agmarkreplicatotal' => $_POST['agmark_replica_total'],
+					'replicacharges' => $_POST['replica_charges'],
+					'laboratoryname' => $_POST['laboratory_name'],
+					'reportno' => $_POST['report_no'],
+					'reportdate' => $_POST['report_date'],
+					'remarks' => $_POST['remarks'],
+			);
 
-					if (!$atLeastOneFieldPresent) {
-							die('Error: At least one field (other than record_id) must be present for update');
-					}
+			// Insert the data into the database using the model
+			$save_bgr_details = $this->DmiBgrCommodityReportsAddmore->saveCommodityWiseReport($data);// call custome method from model
+
+	} 
+	
+	// else {
+				
+	// 				// Update operation
+	// 				// Ensure that at least one field (other than record_id) is present for update
+	// 				$updateFields = array_diff($requiredFields, ['record_id']);
+	// 				$atLeastOneFieldPresent = false;
+	// 				foreach ($updateFields as $field) {
+	// 						if (isset($_POST[$field]) && !empty($_POST[$field])) {
+	// 								$atLeastOneFieldPresent = true;
+	// 								break;
+	// 						}
+	// 				}
+
+	// 				if (!$atLeastOneFieldPresent) {
+	// 						die('Error: At least one field (other than record_id) must be present for update');
+	// 				}
 					
 					 
-					// Create the data array for update
-					$data = array(
-							'record_id' => $_POST['record_id'],
-							'commodity' => $_POST['ta-commodity-'],
-							'lotno' => $_POST['lot_no_tf_no_m_no'],
-							'datesampling' => $_POST['date_of_sampling'],
-							'dateofpacking' => $_POST['date_of_packing'],
-							'grade' => $_POST['grade'],
-							'packetsize' => $_POST['ta-packet_size-'],
-							'packetsizeunit' => $_POST['ta-packet_size_unit-'],
-							'totalnoofpackets' => $_POST['ta-no_of_packets-'],
-							'totalqtyquintal' => $_POST['total_qty_graded_quintal'],
-							'estimatedvalue' => $_POST['estimated_value'],
-							'agmarkreplicafrom' => $_POST['agmark_replica_from'],
-							'agmarkreplicato' => $_POST['agmark_replica_to'],
-							'agmarkreplicatotal' => $_POST['agmark_replica_total'],
-							'replicacharges' => $_POST['replica_charges'],
-							'laboratoryname' => $_POST['laboratory_name'],
-							'reportno' => $_POST['report_no'],
-							'reportdate' => $_POST['report_date'],
-							'remarks' => $_POST['remarks'],
-					);
+	// 				// Create the data array for update
+	// 				$data = array(
+	// 						'record_id' => $_POST['record_id'],
+	// 						'commodity' => $_POST['ta-commodity-'],
+	// 						'lotno' => $_POST['lot_no_tf_no_m_no'],
+	// 						'datesampling' => $_POST['date_of_sampling'],
+	// 						'dateofpacking' => $_POST['date_of_packing'],
+	// 						'grade' => $_POST['grade'],
+	// 						'packetsize' => $_POST['ta-packet_size-'],
+	// 						'packetsizeunit' => $_POST['ta-packet_size_unit-'],
+	// 						'totalnoofpackets' => $_POST['ta-no_of_packets-'],
+	// 						'totalqtyquintal' => $_POST['total_qty_graded_quintal'],
+	// 						'estimatedvalue' => $_POST['estimated_value'],
+	// 						'agmarkreplicafrom' => $_POST['agmark_replica_from'],
+	// 						'agmarkreplicato' => $_POST['agmark_replica_to'],
+	// 						'agmarkreplicatotal' => $_POST['agmark_replica_total'],
+	// 						'replicacharges' => $_POST['replica_charges'],
+	// 						'laboratoryname' => $_POST['laboratory_name'],
+	// 						'reportno' => $_POST['report_no'],
+	// 						'reportdate' => $_POST['report_date'],
+	// 						'remarks' => $_POST['remarks'],
+	// 				);
 
-				// Update the data in the database using the model
-				$save_bgr_details = $this->DmiBgrCommodityReportsAddmore->saveCommodityWiseReport($data); // Call custom method from model
+	// 			// Update the data in the database using the model
+	// 			$save_bgr_details = $this->DmiBgrCommodityReportsAddmore->saveCommodityWiseReport($data); // Call custom method from model
 
-				// Define a variable to hold the response message
-				$response = "";
-				// Check the result of the update operation
-				if ($save_bgr_details == "updated") {
-						$response = "updated";
-				} elseif($save_bgr_details == "added") {
-						$response = "added";
-				}
+	// 			// Define a variable to hold the response message
+	// 			$response = "";
+	// 			// Check the result of the update operation
+	// 			if ($save_bgr_details == "updated") {
+	// 					$response = "updated";
+	// 			} elseif($save_bgr_details == "added") {
+	// 					$response = "added";
+	// 			}
 
-				// Echo the response
-				echo $response;
-				exit();
+	// 			// Echo the response
+	// 			echo $response;
+	// 			exit();
 
-			}
+	// 		}
 
 		
-	}
 
 	
 	
@@ -2964,7 +2950,7 @@ class AjaxFunctionsController extends AppController{
 	// This method will handle the request to insert record of Replica Allotment details of BGR report for  BGR Module
 	// added by shankhpal shende on 31/08/2023
 	public function addReplicaAllotmentData(){
-
+		
 		$this->autoRender = false;
 		$this->loadModel('DmiBgrCommodityReportsAddmore');
 
@@ -2979,6 +2965,7 @@ class AjaxFunctionsController extends AppController{
 			$startMonthYear = $dates[0];
 			$endMonthYear = $dates[1];
 		}
+		
 		// Create the data array for update
 			$data = array(
 					'rpl_commodity' => $_POST['rpl_commodity'],

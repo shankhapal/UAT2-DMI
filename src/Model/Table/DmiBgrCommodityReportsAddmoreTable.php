@@ -14,7 +14,6 @@
 		
 		
 		$customer_id = $_SESSION['packer_id'];
-
 		$commodity = $forms_data['commodity'];
     $lotNo = $forms_data['lotno'];
     $dateSampling = $forms_data['datesampling'];
@@ -29,44 +28,13 @@
     $agmarkReplicaTo = $forms_data['agmarkreplicato'];
     $agmarkReplicaTotal = $forms_data['agmarkreplicatotal'];
     $replicaCharges = $forms_data['replicacharges'];
-    $laboratoryName = $forms_data['laboratoryname'];
-    $reportNo = $forms_data['reportno'];
-    $reportDate = $forms_data['reportdate'];
-    $remarks = $forms_data['remarks'];
+    $laboratoryName = isset($forms_data['laboratoryname'])?$forms_data['laboratoryname']:null;
+    $reportNo = isset($forms_data['reportno'])?$forms_data['reportno']:null;
+    $reportDate = isset($forms_data['reportdate'])?$forms_data['reportdate']:null;
+    $remarks = isset($forms_data['remarks'])?$forms_data['remarks']:null;
 
-		if(!empty($forms_data['record_id'])){
 
-			$newEntity = $this->newEntity(array(
-				'id'=>$forms_data['record_id'],
-				'customer_id'=>$customer_id,
-				'commodity' =>$commodity,
-				'lotno' => $lotNo,
-				'datesampling' => $dateSampling,
-				'dateofpacking' => $dateofPacking,
-				'gradeasign' => $gradeAsign,
-				'packetsize' => $packetSize,
-				'packetsizeunit'=>$packetsizeunit,
-				'totalnoofpackets' => $totalNoOfPackets,
-				'totalqtyquintal' => $totalQtyQuintal,
-				'estimatedvalue' => $estimatedValue,
-				'agmarkreplicafrom' => $agmarkReplicaFrom,
-				'agmarkreplicato' => $agmarkReplicaTo,
-				'agmarkreplicatotal' => $agmarkReplicaTotal,
-				'replicacharges' => $replicaCharges,
-				'laboratoryname' => $laboratoryName,
-				'reportno' => $reportNo,
-				'reportdate' => $reportDate,
-				'remarks' => $remarks,
-				'created'=>date('Y-m-d H:i:s'),
-				'modified'=>date('Y-m-d H:i:s')
-			));
-
-			if($this->save($newEntity)){
-				echo "updated";
-			}
-
-		}else{
-			$newEntity = $this->newEntity(array(
+		$newEntity = $this->newEntity(array(
 								
 				'customer_id'=>$customer_id,
 				'commodity' =>$commodity,
@@ -94,7 +62,6 @@
 			if($this->save($newEntity)){
 				echo "added";
 			}
-		}
 	}
 
 	public function getBgrData($id){
@@ -145,7 +112,8 @@
 				'reportno' => $forms_data['rpl_reportno'],
 				'reportdate' => $forms_data['rpl_reportdate'],
 				'remarks' => $forms_data['rpl_remarks'],
-				
+				'period_from'=> $forms_data['period_from'],
+				'period_to'=> $forms_data['period_to'],
 				'replica_alloted_record'=>'yes',
 				'created'=>date('Y-m-d H:i:s'),
 				'modified'=>date('Y-m-d H:i:s')
