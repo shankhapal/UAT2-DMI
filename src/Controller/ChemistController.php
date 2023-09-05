@@ -1487,7 +1487,7 @@ class ChemistController extends AppController {
 			$result = $this->DmiChemistRoToRalLogs->updateAll($data,array('chemist_id'=>$chemistId));
 
 			if($result){
-			$message ="Chemist Training Schedule at Ro";
+			$message ="Chemist Training Schedule at "  .$_SESSION['level_3_for']. "";
 			$message_theme = "success";
 
 			//for reschedule dates at ro side comment this pdf genration redirection  and redirect on list by laxmi B. on  10-05-2023 for chemist training module 
@@ -1528,7 +1528,7 @@ class ChemistController extends AppController {
 
 			$result = $this->DmiChemistRoToRalLogs->save($rescheduleDateData);
 			if($result){
-			$message ="Chemist Training Schedule Dates & Confirm at Ro";
+			$message ="Chemist Training Schedule Dates & Confirm at  " .$_SESSION['level_3_for']. "";
 			$message_theme = "success";
 			$redirect_to = '../../applicationformspdfs/trainingScheduleLetterFromRo/';
 			}else{

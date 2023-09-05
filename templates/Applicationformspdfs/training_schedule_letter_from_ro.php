@@ -29,10 +29,29 @@
     
     $sub_commodities_list = implode(',',$sub_commodities_array);
     $commodities_list = implode(',',$commodities_cate_array);
+
+   //set chemist prefix on the basis of middle name type added by laxmi on 05-09-2023
+   if(!empty($middle_name_type)){
+    if($middle_name_type == 'D/o'){
+        $prefix = 'Ms.';
+        $his_her = 'her';
+        $mam_sir = 'madam';
+    }elseif($middle_name_type == 'S/o'){
+        $prefix = 'Shri.';
+        $his_her = 'his';
+        $mam_sir = 'sir';
+    }elseif($middle_name_type == 'W/o'){
+        $prefix = 'Smt.';
+        $his_her = 'her';
+        $mam_sir = 'madam';
+    }
+    
+}
+
 ?>
 	
     <table width="100%" border="1">
-        <tr><td align="center" style="padding:5px;"><h4>Letter from RO To Chemist for Training schedule</h4></td></tr>
+        <tr><td align="center" style="padding:5px;"><h4>Letter from <?php echo $office_type;?> To Chemist for Training schedule</h4></td></tr>
     </table>
 
     <table width="100%" border="1">
@@ -75,7 +94,7 @@
         </tr>                                                                                                                                                                                                                                                                                                                        
 
         <tr>
-            <td>I am to refer to above cited subject & inform that the procedural training of <b> <?php echo $chemist_fname."&nbsp;". $chemist_lname ;?> <?php echo $middle_name_type; ?> <?php echo $parent_name; ?> </b> for analysis, grading & marking of <b><?php echo $commodities_list; ?> (<?php echo $sub_commodities_list; ?>) </b> under Agmark is Scheduled
+            <td>I am to refer to above cited subject & inform that the procedural training of <b> <?php echo $prefix. "&nbsp;" .$chemist_fname."&nbsp;". $chemist_lname ;?> <?php echo $middle_name_type; ?> <?php echo $parent_name; ?> </b> for analysis, grading & marking of <b><?php echo $commodities_list; ?> (<?php echo $sub_commodities_list; ?>) </b> under Agmark is Scheduled
              from <?php echo $schedule_from; ?> to  <?php echo $shedule_to;?> at <?php echo $office_type;?> office <?php echo $ro_office;?><br>
 			
 			It is requested to attend the said training at <b><?php echo $office_type;?> office</b>  <?php echo $ro_office;?>.
