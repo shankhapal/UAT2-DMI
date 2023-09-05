@@ -9,7 +9,12 @@
 		<?php if($section_form_details[0]['form_status'] === "approved"){?>
 			<h5 class="mt-1 mb-2 tacfw700">Report Download Section</h5>
 		<?php }else{ ?>
-				<h5 class="mt-1 mb-2 tacfw700">Commodity wise Grading Data Entery Form</h5>
+				
+        		<h5 class="mt-1 mb-2 tacfw700 header-text">Commodity wise Grading Data Entry Form</h5>
+						<!-- Button trigger modal -->
+						<button type="button" class="btn btn-primary downloadButton" data-toggle="modal"  data-target="#exampleModal">
+							Help
+						</button>
 		<?php } ?>
 			<div id="form_inner_main" class="card card-success">
 					<div class="card-header">
@@ -112,6 +117,37 @@
 								</div>
 						</div>
              
+						<!-- Modal -->
+							<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+								<div class="modal-dialog modal-lg" role="document">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h5 class="modal-title" id="exampleModalLabel">Help</h5>
+											<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+												<span aria-hidden="true">&times;</span>
+											</button>
+										</div>
+										<div class="modal-body">
+											<div class="note">
+											<div class="note">
+												<p class="important"><strong>Note for Users:</strong> </p>
+												<h5>Food Safety Parameters Report System</h5>
+												<p>This system follows specific criteria for displaying certain fields based on the laboratory's NABL accreditation status.</p>
+													<p>If the laboratory is not NABL accredited, then the system is not allowed to enter data of food safety parameters report. The system will not display fields:</p>
+											<ul>
+													<li>"Name of Laboratory which tested the sample"</li>
+													<li>"Report no. and Date"</li>
+													<li>"Remarks"</li>
+											</ul>
+											<p>When the laboratory is NABL accredited, the system will display these fields.</p>
+											</div>
+										</div>
+										<div class="modal-footer">
+											<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+										</div>
+									</div>
+								</div>
+							</div>
 
       </div>
     </div>

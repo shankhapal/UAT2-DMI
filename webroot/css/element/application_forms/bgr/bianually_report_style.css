@@ -75,3 +75,12 @@ td button {
   overflow-y: auto;
   /* Enable vertical scrollbar when needed */
 }
+
+ .downloadButton {
+  
+      float: right;
+      margin: -38px;
+   
+ }
+
+ 

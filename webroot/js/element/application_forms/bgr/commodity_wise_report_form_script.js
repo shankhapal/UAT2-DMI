@@ -43,11 +43,14 @@ $(document).ready(function () {
           xhr.setRequestHeader("X-CSRF-Token", $('[name="_csrfToken"]').val());
         },
         success: function (response) {
-          var response = response.match(/~([^']+)~/)[1]; //getting data bitween ~..~ from response
-
-          if (response == "No Charge") {
-            $("#replica_charges" + id_No).val("");
+          //
+          console.log(response);
+          if (response === "No Charge") {
+            // $("#replica_charges" + id_No).val("");
+            alert("Please Select Comodity");
+            // location.reload();
           } else {
+            var response = response.match(/~([^']+)~/)[1]; //getting data bitween ~..~ from response
             response = JSON.parse(response); //response is JSOn encoded to parse JSON
             // Assuming response is a valid JSON object containing the "unit" property
             //$("#ta-label_charge-" + id_No).val(response["charge"]);
@@ -89,4 +92,9 @@ $(document).ready(function () {
       laboratorynameInput.style.display = "block";
     }
   }
+
+  $("#downloadButton").click(function (e) {
+    e.preventDefault();
+    alert();
+  });
 });

@@ -25,27 +25,9 @@
 		$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
 		$CommGrade = TableRegistry::getTableLocator()->get('CommGrade');
 		$MGradeDesc = TableRegistry::getTableLocator()->get('MGradeDesc');
-		$DmiCaPpLabMapings = TableRegistry::getTableLocator()->get('DmiCaPpLabMapings');
+	
 		$DmiCustomerLaboratoryDetails = TableRegistry::getTableLocator()->get('DmiCustomerLaboratoryDetails');
 
-
-		// $currentPeriodRecord = [];
-		// $financialYear = $_SESSION['financialYear'];
-		
-		// if(isset($financialYear)){
-		// 	$dates = explode(" - ", $financialYear);
-		// 	$startMonthYear = $dates[0];
-		// 	$endMonthYear = $dates[1];
-
-		// 	$currentPeriodRecord = $this->find('all',array(
-		// 	'conditions'=>array(
-		// 		'period_from'=>$startMonthYear,
-		// 		'period_to'=>$endMonthYear,
-		// 		'form_status'=>'approved'
-		// 	)))->first();
-
-		// }
-		
 		
 			$latest_id = $this->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
 			
@@ -147,40 +129,17 @@
 						$sub_commodity_value = [];
 						$grade_list = [];
 				}
-				// --------------------------------------------------------------------------------------------------------
-				// isko dekna hai
-				// attached laboratory
-				$attached_laboratory = $DmiCaPpLabMapings->find('all', [
-						'conditions' => ['customer_id' => $customer_id,'map_type'=>'lab', 'delete_status IS NULL'],
-						'order' => ['id' => 'DESC']
-				])->first();
-						
-				if(!empty($attached_laboratory)){
-					$lab_id = $attached_laboratory['lab_id'];
 				
-					if(strpos($lab_id,"/Own") !== false){
-						$recordidArray = explode("/", $lab_id);
-						$ownlabId = $recordidArray[0];
-
-						$form_laboratory_data = $DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('id'=>$ownlabId),'order'=>'firm_name asc'))->first();
-						$laboratory_name = $form_laboratory_data;
-
-					}else{
-						
-						$form_laboratory_data = $DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('id'=>$lab_id),'order'=>'firm_name asc'))->first();
-						$laboratory_name = $form_laboratory_data;
-						
-					}
-					
-				}else{
-					$laboratory_name = "";
-				}
-				//-------------------------------------------------------------------------------
+			
 				// Get Details of Replica Allotment
 				$ReplicaAllotmentDetails = $CustomersController->Customfunctions->getDetailsReplicaAllotment($customer_id);
 					
 				$bgrAddedTableRecords = $CustomersController->Customfunctions->bgrAddedTableRecords($customer_id);
-					
+				
+				$progressive_revenue = $CustomersController->Customfunctions->calculateProgressiveReveneve($customer_id);
+				
+				// get attached laboratory
+				$attached_lab = $this->getLaboratoryDetails($customer_id);
 
 				$DmiReplicaUnitDetails = TableRegistry::getTableLocator()->get('DmiReplicaUnitDetails');
 					
@@ -206,12 +165,13 @@
 					$endDate=null,
 					$sub_commodity_value,
 					$grade_list,
-					$laboratory_name,
+					$attached_lab,
 					$bgrAddedTableRecords,
 					$unit_list,
 					$period=null,
 					$LabNablAccredited,
-					$ReplicaAllotmentDetails
+					$ReplicaAllotmentDetails,
+					$progressive_revenue,
 				);
 
 		// }
@@ -442,6 +402,40 @@
 				)))->toArray();
 
 			
+		}
+
+		public function getLaboratoryDetails($customer_id){
+		
+			$DmiCaPpLabMapings = TableRegistry::getTableLocator()->get('DmiCaPpLabMapings');
+			$DmiCustomerLaboratoryDetails = TableRegistry::getTableLocator()->get('DmiCustomerLaboratoryDetails');
+			// attached laboratory
+			$attached_laboratory = $DmiCaPpLabMapings->find('all', [
+					'conditions' => ['customer_id' => $customer_id,'map_type'=>'lab', 'delete_status IS NULL'],
+					'order' => ['id' => 'DESC']
+			])->first();
+
+			$laboratory_detail_data = null;
+
+			if(!empty($attached_laboratory)){
+
+				$lab_id = $attached_laboratory['lab_id'];
+			
+				if(strpos($lab_id,"/Own") !== false){
+					$recordidArray = explode("/", $lab_id);
+					$ownlabId = $recordidArray[0];
+
+					$laboratory_detail_data = $DmiCustomerLaboratoryDetails->find('list',array('keyField'=>'id','valueField'=>'laboratory_name', 'conditions'=>array('id'=>$ownlabId)))->toArray();
+
+				}else{
+					
+					$laboratory_detail_data = $DmiCustomerLaboratoryDetails->find('list',array('keyField'=>'id','valueField'=>'laboratory_name', 'conditions'=>array('id'=>$lab_id)))->toArray();
+
+				}
+				
+			}
+
+			return $laboratory_detail_data;
+
 		}
 		
 }

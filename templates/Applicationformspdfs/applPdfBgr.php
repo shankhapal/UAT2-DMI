@@ -21,7 +21,7 @@ use Cake\Datasource\ConnectionManager;
 	<table width="100%" border="1">
 		<tr>
 		<td align="center" style="padding:5px;">
-			<h4>Application Bianually Grading returns ofPeriod:<?php echo $displayStringPeriod; ?></h4>
+			<h4>Application Bianually Grading returns of: <?php echo $_SESSION['financialYear']; ?></h4>
 		</td>
 		</tr>
 	</table>
@@ -43,7 +43,7 @@ use Cake\Datasource\ConnectionManager;
 		</tr>
 			
 		<tr>
-			<td><br>Subject: Submission of Biannual grading returns of Period <?php echo $displayStringPeriod; ?> -regarding.</td><br>
+			<td><br>Subject: Submission of Biannual grading returns of <?php echo $_SESSION['financialYear']; ?> -regarding.</td><br>
 		</tr>
 
 		<tr>
@@ -66,7 +66,7 @@ use Cake\Datasource\ConnectionManager;
 		<table>
 			<tr>
 				<td align="left">
-						I, hereby submitting Agmark Biannual grading returns for the month of Period <?php echo $displayStringPeriod; ?> along with following verified and self attested documents for perusal and necessary action please.
+						I, hereby submitting Agmark Biannual grading returns for the month of Period <?php echo $_SESSION['financialYear']; ?> along with following verified and self attested documents for perusal and necessary action please.
 				</td>
 			</tr>
 	</table>
@@ -117,17 +117,17 @@ use Cake\Datasource\ConnectionManager;
 
 		<tr>
 				<th colspan="6" class="border-bottom" scope="col">Name of Packer with address and e-mail id:</th>
-				<th colspan="8">Name:<?php echo isset($firmname)?$firmname:"NA"; ?>, Email:<?php echo base64_decode($email); ?>, Address:<?php echo isset($address)?$address:"NA"; ?></th>
+				<th colspan="8"><?php echo isset($firmname)?$firmname:"NA"; ?>,<?php echo base64_decode($email); ?>,<?php echo isset($address)?$address:"NA"; ?></th>
 		</tr>
 		<tr>
-				<th colspan="6" class="border-bottom" scope="col">Period:<?php echo $displayStringPeriod; ?> 
+				<th colspan="6" class="border-bottom" scope="col">Period:<?php echo $_SESSION['financialYear']; ?> 
 				</th>
 				<th colspan="8" class="border-bottom" scope="col">Type:<?php echo ($export_unit_status == "yes") ? "Export" : "Domestic"; ?></th>
 		</tr>
 	
 			<tr>
 					<th colspan="6" class="border-bottom" scope="col">Total Revenue (In. Rs.):<?php echo $totalReplicaCharges; ?></th>
-					<th colspan="8" class="border-bottom" scope="col">Progressive Revenue (In Rs.):<?php echo $totalRevenueForSelectedPeriods; ?></th>
+					<th colspan="8" class="border-bottom" scope="col">Progressive Revenue (In Rs.):<?php echo $progressive_revenue; ?></th>
       </tr>
               
 			<tr>
@@ -162,12 +162,14 @@ use Cake\Datasource\ConnectionManager;
 			</tr>
 	   <?php
 
-				if (!empty($bgrReportData)) {
+				if (!empty($bgrAddedTableRecords)) {
 						$i=1;
-					  foreach ($bgrReportData as $row) {
+					  foreach ($bgrAddedTableRecords as $eachrow) {
 							
 							$conn = ConnectionManager::get('default');
-							$gradeasign = $row['gradeasign'];
+							$commodity_code = $eachrow['commodity'];
+
+							$gradeasign = $eachrow['gradeasign'];
 							$query2 = "SELECT grade_desc from m_grade_desc WHERE grade_code = $gradeasign";
 							$q2 = $conn->execute($query2);
 							$row2 = $q2->fetch();
@@ -176,21 +178,28 @@ use Cake\Datasource\ConnectionManager;
 								$gradename = $row2[0]; // Use index 0 to access the value
 							}
 							
+							$commo_query = "SELECT commodity_name from m_commodity WHERE commodity_code = $commodity_code";
+							$q3 = $conn->execute($commo_query);
+							$row3 = $q3->fetch();
+							if (isset($row3[0])) { // Check if index 0 exists
+								$Commodityname = $row3[0]; // Use index 0 to access the value
+							}
+
 							echo "<tr>";
 							echo "<td>" . $i . "</td>";
-            	echo "<td>" . $row['commodity'] . "</td>";
-           		echo "<td>" . $row['lotno'] . "</td>";
-							echo "<td>" . $row['datesampling'] . "</td>";
-          		echo "<td>" . $row['dateofpacking'] . "</td>";
+            	echo "<td>" . $Commodityname . "</td>";
+           		echo "<td>" . $eachrow['lotno'] . "</td>";
+							echo "<td>" . $eachrow['datesampling'] . "</td>";
+          		echo "<td>" . $eachrow['dateofpacking'] . "</td>";
 							echo "<td>" . $gradename . "</td>";
-							echo "<td>" . $row['packetsize'] . "</td>";
-							echo "<td>" . $row['totalnoofpackets'] . "</td>";
-							echo "<td>" . $row['totalqtyquintal'] . "</td>";
-							echo "<td>" . $row['estimatedvalue'] . "</td>";
-							echo "<td>" . $row['agmarkreplicafrom'] . "</td>";
-							echo "<td>" . $row['agmarkreplicato'] . "</td>";
-							echo "<td>" . $row['agmarkreplicatotal'] . "</td>";
-							echo "<td>" . $row['replicacharges'] . "</td>";
+							echo "<td>" . $eachrow['packetsize'] . "</td>";
+							echo "<td>" . $eachrow['totalnoofpackets'] . "</td>";
+							echo "<td>" . $eachrow['totalqtyquintal'] . "</td>";
+							echo "<td>" . $eachrow['estimatedvalue'] . "</td>";
+							echo "<td>" . $eachrow['agmarkreplicafrom'] . "</td>";
+							echo "<td>" . $eachrow['agmarkreplicato'] . "</td>";
+							echo "<td>" . $eachrow['agmarkreplicatotal'] . "</td>";
+							echo "<td>" . $eachrow['replicacharges'] . "</td>";
             	echo "</tr>";
 							$i++;
 						}
@@ -212,7 +221,7 @@ use Cake\Datasource\ConnectionManager;
 
 <table width="100%" border="1">
 	<tr>
-			<td align="center" style="padding:5px;"><h4>Details of Analysis of Food Safety Parameters Done from NABL Accredited Laboratory During period <?php echo $displayStringPeriod; ?></h4></td>
+			<td align="center" style="padding:5px;"><h4>Details of Analysis of Food Safety Parameters Done from NABL Accredited Laboratory During period <?php echo $_SESSION['financialYear']; ?></h4></td>
 	</tr>
 </table>
 
@@ -226,18 +235,38 @@ use Cake\Datasource\ConnectionManager;
 			<th class="tablehead wdth" scope="col">Remarks</th>
 		</tr>
 		<?php
-				if (!empty($bgrReportData)) {
+				if (!empty($bgrAddedTableRecords)) {
 				
 						$i=1;
-					  foreach ($bgrReportData as $row) {
+					  foreach ($bgrAddedTableRecords as $eachRecord) {
+						
+							$conn = ConnectionManager::get('default');
+
+							$lab_id = $eachRecord['laboratoryname'];
+              $lab_id = intval($lab_id);
+						
+							 $query = $conn->newQuery()
+								->select(['laboratory_name'])
+								->from('dmi_customer_laboratory_details')
+								->where(['id' => $lab_id]);
+								// Execute the query
+								$result = $query->execute();
+									
+								// Fetch the row
+								$row4 = $result->fetch('assoc'); // Fetch as an associative array
+								$labname = '';
+								if(!empty($row4)){
+										$labname = $row4['laboratory_name']; // Use index 0 to access the value
+								}
+
 							echo "<tr>";
 							echo "<td>" . $i . "</td>";
-           		echo "<td>" . $row['lotno'] . "</td>";
-          		echo "<td>" . $row['dateofpacking'] . "</td>";
-							echo "<td>" . $row['laboratoryname'] . "</td>";
-							echo "<td>" . $row['reportno'] . "</td>";
-							echo "<td>" . $row['reportdate'] . "</td>";
-							echo "<td>" . $row['remarks'] . "</td>";
+           		echo "<td>" . $eachRecord['lotno'] . "</td>";
+          		echo "<td>" . $eachRecord['dateofpacking'] . "</td>";
+							echo "<td>" . $labname . "</td>";
+							echo "<td>" . $eachRecord['reportno'] . "</td>";
+							echo "<td>" . $eachRecord['reportdate'] . "</td>";
+							echo "<td>" . $eachRecord['remarks'] . "</td>";
             	echo "</tr>";
 							$i++;
 						}

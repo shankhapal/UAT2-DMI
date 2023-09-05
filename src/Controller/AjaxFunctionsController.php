@@ -2654,7 +2654,7 @@ class AjaxFunctionsController extends AppController{
 			echo '~'.json_encode($result).'~';
 			
 		} else {
-				echo json_encode(['message' => 'No Charge']);
+				echo 'No Charge';
 		}
 		exit;
 	}
@@ -2712,12 +2712,21 @@ class AjaxFunctionsController extends AppController{
 	 // added by shankhpal shende on 02/08/2023
 	function addBgrDetails() {
 
-				//  pr($_POST);die;
+		
+				
 			$this->autoRender = false;
 			$this->loadModel('DmiBgrCommodityReportsAddmore');
 
-				
-			// Create the data array for insert
+			$financialYear = $_SESSION['financialYear'];
+			$startMonthYear=null;
+			$endMonthYear=null;
+
+			if(isset($financialYear)){
+				$dates = explode(" - ", $financialYear);
+				$startMonthYear = $dates[0];
+				$endMonthYear = $dates[1];
+			}
+		if (empty($_POST['record_id'])) {
 			$data = array(
 					'commodity' => $_POST['commodity'],
 					'lotno' => $_POST['lot_no_tf_no_m_no'],
@@ -2726,8 +2735,8 @@ class AjaxFunctionsController extends AppController{
 					'grade' => $_POST['grade'],
 					'packetsize' => $_POST['packet_size'],
 					'packetsizeunit' => $_POST['packet_size_unit'],
-					'totalnoofpackets' => $_POST['total_qty_graded_quintal'],
-					'totalqtyquintal' => $_POST['agmark_replica_from'],
+					'totalnoofpackets' => $_POST['no_of_packets'],
+					'totalqtyquintal' => $_POST['total_qty_graded_quintal'],
 					'estimatedvalue' => $_POST['estimated_value'],
 					'agmarkreplicafrom' => $_POST['agmark_replica_from'],
 					'agmarkreplicato' => $_POST['agmark_replica_to'],
@@ -2737,10 +2746,52 @@ class AjaxFunctionsController extends AppController{
 					'reportno' => $_POST['report_no'],
 					'reportdate' => $_POST['report_date'],
 					'remarks' => $_POST['remarks'],
+					'period_from'=>$startMonthYear,
+					'period_to'=>$endMonthYear,
 			);
 
 			// Insert the data into the database using the model
 			$save_bgr_details = $this->DmiBgrCommodityReportsAddmore->saveCommodityWiseReport($data);// call custome method from model
+		}else{
+			$data = array(
+				'record_id' => $_POST['record_id'],
+				'commodity' => $_POST['commodity'],
+				'lotno' => $_POST['lot_no_tf_no_m_no'],
+				'datesampling' => $_POST['date_of_sampling'],
+				'dateofpacking' => $_POST['date_of_packing'],
+				'grade' => $_POST['grade'],
+				'packetsize' => $_POST['packet_size'],
+				'packetsizeunit' => $_POST['packet_size_unit'],
+				'totalnoofpackets' => $_POST['no_of_packets'],
+				'totalqtyquintal' => $_POST['total_qty_graded_quintal'],
+				'estimatedvalue' => $_POST['estimated_value'],
+				'agmarkreplicafrom' => $_POST['agmark_replica_from'],
+				'agmarkreplicato' => $_POST['agmark_replica_to'],
+				'agmarkreplicatotal' => $_POST['agmark_replica_total'],
+				'replicacharges' => $_POST['replica_charges'],
+				'laboratoryname' => $_POST['laboratory_name'],
+				'reportno' => $_POST['report_no'],
+				'reportdate' => $_POST['report_date'],
+				'remarks' => $_POST['remarks'],
+				'period_from'=>$startMonthYear,
+				'period_to'=>$endMonthYear,
+			);
+
+			$save_bgr_details = $this->DmiBgrCommodityReportsAddmore->saveCommodityWiseReport($data); // Call custom method from model
+			// Define a variable to hold the response message
+			$response = "";
+			// Check the result of the update operation
+			if ($save_bgr_details == "updated") {
+					$response = "updated";
+			} elseif($save_bgr_details == "added") {
+					$response = "added";
+			}
+
+			// Echo the response
+			echo $response;
+			exit();
+		}
+			
 
 	} 
 	
@@ -2926,26 +2977,34 @@ class AjaxFunctionsController extends AppController{
 			$customer_id = null;
 		}
 
-		$reports = $this->DmiBgrCommodityReports
-    ->find()
-    ->select(['total_revenue', 'period'])
-    ->where([
-        'customer_id' => $customer_id,
-        'period IN' => ['Second-Half', 'First-Half']
-    ])
-    ->toArray();
-		$totalRevenueForSelectedPeriods = '';
-		if (!empty($reports)) {
-			$totalRevenueForSelectedPeriods = 0.0;
+		$currentPeriodRecord = [];
+		$financialYear = $_SESSION['financialYear'];
+		
+		if(isset($financialYear)){
+			$dates = explode(" - ", $financialYear);
+			$startMonthYear = $dates[0];
+			$endMonthYear = $dates[1];
 
-			foreach ($reports as $report) {
-				$totalRevenueForSelectedPeriods += (float)$report->total_revenue;
-			}
+			$currentPeriodRecord = $this->DmiBgrCommodityReports->find('all', [
+					'conditions' => [
+							'customer_id' => $customer_id,
+							'period_from' => $startMonthYear,
+							'period_to' => $endMonthYear,
+					],
+					'order' => ['id' => 'DESC'], // Order by id in descending order
+			])->first();
 			
-		} 
-		echo $totalRevenueForSelectedPeriods;
+			$total_revenue = '';
+			if(!empty($currentPeriodRecord)){
 				
-	}
+				$total_revenue = $currentPeriodRecord['total_revenue'];
+			
+			}
+
+			echo $total_revenue;
+				
+		}
+}
 
 	// This method will handle the request to insert record of Replica Allotment details of BGR report for  BGR Module
 	// added by shankhpal shende on 31/08/2023

@@ -24,6 +24,7 @@ $(document).ready(function () {
     });
   }
   updateOverallTotalCharges();
+
   $(".delete_bgr_id").click(function (e) {
     e.preventDefault();
     var id = $(this).attr("id");
@@ -37,7 +38,8 @@ $(document).ready(function () {
           if (response == "success") {
             var custom_row = document.getElementById("custom_row" + id);
             custom_row.parentNode.removeChild(custom_row);
-            alert("Record deleted successfully."); // Display the success message
+            renderToast("success", "Record deleted successfully.");
+            // location.reload(); // Reload the page
           } else {
             alert("An error occurred while deleting the record."); // Display an error message
           }
@@ -47,7 +49,12 @@ $(document).ready(function () {
     }
   });
 
-  $("#add_bgr_details").on("click", function () {
+  $("#add_bgr_details, #update_bgr_details").on("click", function (e) {
+    e.preventDefault();
+    let labNablAccreditedInput = document.getElementById(
+      "lab_nabl_accredited"
+    ).value;
+
     var isValid = true;
     function validateField(fieldId, errorMessage) {
       var $field = $("#" + fieldId);
@@ -104,7 +111,14 @@ $(document).ready(function () {
       "agmark_replica_total",
       "Please Enter No. of Agmark Replica Total."
     ); // Validate remarks
+
     validateField("replica_charges", "Please Enter Replica Charges."); // Validate remarks
+    if (labNablAccreditedInput.trim() !== "") {
+      validateField("laboratory_name", "Please Select laboratory.");
+      validateField("report_no", "Please Enter Report no.");
+      validateField("report_date", "Please Select Report Date.");
+      validateField("remarks", "Please Enter Remark.");
+    }
 
     if (!isValid) {
       renderToast(
@@ -129,12 +143,11 @@ $(document).ready(function () {
         agmark_replica_to: $("#agmark_replica_to").val(),
         agmark_replica_total: $("#agmark_replica_total").val(),
         replica_charges: $("#replica_charges").val(),
-
         laboratory_name: $("#laboratory_name").val(),
         report_no: $("#report_no").val(),
         report_date: $("#report_date").val(),
         remarks: $("#remarks").val(),
-
+        record_id: $("#record_id").val(),
         // Add more fields as needed
       };
 
@@ -143,11 +156,15 @@ $(document).ready(function () {
         type: "POST",
         data: formData,
         success: function (response) {
-          if (response == "added")
+          if (response == "added") {
             // Handle success response here
             renderToast("success", "Data inserted successfully!");
+          } else if (response === "updated") {
+            // Handle success response here
+            renderToast("success", "Data Updated successfully!");
+          }
 
-          // location.reload(); // Reload the page
+          location.reload(); // Reload the page
           // Optionally, you might want to reset form fields here
         },
         error: function (error) {
@@ -159,9 +176,9 @@ $(document).ready(function () {
   });
 
   $(".edit_bgr_id").click(function (e) {
+    e.preventDefault();
     $("#update_bgr_details").show(); // Show Edit button
     $("#add_bgr_details").hide();
-    e.preventDefault();
 
     var id = $(this).attr("id");
 
@@ -227,174 +244,4 @@ $(document).ready(function () {
     });
     updateOverallTotalCharges();
   });
-
-  const form_section_id = $("#form_section_id").val();
-
-  const labNablAccreditedInput = document.getElementById(
-    "lab_nabl_accredited"
-  ).value;
-
-  const requiredFields = {
-    "ta-commodity-": "Commodity",
-    lot_no_tf_no_m_no: "Lot No/TF No/M No",
-    date_of_sampling: "Date of Sampling",
-    date_of_packing: "Date of Packing",
-    grade: "Grade",
-    "ta-packet_size-": "Pack Size",
-    replica_charges: "Replica Charges",
-    "ta-no_of_packets-": "Total No. of Packages",
-    total_qty_graded_quintal: "Total Qty Graded (Quintal)",
-    estimated_value: "Estimated Value",
-    agmark_replica_from: "Agmark Replica From",
-    agmark_replica_to: "Agmark Replica To",
-    agmark_replica_total: "Agmark Replica Total",
-    laboratory_name: "Laboratory Name",
-    report_no: "Report No",
-    report_date: "Report Date",
-    remarks: "Remarks",
-  };
-
-  // $("#add_bgr_details").on("click", function (e) {
-  //   e.preventDefault();
-  //   handleFormAction("add");
-  // });
-  // $("#update_bgr_details").on("click", function (e) {
-  //   e.preventDefault();
-  //   handleFormAction("update");
-  // });
-
-  // You can similarly add event handlers for other actions (edit, delete, save) if needed.
-
-  async function handleFormAction(action) {
-    let form_data = $("#" + form_section_id).serializeArray();
-    let itemsToRemove = [
-      "report_date",
-      "remarks",
-      "report_no",
-      "progresive_revenue",
-      "record_id",
-    ];
-    form_data = form_data.filter((item) => !itemsToRemove.includes(item.name));
-
-    console.log(form_data);
-    const validationStatus = await bgr_report_validation(form_data);
-
-    if (validationStatus.isValid) {
-      // Proceed with further actions if validation is successful
-      try {
-        const response = await sendFormToServer(form_data);
-      } catch (error) {
-        console.error("Error while submitting the form:", error);
-      }
-    } else {
-      // Display error messages to the user
-      alert("Please fill in all the required fields");
-      highlightEmptyFields(validationStatus.emptyFields);
-    }
-  }
-
-  async function sendFormToServer(form_data) {
-    let recordId = null;
-
-    for (const item of form_data) {
-      if (item.name === "record_id") {
-        recordId = item.value;
-        break; // No need to continue searching
-      }
-    }
-
-    return new Promise((resolve, reject) => {
-      $.ajax({
-        type: "POST",
-        url: "../AjaxFunctions/add_bgr_details",
-        data: form_data,
-        beforeSend: function (xhr) {
-          xhr.setRequestHeader("X-CSRF-Token", $('[name="_csrfToken"]').val());
-        },
-        success: function (response) {
-          console.log(response);
-          if (response === "updated" || response === "added") {
-            // Clear input fields
-            $(
-              "#record_id, #ta-commodity-, #lot_no_tf_no_m_no, #date_of_sampling, #date_of_packing, #grade, #ta-packet_size-, #ta-packet_size_unit-, #ta-no_of_packets-, #total_qty_graded_quintal, #estimated_value, #agmark_replica_from, #agmark_replica_to, #agmark_replica_total, #replica_charges, #report_no, #report_date, #remarks"
-            ).val("");
-
-            location.reload(); // Reload the page
-            alert(
-              "Record " +
-                (response === "updated" ? "updated" : "added") +
-                " successfully."
-            );
-          } else {
-            alert("An error occurred."); // Display an error message
-          }
-        },
-      });
-    });
-  }
-
-  async function bgr_report_validation(form_data) {
-    let emptyFields = [];
-
-    for (const field of Object.keys(requiredFields)) {
-      const formField = form_data.find((item) => item.name === field);
-      // console.log(formField);
-      if (formField && formField?.value.trim() === "") {
-        emptyFields.push(field);
-      }
-    }
-
-    return {
-      isValid: emptyFields.length === 0,
-      emptyFields: emptyFields,
-    };
-  }
-
-  function highlightEmptyFields(emptyFields) {
-    // Remove existing highlights
-    $("input")
-      .removeClass("highlight-empty")
-      .on("focus", function () {
-        $(this).removeClass("highlight-empty");
-        const fieldId = $(this).attr("id");
-        $(`#error-${fieldId}`).empty();
-      })
-      .on("click", function () {
-        $(this).removeClass("highlight-empty");
-        const fieldId = $(this).attr("id");
-        $(`#error-${fieldId}`).empty();
-      });
-
-    // Add highlight class to empty fields
-    for (const field of emptyFields) {
-      const fieldName = requiredFields[field];
-      const labNablAccreditedInput = document.getElementById(
-        "lab_nabl_accredited"
-      ).value;
-
-      if (
-        labNablAccreditedInput === "" &&
-        (field === "report_no" ||
-          field === "report_date" ||
-          field === "remarks")
-      ) {
-        continue; // Skip validation for specific fields if labNablAccreditedInput is empty
-      }
-
-      // Additional check to skip validation for certain field names
-
-      const fieldValue = $(`#${field}`).val().trim();
-
-      if (!fieldValue) {
-        $(`#${field}`).addClass("highlight-empty");
-        const errorMessage = `<span class="error">${fieldName} is required.</span>`;
-
-        $(`#error-${field}`).html(errorMessage);
-
-        setTimeout(() => {
-          $(`#error-${field}`).empty();
-        }, 5000);
-      }
-    }
-  }
 });

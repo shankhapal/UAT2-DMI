@@ -4277,6 +4277,7 @@ class CustomfunctionsComponent extends Component {
     			"startDateofAssociativeFH" => "April-".$lastYear,
     			"endDateofAssociativeFH" => "Sep-".$lastYear
 				);
+
 		} else {
 				// Current date is after 30th September, switch to the next period
 				$startDate = "April-".$currentYear; 
@@ -4288,13 +4289,69 @@ class CustomfunctionsComponent extends Component {
 			"startDate" => $startDate,
 			"endDate" => $endDate,
 			// "period" => $period,
-			// "associative_first_half" => $associative_first_half
+			"associative_first_half" => $associative_first_half
 		);
-    
+   
 		
     return $myMap;  
 	}
 
+	// added for biannually grading report module
+	// for calculate progressive revenue
+	// written by shankhpal shende on 05/09/2023
+	public function calculateProgressiveReveneve($customer_id){
+
+		$DmiBgrCommodityReports = TableRegistry::getTableLocator()->get('DmiBgrCommodityReports');
+
+		$time_period_map=	$this->computeBiannualPeriod();
+		
+		$startDate = $time_period_map['startDate'];
+		$endDate = $time_period_map['endDate'];
+		$associative_first_half = $time_period_map['associative_first_half'];
+				
+		if(!empty($associative_first_half)){
+			$startDateofAssociativeFH = $associative_first_half['startDateofAssociativeFH'];
+			$endDateofAssociativeFH = $associative_first_half['endDateofAssociativeFH'];
+
+			$associative_first = $DmiBgrCommodityReports
+			->find()
+			->select(['total_revenue'])
+			->where([
+					'customer_id' => $customer_id,
+					'period_from' => $startDateofAssociativeFH,
+					'period_to' => $endDateofAssociativeFH,
+			])
+			->order(['id' => 'desc'])
+			->first();
+			
+		}	
+				
+		$financialYear = $_SESSION['financialYear'];
+
+		if(isset($financialYear)){
+			$dates = explode(" - ", $financialYear);
+			$startMonthYear = $dates[0];
+			$endMonthYear = $dates[1];
+		}
+
+		$reports = $DmiBgrCommodityReports
+		->find()
+		->select(['total_revenue'])
+		->where([
+				'customer_id' => $customer_id,
+				'period_from' => $startMonthYear,
+				'period_to' => $endMonthYear,
+		])
+		->order(['id' => 'desc'])
+		->first();
+
+		$totalRevenueForSelectedPeriods = "";
+		if(!empty($reports)){
+				$totalRevenueForSelectedPeriods = (float)$reports->total_revenue + (float)$associative_first->total_revenue;
+		}
+
+		return $totalRevenueForSelectedPeriods;
+	}
 	// added for biannually grading report module
 	// for check record is available or not 
 	// written by shankhpal shende on 29/08/2023

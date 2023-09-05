@@ -2665,7 +2665,7 @@ class ApplicationformspdfsController extends AppController{
 		require_once(ROOT . DS . 'vendor' . DS . 'tcpdf' . DS . 'tcpdf_watermark.php');
 
 		
-                
+             
 		//This below condition is updated for the Surrender (SOC) Application PDFs watermarks - Akash [12-05-2023]
 		if ($appl_type == 9 && $current_level != 'applicant') { 
 
@@ -2681,7 +2681,12 @@ class ApplicationformspdfsController extends AppController{
 
 		}elseif($appl_type == 4 && $pdf_for == 'grant'){ 
 			$pdf = new MyCustomPDFWithWatermark(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);	
-		}else{
+
+			
+		}elseif($appl_type == 11 && $pdf_for == 'Bianually Grading'){ // condition added by shankhpal for BGR module on 05/09/2023
+			$pdf = new TCPDF('L', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+		}
+		else{
 			$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 		}
 		
@@ -4799,48 +4804,25 @@ class ApplicationformspdfsController extends AppController{
 				$this->set('pdf_date',$pdf_date);
 
 
-
-				$query = $this->DmiBgrCommodityReportsAddmore->find()
-        ->where([
-            'customer_id' => $customer_id,
-            'delete_status IS NULL' // Records where delete_status is NULL
-        ])
-        ->order(['id' => 'desc']);
-
-    		$bgrReportData = $query->toArray();
-
-				foreach ($bgrReportData as &$eachvalue) { // Note the "&" before $eachvalue
-					$commodity_code = $eachvalue['commodity'];
-
-					$result = $this->MCommodity->find()
-							->select('commodity_name')
-							->where(['commodity_code' => $commodity_code]);
-
-					$commodityArray = $result->first();
-					$eachvalue['commodity'] = $commodityArray ? $commodityArray->commodity_name : '';
-    		}
+				$bgrAddedTableRecords = $CustomersController->Customfunctions->bgrAddedTableRecords($customer_id);
+				$this->set('bgrAddedTableRecords',$bgrAddedTableRecords);
+				
 
 				$this->loadComponent('Randomfunctions');
 				//added custom method to check if the lab application is NABL accreditated
-				// $NablDate = $this->Randomfunctions->checkIfLabNablAccreditated($customer_id);
-				$NablDate = 'yes';
+				$NablDate = $this->Randomfunctions->checkIfLabNablAccreditated($customer_id);
+				// $NablDate = 'yes';
 			
 				$this->set('NablDate',$NablDate);
-				$this->set('bgrReportData',$bgrReportData);
+				
 
 
 				$this->loadModel('DmiBgrCommodityReportsAddmore');
-			
-				$time_period_map=	$CustomersController->Customfunctions->computeBiannualPeriod();
-				// pr($time_period_map);die;
-				$startDate = $time_period_map['startDate'];
-				$endDate = $time_period_map['endDate'];
-				$period = $time_period_map['period'];
+				$this->loadModel('DmiBgrCommodityReports');
+				$progressive_revenue =	$CustomersController->Customfunctions->calculateProgressiveReveneve($customer_id);
 				
-				// Construct the final string
-				$displayStringPeriod = $startDate . ' - ' . $endDate . ' - ' . $period;
-				$this->set('displayStringPeriod',$displayStringPeriod);
-
+				$this->set('progressive_revenue',$progressive_revenue);
+		
 				$query = $this->DmiBgrCommodityReportsAddmore->find();
 				$query->select(['replicacharges' => $query->func()->sum('replicacharges')]);
 				$query->where(['customer_id'=>$customer_id,'delete_status IS' => null]);
@@ -4849,46 +4831,8 @@ class ApplicationformspdfsController extends AppController{
 				
 				$totalReplicaCharges = $result['replicacharges'];
 				$this->set('totalReplicaCharges',$totalReplicaCharges);
-
-				$this->loadModel('DmiBgrCommodityReports');
-
-				$reports = $this->DmiBgrCommodityReports
-				->find()
-				->select(['total_revenue', 'period'])
-				->where([
-						'customer_id' => $customer_id,
-						'period IN' => ['Second-Half', 'First-Half']
-				])
-				->order(['id' => 'desc'])
-				->first();
+	
 				
-				$totalRevenueForSelectedPeriods = '';
-				if (!empty($reports)) {
-					$totalRevenueForSelectedPeriods = 0.0;
-					$associative_first_half = $time_period_map['associative_first_half'];
-					//  pr($associative_first_half);die;
-					if(!empty($associative_first_half)){
-						$startDateofAssociativeFH = $associative_first_half['startDateofAssociativeFH'];
-						$endDateofAssociativeFH = $associative_first_half['endDateofAssociativeFH'];
-
-						$associative_first = $this->DmiBgrCommodityReports
-						->find()
-						->select(['total_revenue', 'period'])
-						->where([
-								'customer_id' => $customer_id,
-								'period_from' => $startDateofAssociativeFH,
-								'period_to' => $endDateofAssociativeFH,
-						])
-						->order(['id' => 'desc'])
-						->first();
-					}	
-					
-					$totalRevenueForSelectedPeriods = (float)$reports->total_revenue + (float)$associative_first->total_revenue;
-			
-					
-					
-				} 
-			$this->set('totalRevenueForSelectedPeriods',$totalRevenueForSelectedPeriods);
 	
 				$this->generateApplicationPdf('/Applicationformspdfs/applPdfBgr');	
 			}

@@ -101,7 +101,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                   <th colspan="6" class="border-bottom" scope="col">
                     Total Revenue (In. Rs.): <span id="totalRevenueHeader"></span>
                   </th>
-                  <th colspan="6" class="border-bottom" scope="col">Progressive Revenue (In Rs.):<span id="progresiveRevenue"></span>
+                  <th colspan="6" class="border-bottom" scope="col">Progressive Revenue (In Rs.): <?php echo $section_form_details[17]; ?>
                   </th>
                   <th scope="col"></th>
                   <th scope="col"></th>
@@ -155,18 +155,22 @@ $class1 = INPUT_FIELD_CLASSES;?>
              </thead>
               <tbody>
                
-                  <?php 
+                  <?php
                     if(!empty($section_form_details[12]) || !empty($section_form_details[16])){
                           $i=1;
                           if(!empty($section_form_details[12])){
 
                             foreach ($section_form_details[12] as  $eachrow) {
-                              
+                             
                               $conn = ConnectionManager::get('default');
-
+                             
                               $commodity_code = $eachrow['commodity'];
 
                               $gradeasign = $eachrow['gradeasign'];
+
+                              $lab_id = $eachrow['laboratoryname'];
+                              $lab_id = intval($lab_id);
+                              
                               $query2 = "SELECT grade_desc from m_grade_desc WHERE grade_code = $gradeasign";
                               $q2 = $conn->execute($query2);
                               $row2 = $q2->fetch();
@@ -182,6 +186,21 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                 $Commodityname = $row3[0]; // Use index 0 to access the value
                               }
                               
+                             $query = $conn->newQuery()
+                            ->select(['laboratory_name'])
+                            ->from('dmi_customer_laboratory_details')
+                            ->where(['id' => $lab_id]);
+                            // Execute the query
+                            $result = $query->execute();
+                             
+                            // Fetch the row
+                            $row4 = $result->fetch('assoc'); // Fetch as an associative array
+                            $labname = '';
+                            if(!empty($row4)){
+                               $labname = $row4['laboratory_name']; // Use index 0 to access the value
+                            }
+                           
+
                               ?>
                               <tr  id="custom_row<?php echo $eachrow['id'];?>">
                                 <td><?php echo $i; ?></td>
@@ -199,7 +218,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                 <td><?php echo $eachrow['agmarkreplicato'];?></td>
                                 <td><?php echo $eachrow['agmarkreplicatotal'];?></td>
                                 <td><?php echo $eachrow['replicacharges'];?></td>
-                                <td><?php echo $eachrow['laboratoryname'];?></td>
+                                <td><?php echo $labname;?></td>
                                 <td><?php echo $eachrow['reportno'];?></td>
                                 <td><?php echo $eachrow['reportdate'];?></td>
                                 <td><?php echo $eachrow['remarks'];?></td>
@@ -641,18 +660,20 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     )); ?>
                                   <span id="error-replica_charges"></span>
                               </td>
+                              
                               <td>
                                 <?php echo $this->Form->control('laboratory_name', array(
-                                      'type'=>'text',
+                                      'type'=>'select',
                                       'escape'=>false,
                                       'id'=>'laboratory_name',
-                                      'readonly'=>'readonly',
-                                      'value'=>$section_form_details[11],
+                                      'empty'=>'Select Laboratory name',
+                                      'options'=>$section_form_details[11],
                                       'label'=>false,
                                       'class'=>$class1,
                                     )); ?>
                                  <span id="error-laboratory_name"></span>
                               </td>
+
                               <td>
                                   <?php echo $this->Form->control('report_no', array(
                                     'type'=>'text',
