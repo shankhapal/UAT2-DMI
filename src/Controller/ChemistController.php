@@ -1063,7 +1063,7 @@ class ChemistController extends AppController {
 				$this->DmiChemistAllCurrentPositions->currentUserUpdate($customer_id,$user_email_id,$current_level);//call to custom function from model
 				}
 
-				$message ="Chemist Application Forwarded to RAL" .$find_office_email_id['ro_office'].". And the email id is ".base64_decode($office_incharge_id)."  ";
+				$message ="Chemist Application Forwarded to RAL "  .$find_office_email_id['ro_office'].". And the email id is ".base64_decode($office_incharge_id)."  ";
 				$message_theme = "success";
 
 				// for rescheduling chemist training at RAL and generate letter pdf so comment this redirect url and redirect on  chemist module  by laxmi B. on 10-05-2023  for chemist modeule
