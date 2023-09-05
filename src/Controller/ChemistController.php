@@ -1378,7 +1378,7 @@ class ChemistController extends AppController {
 			$result = $this->DmiChemistTrainingAtRo->save($data);
 			if($result){
 			$lastInsertedId = $result['id'];	
-			$message ="Chemist Application Training done at Ro";
+			$message ="Chemist Application Training done at " .$_SESSION['level_3_for']."";
 			$message_theme = "success";
 			$redirect_to = '../../Applicationformspdfs/chemistTrainingCompPdfRo/'.$lastInsertedId;
 			}else{
