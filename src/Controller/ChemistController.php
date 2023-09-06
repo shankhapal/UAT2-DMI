@@ -1649,29 +1649,30 @@ class ChemistController extends AppController {
 		$endDate = $finacialYears['endDate'];
 
 		$finacialYearsArray[$startDate . ' - ' . $endDate] = $startDate . ' - ' . $endDate;
+		$this->set('finacialYearsArray',$finacialYearsArray);
 
-		$finacialYearsData = $this->DmiBgrCommodityReports
-		->find()
-    ->select(['period_from', 'period_to'])
-    ->where([
-				'customer_id' =>$customer_id,
-        'form_status' => 'approved',
-        'period_from <=' => $finacialYears['endDate'], // Compare with the end date
-        'period_to >=' => $finacialYears['startDate'],   // Compare with the start date
-    ])
-    ->order(['id' => 'DESC'])  // Order by ID in descending order to get the last added record
-    ->toArray();
+		// $finacialYearsData = $this->DmiBgrCommodityReports
+		// ->find()
+    // ->select(['period_from', 'period_to'])
+    // ->where([
+		// 		'customer_id' =>$customer_id,
+    //     'form_status' => 'approved',
+    //     'period_from <=' => $finacialYears['endDate'], // Compare with the end date
+    //     'period_to >=' => $finacialYears['startDate'],   // Compare with the start date
+    // ])
+    // ->order(['id' => 'DESC'])  // Order by ID in descending order to get the last added record
+    // ->toArray();
 		
-		if (!empty($finacialYearsData)) {
-			// Get the last added record that meets the criteria
-			$lastAddedRecord = $finacialYearsData[0]; // Assuming the first record is the last added
+		// if (!empty($finacialYearsData)) {
+		// 	// Get the last added record that meets the criteria
+		// 	$lastAddedRecord = $finacialYearsData[0]; // Assuming the first record is the last added
 
-			// Add the last added record to the array
-			$finacialYearsArray[$lastAddedRecord['period_from'] . ' - ' . $lastAddedRecord['period_to']] = $lastAddedRecord['period_from'] . ' - ' . $lastAddedRecord['period_to'];
-		}
+		// 	// Add the last added record to the array
+		// 	$finacialYearsArray[$lastAddedRecord['period_from'] . ' - ' . $lastAddedRecord['period_to']] = $lastAddedRecord['period_from'] . ' - ' . $lastAddedRecord['period_to'];
+		// }
 	
 
-		$this->set('finacialYearsArray',$finacialYearsArray);
+		
 	
 		
 
@@ -1687,8 +1688,8 @@ class ChemistController extends AppController {
 			
 			$financialYear = $_POST['financialYear'];
 		// echo $financialYear;die;
-			if(!empty($packerid) || !empty($financialYear)){
-				//  echo "ok";die;
+			if(!empty($packerid) && !empty($financialYear)){
+				 
 				$this->request->getSession()->write('packer_id',$packerid);
 				$this->request->getSession()->write('financialYear',$financialYear);
 				if(isset($_SESSION)){

@@ -8,7 +8,12 @@ use Cake\Datasource\ConnectionManager;
 		font-family: times;
 		font-size: 13pt;
 	}
-							 
+	.rowwidth{
+		width:25px;
+	}		
+	.rowwidth2{
+		width:50px;
+	}						 
 
 	table{
 		padding: 5px;

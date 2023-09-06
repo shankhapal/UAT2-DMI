@@ -285,7 +285,7 @@ class ApplicationController extends AppController{
 			
 		}			
 		
-		// This condition added by shankhpal shende for BGR Module on 06/07/2023
+		// This condition added by shankhpal shende for BGR Module on 06/09/2023
 		if($application_type == 11){
 		
 			
@@ -303,6 +303,7 @@ class ApplicationController extends AppController{
 			$this->loadModel('DmiBgrGrantCertificatePdfs');  
 			//added for checking if application is Granted on 24/11/2022
 			$checkIfgrant = $this->DmiBgrGrantCertificatePdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
+			
 			$this->set('checkIfgrant',$checkIfgrant);
 		}
 		

@@ -1,11 +1,6 @@
 $(document).ready(function () {
   const form_status = $("#form_status").val();
   if (form_status === "approved") {
-    // If form_status is "approved," show the downloadDiv
-    $("#downloadDiv").show();
-    $("#dataTable").hide();
-    $(".replica_charge").hide();
-    $(".file_upload").hide();
     $("#comment_reply_box").hide();
   } else {
     $("#date_of_sampling").datepicker({

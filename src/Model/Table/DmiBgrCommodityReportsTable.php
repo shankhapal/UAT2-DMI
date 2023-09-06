@@ -138,6 +138,15 @@
 				
 				$progressive_revenue = $CustomersController->Customfunctions->calculateProgressiveReveneve($customer_id);
 				
+        if($_SESSION !== 'financialYear'){
+					$Perioddata = $CustomersController->Customfunctions->computeBiannualPeriod();
+					$startDate = $Perioddata['startDate'];
+					$endDate = $Perioddata['endDate'];
+					$financialYear = $startDate . ' - ' . $endDate;
+				}else{
+					$financialYear = $_SESSION['financialYear'];
+				}         
+
 				// get attached laboratory
 				$attached_lab = $this->getLaboratoryDetails($customer_id);
 
@@ -172,6 +181,7 @@
 					$LabNablAccredited,
 					$ReplicaAllotmentDetails,
 					$progressive_revenue,
+					$financialYear,
 				);
 
 		// }

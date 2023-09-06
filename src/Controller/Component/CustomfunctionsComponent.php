@@ -854,7 +854,7 @@ class CustomfunctionsComponent extends Component {
 	public function formScrutinized($customer_id,$current_level,$last_user_email_id,$last_user_aadhar_no,$last_record_id,$tablename) {
 
 		$Dmi_tablename = TableRegistry::getTableLocator()->get($tablename);
-
+		
 		if ($last_user_aadhar_no == $_SESSION['once_card_no']) {
 
 			$user_email_id = $_SESSION['username'];
@@ -876,6 +876,7 @@ class CustomfunctionsComponent extends Component {
 			}
 		}
 
+		
 		$Dmi_tablename_Entity = $Dmi_tablename->newEntity(array('id'=>$last_record_id,
 																'form_status'=>'approved',
 																'current_level'=>$current_level,
@@ -4326,7 +4327,14 @@ class CustomfunctionsComponent extends Component {
 			
 		}	
 				
-		$financialYear = $_SESSION['financialYear'];
+		if($_SESSION !== 'financialYear'){
+			$Perioddata = $this->computeBiannualPeriod();
+			$startDate = $Perioddata['startDate'];
+			$endDate = $Perioddata['endDate'];
+			$financialYear = $startDate . ' - ' . $endDate;
+		}else{
+			$financialYear = $_SESSION['financialYear'];
+		}
 
 		if(isset($financialYear)){
 			$dates = explode(" - ", $financialYear);
@@ -4335,19 +4343,21 @@ class CustomfunctionsComponent extends Component {
 		}
 
 		$reports = $DmiBgrCommodityReports
-		->find()
-		->select(['total_revenue'])
-		->where([
-				'customer_id' => $customer_id,
-				'period_from' => $startMonthYear,
-				'period_to' => $endMonthYear,
-		])
-		->order(['id' => 'desc'])
-		->first();
+    ->find()
+    ->select(['total_revenue'])
+    ->where([
+        'customer_id' => $customer_id,
+        'period_from' => $startMonthYear,
+        'period_to' => $endMonthYear,
+    ])
+    ->order(['id' => 'desc'])
+    ->first();
 
-		$totalRevenueForSelectedPeriods = "";
-		if(!empty($reports)){
-				$totalRevenueForSelectedPeriods = (float)$reports->total_revenue + (float)$associative_first->total_revenue;
+		$totalRevenueForSelectedPeriods = 0.0;
+
+		if ($reports !== null && property_exists($reports, 'total_revenue') &&
+   		 $associative_first !== null && property_exists($associative_first, 'total_revenue')) {
+   		 $totalRevenueForSelectedPeriods = (float)$reports->total_revenue + (float)$associative_first->total_revenue;
 		}
 
 		return $totalRevenueForSelectedPeriods;
@@ -4379,7 +4389,7 @@ class CustomfunctionsComponent extends Component {
 		return !empty($report_fields) ? 1 : 0;
 	}
 
-
+// this function are written by shankhpal shende for bgr module on 06/09/2023
 	public function getDetailsReplicaAllotment($customer_id){
 		
 		$DmiReplicaAllotmentDetails = TableRegistry::getTableLocator()->get('DmiReplicaAllotmentDetails');
@@ -4446,14 +4456,25 @@ class CustomfunctionsComponent extends Component {
 
 	}
 
+	// this function are written by shankhpal shende for bgr module on 06/09/2023
 	public function bgrAddedTableRecords($customer_id){
-
+		// echo $customer_id;die;
 		
 		$MCommodity = TableRegistry::getTableLocator()->get('MCommodity');
 		$DmiBgrCommodityReportsAddmore = TableRegistry::getTableLocator()->get('DmiBgrCommodityReportsAddmore');
 
 		$currentPeriodRecord = [];
-		$financialYear = $_SESSION['financialYear'];
+		// 
+		if($_SESSION !== 'financialYear'){
+			$Perioddata = $this->computeBiannualPeriod();
+			$startDate = $Perioddata['startDate'];
+			$endDate = $Perioddata['endDate'];
+			$financialYear = $startDate . ' - ' . $endDate;
+		}else{
+			$financialYear = $_SESSION['financialYear'];
+		}
+		
+		
 		
 		if(isset($financialYear)){
 			$dates = explode(" - ", $financialYear);
@@ -4471,34 +4492,96 @@ class CustomfunctionsComponent extends Component {
 		
 		}
 
-		// if(!empty($currentPeriodRecord)){
-
-		// }
-		// $bgraAddedRecord = $DmiBgrCommodityReportsAddmore->find('all',array(
-		// 	'conditions'=>array(
-		// 	'customer_id IS'=>$customer_id)))->toArray();
-	
-		// $query = $DmiBgrCommodityReportsAddmore->find()
-		// ->where([
-		// 		'customer_id' => $customer_id,
-		// 		'delete_status IS NULL' // Records where delete_status is NULL
-		// ])
-		// ->order(['id' => 'desc']);
-
-    // $bgrReportData = $query->toArray();
-		// pr($bgrReportData);die;
-    // foreach ($bgrReportData as $eachvalue) { // Note the "&" before $eachvalue
-    //     $commodity_code = $eachvalue['commodity'];
-
-    //     $result = $MCommodity->find()
-    //         ->select('commodity_name')
-    //         ->where(['commodity_code' => $commodity_code]);
-
-    //     $commodityArray = $result->first();
-    //     $eachvalue['commodity'] = $commodityArray ? $commodityArray->commodity_name : '';
-    // }
-
 		return $currentPeriodRecord;
+	}
+
+	// This function are written by shankhpal on 06/09/2023
+	// are use to add entry in grant pdf table
+	public function bgrGrantTableEntry($customer_id){
+
+		$DmiBgrGrantCertificatePdfsTable = TableRegistry::getTableLocator()->get('DmiBgrGrantCertificatePdfs');	
+		//check applicant last record version to increment		
+		$list_id = $DmiBgrGrantCertificatePdfsTable->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+		
+		if(!empty($list_id))
+		{
+			$max_id = $DmiBgrGrantCertificatePdfsTable->find('all', array('fields'=>'pdf_version', 'conditions'=>array('id'=>max($list_id))))->first();
+			$last_pdf_version 	=	$max_id['pdf_version'];
+
+		}else{	$last_pdf_version = 0;	}
+
+		$current_pdf_version = $last_pdf_version+1; //increment last version by 1
+
+		$pdfPrefix = 'BGR-';
+		$split_customer_id = explode('/',(string) $customer_id); #For Deprecations
+		
+		$rearranged_id = $pdfPrefix.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];	
+		
+		$this->Session->write('pdf_file_name',$rearranged_id.'('.$current_pdf_version.')'.'.pdf');
+
+		$file_path = '/testdocs/DMI/temp/'.$rearranged_id.'('.$current_pdf_version.')'.'.pdf';
+	
+		$filename = $_SERVER["DOCUMENT_ROOT"].$file_path;
+		$current_level = 'applicant';	
+
+		$folderName = $this->getFolderName($customer_id);
+	
+		$file_name = $rearranged_id.'('.$current_pdf_version.')'.'.pdf';
+		$source = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/temp/';
+		$destination = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/applications/'.$folderName.'/';
+		
+		
+		if($this->moveFile($file_name,$source,$destination)==1){
+
+			//changed file path from temp to files
+			$file_path = '/testdocs/DMI/applications/'.$folderName.'/'.$rearranged_id.'('.$current_pdf_version.')'.'.pdf';
+			$Perioddata = $this->computeBiannualPeriod();
+			$startDate = $Perioddata['startDate'];
+			$endDate = $Perioddata['endDate'];
+
+			$Dmi_app_pdf_record_entity = $DmiBgrGrantCertificatePdfsTable->newEntity(array(
+	
+				'customer_id'=>$customer_id,
+				'pdf_file'=>$file_path,
+				'user_email_id'=>$_SESSION['username'],
+				'date'=>date('Y-m-d H:i:s'),
+				'pdf_version'=>$current_pdf_version,
+				'created'=>date('Y-m-d H:i:s'),
+				'modified'=>date('Y-m-d H:i:s'),
+				'period_from' => $startDate,
+				'period_to' => $endDate
+
+	
+			));
+	
+			$DmiBgrGrantCertificatePdfsTable->save($Dmi_app_pdf_record_entity);
+
+		}
+		
+	}
+
+	//function added by shankhpal on 06/09/2023 for BGR module
+	public function moveFile($file_name,$source,$destination){
+		
+		// If we copied this successfully, mark it for deletion
+		if (copy($source.$file_name, $destination.$file_name)) {
+			$delete_path = $source.$file_name;
+			unlink($delete_path);
+			return true;
+		}else{
+			//this if condition added on 01-04-2019 by Amol
+			//to try the moving of file for 2nd attempt, because many times it was not moved in 1st attempt.
+			if (copy($source.$file_name, $destination.$file_name)) {
+				$delete_path = $source.$file_name;
+				unlink($delete_path);
+				return true;
+			}else{
+				
+				if (file_exists($source.$file_name)) {//added this new condition on 15-01-2020  
+					return false;					                       
+				}	
+			}
+		}
 	}
 
 

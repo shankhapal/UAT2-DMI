@@ -27,7 +27,7 @@ define('INPUT_FIELD_CLASSES', 'form-control input-field wd120');
 $placeholder = DATE_FORMAT_MESSAGE;
 $class1 = INPUT_FIELD_CLASSES;?>
  
-<?php if($section_form_details[0]['form_status'] !== "approved"){ ?>
+<?php if(empty($checkIfgrant)){ ?>
 <div class="row">
   <div class="col-md-12 ">
     <div class="table-format">
@@ -74,7 +74,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                             echo $this->Form->control('period', array(
                               'type'=>'text',
                               'id'=>'period',
-                              'value'=>$_SESSION['financialYear'],
+                              'value'=>$section_form_details[18],
                               'label'=>'Period:',
                               'readonly'=>'readonly',
                               'class'=>'form-control'
@@ -744,6 +744,59 @@ $class1 = INPUT_FIELD_CLASSES;?>
         </div>
       </div>
       
+      <div class="form-horizontal border fileupload">
+										<div class="card-body">
+												<div class="row">
+														<div class="col-md-3">
+																<div class="form-group row">
+																		<label for="field3" class="col-sm col-form-label">
+																			<span>
+																				<?php
+																					if ($_SESSION['current_level'] == 'level_2'
+																					 && $application_mode == 'edit' )
+																					 {echo 'Other Upload Docs'; }
+																					else { echo 'Other Upload Docs'; }
+																					?>
+																				</span><span class="cRed">*</span>
+																		</label>
+
+																				<span class="float-left">
+																					<?php if ($_SESSION['current_level'] == 'level_2'
+																					&& $application_mode == 'edit'
+																					&& empty($section_form_details[0]
+																					['other_upload_docs']))
+																					{ echo 'Attach docs'; }else{ echo 'Attached docs'; } ?> :
+																				<?php
+																				if (!empty($section_form_details[0]['other_upload_docs'])) { ?>
+																						<a id="other_upload_docs_value"
+																						target="blank"
+																						href="<?php
+																						echo str_replace("D:/xampp/htdocs","",
+																						$section_form_details[0]
+																						['other_upload_docs']);
+																						?>">
+																						<?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]
+																						['other_upload_docs'])), -1))[0],23);?></a>
+																				<?php }else{ echo "No Document Provided" ;} ?>
+																		</div>
+																</div>
+																<div class="col-md-3">
+																		<div class="form-group row">
+																				<div class="custom-file col-sm">
+																							<input
+																							type="file" name="other_upload_docs"
+																							class="form-control" id="other_upload_docs" multiple='multiple'>
+																							<span id="error_other_upload_docs" class="error invalid-feedback"></span>
+																							<span id="error_type_other_upload_docs" class="error invalid-feedback"></span>
+																							<span id="error_size_other_upload_docs" class="error warning"></span>
+																					</div>
+																		</div>
+																			<p class="lab_form_note float-right mt-3">
+																				<i class="fa fa-info-circle"></i> File type: PDF, jpg &amp; max size upto 2 MB</p>
+														</div>
+										</div>
+								</div>
+						</div>
 <?php } ?>
 <?php if(!empty($_SESSION['packer_id']) || isset($_SESSION['packer_id'])){
 			$customer_id = $_SESSION['packer_id'];

@@ -106,12 +106,18 @@ class ApplicationformspdfsController extends AppController{
 			$pdfPrefix = 'BGR-';
 		}																		 
 		 //added if else for chemist application use rearranged id given format added by laxmi B. on 15-12-2022
-         if($_SESSION['application_type']==4 || $_SESSION['application_type']==11){
-    	  $rearranged_id = $pdfPrefix.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2];
-         }else{
+		if($_SESSION['application_type']==4){
+			$rearranged_id = $pdfPrefix.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2];
+		}elseif($_SESSION['application_type']==11){
+			$customer_id = $this->Session->read('packer_id');
+			$split_customer_id = explode('/',(string) $customer_id); #For Deprecations
+			$rearranged_id = $pdfPrefix.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];	
+			
+		}
+		else{
 
-         	$rearranged_id = $pdfPrefix.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];	
-         }	
+		$rearranged_id = $pdfPrefix.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];	
+		}	
 				
 		//check applicant last record version to increment		
 		$list_id = $Dmi_app_pdf_record->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
@@ -388,6 +394,8 @@ class ApplicationformspdfsController extends AppController{
 			$pdfPrefix = 'MOD-';
 		}elseif($application_type==9){ #For Surrender Application -Akash [14-04-2023]
 			$pdfPrefix = 'SOC-';
+		}elseif($application_type==11){ #For Biannually Grading report -Shankhpal [06/09/2023]
+			$pdfPrefix = 'BGR-';
 		}
 
 		
@@ -2684,7 +2692,8 @@ class ApplicationformspdfsController extends AppController{
 
 			
 		}elseif($appl_type == 11 && $pdf_for == 'Bianually Grading'){ // condition added by shankhpal for BGR module on 05/09/2023
-			$pdf = new TCPDF('L', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+			$pdf = new TCPDF('L', PDF_UNIT, 'LEGAL', true, 'UTF-8', false);
+			
 		}
 		else{
 			$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);

@@ -244,7 +244,7 @@ class ScrutinyController extends AppController{
 
 		}
 		//----------------------------------------------------------------------------------------------------------
-
+		
 		if($current_level){
 
 			$back_to_inspection_level = $current_level;
@@ -425,7 +425,7 @@ class ScrutinyController extends AppController{
 		$last_record_with_delete_null = $this->Communication->lastRecordWithDeleteNull($section_model,$customer_id);
 
 		$this->Communication->editDeleteOptionForMoRoCommunication($section_model,$customer_id,$current_level,$last_record_with_delete_null);
-
+		
 		//For MO comment
 		if (null!==($this->request->getData('save_edited_mo_comment'))){
 
@@ -469,7 +469,7 @@ class ScrutinyController extends AppController{
 
 		//Start code for Edit/Delete options For RO on Communication with Applicant.
 		if($current_level == 'level_3'){
-
+			
 			$reffered_back_date = $section_form_details[0]['reffered_back_date'];
 			$this->Communication->editDeleteOptionForRoApplicantCommunication($customer_id,$reffered_back_date);
 
@@ -493,7 +493,7 @@ class ScrutinyController extends AppController{
 			}
 		}
 		//End code for Edit/Delete options For RO on Communication with Applicant.
-
+		
 		// Saved referredback comments in chemist flow, Done Akash [30-09-2021]
 		if(null!==($this->request->getData('che_ro_referred_back'))){
 
@@ -641,11 +641,11 @@ class ScrutinyController extends AppController{
 			}
 
 		}elseif (null!== ($this->request->getData('mo_verified'))) { //only done by RO but recorded as level 1 entry
-
+			
 			//called this component to optimized code on 02-04-2018
-
+			
 			$result = $this->Romoioapplicantcommunicationactions->ROScrutinizedATMOLevel($customer_id,$section_model,$section_form_details[0],$allSectionDetails);
-
+			
 			if($result == 1 && $oldapplication=='yes' && ($application_type==1 || $application_type==6)){//added appl type 6 cond. on 23-11-2021
 
 				$this->Romoioapplicantcommunicationactions->ROScrutinizedOldApplication($customer_id);
