@@ -953,8 +953,8 @@ class ChemistController extends AppController {
 				$this->set('chemist_id', $chemist_id);
 
 				if(!empty($chemist_details['chemist_fname'] && !empty($chemist_details['chemist_lname']))){
-				$this->set('chemist_fname', $chemist_details['chemist_fname']);
-				$this->set('chemist_lname', $chemist_details['chemist_lname']);
+					$this->set('chemist_fname', $chemist_details['chemist_fname']);
+					$this->set('chemist_lname', $chemist_details['chemist_lname']);
 				}
 
 				// for Ral Office and RAL information
@@ -964,20 +964,20 @@ class ChemistController extends AppController {
 
 				
 				if(!empty($ral_details)){
-				$this->set('ral_details',$ral_details);
+				  $this->set('ral_details',$ral_details);
 				}
-				$ro_office_id= $this->DmiRoOffices->find('all')->where(array('ro_email_id'=>$ro_email, 'or'=>array(['office_type IS'=>'RO'],['office_type IS'=>'SO'])))->first();
+				  $ro_office_id= $this->DmiRoOffices->find('all')->where(array('ro_email_id'=>$ro_email, 'or'=>array(['office_type IS'=>'RO'],['office_type IS'=>'SO'])))->first();
 				
 				// for export unit  condition added by laxmi on 9-1-23
 				if(!empty($_SESSION['export_unit']) && $_SESSION['export_unit'] == 'yes'){
-				$ral_details = $this->DmiRoOffices->find('all')->select(['id','ro_office'])->where(array('office_type IS'=>'RAL', 'ro_office IS'=> 'Mumbai', 'delete_status IS'=>NULL ))->toArray();
+				    $ral_details = $this->DmiRoOffices->find('all')->select(['id','ro_office'])->where(array('office_type IS'=>'RAL', 'ro_office IS'=> 'Mumbai', 'delete_status IS'=>NULL ))->toArray();
 				
 				if(!empty($ral_details)){
-				$this->set('ral_details',$ral_details);
+				   $this->set('ral_details',$ral_details);
 				}
-				$ro_office_id= $this->DmiRoOffices->find('all')->where(array('ro_email_id'=>$ro_email, 'or'=>array(['office_type IS'=>'RO'],['office_type IS'=>'SO'])))->first();
-				//for export unit is yes for chemist then application with only Mumbai office
-				$export_unit = $this->Session->read('export_unit');
+				  $ro_office_id= $this->DmiRoOffices->find('all')->where(array('ro_email_id'=>$ro_email, 'or'=>array(['office_type IS'=>'RO'],['office_type IS'=>'SO'])))->first();
+					//for export unit is yes for chemist then application with only Mumbai office
+					$export_unit = $this->Session->read('export_unit');
 				
 				if(!empty($export_unit) && $export_unit == 'yes'){
 					
@@ -990,100 +990,100 @@ class ChemistController extends AppController {
 				
 				
 				if($this->request->is('post') != '' ){
-				$document= $this->request->getData('document');
-				$shedule_from = $this->request->getData('shedule_from');
-				$from_date = date('Y-m-d H:i:s', strtotime(str_replace('/','-',$shedule_from)));
-				$shedule_to = $this->request->getData('shedule_to');
-				$to_date = date('Y-m-d H:i:s', strtotime(str_replace('/','-',$shedule_to)));
+					$document= $this->request->getData('document');
+					$shedule_from = $this->request->getData('shedule_from');
+					$from_date = date('Y-m-d H:i:s', strtotime(str_replace('/','-',$shedule_from)));
+					$shedule_to = $this->request->getData('shedule_to');
+					$to_date = date('Y-m-d H:i:s', strtotime(str_replace('/','-',$shedule_to)));
 		
-				if (!empty($this->request->getData('document')->getClientFilename())) {
+					if (!empty($this->request->getData('document')->getClientFilename())) {
 
-				$attchment = $document; 
-				$file_name = $attchment->getClientFilename();
-				$file_size = $attchment->getSize();
-				$file_type = $attchment->getClientMediaType();
-				$file_local_path = $attchment->getStream()->getMetadata('uri');
-				// calling file uploading function
+						$attchment = $document; 
+						$file_name = $attchment->getClientFilename();
+						$file_size = $attchment->getSize();
+						$file_type = $attchment->getClientMediaType();
+						$file_local_path = $attchment->getStream()->getMetadata('uri');
+						// calling file uploading function
 
-				$document = $this->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path);
+						$document = $this->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path);
+
+					}else{
+						$document = "";
+					}
+
+						$postdata = $this->request->getData();
+
+					if(!empty($postdata['ro_office']) && !empty($postdata['shedule_from'])  && !empty($postdata['shedule_to'])){
+
+
+						$this->loadModel('DmiChemistRoToRalLogs');
+						$chemistId = $postdata['chemist_id'];
+
+						$data = $this->DmiChemistRoToRalLogs->newEntity(array(
+						'chemist_id' =>$postdata['chemist_id'],
+						'ro_first_name' =>$postdata['ro_first_name'],
+						'ro_last_name' => $postdata['ro_last_name'],
+						'chemist_first_name' => $postdata['chemist_first_name'],
+						'chemist_last_name' => $postdata['chemist_last_name'],
+						'ral_office_id' => $postdata['ro_office'], 
+						'remark' => $postdata['remark'], 
+						'document' => $document,
+						'is_forwordedtoral' => 'yes',
+						'created' => date('Y-m-d H:i:s'),
+						'appliaction_type'=> 4,
+						'shedule_from' => $from_date,
+						'shedule_to' => $to_date,
+						'ro_office_id' =>$ro_office_id['id'],
+						));
+					
+						if($this->DmiChemistRoToRalLogs->save($data)){
+					
+							//to enter RAL Email id in allocation and current position table added by laxmi on 10-01-2023
+							$this->loadModel('DmiRoOffices');
+							$find_office_email_id = $this->DmiRoOffices->find('all',array( 'conditions'=>array('id'=>$data['ral_office_id'])))->first();  
+							$office_incharge_id = $find_office_email_id['ro_email_id'];
+
+							//Entry in allocation table for level_3 Ro
+							$this->loadModel('DmiChemistAllocations');
+							$allocationEntity = $this->DmiChemistAllocations->newEntity(array(
+							'customer_id'=>$chemist_id,
+							'level_3'=>$office_incharge_id,
+							'current_level'=>$office_incharge_id,
+							'created'=>date('Y-m-d H:i:s'),
+							'modified'=>date('Y-m-d H:i:s')
+							));
+
+							if($this->DmiChemistAllocations->save($allocationEntity)){
+
+								$this->loadModel('DmiChemistAllCurrentPositions');
+								//Entry in all applications current position table
+								$customer_id =  $chemist_id;
+								$user_email_id = $office_incharge_id;
+								$current_level = 'level_3';
+								$this->DmiChemistAllCurrentPositions->currentUserUpdate($customer_id,$user_email_id,$current_level);//call to custom function from model
+							}
+
+							$message ="Chemist Application Forwarded to RAL "  .$find_office_email_id['ro_office'].". And the email id is ".base64_decode($office_incharge_id)."  ";
+							$message_theme = "success";
+
+							// for rescheduling chemist training at RAL and generate letter pdf so comment this redirect url and redirect on  chemist module  by laxmi B. on 10-05-2023  for chemist modeule
+							//$redirect_to = '../applicationformspdfs/chemistAppPdfRoToRal/';
+
+							$redirect_to = '../chemist/listOfChemistApplRoToRal/';
+
+						}else{
+
+							$message ="Something went wrong, Please Try Again!";
+							$message_theme = "warning";
+							$redirect_to = '../scrutiny/form-scrutiny';
+						}
 
 				}else{
-				$document = "";
-				}
-
-				$postdata = $this->request->getData();
-
-				if(!empty($postdata['ro_office']) && !empty($postdata['shedule_from'])  && !empty($postdata['shedule_to'])){
-
-
-				$this->loadModel('DmiChemistRoToRalLogs');
-				$chemistId = $postdata['chemist_id'];
-
-				$data = $this->DmiChemistRoToRalLogs->newEntity(array(
-				'chemist_id' =>$postdata['chemist_id'],
-				'ro_first_name' =>$postdata['ro_first_name'],
-				'ro_last_name' => $postdata['ro_last_name'],
-				'chemist_first_name' => $postdata['chemist_first_name'],
-				'chemist_last_name' => $postdata['chemist_last_name'],
-				'ral_office_id' => $postdata['ro_office'], 
-				'remark' => $postdata['remark'], 
-				'document' => $document,
-				'is_forwordedtoral' => 'yes',
-				'created' => date('Y-m-d H:i:s'),
-				'appliaction_type'=> 4,
-				'shedule_from' => $from_date,
-				'shedule_to' => $to_date,
-				'ro_office_id' =>$ro_office_id['id'],
-				));
-				
-				if($this->DmiChemistRoToRalLogs->save($data)){
-				
-				//to enter RAL Email id in allocation and current position table added by laxmi on 10-01-2023
-				$this->loadModel('DmiRoOffices');
-				$find_office_email_id = $this->DmiRoOffices->find('all',array( 'conditions'=>array('id'=>$data['ral_office_id'])))->first();  
-				$office_incharge_id = $find_office_email_id['ro_email_id'];
-
-				//Entry in allocation table for level_3 Ro
-				$this->loadModel('DmiChemistAllocations');
-				$allocationEntity = $this->DmiChemistAllocations->newEntity(array(
-				'customer_id'=>$chemist_id,
-				'level_3'=>$office_incharge_id,
-				'current_level'=>$office_incharge_id,
-				'created'=>date('Y-m-d H:i:s'),
-				'modified'=>date('Y-m-d H:i:s')
-				));
-
-				if($this->DmiChemistAllocations->save($allocationEntity)){
-
-				$this->loadModel('DmiChemistAllCurrentPositions');
-				//Entry in all applications current position table
-				$customer_id =  $chemist_id;
-				$user_email_id = $office_incharge_id;
-				$current_level = 'level_3';
-				$this->DmiChemistAllCurrentPositions->currentUserUpdate($customer_id,$user_email_id,$current_level);//call to custom function from model
-				}
-
-				$message ="Chemist Application Forwarded to RAL "  .$find_office_email_id['ro_office'].". And the email id is ".base64_decode($office_incharge_id)."  ";
-				$message_theme = "success";
-
-				// for rescheduling chemist training at RAL and generate letter pdf so comment this redirect url and redirect on  chemist module  by laxmi B. on 10-05-2023  for chemist modeule
-				//$redirect_to = '../applicationformspdfs/chemistAppPdfRoToRal/';
-
-				$redirect_to = '../chemist/listOfChemistApplRoToRal/';
-
-				}else{
-
-				$message ="Something went wrong, Please Try Again!";
-				$message_theme = "warning";
-				$redirect_to = '../scrutiny/form-scrutiny';
-				}
-
-				}else{
-				$message ="Please Enter all Field data";
-				$message_theme = "warning";
-				$redirect_to = '';
+					$message ="Please Enter all Field data";
+					$message_theme = "warning";
+					$redirect_to = '';
 				}  
-				}
+			}
 				// set variables to show popup messages from view file
 				$this->set('message',$message);
 				$this->set('message_theme',$message_theme);
@@ -1093,539 +1093,564 @@ class ChemistController extends AppController {
 
 			// List of chemist application  forwarded by ro to RAL added by laxmi on 26-12-2022
 			public function listOfChemistApplRoToRal(){
-				//$username = $this->Session->read('username');
-			$username = $this->getRequest()->getSession()->read('username');
+					//$username = $this->Session->read('username');
+					$username = $this->getRequest()->getSession()->read('username');
 
-			if($username == null){
-				$this->customAlertPage("Sorry You are not authorized to view this page..");
-				exit();
-			}
-			else{
-				$this->loadModel('DmiUsers');
-				//check if user entry in Dmi_users table for valid user
-				$check_user = $this->DmiUsers->find('all',array('conditions'=>array('email'=>$this->Session->read('username'))))->first();
+					if($username == null){
+						$this->customAlertPage("Sorry You are not authorized to view this page..");
+						exit();
+					}
+					else{
+						$this->loadModel('DmiUsers');
+						//check if user entry in Dmi_users table for valid user
+						$check_user = $this->DmiUsers->find('all',array('conditions'=>array('email'=>$this->Session->read('username'))))->first();
 
-				if(empty($check_user)){
-					$this->customAlertPage("Sorry You are not authorized to view this page..");
-					exit();
-				}
-			}
+						if(empty($check_user)){
+							$this->customAlertPage("Sorry You are not authorized to view this page..");
+							exit();
+						}
+					}
 
-			$this->loadModel('DmiChemistRoToRalLogs');
-			$this->loadModel('DmiRoOffices');
-			$this->loadModel('DmiChemistRegistrations');
-			$this->loadModel('DmiChemistRalToRoLogs');
-			$this->viewBuilder()->setLayout('admin_dashboard');
+					$this->loadModel('DmiChemistRoToRalLogs');
+					$this->loadModel('DmiRoOffices');
+					$this->loadModel('DmiChemistRegistrations');
+					$this->loadModel('DmiChemistRalToRoLogs');
+					$this->viewBuilder()->setLayout('admin_dashboard');
 
-			$ro_email = $_SESSION['username'];	
-			$ro_office_ids = $this->DmiRoOffices->find('all',array('fields'=>['id', 'office_type'], 'conditions'=>array('ro_email_id IS'=>$ro_email)))->last(); 
-			$ro_office_id = $ro_office_ids['id'];
+					$ro_email = $_SESSION['username'];	
+					$ro_office_ids = $this->DmiRoOffices->find('all',array('fields'=>['id', 'office_type'], 'conditions'=>array('ro_email_id IS'=>$ro_email)))->last(); 
+					$ro_office_id = $ro_office_ids['id'];
             
 
-			$export_unit = $this->Session->read('export_unit');
-			if(!empty($export_unit) && $export_unit == 'yes'){
-				$ro_office_ids = $this->DmiRoOffices->find('all',array('valueField'=>['id','office_type'], 'conditions'=>array('ro_email_id IS'=>$ro_email, 'ro_office IS'=>'Mumbai')))->first(); 
-			    $ro_office_id = $ro_office_ids['id'];
-			}
-			$this->set('office_type', $ro_office_ids['office_type']);
-			$listofApp = $this->DmiChemistRoToRalLogs->find('all')->where(array('is_forwordedtoral IS NOT '=>NULL, 'ro_office_id IS'=>$ro_office_id))->order('created desc')->toArray();
+					$export_unit = $this->Session->read('export_unit');
+					if(!empty($export_unit) && $export_unit == 'yes'){
+						$ro_office_ids = $this->DmiRoOffices->find('all',array('valueField'=>['id','office_type'], 'conditions'=>array('ro_email_id IS'=>$ro_email, 'ro_office IS'=>'Mumbai')))->first(); 
+						$ro_office_id = $ro_office_ids['id'];
+					}
+						$this->set('office_type', $ro_office_ids['office_type']);
+						$listofApp = $this->DmiChemistRoToRalLogs->find('all')->where(array('is_forwordedtoral IS NOT '=>NULL, 'ro_office_id IS'=>$ro_office_id))->order('created desc')->toArray();
 			
-			$i=0;
-			$ral_offices= array();
-			$chemistId= array(); 
-			$ro_offices = array();
-			$ral_schedule_pdf = array();
+						$i=0;
+						$ral_offices= array();
+						$chemistId= array(); 
+						$ro_offices = array();
+						$ral_schedule_pdf = array();
 
-			if(!empty($listofApp)){
-			$this->set('listOfChemistApp',$listofApp);
-			foreach($listofApp as $list){
-			$ral_result = $this->DmiRoOffices->find('all',array('fields'=>'ro_office', 'conditions'=>array('id IS'=>$list['ral_office_id'])))->first();
-			$ral_offices[$i] = $ral_result['ro_office'];
-			$chemistId[$i] = $this->DmiChemistRegistrations->find('all',array('fields'=>'id', 'conditions'=>array('chemist_id'=>$list['chemist_id'])))->first();
+					if(!empty($listofApp)){
+						$this->set('listOfChemistApp',$listofApp);
+						foreach($listofApp as $list){
+							$ral_result = $this->DmiRoOffices->find('all',array('fields'=>'ro_office', 'conditions'=>array('id IS'=>$list['ral_office_id'])))->first();
+							$ral_offices[$i] = $ral_result['ro_office'];
+							$chemistId[$i] = $this->DmiChemistRegistrations->find('all',array('fields'=>'id', 'conditions'=>array('chemist_id'=>$list['chemist_id'])))->first();
 
 
-			$ro_officesId = $this->DmiRoOffices->find('all',array('fields'=>'ro_office', 'conditions'=>array('id IS'=>$list['ro_office_id'])))->first();
-			if(!empty($ro_officesId)){
-			$ro_offices[$i]= $ro_officesId['ro_office'];
-			}
-            $ral_schedule = $this->DmiChemistRalToRoLogs->find('all')->where(array('chemist_id'=>$list['chemist_id'], 'reshedule_pdf IS NOT'=>NULL, 'reshedule_status'=>'confirm'))->last();
-            if(!empty($ral_schedule)){$ral_schedule_pdf[$i] = $ral_schedule['reshedule_pdf'];}
+								$ro_officesId = $this->DmiRoOffices->find('all',array('fields'=>'ro_office', 'conditions'=>array('id IS'=>$list['ro_office_id'])))->first();
+							if(!empty($ro_officesId)){
+								$ro_offices[$i]= $ro_officesId['ro_office'];
+							}
+								$ral_schedule = $this->DmiChemistRalToRoLogs->find('all')->where(array('chemist_id'=>$list['chemist_id'], 'reshedule_pdf IS NOT'=>NULL, 'reshedule_status'=>'confirm'))->last();
+							if(!empty($ral_schedule)){$ral_schedule_pdf[$i] = $ral_schedule['reshedule_pdf'];}
 			
-			$i= $i+1;
-			}
-			$this->set('ro_office', $ro_offices);
-			$this->set('ral_offices',$ral_offices);
-			$this->set('chemisttblId',$chemistId);
-			$this->set('ral_schedule_pdf',$ral_schedule_pdf);
+										$i= $i+1;
+						}
+								$this->set('ro_office', $ro_offices);
+								$this->set('ral_offices',$ral_offices);
+								$this->set('chemisttblId',$chemistId);
+								$this->set('ral_schedule_pdf',$ral_schedule_pdf);
 
-			}
+					}
 
-			}
+				}
 			
 			//list of application forwarded back Ral to RO added by laxmi on 29/12/2022
 			public function  listOfChemistApplRalToRo(){  
-				//$username = $this->Session->read('username');
-			$username = $this->getRequest()->getSession()->read('username');
+							//$username = $this->Session->read('username');
+						$username = $this->getRequest()->getSession()->read('username');
 
-			if($username == null){
-				$this->customAlertPage("Sorry You are not authorized to view this page..");
-				exit();
-			}
-			else{
-				$this->loadModel('DmiUsers');
-				//check if user entry in Dmi_users table for valid user
-				$check_user = $this->DmiUsers->find('all',array('conditions'=>array('email'=>$this->Session->read('username'))))->first();
+						if($username == null){
+							$this->customAlertPage("Sorry You are not authorized to view this page..");
+							exit();
+						}
+						else{
+							$this->loadModel('DmiUsers');
+							//check if user entry in Dmi_users table for valid user
+							$check_user = $this->DmiUsers->find('all',array('conditions'=>array('email'=>$this->Session->read('username'))))->first();
 
-				if(empty($check_user)){
-					$this->customAlertPage("Sorry You are not authorized to view this page..");
-					exit();
-				}
-			}
+							if(empty($check_user)){
+								$this->customAlertPage("Sorry You are not authorized to view this page..");
+								exit();
+							}
+						}
 
-			$this->viewBuilder()->setLayout('admin_dashboard');
-            
-			$this->loadModel('DmiChemistRalToRoLogs');
-			$this->loadModel('DmiRoOffices');
-			$this->loadModel('DmiChemistTrainingAtRo');
-			$this->loadModel('DmiChemistRegistrations');
-			$this->loadModel('DmiChemistAllCurrentPositions');
-			$this->loadModel('DmiChemistRoToRalLogs');
-			$this->loadModel('DmiRejectedApplLogs');
-			$conn = ConnectionManager::get('default');
+					$this->viewBuilder()->setLayout('admin_dashboard');
+					
+					$this->loadModel('DmiChemistRalToRoLogs');
+					$this->loadModel('DmiRoOffices');
+					$this->loadModel('DmiChemistTrainingAtRo');
+					$this->loadModel('DmiChemistRegistrations');
+					$this->loadModel('DmiChemistAllCurrentPositions');
+					$this->loadModel('DmiChemistRoToRalLogs');
+					$this->loadModel('DmiRejectedApplLogs');
+					$conn = ConnectionManager::get('default');
 
-			$ro_email = $this->Session->read('username');
-			
-			$chemist_allocation  = $this->DmiChemistAllCurrentPositions->find('all',array('fields'=>array('current_level', 'current_user_email_id')))->where(array('current_user_email_id IS'=>$ro_email))->first();
-			if(!empty($chemist_allocation)){
-			$this->set('current_level', $chemist_allocation['current_level']);
-			$this->Session->write('current_level', $chemist_allocation['current_level']);
-				
-		}
+					$ro_email = $this->Session->read('username');
+					
+					$chemist_allocation  = $this->DmiChemistAllCurrentPositions->find('all',array('fields'=>array('current_level', 'current_user_email_id')))->where(array('current_user_email_id IS'=>$ro_email))->first();
+					if(!empty($chemist_allocation)){
+						$this->set('current_level', $chemist_allocation['current_level']);
+						$this->Session->write('current_level', $chemist_allocation['current_level']);
+						
+					}
 		
-			$ro_office_data = $this->DmiRoOffices->find('all',array('fields'=>array('id', 'office_type','ro_office'), 'conditions'=>array('ro_email_id IS'=>$ro_email, 'ro_email_id'=>$chemist_allocation['current_user_email_id'])))->last(); 
-			
-			$export_unit = $this->Session->read('export_unit');
-			if(!empty($export_unit) && $export_unit == 'yes'){
-				$ro_office_data = $this->DmiRoOffices->find('all',array('fields'=>array('id', 'office_type','ro_office'), 'conditions'=>array('ro_email_id IS'=>$ro_email, 'ro_email_id'=>$chemist_allocation['current_user_email_id'],'ro_office'=>'Mumbai')))->first();
-			}
-			$this->set('level_3_for', $ro_office_data['office_type']);
-			$this->Session->write('level_3_for', $ro_office_data['office_type']);
+					$ro_office_data = $this->DmiRoOffices->find('all',array('fields'=>array('id', 'office_type','ro_office'), 'conditions'=>array('ro_email_id IS'=>$ro_email, 'ro_email_id'=>$chemist_allocation['current_user_email_id'])))->last(); 
+					
+					$export_unit = $this->Session->read('export_unit');
+					if(!empty($export_unit) && $export_unit == 'yes'){
+						$ro_office_data = $this->DmiRoOffices->find('all',array('fields'=>array('id', 'office_type','ro_office'), 'conditions'=>array('ro_email_id IS'=>$ro_email, 'ro_email_id'=>$chemist_allocation['current_user_email_id'],'ro_office'=>'Mumbai')))->first();
+					}
+					$this->set('level_3_for', $ro_office_data['office_type']);
+					$this->Session->write('level_3_for', $ro_office_data['office_type']);
 			
 			
 
-			$query = $conn->execute( "SELECT * FROM dmi_chemist_ral_to_ro_logs  WHERE chemist_id NOT IN (SELECT customer_id FROM dmi_rejected_appl_logs) 
-			AND ro_office_id = '".$ro_office_data['id']."' AND training_completed = '1' ORDER BY id DESC" );
-			$listofApp = $query->fetchAll('assoc');
+					$query = $conn->execute( "SELECT * FROM dmi_chemist_ral_to_ro_logs  WHERE chemist_id NOT IN (SELECT customer_id FROM dmi_rejected_appl_logs) 
+					AND ro_office_id = '".$ro_office_data['id']."' AND training_completed = '1' ORDER BY id DESC" );
+					$listofApp = $query->fetchAll('assoc');
 				
 		
              
 
 
-			$i=0;
-			$ral_offices = array();
-			$isTainingCompleted = array();
-			$pdf_file = array();
-			$chemistTblid = array();
-			$is_trainingScheduleRO = array();
-			$ro_schedule_letter = array();
-			$reschedule_status =  array();
-			$appl_type = array();
-			$status  = array();
+						$i=0;
+						$ral_offices = array();
+						$isTainingCompleted = array();
+						$pdf_file = array();
+						$chemistTblid = array();
+						$is_trainingScheduleRO = array();
+						$ro_schedule_letter = array();
+						$reschedule_status =  array();
+						$appl_type = array();
+						$status  = array();
 			
-			if(!empty($listofApp)){
-			foreach($listofApp as $list){ 
-			$ral_offices[$i] = $this->DmiRoOffices->find('list',array('valueField'=>'ro_office', 'conditions'=>array('id IS'=>$list['ral_office_id'])))->first();
+				if(!empty($listofApp)){
+					foreach($listofApp as $list){ 
+						$ral_offices[$i] = $this->DmiRoOffices->find('list',array('valueField'=>'ro_office', 'conditions'=>array('id IS'=>$list['ral_office_id'])))->first();
 
-			//training complete or not
-			$trainingComplete = $this->DmiChemistTrainingAtRo->find('all', array('fields'=>array('training_completed', 'pdf_file')))->where(array('chemist_id IS'=>$list['chemist_id']))->first();
+						//training complete or not
+						$trainingComplete = $this->DmiChemistTrainingAtRo->find('all', array('fields'=>array('training_completed', 'pdf_file')))->where(array('chemist_id IS'=>$list['chemist_id']))->first();
           
-			if(!empty($trainingComplete)){
-			$isTainingCompleted[$i] = $trainingComplete['training_completed'];
-			$pdf_file[$i]  = $trainingComplete['pdf_file'];
+						if(!empty($trainingComplete)){
+						$isTainingCompleted[$i] = $trainingComplete['training_completed'];
+						$pdf_file[$i]  = $trainingComplete['pdf_file'];
 
-			}
+						}
 
-			$chemistTableid = $this->DmiChemistRegistrations->find('all',array('fields'=>['id', 'chemist_id'], 'conditions'=>array('chemist_id'=>$list['chemist_id'])))->first();
-			if(!empty($chemistTableid)){
-			$chemistTblid[$i] = $chemistTableid['id'];
-			}
+								$chemistTableid = $this->DmiChemistRegistrations->find('all',array('fields'=>['id', 'chemist_id'], 'conditions'=>array('chemist_id'=>$list['chemist_id'])))->first();
+							if(!empty($chemistTableid)){
+								$chemistTblid[$i] = $chemistTableid['id'];
+							}
 
-			//training schedule at ro side training
-			$ro_schedule_training = $this->DmiChemistRoToRalLogs->find('all', array('conditions'=>array('chemist_id'=>$list['chemist_id'])))->last();
+							//training schedule at ro side training
+							$ro_schedule_training = $this->DmiChemistRoToRalLogs->find('all', array('conditions'=>array('chemist_id'=>$list['chemist_id'])))->last();
            
-			if(!empty($ro_schedule_training)){
-			$is_trainingScheduleRO[$i] = $ro_schedule_training['is_training_scheduled_ro'];
-			$ro_schedule_letter[$i] = $ro_schedule_training['ro_schedule_letter'];
-            $reschedule_status[$i] = $ro_schedule_training['reshedule_status'];
-			}
-            if(!empty($list['appliaction_type'])){
-               $this->loadModel('DmiApplicationTypes');
-			   $application_type = $this->DmiApplicationTypes->find('all',array( 'conditions'=>['id IS'=>$list['appliaction_type']]))->first();
-			  $appl_type[$i] = $application_type['application_type'];
-			}
+						if(!empty($ro_schedule_training)){
+							$is_trainingScheduleRO[$i] = $ro_schedule_training['is_training_scheduled_ro'];
+							$ro_schedule_letter[$i] = $ro_schedule_training['ro_schedule_letter'];
+							$reschedule_status[$i] = $ro_schedule_training['reshedule_status'];
+						}
+						if(!empty($list['appliaction_type'])){
+						$this->loadModel('DmiApplicationTypes');
+						$application_type = $this->DmiApplicationTypes->find('all',array( 'conditions'=>['id IS'=>$list['appliaction_type']]))->first();
+						$appl_type[$i] = $application_type['application_type'];
+						}
 
-			$this->loadModel('DmiChemistGrantCertificatePdfs');
-			$g_status = $this->DmiChemistGrantCertificatePdfs->find('all',array('fields'=>array('pdf_file'), 'conditions'=>['customer_id IS'=>$chemistTableid['chemist_id']]))->last();
-			if(!empty($g_status)){
-			$status[$i] =$g_status['pdf_file'];
-			}
-			$i= $i+1;	
-			}
+						$this->loadModel('DmiChemistGrantCertificatePdfs');
+						$g_status = $this->DmiChemistGrantCertificatePdfs->find('all',array('fields'=>array('pdf_file'), 'conditions'=>['customer_id IS'=>$chemistTableid['chemist_id']]))->last();
+						if(!empty($g_status)){
+						 $status[$i] =$g_status['pdf_file'];
+						}
+							$i= $i+1;	
+					}
 
-             //check application is final granted
-			
-          
-             $this->set('grant_approval_pdf',$status);
-           
-			$this->set('ro_schedule_letter',$ro_schedule_letter);
-			$this->set('is_trainingScheduleRO',$is_trainingScheduleRO);
-			$this->set('chemistTblid',$chemistTblid);
-			$this->set('listOfChemistApp',$listofApp);
-			$this->set('ral_office', $ral_offices);
-			$this->set('isTrainingComplete',$isTainingCompleted);   
-			$this->set('pdf_file',$pdf_file);
-			$this->set('ro_offices',$ro_office_data['ro_office']);
-			$this->set('reschedule_status',$reschedule_status);
-			$this->set('appl_type', $appl_type);
+							//check application is final granted
+							
+						
+							$this->set('grant_approval_pdf',$status);
+						
+							$this->set('ro_schedule_letter',$ro_schedule_letter);
+							$this->set('is_trainingScheduleRO',$is_trainingScheduleRO);
+							$this->set('chemistTblid',$chemistTblid);
+							$this->set('listOfChemistApp',$listofApp);
+							$this->set('ral_office', $ral_offices);
+							$this->set('isTrainingComplete',$isTainingCompleted);   
+							$this->set('pdf_file',$pdf_file);
+							$this->set('ro_offices',$ro_office_data['ro_office']);
+							$this->set('reschedule_status',$reschedule_status);
+							$this->set('appl_type', $appl_type);
  
-			}
+				}
 
 			}
 
                //List of chemist training application where training completed at ro office added by laxmi on 3/1/2023
 			public function chemistTrainingCompleteAtRo ($id){
-			//$username = $this->Session->read('username');
-			$username = $this->getRequest()->getSession()->read('username');
+					//$username = $this->Session->read('username');
+					$username = $this->getRequest()->getSession()->read('username');
 
-			if($username == null){
-			$this->customAlertPage("Sorry You are not authorized to view this page..");
-			exit();
+					if($username == null){
+					  	$this->customAlertPage("Sorry You are not authorized to view this page..");
+						exit();
+					}else{
+						$this->loadModel('DmiUsers');
+						//check if user entry in Dmi_users table for valid user
+						$check_user = $this->DmiUsers->find('all',array('conditions'=>array('email'=>$this->Session->read('username'))))->first();
+
+						if(empty($check_user)){
+							$this->customAlertPage("Sorry You are not authorized to view this page..");
+							exit();
+						}
+					}
+						$this->viewBuilder()->setLayout('admin_dashboard');
+						$message="";
+						$message_theme ="";
+						$redirect_to   ="";
+
+
+						$ro_fname = $this->Session->read('f_name'); 
+						$ro_lname = $this->Session->read('l_name');
+						$this->set('ro_fname',$ro_fname);
+						$this->set('ro_last_name',$ro_lname);
+
+
+						$this->loadModel('DmiChemistRalToRoLogs');
+						$roToRalData = $this->DmiChemistRalToRoLogs->find('all')->where(array('id'=>$id))->first(); 
+					if(!empty($roToRalData)){
+						$this->set('chemist_fname',$roToRalData['chemist_first_name']);
+						$this->set('chemist_lname',$roToRalData['chemist_last_name']);
+						$this->set('chemist_id',$roToRalData['chemist_id']);
+						$this->Session->write('customer_id', $roToRalData['chemist_id']);
+						$ro_id = $roToRalData['ro_office_id'];
+						$customer_id =$roToRalData['chemist_id'];
+					}
+
+					if($this->request->is('post') != ''){
+							$postdata = $this->request->getData();
+
+						if (!empty($postdata['document']->getClientFilename()) && !empty($postdata['document'])) {
+
+							$attchment = $postdata['document']; 
+							$file_name = $attchment->getClientFilename();
+							$file_size = $attchment->getSize();
+							$file_type = $attchment->getClientMediaType();
+							$file_local_path = $attchment->getStream()->getMetadata('uri');
+							// calling file uploading function
+
+							$document = $this->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path);
+						}else{
+							$document = NULL;
+						}
+
+
+						if(!empty($postdata['training_completed'] && !empty($postdata['chemist_id']))){
+
+								$this->loadModel('DmiChemistTrainingAtRo');
+
+								$chemist_id = htmlentities($postdata['chemist_id'], ENT_QUOTES);
+								$chemist_first_name = htmlentities($postdata['chemist_first_name'], ENT_QUOTES);
+								$chemist_last_name = htmlentities($postdata['chemist_last_name'], ENT_QUOTES);
+								$remark = htmlentities($postdata['remark'], ENT_QUOTES);
+								$training_completed = htmlentities($postdata['training_completed'], ENT_QUOTES);
+								$appl_type = 4;
+
+								$data = $this->DmiChemistTrainingAtRo->newEntity(array(
+								'chemist_id' =>$chemist_id,
+								'chemist_fname' => $chemist_first_name,
+								'chemist_lname' => $chemist_last_name,
+								'remark' => $remark, 
+								'document' => $document,
+								'training_completed' =>$training_completed,
+								'ro_office_id' =>$ro_id,
+								'appliaction_type'=> $appl_type,
+								'created' => date('Y-m-d H:i:s'),
+								));
+
+								$result = $this->DmiChemistTrainingAtRo->save($data);
+							if($result){
+								$lastInsertedId = $result['id'];	
+								$message ="Chemist Application Training done at " .$_SESSION['level_3_for']."";
+								$message_theme = "success";
+								$redirect_to = '../../Applicationformspdfs/chemistTrainingCompPdfRo/'.$lastInsertedId;
+							}else{
+
+								$message ="Something went wrong, Please Try Again!";
+								$message_theme = "warning";
+								$redirect_to = '../scrutiny/form-scrutiny';
+							}
+
+						}else{
+							$message ="Please Enter all Field data";
+							$message_theme = "warning";
+							$redirect_to = '';
+						}  
+					}
+							// set variables to show popup messages from view file
+							$this->set('message',$message);
+							$this->set('message_theme',$message_theme);
+							$this->set('redirect_to',$redirect_to);
 			}
-			else{
-			$this->loadModel('DmiUsers');
-			//check if user entry in Dmi_users table for valid user
-			$check_user = $this->DmiUsers->find('all',array('conditions'=>array('email'=>$this->Session->read('username'))))->first();
-
-			if(empty($check_user)){
-			$this->customAlertPage("Sorry You are not authorized to view this page..");
-			exit();
-			}
-			}
-			$this->viewBuilder()->setLayout('admin_dashboard');
-			$message="";
-			$message_theme ="";
-			$redirect_to   ="";
 
 
-			$ro_fname = $this->Session->read('f_name'); 
-			$ro_lname = $this->Session->read('l_name');
-			$this->set('ro_fname',$ro_fname);
-			$this->set('ro_last_name',$ro_lname);
-
-
-			$this->loadModel('DmiChemistRalToRoLogs');
-			$roToRalData = $this->DmiChemistRalToRoLogs->find('all')->where(array('id'=>$id))->first(); 
-			if(!empty($roToRalData)){
-			$this->set('chemist_fname',$roToRalData['chemist_first_name']);
-			$this->set('chemist_lname',$roToRalData['chemist_last_name']);
-			$this->set('chemist_id',$roToRalData['chemist_id']);
-			$this->Session->write('customer_id', $roToRalData['chemist_id']);
-			$ro_id = $roToRalData['ro_office_id'];
-			$customer_id =$roToRalData['chemist_id'];
-			}
-
-			if($this->request->is('post') != ''){
-			$postdata = $this->request->getData();
-
-			if (!empty($postdata['document']->getClientFilename()) && !empty($postdata['document'])) {
-
-			$attchment = $postdata['document']; 
-			$file_name = $attchment->getClientFilename();
-			$file_size = $attchment->getSize();
-			$file_type = $attchment->getClientMediaType();
-			$file_local_path = $attchment->getStream()->getMetadata('uri');
-			// calling file uploading function
-
-			$document = $this->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path);
-			}else{
-			$document = NULL;
-			}
-
-
-			if(!empty($postdata['training_completed'] && !empty($postdata['chemist_id']))){
-
-			$this->loadModel('DmiChemistTrainingAtRo');
-
-			$chemist_id = htmlentities($postdata['chemist_id'], ENT_QUOTES);
-			$chemist_first_name = htmlentities($postdata['chemist_first_name'], ENT_QUOTES);
-			$chemist_last_name = htmlentities($postdata['chemist_last_name'], ENT_QUOTES);
-			$remark = htmlentities($postdata['remark'], ENT_QUOTES);
-			$training_completed = htmlentities($postdata['training_completed'], ENT_QUOTES);
-			$appl_type = 4;
-
-			$data = $this->DmiChemistTrainingAtRo->newEntity(array(
-			'chemist_id' =>$chemist_id,
-			'chemist_fname' => $chemist_first_name,
-			'chemist_lname' => $chemist_last_name,
-			'remark' => $remark, 
-			'document' => $document,
-			'training_completed' =>$training_completed,
-			'ro_office_id' =>$ro_id,
-			'appliaction_type'=> $appl_type,
-			'created' => date('Y-m-d H:i:s'),
-			));
-
-			$result = $this->DmiChemistTrainingAtRo->save($data);
-			if($result){
-			$lastInsertedId = $result['id'];	
-			$message ="Chemist Application Training done at " .$_SESSION['level_3_for']."";
-			$message_theme = "success";
-			$redirect_to = '../../Applicationformspdfs/chemistTrainingCompPdfRo/'.$lastInsertedId;
-			}else{
-
-			$message ="Something went wrong, Please Try Again!";
-			$message_theme = "warning";
-			$redirect_to = '../scrutiny/form-scrutiny';
-			}
-
-			}else{
-			$message ="Please Enter all Field data";
-			$message_theme = "warning";
-			$redirect_to = '';
-			}  
-			}
-			// set variables to show popup messages from view file
-			$this->set('message',$message);
-			$this->set('message_theme',$message_theme);
-			$this->set('redirect_to',$redirect_to);
-			}
-
-
-			// Training scheduled at Ro added by laxmi on 27-01-2023
+			   // Training scheduled at Ro added by laxmi on 27-01-2023
 			public function trainingScheduleAtRo($id=null){
-			//$username = $this->Session->read('username');
-			$username = $this->getRequest()->getSession()->read('username');
+					//$username = $this->Session->read('username');
+					$username = $this->getRequest()->getSession()->read('username');
 
-			if($username == null){
-			$this->customAlertPage("Sorry You are not authorized to view this page..");
-			exit();
-			}
-			else{
-			$this->loadModel('DmiUsers');
-			//check if user entry in Dmi_users table for valid user
-			$check_user = $this->DmiUsers->find('all',array('conditions'=>array('email'=>$this->Session->read('username'))))->first();
+					if($username == null){
+						$this->customAlertPage("Sorry You are not authorized to view this page..");
+						exit();
+					}else{
+						$this->loadModel('DmiUsers');
+						//check if user entry in Dmi_users table for valid user
+						$check_user = $this->DmiUsers->find('all',array('conditions'=>array('email'=>$this->Session->read('username'))))->first();
 
-			if(empty($check_user)){
-			$this->customAlertPage("Sorry You are not authorized to view this page..");
-			exit();
-			}
-			}
-			$message = "";
-			$message_theme = "";
-			$redirect_to = "";
-			$this->viewBuilder()->setLayout('admin_dashboard');
-			$ro_email = $this->Session->read('username');  
-			$ro_fname = $this->Session->read('f_name');
-			$ro_lname = $this->Session->read('l_name');
-			$ro_role  = $this->Session->read('role');
-			//for information
-			$this->set('ro_fname', $ro_fname);
-			$this->set('ro_lname', $ro_lname);
-			$this->set('ro_role', $ro_role);
-			//for chemist information
-			$this->loadModel('DmiChemistRegistrations');
-			$this->loadModel('DmiChemistRalToRoLogs');
+						if(empty($check_user)){
+							$this->customAlertPage("Sorry You are not authorized to view this page..");
+							exit();
+						}
+					}
+						$message = "";
+						$message_theme = "";
+						$redirect_to = "";
+						$this->viewBuilder()->setLayout('admin_dashboard');
+						$ro_email = $this->Session->read('username');  
+						$ro_fname = $this->Session->read('f_name');
+						$ro_lname = $this->Session->read('l_name');
+						$ro_role  = $this->Session->read('role');
+						//for information
+						$this->set('ro_fname', $ro_fname);
+						$this->set('ro_lname', $ro_lname);
+						$this->set('ro_role', $ro_role);
+						//for chemist information
+						$this->loadModel('DmiChemistRegistrations');
+						$this->loadModel('DmiChemistRalToRoLogs');
 
-			$ralToRoDatas = $this->DmiChemistRalToRoLogs->find('all')->where(['id'=>$id])->last();
-			$chemist_id =  $ralToRoDatas['chemist_id'];
+						$ralToRoDatas = $this->DmiChemistRalToRoLogs->find('all')->where(['id'=>$id])->last();
+						$chemist_id =  $ralToRoDatas['chemist_id'];
 
-			$this->Session->write('customer_id',$ralToRoDatas['chemist_id']);
+						$this->Session->write('customer_id',$ralToRoDatas['chemist_id']);
 
-			$chemist_details = $this->DmiChemistRegistrations->find('all')->where(array('chemist_id'=>$chemist_id))->first();
-			$this->set('chemist_id', $chemist_id);
+						$chemist_details = $this->DmiChemistRegistrations->find('all')->where(array('chemist_id'=>$chemist_id))->first();
+						$this->set('chemist_id', $chemist_id);
 
-			$this->set('ral_reschedule_status', $ralToRoDatas['reshedule_status']);
-			if(!empty($chemist_details['chemist_fname'] && !empty($chemist_details['chemist_lname']))){
-			$this->set('chemist_fname', $chemist_details['chemist_fname']);
-			$this->set('chemist_lname', $chemist_details['chemist_lname']);
+						$this->set('ral_reschedule_status', $ralToRoDatas['reshedule_status']);
+					if(!empty($chemist_details['chemist_fname'] && !empty($chemist_details['chemist_lname']))){
+						$this->set('chemist_fname', $chemist_details['chemist_fname']);
+						$this->set('chemist_lname', $chemist_details['chemist_lname']);
 
-			}
+					}
 
-			$this->loadModel('DmiChemistRoToRalLogs');
-			$check_reschedule = $this->DmiChemistRoToRalLogs->find('all', ['conditions'=>['chemist_id IS'=> $chemist_id]])->last();
-
-
-			$this->set('ro_schedule_from',date('d/m/Y', strtotime(str_replace("/","-",$check_reschedule['ro_schedule_from']))));
-			$this->set('ro_schedule_to', date('d/m/Y',strtotime(str_replace("/","-",$check_reschedule['ro_schedule_to']))));
-			$this->set('reschedule_status', $check_reschedule['ro_reschedule_status']);
-
-			$this->set('is_training_scheduled_ro', $check_reschedule['is_training_scheduled_ro']);
-
-			if($this->request->is('post') != '' ){
-
-			$shedule_from = $this->request->getData('shedule_from');
-			$from_date = date('Y-m-d H:i:s', strtotime(str_replace('/','-',$shedule_from)));
-			$shedule_to = $this->request->getData('shedule_to');
-			$to_date = date('Y-m-d H:i:s', strtotime(str_replace('/','-',$shedule_to)));
-
-			$postdata = $this->request->getData();
-
-			if(!empty($postdata['shedule_from'])  && !empty($postdata['shedule_to'])){
+						$this->loadModel('DmiChemistRoToRalLogs');
+						$check_reschedule = $this->DmiChemistRoToRalLogs->find('all', ['conditions'=>['chemist_id IS'=> $chemist_id]])->last();
 
 
-			$this->loadModel('DmiChemistRoToRalLogs');
-			$chemistId = $postdata['chemist_id'];
-			if(empty($check_reschedule['ro_reschedule_status']) && empty($check_reschedule['is_training_scheduled_ro'])) {
+						$this->set('ro_schedule_from',date('d/m/Y', strtotime(str_replace("/","-",$check_reschedule['ro_schedule_from']))));
+						$this->set('ro_schedule_to', date('d/m/Y',strtotime(str_replace("/","-",$check_reschedule['ro_schedule_to']))));
+						$this->set('reschedule_status', $check_reschedule['ro_reschedule_status']);
 
-			$data = array(
-			'ro_schedule_from' => $from_date,
-			'ro_schedule_to'=>$to_date,
-			'is_training_scheduled_ro' => 1,
-			'modified' => date('Y-m-d'),
-			);
+						$this->set('is_training_scheduled_ro', $check_reschedule['is_training_scheduled_ro']);
 
-			$result = $this->DmiChemistRoToRalLogs->updateAll($data,array('chemist_id'=>$chemistId));
+					if($this->request->is('post') != '' ){
 
-			if($result){
-			$message ="Chemist Training Schedule at "  .$_SESSION['level_3_for']. "";
-			$message_theme = "success";
+							$shedule_from = $this->request->getData('shedule_from');
+							$from_date = date('Y-m-d H:i:s', strtotime(str_replace('/','-',$shedule_from)));
+							$shedule_to = $this->request->getData('shedule_to');
+							$to_date = date('Y-m-d H:i:s', strtotime(str_replace('/','-',$shedule_to)));
 
-			//for reschedule dates at ro side comment this pdf genration redirection  and redirect on list by laxmi B. on  10-05-2023 for chemist training module 
-			//$redirect_to = '../../applicationformspdfs/trainingScheduleLetterFromRo/';
+							$postdata = $this->request->getData();
 
-			$redirect_to = '../../chemist/listOfChemistApplRalToRo/';
-			}else{
+						if(!empty($postdata['shedule_from'])  && !empty($postdata['shedule_to'])){
 
-			$message ="Something went wrong, Please Try Again!";
-			$message_theme = "warning";
-			$redirect_to = '../../chemist/listOfChemistApplRalToRo/';
-			} 
-			}else{
 
-			$reqData = $this->request->getData();
-			$ro_office_id = $this->DmiRoOffices->find('all', ['conditions'=>['ro_email_id IS'=> $_SESSION['username'],'OR'=>array(['office_type IS'=>'RO'], ['office_type IS'=>'SO']), 'delete_status IS'=> NULL ]])->first();
+							$this->loadModel('DmiChemistRoToRalLogs');
+							$chemistId = $postdata['chemist_id'];
+							if(empty($check_reschedule['ro_reschedule_status']) && empty($check_reschedule['is_training_scheduled_ro'])) {
 
-			$from = date('d-m-Y',strtotime(str_replace('/','-',$reqData['shedule_from'])));
-			$to   = date('d-m-Y',strtotime(str_replace('/','-',$reqData['shedule_to'])));
+								$data = array(
+								'ro_schedule_from' => $from_date,
+								'ro_schedule_to'=>$to_date,
+								'is_training_scheduled_ro' => 1,
+								'modified' => date('Y-m-d'),
+								);
+
+								$result = $this->DmiChemistRoToRalLogs->updateAll($data,array('chemist_id'=>$chemistId));
+
+								if($result){
+									$message ="Chemist Training Schedule at "  .$_SESSION['level_3_for']. "";
+									$message_theme = "success";
+
+									//for reschedule dates at ro side comment this pdf genration redirection  and redirect on list by laxmi B. on  10-05-2023 for chemist training module 
+									//$redirect_to = '../../applicationformspdfs/trainingScheduleLetterFromRo/';
+
+										$redirect_to = '../../chemist/listOfChemistApplRalToRo/';
+								}else{
+
+										$message ="Something went wrong, Please Try Again!";
+										$message_theme = "warning";
+										$redirect_to = '../../chemist/listOfChemistApplRalToRo/';
+								} 
+							}else{
+
+								$reqData = $this->request->getData();
+								$ro_office_id = $this->DmiRoOffices->find('all', ['conditions'=>['ro_email_id IS'=> $_SESSION['username'],'OR'=>array(['office_type IS'=>'RO'], ['office_type IS'=>'SO']), 'delete_status IS'=> NULL ]])->first();
+
+								$from = date('d-m-Y',strtotime(str_replace('/','-',$reqData['shedule_from'])));
+								$to   = date('d-m-Y',strtotime(str_replace('/','-',$reqData['shedule_to'])));
 			
 			
-			$this->loadModel('DmiChemistRoToRalLogs');
-			$rescheduleDateData = $this->DmiChemistRoToRalLogs->newEntity( array('chemist_id' => $reqData['chemist_id'],
-			'chemist_first_name' => $reqData['chemist_first_name'],
-			'chemist_last_name' => $reqData['chemist_last_name'],
-			'ro_first_name' => $reqData['ro_first_name'],
-			'ro_last_name' => $reqData['ro_last_name'],
-			'ro_schedule_from'=> date('Y-m-d H:i:s',strtotime(str_replace('/','-',$reqData['shedule_from']))),
-			'ro_schedule_to'=> date('Y-m-d H:i:s',strtotime(str_replace('/','-',$reqData['shedule_to']))),
-			'is_training_scheduled_ro'=> 1,
-			'created' => date('Y-m-d H:i:s'),
-			'reshedule_remark' =>$reqData['reshedule_remark'],
-			'modified' => date('Y-m-d H:i:s'),
-			'appliaction_type' =>4,
-			'reshedule_status' =>'confirm',
-			'ro_office_id' =>$check_reschedule['ro_office_id'],
-			));
+								$this->loadModel('DmiChemistRoToRalLogs');
+								$rescheduleDateData = $this->DmiChemistRoToRalLogs->newEntity( array('chemist_id' => $reqData['chemist_id'],
+								'chemist_first_name' => $reqData['chemist_first_name'],
+								'chemist_last_name' => $reqData['chemist_last_name'],
+								'ro_first_name' => $reqData['ro_first_name'],
+								'ro_last_name' => $reqData['ro_last_name'],
+								'ro_schedule_from'=> date('Y-m-d H:i:s',strtotime(str_replace('/','-',$reqData['shedule_from']))),
+								'ro_schedule_to'=> date('Y-m-d H:i:s',strtotime(str_replace('/','-',$reqData['shedule_to']))),
+								'is_training_scheduled_ro'=> 1,
+								'created' => date('Y-m-d H:i:s'),
+								'reshedule_remark' =>$reqData['reshedule_remark'],
+								'modified' => date('Y-m-d H:i:s'),
+								'appliaction_type' =>4,
+								'reshedule_status' =>'confirm',
+								'ro_office_id' =>$check_reschedule['ro_office_id'],
+								));
 
-			$result = $this->DmiChemistRoToRalLogs->save($rescheduleDateData);
-			if($result){
-			$message ="Chemist Training Schedule Dates & Confirm at  " .$_SESSION['level_3_for']. "";
-			$message_theme = "success";
-			$redirect_to = '../../applicationformspdfs/trainingScheduleLetterFromRo/';
-			}else{
+								$result = $this->DmiChemistRoToRalLogs->save($rescheduleDateData);
+							if($result){
+								$message ="Chemist Training Schedule Dates & Confirm at  " .$_SESSION['level_3_for']. "";
+								$message_theme = "success";
+								$redirect_to = '../../applicationformspdfs/trainingScheduleLetterFromRo/';
+							}else{
 
-			$message ="Something went wrong, Please Try Again!";
-			$message_theme = "warning";
-			$redirect_to = '../../chemist/listOfChemistApplRalToRo/';
-			}
+								$message ="Something went wrong, Please Try Again!";
+								$message_theme = "warning";
+								$redirect_to = '../../chemist/listOfChemistApplRalToRo/';
+							}
 			 
-			}
+						}
 
-			}else{
-			$message ="Please Enter all Field data";
-			$message_theme = "warning";
-			$redirect_to = '';
-			}
-			}  
+					}else{
+						$message ="Please Enter all Field data";
+						$message_theme = "warning";
+						$redirect_to = '';
+					}
+				}  
 
 
-			// set variables to show popup messages from view file
-			$this->set('message',$message);
-			$this->set('message_theme',$message_theme);
-			$this->set('redirect_to',$redirect_to);
+				// set variables to show popup messages from view file
+				$this->set('message',$message);
+				$this->set('message_theme',$message_theme);
+				$this->set('redirect_to',$redirect_to);
 
 			}  
 
 			//For reject chemist application from ro side and save value in rejectedLogs table for chemist training module added by laxmi B. on 18-05-2023
 			public function chemistApplicationReject(){
 
-			$this->setLayout= false;
-			$this->autoRender = false;
+				$this->setLayout= false;
+				$this->autoRender = false;
 
 
-			if($this->request->is('post')){
-			$reqData = $this->request->getData();
-			$app_type = $reqData['appl_type'];
-			$chemistId = $reqData['chemist_id'];
-			$reason    = $reqData['remark'];
-			$byuser    = $this->Session->read('username');
+				if($this->request->is('post')){
+					$reqData = $this->request->getData();
+					$app_type = $reqData['appl_type'];
+					$chemistId = $reqData['chemist_id'];
+					$reason    = $reqData['remark'];
+					$byuser    = $this->Session->read('username');
 
-			$this->loadModel('DmiRejectedApplLogs');
-			$this->loadModel('DmiApplicationTypes');
+					$this->loadModel('DmiRejectedApplLogs');
+					$this->loadModel('DmiApplicationTypes');
 
-			$appl_type = $this->DmiApplicationTypes->find('all',array('fields'=>['id'], 'conditions'=>['application_type'=>$app_type]))->first();
+					$appl_type = $this->DmiApplicationTypes->find('all',array('fields'=>['id'], 'conditions'=>['application_type'=>$app_type]))->first();
 
-			if($appl_type['id'] == 4) {
+					if($appl_type['id'] == 4) {
 
-			$form_type='CHM';
-			$appll_dashboard = $this->Session->read('application_dashboard');
-			if(!empty($appll_dashboard) && $appll_dashboard == 'chemist'){
-			$byuser = $this->Session->read('user_email');
+						$form_type='CHM';
+						$appll_dashboard = $this->Session->read('application_dashboard');
+						if(!empty($appll_dashboard) && $appll_dashboard == 'chemist'){
+							$byuser = $this->Session->read('user_email');
+						}
+
+					}
+
+						if(!empty($reason)){
+							$DmiRejectedApplLogsEntity = $this->DmiRejectedApplLogs->newEntity(
+							array(
+							'appl_type'   => $appl_type['id'],
+							'form_type'   => $form_type,
+							'customer_id' => $chemistId,
+							'by_user'     => $byuser,
+							'remark'      => $reason,
+							'created'     => date('Y-m-d H:i:s'),
+							));
+						}else{
+							$message = "Please enter all fields data.";
+						}
+
+
+						if($this->DmiRejectedApplLogs->save($DmiRejectedApplLogsEntity) ) {
+							$message ="Application Rejected successfully.";
+						}else{
+							$message ="Something went wrong, Please try Again.";
+						}
+
+				}
 			}
 
-			}
-
-			if(!empty($reason)){
-			$DmiRejectedApplLogsEntity = $this->DmiRejectedApplLogs->newEntity(
-			array(
-			'appl_type'   => $appl_type['id'],
-			'form_type'   => $form_type,
-			'customer_id' => $chemistId,
-			'by_user'     => $byuser,
-			'remark'      => $reason,
-			'created'     => date('Y-m-d H:i:s'),
-			));
-			}else{
-			$message = "Please enter all fields data.";
-			}
-
-
-			if($this->DmiRejectedApplLogs->save($DmiRejectedApplLogsEntity) ) {
-			$message ="Application Rejected successfully.";
-			}else{
-			$message ="Something went wrong, Please try Again.";
-			}
-
-			}
-			}
-
-	//to ftech subcommodity after selected commodity category alery selected by CA added by laxmi 14-07-2023
+	   //to ftech subcommodity after selected commodity category alery selected by CA added by laxmi 14-07-2023
 	public function showCommodityDropdown(){
-		$this->autoRender = false;
-		$this->loadModel('MCommodity');
-		$category_id = $_POST['commodity'];
-		//fetch subcommodities first from firm table
-		$this->loadModel('DmiFirms');
-		$sub_commodities = $this->DmiFirms->find('all', array('fields'=>['sub_commodity'], 'conditions'=>['customer_id IS'=>$_SESSION['username']]))->first();
-		$sub_commodities_array = explode(',',$sub_commodities['sub_commodity']);
-		
-		$commodities = $this->MCommodity->find('all', array('fields'=>array('commodity_code','commodity_name'), 'conditions'=>array('category_code IS'=>$category_id,'display'=>'Y', 'commodity_code IN'=>$sub_commodities_array),'order'=>array('commodity_name asc')))->toArray();
+			$this->autoRender = false;
+			$this->loadModel('MCommodity');
+			$category_id = $_POST['commodity'];
+			//fetch subcommodities first from firm table
+			$this->loadModel('DmiFirms');
+			$sub_commodities = $this->DmiFirms->find('all', array('fields'=>['sub_commodity'], 'conditions'=>['customer_id IS'=>$_SESSION['username']]))->first();
+			$sub_commodities_array = explode(',',$sub_commodities['sub_commodity']);
+			
+			$commodities = $this->MCommodity->find('all', array('fields'=>array('commodity_code','commodity_name'), 'conditions'=>array('category_code IS'=>$category_id,'display'=>'Y', 'commodity_code IN'=>$sub_commodities_array),'order'=>array('commodity_name asc')))->toArray();
 		?>
 				<option value=""><?php echo "Select Commodity";?></option>
 		<?php foreach ($commodities as $commodity) { ?>
-				<option value="<?php echo $commodity['commodity_code'];?>"><?php echo $commodity['commodity_name'];?></option>
+				 <option value="<?php echo $commodity['commodity_code'];?>"><?php echo $commodity['commodity_name'];?></option>
 		<?php }
 		exit;
 	}	
+
+
+
+	//created new function to save chemist photo in db as preview  added by laxmi[06-09-2023]
+	public function chemistPhotoPreview(){
+		$this->autoRender = false;
+		if(NULL != $this->request->getData('photo')){
+			$photo = $this->request->getData('photo');
+			
+			
+			//if ($this->request->getData('photo')->getClientFilename() != null) {
+				
+				$attachment = $this->request->getData('photo');
+				//$file_name = $attachment->getClientFilename();
+				$file_name = $photo;
+				$file_size = $attachment->getSize();print_r($file_size);exit;
+				$file_type = $attachment->getClientMediaType();
+				$file_local_path = $attachment->getStream()->getMetadata('uri');
+				
+				$cr_comment_ul = $this->Customfunctions->fileUploadLib($file_name,$file_size,$file_type,$file_local_path); // calling file uploading function
+
+			//}
+
+         
+		}
+
+	}
 
 
 }
