@@ -13,7 +13,7 @@
       <div class="row">
         <div class="col-md-12 row">
           <div class="col-md-2">
-            <label for="field3"><span>RO First Name <span class="cRed">*</span></span></label>
+            <label for="field3"><span><?php if(!empty($_SESSION['level_3_for'])){ echo $_SESSION['level_3_for']; }?> In-charge First Name <span class="cRed">*</span></span></label>
           </div>
           <div class="col-md-4">
             <?php echo $this->Form->control('ro_first_name', array('type'=>'text', 'id'=>'rofirstname', 'escape'=>false, 'value'=>$ro_fname, 'placeholder'=>'Enter First Name', 'class'=>'cvOn cvReq cvAlphaNum form-control', 'maxlength'=>255, 'readonly'=>true, 'label'=>false)); ?>

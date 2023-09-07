@@ -27,6 +27,26 @@
     
     $sub_commodities_list = implode(',',$sub_commodities_array);
     $commodities_cate_list = implode(',',$commodities_cate_array);
+     //set chemist prefix on the basis of middle name type added by laxmi on 05-09-2023
+   if(!empty($middle_name_type)){
+    if($middle_name_type == 'D/o'){
+        $prefix = 'Ms.';
+        $his_her = 'her';
+        $mam_sir = 'madam';
+        $he_she = 'She';
+    }elseif($middle_name_type == 'S/o'){
+        $prefix = 'Shri.';
+        $his_her = 'his';
+        $mam_sir = 'sir';
+        $he_she = 'He';
+    }elseif($middle_name_type == 'W/o'){
+        $prefix = 'Smt.';
+        $his_her = 'her';
+        $mam_sir = 'madam';
+        $he_she = 'She';
+    }
+    
+}
 ?>
 
 	<table width="100%" border="1">		
@@ -79,7 +99,7 @@
     </table>
     <table  width="100%">
         <tr>    
-            <td><br>Subject: Approval of <?php echo $chemist_fname;?> <?php echo $chemist_lname;?>  <?php echo $middle_name_type ; ?> <?php echo $middle_name ; ?> for grading & marking of <?php echo $commodities_cate_list;?> (<?php echo $sub_commodities_list;?>) under Agmark.</td>
+            <td><br>Subject: Approval of <?php echo $prefix;?> <?php echo $chemist_fname;?> <?php echo $chemist_lname;?>  <?php echo $middle_name_type ; ?> <?php echo $middle_name ; ?> for grading & marking of <?php echo $commodities_cate_list;?> (<?php echo $sub_commodities_list;?>) under Agmark.</td>
         </tr>
                     
         <tr>
@@ -88,15 +108,14 @@
 
         <tr>
             <td>I am to inform that,
-               Your chemist, <b><?php echo $chemist_fname;?> <?php echo $chemist_lname;?> <?php echo $middle_name_type ; ?> <?php echo $middle_name ; ?> </b>who has undergone necessary training for the analysis, grading & marking of<b> <?php echo $commodities_cate_list;?> (<?php echo $sub_commodities_list;?>) </b>under Agmark at the Regional Agmark Laboaratory, <b><?php echo $ral_office;?>  </b>
+               Your chemist, <b><?php echo $prefix;?> <?php echo $chemist_fname;?> <?php echo $chemist_lname;?> <?php echo $middle_name_type ; ?> <?php echo $middle_name ; ?> </b>who has undergone necessary training for the analysis, grading & marking of<b> <?php echo $commodities_cate_list;?> (<?php echo $sub_commodities_list;?>) </b>under Agmark at the Regional Agmark Laboaratory, <b><?php echo $ral_office;?>  </b>
                for the period from <b><?php echo $schedule_from;?></b> to <b> <?php echo $shedule_to;?></b>  and procedural training for sampling, grading, packing and maintainance of records at the <?php echo $office_type; ?>, DMI, <b><?php echo $ro_office;?> </b>for the period from <b><?php echo $ro_schedule_from;?></b>  to <b><?php echo $ro_shedule_to;?></b> 
-               is hereby approved as chemist and permitted to take up the work relating to the analysis, grading and marking of <b> <?php echo $commodities_cate_list;?> (<?php echo $sub_commodities_list;?>) </b> under Agmark in accordance with the provisions of General Grading and Marking Rules, 1988 (as amended 2008), under Agriculture Produce (Grading & Marking) Act, 1973,
+               is hereby approved as chemist and permitted to take up the work relating to the analysis, grading and marking of <b> <?php echo $commodities_cate_list;?> (<?php echo $sub_commodities_list;?>) </b> under Agmark in accordance with the provisions of General Grading and Marking Rules, 1988 (as amended 2008), relevant Commodity Grading & Marking Rules under Agricultural Produce (Grading & Marking) Act, 1937
+               and the Guidelines/instruction issued in this connection from time to time by Agricultural Marketing Adviser to the Govt. of India.<br>
 
-               and the instructions issued in this connection from time to time by Agriculture Marketing Adviser to the Govt. of India.<br>
+               <b><?php echo $prefix;?>  <?php echo $chemist_fname;?> <?php echo $chemist_lname;?></b> chemist shall be responsible for safe custody of labels, replica bearing containers, maintenance of label account and label charges accounts, submission of regular biannual returns etc in the absence of chemist In-charge.<br>
 
-               <b><?php echo $chemist_fname;?> <?php echo $chemist_lname;?></b> chemist shall be responsible for safe custody of labels, replica bearing containers, maintenance of label account and label charges accounts, submission of regular biannual returns etc in the absence of chemist In-charge.<br>
-
-               It may be noted that as per the relevant instructions, the services of the approved chemist shall not be dispensed without prior consent of the Agriculture Marketing Adviser to the Government of India or any person duly authorized by him.<br>	
+               It may be noted that as per the relevant instructions, the services of the approved chemist shall not be dispensed without prior consent of the Agricultural Marketing Adviser to the Government of India or any person duly authorized by him.<br>	
 			</td>
         </tr>
                     
@@ -124,7 +143,7 @@
   	<td>
   		Copy to:<br>
   		1.The Agricultural Marketing Adviser to the Govt. of India, DMI, Head Office, Faridabad for favour of information.<br>
-  		2.<?php echo $chemist_fname;?> <?php echo $chemist_lname;?> <?php echo $middle_name_type ; ?> <?php echo $middle_name ; ?>, <?php echo htmlspecialchars_decode($chemist_address);?>, for necessary action.<br>
+  		2.<?php echo $prefix;?> <?php echo $chemist_fname;?> <?php echo $chemist_lname;?> <?php echo $middle_name_type ; ?> <?php echo $middle_name ; ?>, <?php echo htmlspecialchars_decode($chemist_address);?>, for necessary action.<br>
         <br>  <img width="100" height="100" src="<?php echo $result_for_qr['qr_code_path']; ?>">
   	</td>
       

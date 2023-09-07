@@ -52,6 +52,7 @@
 	  <th scope="col">Chemist Id</th>
       <th scope="col">First Name</th>
       <th scope="col">Last Name</th>
+	  <th scope="col">Application PDF</th>
       <th scope="col">Schedule Letters</th>
 	  <th scope="col">Relieving Letters</th>
 	  <th scope="col">Certificate</th>
@@ -64,6 +65,9 @@
       <td><?php echo $_SESSION['username'] ;?></td>
 	  <td><?php echo $_SESSION['f_name'] ;?></td>
       <td><?php echo $_SESSION['l_name'] ;?></td>
+	  <!-- application pdf added by laxmi on 31-08-2023 -->
+	  <td><?php if(!empty($chemist_appl_pdf_file)){?> <a href="<?php echo $chemist_appl_pdf_file; ?>" target="_blank">View PDF</a><?php } else { echo "NA"; }?></td>
+
 	  <td><!-- training schedule letter from RO added by laxmi B. on 30-12-2022-->
         <?php if(!empty($pdf_file)){?> <a href="<?php echo $pdf_file; ?>" target="_blank">Training Schedule At RAL</a><?php } else { echo "In process"; }?>
     <!-- Ro side Schedule letter added by laxmi B. on 27-01-2023-->

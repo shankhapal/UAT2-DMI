@@ -10,7 +10,7 @@
       <th scope="col">#</th>
       <th scope="col">Chemist ID</th>
       <th scope="col">Chemist Name</th>
-      <th scope="col">RO Office</th>
+      <th scope="col"><?php if(!empty($office_type)){ echo $office_type ; }?> Office</th>
       <th scope="col">RAL/CAL Office</th>
       <th scope="col">Forwarded On</th>
       <th scope="col">Training End On</th>

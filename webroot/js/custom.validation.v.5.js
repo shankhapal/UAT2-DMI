@@ -378,14 +378,31 @@ $(function(){
     $('.file_profile').change(function(){
      var upload_view_src = $('.chemist_doc').attr('src');
      $('.uploadpreview').remove();
-    //  if(upload_view_src == '' || upload_view_src == undefined){
-    //        $('.chemist_doc').hide();
-    //  }
+     var ext = this.value.match(/\.(.+)$/)[1];
+     switch (ext) {
+         case 'jpg':
+         case 'jpeg':
+          $('.file_profile').attr('disabled', false);
+          break;
+         default:
+             $.alert('This is not an allowed file type.');
+             this.value = '';
+      }
       var path = URL.createObjectURL(event.target.files[0]);
       $("<img src width=auto height=80px class= uploadpreview>").insertAfter( $("#profile_img") ).fadeIn("fast").attr('src',path);
     });
     $('.file_sign').change(function(){
       $('.signpreview').remove();
+      var ext = this.value.match(/\.(.+)$/)[1];
+     switch (ext) {
+         case 'jpg':
+         case 'jpeg':
+          $('.file_sign').attr('disabled', false);
+          break;
+         default:
+             $.alert('This is not an allowed file type.');
+             this.value = '';
+      }
       var path = URL.createObjectURL(event.target.files[0]);
       $("<img src width=auto height=80px class=signpreview>").insertAfter( $("#sign_img") ).fadeIn("fast").attr('src',path);
     });

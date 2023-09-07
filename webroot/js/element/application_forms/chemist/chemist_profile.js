@@ -54,29 +54,64 @@ $("#profile_photo").change(function(){
 
   $(document).ready(function() {
     // When the file input value changes (user selects an image)
-    $("#profile_photo").change(function() {
-      // Get the selected file from the input element
-      const file = this.files[0];
+    // $("#profile_photo").change(function() {
+    //   // Get the selected file from the input element
+    //   const file = this.files[0];
 
-      if (file) {
-        // Create a blob URL for the selected file
-        const blobURL = URL.createObjectURL(file);
+    //   if (file) {
+    //     // Create a blob URL for the selected file
+    //     const blobURL = URL.createObjectURL(file);
 
-        // Create a new image element to display the preview
-        const img = new Image();
-        img.src = blobURL;
-        img.alt = "Preview Image";
-        img.style.maxWidth = "300px";
-        img.style.maxHeight = "300px";
+    //     // Create a new image element to display the preview
+    //     const img = new Image();
+    //     img.src = blobURL;
+    //     img.alt = "Preview Image";
+    //     img.style.maxWidth = "300px";
+    //     img.style.maxHeight = "300px";
 
-        // Remove the previous preview image (if any)
-        $("#profile_photo_prev").remove();
+    //     // Remove the previous preview image (if any)
+    //     $("#profile_photo_prev").remove();
 
-        // Append the image element to the preview container
-        $("#profile_photo").after(img);
-      } else {
-        // If no file was selected, remove the preview image
-        $("#profile_photo_prev").remove();
-      }
-    });
+    //     // Append the image element to the preview container
+    //     $("#profile_photo").after(img);
+    //   } else {
+    //     // If no file was selected, remove the preview image
+    //     $("#profile_photo_prev").remove();
+    //   }
+    // });
+
+
+
+    // onchange of profile and sign save in db and preview image added by laxmi on 06-09-2023
+    // $('.file_profile').change(function(){
+    //   var photo = $(this).val();
+    //   var photo_name = $(".file_profile").attr("name");
+    //   var filename = photo.replace(/.*(\/|\\)/, '');
+    //   var size = this.files[0].size;
+    //   var file_type = photo.split('.').pop();
+    //   if(photo != '' || photo != undefined){
+    //     $.ajax({
+    //       method: 'POST',
+    //       url : '../chemist/chemist_photo_preview/',
+    //       data : {photo:filename,size: size,file_type:file_type},
+    //       cache: false,
+    //       beforeSend: function (xhr){
+    //           xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+    //       }, 
+    //       success: function(data){
+           
+    //       },
+    //       // error : function(error){
+    //       //   $.alert({
+    //       //     content:"Something went wrong, Please try again.",
+    //       //     onClose: function(){
+    //       //     location.reload();
+    //       //     }
+    //       //   });
+    //       // }
+
+    //     });
+         
+    //   }
+    // });
   });

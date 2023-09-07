@@ -2680,7 +2680,7 @@ class ApplicationformspdfsController extends AppController{
 
 		}elseif($appl_type == 4 && $pdf_for == 'grant'){ 
 			// for chemist certificate page height and width specify manually by laxmi on 01-08-2023
-			$pdf = new MyCustomPDFWithWatermark(PDF_PAGE_ORIENTATION, PDF_UNIT, array(250, 335), true, 'UTF-8', false);	
+			$pdf = new MyCustomPDFWithWatermark(PDF_PAGE_ORIENTATION, PDF_UNIT, array(250, 345), true, 'UTF-8', false);	
 		}else{
 			$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 		}
