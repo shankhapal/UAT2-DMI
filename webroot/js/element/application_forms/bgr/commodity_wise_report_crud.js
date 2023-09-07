@@ -90,6 +90,7 @@ $(document).ready(function () {
     validateField("date_of_packing", "Please Select Date of packing."); // Validate Date of date of packing field
     validateField("grade", "Please Select grade."); // Validation for grade
     validateField("ta-packet_size_unit-", "Please Select Unit"); // Validation for Estimated value (in Rs.)
+    validateField("ta-packet_size-", "Please Enter Size");
 
     validateField(
       "ta-no_of_packets-",

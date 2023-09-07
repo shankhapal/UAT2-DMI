@@ -23,7 +23,7 @@ use Cake\Datasource\ConnectionManager;
 				
 </style>
 
-	<table width="100%" border="1">
+	<table width="50%" border="1">
 		<tr>
 		<td align="center" style="padding:5px;">
 			<h4>Application Bianually Grading returns of: <?php echo $_SESSION['financialYear']; ?></h4>

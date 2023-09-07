@@ -4302,66 +4302,56 @@ class CustomfunctionsComponent extends Component {
 	// written by shankhpal shende on 05/09/2023
 	public function calculateProgressiveReveneve($customer_id){
 
-		$DmiBgrCommodityReports = TableRegistry::getTableLocator()->get('DmiBgrCommodityReports');
-
-		$time_period_map=	$this->computeBiannualPeriod();
-		
-		$startDate = $time_period_map['startDate'];
-		$endDate = $time_period_map['endDate'];
-		$associative_first_half = $time_period_map['associative_first_half'];
-				
-		if(!empty($associative_first_half)){
-			$startDateofAssociativeFH = $associative_first_half['startDateofAssociativeFH'];
-			$endDateofAssociativeFH = $associative_first_half['endDateofAssociativeFH'];
-
-			$associative_first = $DmiBgrCommodityReports
-			->find()
-			->select(['total_revenue'])
-			->where([
-					'customer_id' => $customer_id,
-					'period_from' => $startDateofAssociativeFH,
-					'period_to' => $endDateofAssociativeFH,
-			])
-			->order(['id' => 'desc'])
-			->first();
+			$DmiBgrCommodityReports = TableRegistry::getTableLocator()->get('DmiBgrCommodityReports');
 			
-		}	
-				
-		if($_SESSION !== 'financialYear'){
-			$Perioddata = $this->computeBiannualPeriod();
-			$startDate = $Perioddata['startDate'];
-			$endDate = $Perioddata['endDate'];
-			$financialYear = $startDate . ' - ' . $endDate;
-		}else{
-			$financialYear = $_SESSION['financialYear'];
-		}
+			$time_period_map = $this->computeBiannualPeriod();
+			
+			$startDate = $time_period_map['startDate'];
+			$endDate = $time_period_map['endDate'];
+			$associative_first_half = $time_period_map['associative_first_half'];
+			
+			$progressive_revenue = 0;
+			
+			if (!empty($associative_first_half)) {
 
-		if(isset($financialYear)){
-			$dates = explode(" - ", $financialYear);
-			$startMonthYear = $dates[0];
-			$endMonthYear = $dates[1];
-		}
-
-		$reports = $DmiBgrCommodityReports
-    ->find()
-    ->select(['total_revenue'])
-    ->where([
-        'customer_id' => $customer_id,
-        'period_from' => $startMonthYear,
-        'period_to' => $endMonthYear,
-    ])
-    ->order(['id' => 'desc'])
-    ->first();
-
-		$totalRevenueForSelectedPeriods = 0.0;
-
-		if ($reports !== null && property_exists($reports, 'total_revenue') &&
-   		 $associative_first !== null && property_exists($associative_first, 'total_revenue')) {
-   		 $totalRevenueForSelectedPeriods = (float)$reports->total_revenue + (float)$associative_first->total_revenue;
-		}
-
-		return $totalRevenueForSelectedPeriods;
+					$startDateofAssociativeFH = $associative_first_half['startDateofAssociativeFH'];
+					$endDateofAssociativeFH = $associative_first_half['endDateofAssociativeFH'];
+					
+					$associative_first = $DmiBgrCommodityReports
+							->find()
+							->select(['total_revenue'])
+							->where([
+									'customer_id' => $customer_id,
+									'period_from' => $startDateofAssociativeFH,
+									'period_to' => $endDateofAssociativeFH,
+							])
+							->order(['id' => 'desc'])
+							->first();
+					
+					$current_period = $DmiBgrCommodityReports
+							->find()
+							->select(['total_revenue'])
+							->where([
+									'customer_id' => $customer_id,
+									'period_from' => $startDate,
+									'period_to' => $endDate,
+							])
+							->order(['id' => 'desc'])
+							->first();
+					
+					if (!empty($associative_first)) {
+							$progressive_revenue = $associative_first['total_revenue'] + $current_period['total_revenue'];
+					}
+					if (!empty($current_period)) {
+            $progressive_revenue += $current_period['total_revenue'];
+        	}
+					
+					
+			}
+			
+			return $progressive_revenue;
 	}
+
 	// added for biannually grading report module
 	// for check record is available or not 
 	// written by shankhpal shende on 29/08/2023
@@ -4531,7 +4521,7 @@ class CustomfunctionsComponent extends Component {
 		$destination = $_SERVER["DOCUMENT_ROOT"].'/testdocs/DMI/applications/'.$folderName.'/';
 		
 		
-		if($this->moveFile($file_name,$source,$destination)==1){
+		if($this->moveFileforbgr($file_name,$source,$destination)==1){
 
 			//changed file path from temp to files
 			$file_path = '/testdocs/DMI/applications/'.$folderName.'/'.$rearranged_id.'('.$current_pdf_version.')'.'.pdf';
@@ -4548,10 +4538,9 @@ class CustomfunctionsComponent extends Component {
 				'pdf_version'=>$current_pdf_version,
 				'created'=>date('Y-m-d H:i:s'),
 				'modified'=>date('Y-m-d H:i:s'),
+				'status'=>'Granted',
 				'period_from' => $startDate,
 				'period_to' => $endDate
-
-	
 			));
 	
 			$DmiBgrGrantCertificatePdfsTable->save($Dmi_app_pdf_record_entity);
@@ -4561,7 +4550,7 @@ class CustomfunctionsComponent extends Component {
 	}
 
 	//function added by shankhpal on 06/09/2023 for BGR module
-	public function moveFile($file_name,$source,$destination){
+	public function moveFileforbgr($file_name,$source,$destination){
 		
 		// If we copied this successfully, mark it for deletion
 		if (copy($source.$file_name, $destination.$file_name)) {

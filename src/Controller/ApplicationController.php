@@ -265,7 +265,7 @@ class ApplicationController extends AppController{
 			$section_id = 1;
 			$this->Session->write('section_id',$section_id);
 		}
-
+		
 		// For Chemist added the appluicant type 4 and replaced chemist id with customer id , Done By AKASH THAKRE 30-09-2021
 		if ($application_type == 4) {
 
@@ -302,7 +302,7 @@ class ApplicationController extends AppController{
 			$form_type='BGR';
 			$this->loadModel('DmiBgrGrantCertificatePdfs');  
 			//added for checking if application is Granted on 24/11/2022
-			$checkIfgrant = $this->DmiBgrGrantCertificatePdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
+			$checkIfgrant = $this->DmiBgrGrantCertificatePdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'Granted'),'order'=>'id DESC'))->first();
 			
 			$this->set('checkIfgrant',$checkIfgrant);
 		}

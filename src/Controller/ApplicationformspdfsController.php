@@ -2693,7 +2693,6 @@ class ApplicationformspdfsController extends AppController{
 			
 		}elseif($appl_type == 11 && $pdf_for == 'Bianually Grading'){ // condition added by shankhpal for BGR module on 05/09/2023
 			$pdf = new TCPDF('L', PDF_UNIT, 'LEGAL', true, 'UTF-8', false);
-			
 		}
 		else{
 			$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);

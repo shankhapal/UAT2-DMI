@@ -1,6 +1,15 @@
 $(document).ready(function () {
-  const form_status = $("#form_status").val();
-  if (form_status === "approved") {
+  const form_status = $("#status").val();
+  var application_mode = $("#application_mode").val();
+  if (application_mode == "view") {
+    $("#section_form_id :input").prop("disabled", false);
+    $(document).ready(function () {
+      $(".glyphicon-edit").css("display", "none");
+      $(".glyphicon-remove-sign").css("display", "none");
+    });
+  }
+
+  if (form_status === "Granted") {
     $("#comment_reply_box").hide();
   } else {
     $("#date_of_sampling").datepicker({

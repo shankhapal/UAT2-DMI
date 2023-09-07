@@ -19,7 +19,7 @@
 											<?php echo $this->Form->control('packerid', array(
                         'type'=>'select',
                         'empty'=>'Select Packer',
-                        'id'=>'packerlist',
+                        'id'=>'owner',
                         'options'=>$alloted_chemist,
                         'label'=>false,
                         'class'=>$class1,
@@ -35,7 +35,7 @@
 												echo $this->Form->control('financialYear', array(
                         'type'=>'select',
                         'empty'=>'Select Financial Year',
-                        'id'=>'financialYear',
+                        'id'=>'co-owner',
                         'options'=>$finacialYearsArray,
                         'label'=>false,
                         'class'=>$class1,
@@ -49,7 +49,10 @@
 								</div>
 							</div>
 						</div>
-					<?php echo $this->Form->end(); ?>
+					<?php 
+					echo $this->Form->end(); 
+					echo $this->Html->script('element/application_forms/bgr/bgr_calculation');
+					?>
 					
 				</div>
 			</div>

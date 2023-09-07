@@ -18,7 +18,7 @@
 // Developed by Shankhpal Shende on 28/07/2023 for the Bianually Grading Report module of the application.
 // -->
 
-//  pr($section_form_details);die;
+//  pr($checkIfgrant);die;
  // Define the constant with the message
 use Cake\Datasource\ConnectionManager;
 use Cake\ORM\TableRegistry;
@@ -27,7 +27,7 @@ define('INPUT_FIELD_CLASSES', 'form-control input-field wd120');
 $placeholder = DATE_FORMAT_MESSAGE;
 $class1 = INPUT_FIELD_CLASSES;?>
  
-<?php if(empty($checkIfgrant)){ ?>
+
 <div class="row">
   <div class="col-md-12 ">
     <div class="table-format">
@@ -156,7 +156,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
               <tbody>
                
                   <?php
-                    if(!empty($section_form_details[12]) || !empty($section_form_details[16])){
+                    // if(empty($section_form_details[12]) || !empty($section_form_details[16])){
                           $i=1;
                           if(!empty($section_form_details[12])){
 
@@ -485,7 +485,8 @@ $class1 = INPUT_FIELD_CLASSES;?>
                           </tr>
                           <?php $j++;$k++;
                     }
-                  }else{?>
+                  }else{
+                    ?>
                     <tr id="add_new_row">
                               <td>
                                 <?php echo $this->Form->control('record_id', array(
@@ -515,7 +516,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                       'id'=>'lot_no_tf_no_m_no',
                                       'label'=>false,
                                       'class'=>$class1,
-                                      'placeholder'=>'Enter Lot No.TF No./M. No.'
+                                      // 'placeholder'=>'Enter Lot No.TF No./M. No.'
                                     )); ?>
                                     <span id="error-lot_no_tf_no_m_no"></span>
                               </td>
@@ -561,7 +562,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'options'=>$section_form_details[10],
                                     'label'=>false,
                                     'class'=>$class1,
-                                    'placeholder'=>'Enter Pack Size'
+                                    // 'placeholder'=>'Enter Pack Size'
                                   )); ?>
                                   <span id="error-ta-packet_size-"></span>
                               </td>
@@ -588,7 +589,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'id'=>'ta-no_of_packets-',
                                     'label'=>false,
                                     'class'=>'total_no_packages form-control input-field wd120',
-                                    'placeholder'=>'Enter Total No. of packages'
+                                    // 'placeholder'=>'Enter Total No. of packages'
                                   )); ?>
                                   <span id="error-ta-no_of_packets-"></span>
                               </td>
@@ -612,7 +613,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                       'id'=>'estimated_value',
                                       'label'=>false,
                                       'class'=>$class1,
-                                      'placeholder'=>'0.00'
+                                      // 'placeholder'=>'0.00'
                                     )); ?>
                                   <span id="error-estimated_value"></span>
                               </td>
@@ -622,7 +623,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                       'escape'=>false,
                                       'id'=>'agmark_replica_from',
                                       'label'=>false,
-                                      'placeholder'=>'',
+                                      // 'placeholder'=>'',
                                       'class'=>$class1,
                                     )); ?>
                                   <span id="error-agmark_replica_from"></span>
@@ -653,10 +654,10 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                       'type'=>'text',
                                       'escape'=>false,
                                       'id'=>'replica_charges',
-                                      'readonly'=>'readonly',
+                                      // 'readonly'=>'readonly',
                                       'label'=>false,
                                       'class'=>$class1,
-                                      'placeholder'=>'0.00'
+                                      // 'placeholder'=>'0.00'
                                     )); ?>
                                   <span id="error-replica_charges"></span>
                               </td>
@@ -681,7 +682,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'id'=>'report_no',
                                     'label'=>false,
                                     'class'=>$class1,
-                                    'placeholder'=>'Enter Report No.'
+                                    // 'placeholder'=>'Enter Report No.'
                                   )); ?>
                                   <span id="error-report_no"></span>
                               </td>
@@ -703,7 +704,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'id'=>'remarks',
                                     'label'=>false,
                                     'class'=>$class1,
-                                    'placeholder'=>'Enter Remarks'
+                                    // 'placeholder'=>'Enter Remarks'
                                   )); ?>
                                   <span id="error-remarks"></span>
                               </td>
@@ -716,7 +717,8 @@ $class1 = INPUT_FIELD_CLASSES;?>
                               </td>
                             </tr>
 
-                            <?php }}?>
+                            <?php }
+                          ?>
         
                   
                 
@@ -797,14 +799,15 @@ $class1 = INPUT_FIELD_CLASSES;?>
 										</div>
 								</div>
 						</div>
-<?php } ?>
+           
+
 <?php if(!empty($_SESSION['packer_id']) || isset($_SESSION['packer_id'])){
 			$customer_id = $_SESSION['packer_id'];
 		}else{
 			$customer_id = $_SESSION['customer_id'];
 		} ?>
 <input type="hidden" id="custemer_id" value='<?php echo $customer_id; ?>'>
-<input type="hidden" id="form_status" value='<?php echo $section_form_details[0]['form_status']; ?>'>
+<input type="hidden" id="application_mode" value='<?php echo isset($_SESSION['application_mode'])?$_SESSION['application_mode']:""; ?>'>
 <input type="hidden" id="lab_nabl_accredited" value='<?php echo $section_form_details[15]; ?>'>
 <input type="hidden" name="total_revenue" id="totalRevenueHidden">
 <input type="hidden" name="progresive_revenue" id="progresiveRevenueHidden">
