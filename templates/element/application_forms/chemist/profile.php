@@ -273,4 +273,4 @@
 		<?php echo $this->Form->control('application_dashboard', array('type'=>'hidden', 'id'=>'application_dashboard', 'value'=>$_SESSION['application_dashboard'])); ?>
 
 </div>
-<?php echo $this->Html->script('element/application_forms/chemist/chemist_profile'); ?>
+<?php //echo $this->Html->script('element/application_forms/chemist/chemist_profile'); ?>

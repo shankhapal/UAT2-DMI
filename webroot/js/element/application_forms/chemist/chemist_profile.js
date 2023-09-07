@@ -83,34 +83,35 @@ $("#profile_photo").change(function(){
 
 
     // onchange of profile and sign save in db and preview image added by laxmi on 06-09-2023
-    $('.file_profile').change(function(){
-      var photo = $(this).val();
-      var photo_name = $(".file_profile").attr("name");
-      var filename = photo.replace(/.*(\/|\\)/, '');
-      
-      if(photo != '' || photo != undefined){
-        $.ajax({
-          method: 'POST',
-          url : '../chemist/chemist_photo_preview/',
-          data : {photo:filename},
-          cache: false,
-          beforeSend: function (xhr){
-              xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-          }, 
-          success: function(data){
+    // $('.file_profile').change(function(){
+    //   var photo = $(this).val();
+    //   var photo_name = $(".file_profile").attr("name");
+    //   var filename = photo.replace(/.*(\/|\\)/, '');
+    //   var size = this.files[0].size;
+    //   var file_type = photo.split('.').pop();
+    //   if(photo != '' || photo != undefined){
+    //     $.ajax({
+    //       method: 'POST',
+    //       url : '../chemist/chemist_photo_preview/',
+    //       data : {photo:filename,size: size,file_type:file_type},
+    //       cache: false,
+    //       beforeSend: function (xhr){
+    //           xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+    //       }, 
+    //       success: function(data){
            
-          },
-          // error : function(error){
-          //   $.alert({
-          //     content:"Something went wrong, Please try again.",
-          //     onClose: function(){
-          //     location.reload();
-          //     }
-          //   });
-          // }
+    //       },
+    //       // error : function(error){
+    //       //   $.alert({
+    //       //     content:"Something went wrong, Please try again.",
+    //       //     onClose: function(){
+    //       //     location.reload();
+    //       //     }
+    //       //   });
+    //       // }
 
-        });
+    //     });
          
-      }
-    });
+    //   }
+    // });
   });
