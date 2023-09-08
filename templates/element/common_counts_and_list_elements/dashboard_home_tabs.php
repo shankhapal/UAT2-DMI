@@ -64,7 +64,10 @@ $user_role_arr = json_encode($current_user_roles);
 <a class="btn btn-warning m-2" href="<?php echo $this->request->getAttribute('webroot');?>othermodules/get_officer_wise_pending_appl">Officer Wise Pending</a>
 <?php endif; ?>
 
-<?php if ($current_user_roles['super_admin'] == 'yes'): ?>	
+<?php //updated conditions with user ids as suggested by DMI on 18-07-2023 to show option
+	$username = base64_decode($_SESSION['username']);
+	if ($current_user_roles['super_admin'] == 'yes' || $username=='brajesh.tiwari@gov.in' || $username=='jtama-dmi@gov.in' 
+		|| $username=='j.singh75@gov.in' || $username=='saurabh.jaiman90@gov.in'): ?>	
 <a class="btn btn-warning m-2" href="<?php echo $this->request->getAttribute('webroot');?>othermodules/get_ro_wise_pending_appl">RO Wise pending</a>
 <?php endif; ?>
 

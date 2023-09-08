@@ -1765,12 +1765,8 @@ class AjaxFunctionsController extends AppController{
 									<th>District</th>
 									<th>Position</th>
 									<th>Process</th>
-									<th>Available With</th>";
-		
-									//if entery in rejected table with same id status is empty added by laxmi on 13-01-2023
-									if(!empty($rejectedData['customer_id']) && $rejectedData['customer_id'] == $customer_id){
-										echo "<th>Status</th>";
-									}
+									<th>Available With</th>
+									<th>Status</th>";
 		
 							echo "</tr>
 							</thead>
@@ -1784,6 +1780,8 @@ class AjaxFunctionsController extends AppController{
 									//added by laxmi on 13-12-23
 									if(!empty($rejectedData['customer_id']) && $rejectedData['customer_id'] == $customer_id){
 										echo "<td>Rejected</td>";
+									}else{//added appl_status on 19-07-2023 by Amol
+										echo "<td>".$resultArray['appl_status']."</td>";
 									}
 		
 							echo "</tr>

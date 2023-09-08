@@ -5,9 +5,9 @@
    <div class="row">
     <div class="col-lg-12 mx-auto text-center">
       <?php if($ral_reschedule_status == 'confirm' && empty($reschedule_status) && empty($is_training_scheduled_ro )){?>
-      <p class="fontSize26"><b>Training Schedule At RO</b></p>
+      <p class="fontSize26"><b>Training Schedule At <?php if(!empty($_SESSION['level_3_for'])){ echo $_SESSION['level_3_for']; }?></b></p>
       <?php }else{ ?>
-        <p class="fontSize26"><b>Training Reschedule At RO</b></p>
+        <p class="fontSize26"><b>Training Reschedule At <?php if(!empty($_SESSION['level_3_for'])){ echo $_SESSION['level_3_for']; }?></b></p>
         <?php } ?>
        <!-- <hr/> -->
     </div>
@@ -18,7 +18,7 @@
       <div class="row">
         <div class="col-md-12 row">
           <div class="col-md-2">
-            <label for="field3"><span>RO First Name <span class="cRed">*</span></span></label>
+            <label for="field3"><span><?php if(!empty($_SESSION['level_3_for'])){ echo $_SESSION['level_3_for']; }?> In-charge, First Name <span class="cRed">*</span></span></label>
           </div>
           <div class="col-md-4">
             <?php echo $this->Form->control('ro_first_name', array('type'=>'text', 'id'=>'rofirstname', 'escape'=>false, 'value'=>$ro_fname, 'placeholder'=>'Enter First Name', 'class'=>'cvOn cvReq cvAlphaNum form-control', 'maxlength'=>255, 'readonly'=>true, 'label'=>false)); ?>

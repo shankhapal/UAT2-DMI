@@ -856,7 +856,7 @@ class DashboardController extends AppController{
 										//application must not be with applicant while allocation
 										//added on 03-02-2023 by Amol
 										$finalSubmitStatus = $this->$final_submit_table->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
-										if($finalSubmitStatus['status'] != 'referred_back'){
+										if(!empty($finalSubmitStatus) && $finalSubmitStatus['status'] != 'referred_back'){
 											$creat_array = true;
 										}
 										
@@ -1734,7 +1734,7 @@ class DashboardController extends AppController{
 
 					'customer_id'=>$customer_id,
 					'application_type'=>$appl_type_id['id'],
-					'created'=>$current_date,
+					'created'=>date('Y-m-d H:i:s'), // added field by shankhpal on 29/08/2023
 					'user_id'=>$user_id,
 					'io_office'=>$io_office,
 					'io_email_id'=>$io_user_id,
@@ -3145,7 +3145,7 @@ class DashboardController extends AppController{
 
 					'customer_id'=>$customer_id,
 					'application_type'=>$appl_type_id['id'],
-					'created'=>$current_date,
+					'created'=>date('Y-m-d H:i:s'), // added field by shankhpal on 29/08/2023
 					'user_id'=>$user_id,
 					'io_office'=>$io_office,
 					'created'=>date('Y-m-d H:i:s'), // added field by shankhpal on 29/08/2023

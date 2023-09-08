@@ -201,7 +201,7 @@ class PaymentverificationsController extends AppController{
 			  
 			  // for export application and application type 4 only Mumbai Ro office include [laxmi 1-06-23]
 			 
-             if($export_unit == 'yes' && $appl_type == 4){
+             if(!empty($$export_unit) && $export_unit == 'yes' && $appl_type == 4){
 				$ro_office = $this->$office_table->find('all', ['fields'=>array('ro_office'), 'conditions'=>array($field_name => $office_incharge_id, 'ro_office'=>'Mumbai')])->first();
 			 }
               

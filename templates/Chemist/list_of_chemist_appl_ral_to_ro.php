@@ -1,7 +1,7 @@
 <!-- file created by laxmi B on 29-12-22 -->
 <div class="container">
   <div class="col-lg-12 mx-auto text-center">
-      <p class="fontSize26"><b>Chemist Application Forwarded From RAL to RO for Training</b></p>
+      <p class="fontSize26"><b>Chemist Application Forwarded From RAL to <?php if(!empty($_SESSION['level_3_for'])){ echo $_SESSION['level_3_for'];}?> for Training</b></p>
        <hr/>
     </div>
 <div class="row">
@@ -12,7 +12,7 @@
       <th scope="col">Chemist ID</th>
       <th scope="col">Chemist Name</th>
       <th scope="col">RAL/CAL Office</th>
-      <th scope="col">RO Office</th>
+      <th scope="col"><?php if(!empty($_SESSION['level_3_for'])){ echo $_SESSION['level_3_for'];}?> Office</th>
       <th scope="col">Forwarded On</th>
       <th scope="col">Training Status</th>
       <th scope="col">Action</th>
@@ -47,7 +47,7 @@
 
            <?php if(empty($isTrainingComplete[$i]) && empty($is_trainingScheduleRO[$i]) && $is_trainingScheduleRO[$i] == '' ){ ?>
          
-            <a href="<?php echo $this->getRequest()->getAttribute('webroot')."chemist/trainingScheduleAtRo/".$list['id'];?>" class=" btn btn-success">Training Schedule At RO</a>
+            <a href="<?php echo $this->getRequest()->getAttribute('webroot')."chemist/trainingScheduleAtRo/".$list['id'];?>" class=" btn btn-success">Training Schedule At <?php if(!empty($_SESSION['level_3_for'])){ echo $_SESSION['level_3_for'];}?></a>
 
           <?php }elseif(!empty($is_trainingScheduleRO[$i]) && $is_trainingScheduleRO[$i] == 1  && (empty($reschedule_status[$i]) && $reschedule_status[$i] != 'confirm')) {?>
 
@@ -57,14 +57,14 @@
         <?php }elseif(empty($isTrainingComplete[$i]) && $is_trainingScheduleRO[$i] == 1 && $reschedule_status[$i] == 'confirm'){?>
             
 
-            <a href="<?php echo $ro_schedule_letter[$i] ;?>" target="_blank" type="application/pdf" rel="alternate">RO Training Schedule Letter</a>
+            <a href="<?php echo $ro_schedule_letter[$i] ;?>" target="_blank" type="application/pdf" rel="alternate"><?php if(!empty($_SESSION['level_3_for'])){ echo $_SESSION['level_3_for'];}?> Training Schedule Letter</a>
           
 
             | <a href="<?php echo $this->getRequest()->getAttribute('webroot')."chemist/chemistTrainingCompleteAtRo/".$list['id'];?>" class=" btn btn-success">Mark Training Completed</a>
         <?php }else{?>
 
           <?php if(!empty($pdf_file)){?>
-        <a href="<?php echo $pdf_file[$i] ;?>" target="_blank" type="application/pdf" rel="alternate">RO Relieving Letter</a>
+        <a href="<?php echo $pdf_file[$i] ;?>" target="_blank" type="application/pdf" rel="alternate"><?php if(!empty($_SESSION['level_3_for'])){ echo $_SESSION['level_3_for'];}?> Relieving Letter</a>
         <?php }?>
 
         | <?php if(!empty($chemistTblid[$i]) && empty($grant_approval_pdf[$i]) && !empty($isTrainingComplete[$i]) ){?>
@@ -75,7 +75,7 @@
             }
             
             if(empty($grant_approval_pdf[$i])){
-              echo '|  <button id=rejectApp_'.$chemistTblid[$i].' class = rejectModel value='.$list['chemist_id'].' appl_type ="' .$appl_type[$i].'"> <span class="glyphicon glyphicon-remove"></span></button>';
+              echo '|  <button id=rejectApp_'.$chemistTblid[$i].' class = "rejectModel btn btn-primary" value='.$list['chemist_id'].' appl_type ="' .$appl_type[$i].'"> Reject </button>';
                }
           $i++;
 

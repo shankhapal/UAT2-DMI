@@ -129,7 +129,7 @@ class EsignController extends AppController {
 			//added this else part on 11-06-2019 by Amol to show esign failed message	
 			} else {
 				
-				$this->redirect('https://10.158.81.78/UAT-DMI/esign/esign_issue');//updated on 31-05-2021 for Form Based Esign method by Amol
+				$this->redirect('https://10.158.81.72/UAT-DMI/esign/esign_issue');//updated on 31-05-2021 for Form Based Esign method by Amol
 			}
 			
 		// }
@@ -456,7 +456,7 @@ class EsignController extends AppController {
 		$txn_id = rand().time();
 		$asp_id = 'DMIC-001';
 		$document_hashed = hash_file('sha256',$doc_path);//create pdf hash		
-		$response_url = 'https://10.158.81.78/UAT-DMI/esign/'.$response_action;
+		$response_url = 'https://10.158.81.72/UAT-DMI/esign/'.$response_action;
 
 		if($current_level == 'level_2'){
 			$doc_info = 'Report Final Submit';
@@ -743,7 +743,7 @@ class EsignController extends AppController {
 		$txn_id = rand().time();
 		$asp_id = 'DMIC-001';
 		$document_hashed = hash_file('sha256',$doc_path);//create pdf hash		
-		$response_url = 'https://10.158.81.78/UAT-DMI/esign/'.$response_action;
+		$response_url = 'https://10.158.81.72/UAT-DMI/esign/'.$response_action;
 
 		if($current_level == 'level_2'){
 			$doc_info = 'Report Final Submit';
@@ -859,7 +859,7 @@ public function renewalRequestReEsign(){
 			$this->DmiApplAddedForReEsigns->updateAll(array('re_esign_status' => "Re_Esigned",'modified'=>"$date1"),array('customer_id IS' => $customer_id));
 			
 			
-			$main_domain_url = 'https://10.158.81.78/UAT-DMI/';
+			$main_domain_url = 'https://10.158.81.72/UAT-DMI/';
 
 			//Below Block Is added to Change the Redirection Paths the Firm is Suspended or Cancelled- Akash [02-06-2023]
 			if ($this->Session->check('for_module')) {
@@ -967,7 +967,7 @@ public function renewalRequestReEsign(){
 					
 				//calling final submit process now after signature appended in pdf.
 
-				$main_domain_url = 'https://10.158.81.78/UAT-DMI/';
+				$main_domain_url = 'https://10.158.81.72/UAT-DMI/';
 				$url_to_redirect =	$main_domain_url.$_SESSION['replica_for'].'/after_replica_allotment_esigned';				
 					
 				//this echo is used to redirect from CDAC to our Agarmark url.
@@ -977,7 +977,7 @@ public function renewalRequestReEsign(){
 			//by Amol to show esign failed message	
 			}else{
 				
-				$this->redirect('https://10.158.81.78/UAT-DMI/esign/esign_issue');//for Form Based Esign method by Amol
+				$this->redirect('https://10.158.81.72/UAT-DMI/esign/esign_issue');//for Form Based Esign method by Amol
 			}
 			
 		}
@@ -1086,7 +1086,7 @@ public function renewalRequestReEsign(){
 				$this->Session->delete('current_level');
 				$this->Session->delete('ren_esign_process');
 				
-				$this->redirect('https://10.158.81.78/UAT-DMI/esign/esign_issue');//updated on 31-05-2021 for Form Based Esign method by Amol
+				$this->redirect('https://10.158.81.72/UAT-DMI/esign/esign_issue');//updated on 31-05-2021 for Form Based Esign method by Amol
 			}
 			
 		}

@@ -13,6 +13,7 @@ $(document).ready(function(){
     format: 'dd/mm/yyyy',
   })
   .on('changeDate', function (selected) { 
+    $('#sheduleTo').val('');
     startDate = new Date(selected.date.valueOf());
     //startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
     startDate.setDate(startDate.getDate() + 1);    
@@ -88,5 +89,40 @@ $(document).ready(function(){
     window.localStorage.removeItem('confirmClick');
    $('.submitReschedule')[0].click();
   }
+
+  // to hide error msg added below by laxmi on 01-09-2023
+  $('#roOffice').click(function(){
+   $('.err_cv_ro_office').hide();
+  });
+  $('#sheduleFrom').click(function(){
+    $('.err_cv_shedule_from').hide();
+    $('#sheduleTo').val('');
+   });
+   $('#sheduleTo').click(function(){
+    $('.err_cv_shedule_to ').hide();
+   });
+
+
+   //onclick submit btn of training schedule at ro added by laxmi on 04-09-2023
+   
+$('#submit').on('click', function() {
+     var scheduleDateFrom = $('#sheduleFrom').val();
+     var scheduleDateTo= $('#sheduleTo').val();
+     var valueReturn = true;
+      if(scheduleDateFrom == ""){
+        $('.err_cv_shedule_from').html("Please select  From date");
+        valueReturn = false;
+      }
+    
+    if(scheduleDateTo == ""){
+     $('.err_cv_shedule_to').html("Please select To date");
+     valueReturn = false;
+    }
+    if(valueReturn == false){
+      return false;
+    }else{
+     return true;
+    }
+});
 
 });

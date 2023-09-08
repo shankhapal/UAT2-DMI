@@ -3301,6 +3301,148 @@ class OthermodulesController extends AppController{
 		
 	}
 
+	public function markApplRejected(){
+
+		// set variables to show popup messages from view file
+		$message = '';
+		$redirect_to = '';
+
+		$this->loadModel('DmiRoOffices');		
+		$this->loadModel('DmiApplicationTypes');
+
+		//get Application types list
+		$applTypesList = $this->DmiApplicationTypes->find('list',array('valueField'=>'application_type','order'=>'id ASC'))->toArray();
+		$this->set('applTypesList',$applTypesList);
+
+		//office list
+		$office_list = $this->DmiRoOffices->find('list', array('keyField'=>'id','valueField'=>'ro_office','conditions'=>array('office_type IN'=>array('RO','SO'),'delete_status IS NULL'),'order'=>'ro_office ASC'));
+		$this->set('office_list',$office_list);
+
+		//on click of transfer btn
+		if ($this->request->getData('transfer') != null){
+
+			$appl_type = $this->request->getData('appl_type');
+			$appl_type = $this->Customfunctions->dropdownSelectInputCheck('DmiApplicationTypes',$this->request->getData('appl_type'));
+
+			//check drop down values
+			$from_office = $this->Customfunctions->dropdownSelectInputCheck('DmiRoOffices',$this->request->getData('from_office'));
+			$to_office = $this->Customfunctions->dropdownSelectInputCheck('DmiRoOffices',$this->request->getData('to_office'));
+
+			$customer_id = $this->request->getData('appl_id');
+			$remark = htmlentities($this->request->getData('remark'), ENT_QUOTES);//html encode
+		
+
+			//validate post data
+			if(!empty($appl_type) && !empty($from_office) && !empty($customer_id) && !empty($to_office) && !empty($remark)) {
+
+				// Make common function to Transfer application from officer to another office
+				// Done by Pravin Bhakare 11-10-2021
+				$transferStatus = $this->transferAppFormTo($appl_type,$customer_id,$from_office,$to_office,$remark);
+
+				if($transferStatus == 1)
+				{
+
+					$message = 'The Selected Application is Successfully Transfered. Thankyou';
+					$redirect_to = 'transfer_appl';
+
+				}
+				elseif( $transferStatus == 0 )
+				{
+					$message = 'Sorry... Your request to transfer this Application is failed due to some reason.';
+					$redirect_to = 'transfer_appl';
+
+				}
+
+			}
+
+		}
+
+		// set variables to show popup messages from view file
+		$this->set('message',$message);
+		$this->set('redirect_to',$redirect_to);
+
+		if($message != null){
+			$this->render('/element/message_boxes');
+		}
+
+	}
+	
+	
+	public function getApplDetailsToMarkReject() {
+
+
+		$customer_id = $_POST['customer_id'];
+		$this->loadModel('DmiUserRoles');
+		$check_user_role = array();
+		$this->loadComponent('Randomfunctions');
+		$check_user_role['super_admin']='yes';//set default 
+		$resultArray = $this->Randomfunctions->dashboardApplicationSearch($customer_id,$check_user_role);
+		$this->loadModel('DmiRejectedApplLogs');
+		$rejectedData = $this->DmiRejectedApplLogs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->last();
+
+		$isApplSurrender = $this->Customfunctions->isApplicationSurrendered($customer_id);
+		$isApplSuspended = $this->Customfunctions->isApplicationSuspended($customer_id);
+		$isApplCancelled = $this->Customfunctions->isApplicationCancelled($customer_id);
+		
+		if ($resultArray['no_result']==null) {
+
+			if (!empty($isApplCancelled)) {
+				echo "<b>This Application is Cancelled on ".$isApplCancelled." and no longer available.</b>";
+			} else {
+
+				//Check if application is suspended
+				if (!empty($isApplSuspended)) {
+					echo "<b>This Application is Suspended Upto ".$isApplSuspended." and no longer available.</b>";
+				} else {
+
+					//Check if the Application is Surrendered
+					if (!empty($isApplSurrender)) {
+						echo "<b>This Application is Surrendered on ".$isApplSurrender." and no longer available.</b>";
+					} else {
+						echo "
+							<h5>Application Details</h5>
+							<table class='table table-sm table-bordered'>
+							<thead>
+								<tr>
+									<th>Appl. Type</th>
+									<th>Appl. Id</th>
+									<th>Firm Name</th>
+									<th>District</th>
+									<th>Position</th>								
+									<!--<th>Available With</th>-->
+									<!--<th>Status</th>-->";
+		
+							echo "</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>".$resultArray['process']."</td>
+									<td>".$customer_id."</td>
+									<td>".$resultArray['firm_data']['firm_name']."</td>
+									<td>".$resultArray['firm_data']['district']."</td>
+									<td>".$resultArray['current_position']."</td>
+									<!--<td>".$resultArray['currentPositionUser']." <br>( ".$resultArray['getEmailCurrent']." )"."</td>-->";
+									//added by laxmi on 13-12-23
+									/*if(!empty($rejectedData['customer_id']) && $rejectedData['customer_id'] == $customer_id){
+										echo "<td>Rejected</td>";
+									}else{//added appl_status on 19-07-2023 by Amol
+										echo "<td>".$resultArray['appl_status']."</td>";
+									}*/
+		
+							echo "</tr>
+							</tbody>
+						</table>";
+					}
+				}
+			}
+			
+		}else{
+			echo $resultArray['no_result'];
+		}
+		
+		exit;
+	}
+
 
 
 	

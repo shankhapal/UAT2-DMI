@@ -143,7 +143,7 @@ class DmiChemistEducationDetailsTable extends Table{
 				),
 				'6' => array(
 					//'col' 		=> '% Marks',//comment this by laxmi and add below line 07-07-23
-					'col' 		=> 'CGPA',
+					'col' 		=> 'CGPA / Percentage',
 					'colspan' 	=> '1',
 					'rowspan' 	=> '1'
 				),
@@ -212,7 +212,7 @@ class DmiChemistEducationDetailsTable extends Table{
 					'valid'		=> 'text',
 					'option'	=> $division,
 					'selected'	=> $row['division'],
-					'class'		=> 'cvOn cvReq',
+					'class'		=> 'cvOn1 cvReq1 cvNotReq',//chnaged class name for division get optional by Laxmi[31-08-23]
 					'id'		=> 'division'
 				),
 				'6' => array(
@@ -299,8 +299,9 @@ class DmiChemistEducationDetailsTable extends Table{
 
 				$table = 'DmiDivisionGrades';
 				$post_input_request = $forms_data['division'][$i];
-				$division = $CustomersController->Customfunctions->dropdownSelectInputCheck($table,$post_input_request);//calling library function
-
+				//for chemist education if cgpa then not mendetory division so, below code is comment and added new one by laxmi [31-08-2023]
+				//$division = $CustomersController->Customfunctions->dropdownSelectInputCheck($table,$post_input_request);//calling library function
+                $division = htmlentities($forms_data['division'][$i], ENT_QUOTES);//added by laxmi
 				$stream = htmlentities($forms_data['stream'][$i], ENT_QUOTES);
 				$university = htmlentities($forms_data['university'][$i], ENT_QUOTES);
 				$year = htmlentities($forms_data['year'][$i], ENT_QUOTES);

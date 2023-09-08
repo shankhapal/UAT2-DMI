@@ -114,6 +114,28 @@
 				$("#dob").addClass("is-invalid");
 				$("#dob").click(function(){$("#error_dob").hide().text;$("#dob").removeClass("is-invalid");});
 				value_return = 'false';
+			}else{
+				//added else to do not enter dob below 18 years by laxmi on 28-07-2023
+				var userDateinput = dob;
+							// convert user input value into date object
+				var birthDate = new Date(userDateinput);
+				// get difference from current date;
+				var difference=Date.now() - birthDate.getTime(); 
+					
+				var  ageDate = new Date(difference); 
+				var calculatedAge=   Math.abs(ageDate.getUTCFullYear() - 1970);
+				
+				if(calculatedAge < 18){
+				$("#error_dob").show().text("Please Do Not Enter Date of Birth less than 18 Years");
+				$("#dob").addClass("is-invalid");
+				$("#dob").click(function(){$("#error_dob").hide().text;$("#dob").removeClass("is-invalid");});
+				
+				value_return = 'false'; 
+					 
+				}else{
+					value_return = 'true';
+				}
+				
 			}
 
 
