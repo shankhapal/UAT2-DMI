@@ -7,6 +7,30 @@ $(document).ready(function () {
     if (rpl_no_of_packets != "") {
       calculateQty(index);
     }
+
+    var labNablAccreditedInput = document.getElementById(
+      "lab_nabl_accredited"
+    ).value;
+
+    const laboratory_id = document.getElementById("rpl_displayed_lab_" + index);
+
+    const rpl_reportno = document.getElementById("rpl_reportno_" + index);
+    const rpl_reportdate = document.getElementById("rpl_reportdate_" + index);
+    const rpl_remarks = document.getElementById("rpl_remarks_" + index);
+    const rpl_grading_lab = document.getElementById("rpl_grading_lab_" + index);
+    if (labNablAccreditedInput === "" || labNablAccreditedInput === null) {
+      laboratory_id.style.display = "none";
+      rpl_reportno.style.display = "none";
+      rpl_reportdate.style.display = "none";
+      rpl_remarks.style.display = "none";
+      rpl_grading_lab.style.display = "none";
+    } else {
+      laboratory_id.style.display = "block"; // Or "initial" depending on your CSS
+      rpl_reportno.style.display = "block";
+      rpl_reportdate.style.display = "block";
+      rpl_remarks.style.display = "block";
+      rpl_grading_lab.style.display = "block";
+    }
   });
 
   $(".replica_allotment_btn").each(function () {
@@ -62,9 +86,17 @@ $(document).ready(function () {
         "Please Enter Estimated value (in Rs.)"
       ); // Validation for Estimated value (in Rs.)
 
-      validateField("rpl_reportno_" + index, "Please Enter Report no."); // Validation for Report no
-      validateField("rpl_reportdate_" + index, "Please Select report date."); // Validate report date
-      validateField("rpl_remarks_" + index, "Please Enter Remark."); // Validate remarks
+      var labNablAccreditedInput = document.getElementById(
+        "lab_nabl_accredited"
+      ).value;
+
+      if (labNablAccreditedInput === "") {
+        console.log("labNablAccreditedInput is empty");
+      } else {
+        validateField("rpl_reportno_" + index, "Please Enter Report no.");
+        validateField("rpl_reportdate_" + index, "Please Select report date.");
+        validateField("rpl_remarks_" + index, "Please Enter Remark.");
+      }
 
       if (!isValid) {
         renderToast(
@@ -97,6 +129,10 @@ $(document).ready(function () {
           // Add more fields as needed
         };
 
+        if (labNablAccreditedInput === "") {
+          delete formData.rpl_grading_lab;
+        }
+
         $.ajax({
           url: "../AjaxFunctions/add_replica_allotment_data",
           type: "POST",
@@ -105,8 +141,7 @@ $(document).ready(function () {
             if (response == "added")
               // Handle success response here
               renderToast("success", "Data inserted successfully!");
-
-            location.reload(); // Reload the page
+            // location.reload(); // Reload the page
             // Optionally, you might want to reset form fields here
           },
           error: function (error) {

@@ -2940,7 +2940,8 @@ class AjaxFunctionsController extends AppController{
 
 		$this->autoRender = false;
 		$this->loadModel('DmiBgrCommodityReportsAddmore');
-		
+		$CustomersController = new CustomersController;
+
 		if(isset($_SESSION['packer_id'])){
 			$customer_id = $_SESSION['packer_id'];
 		}elseif(isset($_SESSION['customer_id'])){
@@ -2949,16 +2950,17 @@ class AjaxFunctionsController extends AppController{
 			$customer_id = null;
 		}
 
-		$query = $this->DmiBgrCommodityReportsAddmore->find();
-		$query->select(['replicacharges' => $query->func()->sum('replicacharges')]);
-		$query->where(['customer_id'=>$customer_id,'delete_status IS' => null]);
+		$bgrAddedTableRecords = $CustomersController->Customfunctions->bgrAddedTableRecords($customer_id);
+		$sumReplicaCharges = 0;
 
-		$result = $query->first();
+		foreach ($bgrAddedTableRecords as $record) {
+			// Check if the 'replicacharges' field is set and not empty
+			if (isset($record->replicacharges) && !empty($record->replicacharges)) {
+					$sumReplicaCharges += $record->replicacharges;
+			}
+		}
 		
-		echo $totalReplicaCharges = $result['replicacharges'];
-
-		
-		// echo json_encode($totalReplicaCharges);
+		echo $sumReplicaCharges;
 		exit;
 	}
 
@@ -3041,7 +3043,7 @@ class AjaxFunctionsController extends AppController{
 					'rpl_alloted_rep_to' => $_POST['rpl_alloted_rep_to'],
 					'rpl_total_quantity' => $_POST['rpl_total_quantity'],
 					'rpl_replicacharges' => $_POST['rpl_replicacharges'],
-					'rpl_grading_lab' => $_POST['rpl_grading_lab'],
+					'rpl_grading_lab' => isset($_POST['rpl_grading_lab'])?$_POST['rpl_grading_lab']:null,
 					'rpl_reportno' => $_POST['rpl_reportno'],
 					'rpl_reportdate' => $_POST['rpl_reportdate'],
 					'rpl_remarks' => $_POST['rpl_remarks'],

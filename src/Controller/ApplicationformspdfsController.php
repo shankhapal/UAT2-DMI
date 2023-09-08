@@ -2694,10 +2694,7 @@ class ApplicationformspdfsController extends AppController{
 		}elseif($appl_type == 11 && $pdf_for == 'Bianually Grading'){ // condition added by shankhpal for BGR module on 05/09/2023
 			$pdf = new TCPDF('L', PDF_UNIT, 'LEGAL', true, 'UTF-8', false);
 		}
-		else{
-			$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-		}
-		
+	
 		 
 			// set default monospaced font
 		//	$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
@@ -4831,17 +4828,17 @@ class ApplicationformspdfsController extends AppController{
 				
 				$this->set('progressive_revenue',$progressive_revenue);
 		
-				$query = $this->DmiBgrCommodityReportsAddmore->find();
-				$query->select(['replicacharges' => $query->func()->sum('replicacharges')]);
-				$query->where(['customer_id'=>$customer_id,'delete_status IS' => null]);
+				$bgrAddedTableRecords = $CustomersController->Customfunctions->bgrAddedTableRecords($customer_id);
+				$totalReplicaCharges = 0;
 
-				$result = $query->first();
-				
-				$totalReplicaCharges = $result['replicacharges'];
+				foreach ($bgrAddedTableRecords as $record) {
+					// Check if the 'replicacharges' field is set and not empty
+					if (isset($record->replicacharges) && !empty($record->replicacharges)) {
+							$totalReplicaCharges += $record->replicacharges;
+					}
+				}
+
 				$this->set('totalReplicaCharges',$totalReplicaCharges);
-	
-				
-	
 				$this->generateApplicationPdf('/Applicationformspdfs/applPdfBgr');	
 			}
 

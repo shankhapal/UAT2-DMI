@@ -83,12 +83,13 @@ $(document).ready(function () {
     const reportDateInput = document.getElementById("report_date");
     const remarksInput = document.getElementById("remarks");
     const laboratorynameInput = document.getElementById("laboratory_name");
-
+    const rpl_reportno = document.getElementsByClassName("rpl_reportno");
     if (labNablAccreditedInput === "" || labNablAccreditedInput === null) {
       reportNoInput.style.display = "none";
       reportDateInput.style.display = "none";
       remarksInput.style.display = "none";
       laboratorynameInput.style.display = "none";
+      rpl_reportno.style.display = "none";
     } else {
       reportNoInput.style.display = "block"; // Or "initial" depending on your CSS
       reportDateInput.style.display = "block"; // Or "initial" depending on your CSS

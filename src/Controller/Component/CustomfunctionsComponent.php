@@ -4471,15 +4471,19 @@ class CustomfunctionsComponent extends Component {
 			$startMonthYear = $dates[0];
 			$endMonthYear = $dates[1];
 
-			$currentPeriodRecord = $DmiBgrCommodityReportsAddmore->find('all',array(
-			'conditions'=>array(
-				'customer_id' => $customer_id,
-				'delete_status IS NULL', // Records where delete_status is NULL
-				'period_from'=>$startMonthYear,
-				'period_to'=>$endMonthYear,
-			)))->toArray();
+			$subquery = $DmiBgrCommodityReportsAddmore->find()
+				->select(['id'])
+				->distinct(['commodity', 'lotno'])
+				->where([
+						'customer_id' => $customer_id,
+						'delete_status IS NULL',
+						'period_from' => $startMonthYear,
+						'period_to' => $endMonthYear,
+				]);
 
-		
+			$currentPeriodRecord = $DmiBgrCommodityReportsAddmore->find()
+				->where(['id IN' => $subquery])
+				->toArray();
 		}
 
 		return $currentPeriodRecord;

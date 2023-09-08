@@ -3239,12 +3239,13 @@ class OthermodulesController extends AppController{
 
 	//This function are written by shankhpal shende on 07/09/2023
 	// for biannually grading report
-	public function listOfBgrReport($appl_type_id){
-
+	public function listOfBgrReport(){
+		
 		$this->loadModel('DmiBgrGrantCertificatePdfs');
 		$this->loadModel('DmiFirms');
 		$fetch_all_granted_pdf = $this->DmiBgrGrantCertificatePdfs->find('all',array('fields'=>array('customer_id','id','pdf_file','created','pdf_version','user_email_id'),'order'=>'id DESC'))->toArray();
 			
+		
 		
 		if(!empty($fetch_all_granted_pdf)){
 
@@ -3252,11 +3253,17 @@ class OthermodulesController extends AppController{
 			$i=0;
 			foreach ($fetch_all_granted_pdf as $eachrecord) {
 				
-
-				$customer_id = $eachrecord['customer_id'];
-				$form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
 				
-				$report_form = '../../application/application-for-certificate/'.$appl_type_id;
+				$customer_id = $eachrecord['customer_id'];
+
+				$firm_details = $this->DmiFirms->firmDetails($customer_id);
+				$firm_name = $firm_details['firm_name'];					
+				$firm_table_id = $firm_details['id'];
+
+				$form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
+				$appl_type_id = 11;
+				$report_form = '../scrutiny/form_scrutiny_fetch_id/'.$firm_table_id.'/view/'.$appl_type_id;
+
 				$split_customer_id = explode('/',(string) $customer_id); #For Deprecations
 				if($split_customer_id[1] == 1){
 					$cert_type = 'CA';

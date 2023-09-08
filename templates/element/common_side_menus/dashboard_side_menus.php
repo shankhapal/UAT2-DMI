@@ -319,7 +319,7 @@
 										</li>
 										<!-- For Biannually Grading Report added by shankhpal shende on 07/09/2023 -->
 										<li class="nav-item"> 
-											<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/list_of_bgr_report/11" class="bg-cyan nav-link">
+											<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/list_of_bgr_report" class="bg-cyan nav-link">
 												<i class="far fa-dot-circle nav-icon"></i>
 												<p class="nav-icon-p"><b>Biannually Grading Report</b></p>
 											</a>

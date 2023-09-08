@@ -434,7 +434,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                   echo $this->Form->text('rpl_displayed_lab', array(
                                       'id' => 'rpl_displayed_lab_'.$j,
                                       'value' => $laboratory_name,
-                                      'class' => 'form-control',
+                                      'class' => 'form-control rpl_displayed_lab',
                                       'readonly' => true
                                   ));
 
@@ -448,7 +448,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'id'=>'rpl_reportno_'. $j,
                                     'label'=>false,
                                     'value'=>$eachrow1['reportno'],
-                                    'class'=>'form-control wd120'
+                                    'class'=>'form-control wd120 rpl_reportno'
                                   )); ?>
                                  <span id="error-rpl_reportno_<?php echo $j; ?>"></span>
                             </td>
@@ -459,7 +459,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'id'=>'rpl_reportdate_'. $j,
                                     'label'=>false,
                                     'value'=>$eachrow1['reportdate'],
-                                    'class'=>'form-control wd120'
+                                    'class'=>'form-control wd120 rpl_reportdate'
                                   )); ?>
                                 <span id="error-rpl_reportdate_<?php echo $j; ?>"></span>
                               </td>
@@ -470,7 +470,7 @@ $class1 = INPUT_FIELD_CLASSES;?>
                                     'id'=>'rpl_remarks_'. $j,
                                     'label'=>false,
                                     'value'=>$eachrow1['remarks'],
-                                    'class'=>'form-control wd120'
+                                    'class'=>'form-control wd120 rpl_remarks'
                                   )); ?>
                                    <span id="error-rpl_remarks_<?php echo $j; ?>"></span>
                                  

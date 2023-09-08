@@ -23,7 +23,7 @@ use Cake\Datasource\ConnectionManager;
 				
 </style>
 
-	<table width="50%" border="1">
+	<table width="100%" border="1">
 		<tr>
 		<td align="center" style="padding:5px;">
 			<h4>Application Bianually Grading returns of: <?php echo $_SESSION['financialYear']; ?></h4>
@@ -216,7 +216,7 @@ use Cake\Datasource\ConnectionManager;
 </table>
 <table width="100%" border="1">
 			<tr>
-			<td align="right" style="padding:5px;"><h5>Total Replica Charges (Rs.): <?php echo $totalReplicaCharges;?></h5></td>
+			<td  align="right" style="padding:5px;"><h5>Total Replica Charges (Rs.): <?php echo $totalReplicaCharges;?></h5></td>
 			</tr>
 	</table>
 
